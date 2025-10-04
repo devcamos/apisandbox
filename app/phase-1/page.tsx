@@ -36,6 +36,49 @@ export default function Phase1() {
             ]}
             color="from-blue-500 to-cyan-500"
             demoLink="/phase-1/categories#rest"
+            documentation={{
+              overview: "REST (Representational State Transfer) is an architectural style for designing networked applications. It uses HTTP protocols and standard methods to create, read, update, and delete resources. REST APIs are stateless, meaning each request contains all information needed to process it.",
+              description: [
+                "Resources are identified by URLs (e.g., /users/123)",
+                "Uses standard HTTP methods: GET (read), POST (create), PUT (update), DELETE (remove)",
+                "Stateless - server doesn't store client context between requests",
+                "Responses typically in JSON or XML format",
+                "Cacheable responses improve performance",
+                "Layered system architecture for scalability"
+              ],
+              useCases: [
+                "Public APIs for web and mobile apps",
+                "CRUD operations on database resources",
+                "Microservices communication",
+                "Third-party integrations (Stripe, Twilio)",
+                "Content management systems",
+                "E-commerce platforms"
+              ],
+              paretoKnowledge: {
+                title: "The 20% You Need to Know",
+                points: [
+                  "Master GET, POST, PUT, DELETE - these cover 95% of operations",
+                  "Understand status codes: 200 (OK), 201 (Created), 400 (Bad Request), 404 (Not Found), 500 (Server Error)",
+                  "Use nouns for endpoints (/users not /getUsers) and HTTP methods for actions",
+                  "Always return appropriate status codes and consistent JSON structures",
+                  "Implement pagination for large datasets (limit, offset or cursor-based)"
+                ]
+              },
+              bestFor: [
+                "Public-facing APIs with broad client support",
+                "Simple CRUD operations",
+                "Cacheable data and idempotent operations",
+                "When HTTP infrastructure is already in place",
+                "Stateless operations"
+              ],
+              notIdealFor: [
+                "Real-time bidirectional communication (use WebSockets)",
+                "Complex queries with nested data (consider GraphQL)",
+                "High-performance internal microservices (consider gRPC)",
+                "Operations requiring streaming data",
+                "When you need strong typing guarantees"
+              ]
+            }}
           />
           <ConceptCard
             icon={GitBranch}
@@ -49,6 +92,49 @@ export default function Phase1() {
             ]}
             color="from-purple-500 to-pink-500"
             demoLink="/phase-1/categories#graphql"
+            documentation={{
+              overview: "GraphQL is a query language and runtime for APIs that enables clients to request exactly the data they need. Unlike REST, which has multiple endpoints, GraphQL uses a single endpoint with a powerful query syntax to fetch nested and related data in one request.",
+              description: [
+                "Single endpoint for all operations (/graphql)",
+                "Clients specify exact data requirements in queries",
+                "Strong type system with schema definition",
+                "No over-fetching or under-fetching of data",
+                "Real-time capabilities through subscriptions",
+                "Built-in introspection for API exploration"
+              ],
+              useCases: [
+                "Mobile apps with limited bandwidth",
+                "Complex UIs requiring data from multiple sources",
+                "Dashboards with customizable data views",
+                "Applications with frequently changing data requirements",
+                "APIs consumed by multiple different clients",
+                "Real-time collaboration tools"
+              ],
+              paretoKnowledge: {
+                title: "The 20% You Need to Know",
+                points: [
+                  "Master Queries (read), Mutations (write), and Subscriptions (real-time)",
+                  "Understand schema definition language (SDL) for types, fields, and relationships",
+                  "Know how to use variables and fragments to avoid repetitive queries",
+                  "Implement proper error handling - GraphQL always returns 200, check errors field",
+                  "Use DataLoader pattern to prevent N+1 query problems"
+                ]
+              },
+              bestFor: [
+                "Mobile applications where bandwidth matters",
+                "Complex data requirements with nested relationships",
+                "APIs with many different client types",
+                "When clients need flexibility in data fetching",
+                "Applications requiring real-time updates"
+              ],
+              notIdealFor: [
+                "Simple CRUD operations (REST is simpler)",
+                "File uploads and binary data",
+                "Caching scenarios (more complex than REST)",
+                "When HTTP caching is critical",
+                "Teams unfamiliar with GraphQL paradigm"
+              ]
+            }}
           />
           <ConceptCard
             icon={Zap}
@@ -62,6 +148,49 @@ export default function Phase1() {
             ]}
             color="from-orange-500 to-red-500"
             demoLink="/phase-1/categories#grpc"
+            documentation={{
+              overview: "gRPC (Google Remote Procedure Call) is a high-performance, language-agnostic RPC framework that uses Protocol Buffers for serialization and HTTP/2 for transport. It's designed for efficient communication between microservices.",
+              description: [
+                "Binary serialization with Protocol Buffers (10x smaller than JSON)",
+                "HTTP/2 transport for multiplexing and streaming",
+                "Bi-directional streaming support",
+                "Strong typing enforced by .proto files",
+                "Automatic client and server code generation",
+                "Built-in authentication, load balancing, and health checking"
+              ],
+              useCases: [
+                "High-performance internal microservices",
+                "Real-time streaming applications",
+                "IoT devices with limited resources",
+                "Low-latency distributed systems",
+                "Polyglot microservice architectures",
+                "Mobile clients communicating with backends"
+              ],
+              paretoKnowledge: {
+                title: "The 20% You Need to Know",
+                points: [
+                  "Learn Protocol Buffer syntax - it's simpler than you think",
+                  "Understand 4 types of RPCs: Unary, Server Streaming, Client Streaming, Bidirectional",
+                  "Use code generation tools to create type-safe clients/servers",
+                  "Implement proper error handling with gRPC status codes",
+                  "Add deadlines/timeouts to all requests to prevent hanging"
+                ]
+              },
+              bestFor: [
+                "Internal microservice communication",
+                "High-throughput, low-latency requirements",
+                "Streaming data in both directions",
+                "Strong typing and code generation",
+                "Polyglot systems (multiple languages)"
+              ],
+              notIdealFor: [
+                "Browser-based applications (limited support)",
+                "Public-facing APIs (REST is more standard)",
+                "When HTTP caching is important",
+                "Small, simple services (overhead not worth it)",
+                "Teams unfamiliar with binary protocols"
+              ]
+            }}
           />
           <ConceptCard
             icon={RefreshCw}
@@ -75,6 +204,49 @@ export default function Phase1() {
             ]}
             color="from-green-500 to-emerald-500"
             demoLink="/phase-1/categories#websocket"
+            documentation={{
+              overview: "WebSocket is a protocol providing full-duplex communication channels over a single TCP connection. Unlike HTTP's request-response model, WebSocket enables real-time, bidirectional communication between client and server.",
+              description: [
+                "Persistent connection after initial handshake",
+                "Bidirectional communication (client and server can both initiate)",
+                "Low latency - no HTTP overhead for each message",
+                "Works over standard HTTP ports (80/443)",
+                "Protocol upgrade from HTTP to WebSocket",
+                "Event-driven programming model"
+              ],
+              useCases: [
+                "Chat applications and messaging platforms",
+                "Live sports scores and financial tickers",
+                "Real-time collaboration tools (Google Docs)",
+                "Online gaming and multiplayer experiences",
+                "Live notifications and alerts",
+                "IoT dashboards with sensor data"
+              ],
+              paretoKnowledge: {
+                title: "The 20% You Need to Know",
+                points: [
+                  "Understand connection lifecycle: open, message, close, error events",
+                  "Implement reconnection logic with exponential backoff",
+                  "Use heartbeat/ping-pong to detect dead connections",
+                  "Handle connection failures gracefully and queue messages",
+                  "Consider using Socket.io or similar libraries for easier implementation"
+                ]
+              },
+              bestFor: [
+                "Real-time bidirectional communication",
+                "High-frequency updates (100+ per second)",
+                "Low latency requirements",
+                "Server-initiated updates to clients",
+                "Persistent connection scenarios"
+              ],
+              notIdealFor: [
+                "Simple request-response operations (use REST)",
+                "When you need HTTP caching",
+                "One-way communication (consider Server-Sent Events)",
+                "RESTful CRUD operations",
+                "When scalability of connections is a concern"
+              ]
+            }}
           />
           <ConceptCard
             icon={Database}
@@ -88,6 +260,49 @@ export default function Phase1() {
             ]}
             color="from-yellow-500 to-amber-500"
             demoLink="/phase-1/categories#event-driven"
+            documentation={{
+              overview: "Event-Driven Architecture is a design pattern where services communicate through events - significant changes in state. Services publish events to message brokers, and interested services subscribe to these events, enabling loose coupling and asynchronous processing.",
+              description: [
+                "Asynchronous communication through event streams",
+                "Publishers don't know about subscribers (loose coupling)",
+                "Message brokers (Kafka, RabbitMQ, SQS) handle delivery",
+                "Events represent state changes (user.created, order.placed)",
+                "Support for replay and event sourcing",
+                "At-least-once or exactly-once delivery guarantees"
+              ],
+              useCases: [
+                "Microservices requiring loose coupling",
+                "Event sourcing and CQRS implementations",
+                "Real-time data pipelines and streaming",
+                "Audit logs and compliance tracking",
+                "Async workflows (order processing, notifications)",
+                "Distributed transactions with saga pattern"
+              ],
+              paretoKnowledge: {
+                title: "The 20% You Need to Know",
+                points: [
+                  "Design events as immutable facts about what happened (past tense)",
+                  "Make consumers idempotent - assume duplicate messages will arrive",
+                  "Use topics/exchanges to categorize events logically",
+                  "Implement dead-letter queues for failed message processing",
+                  "Monitor consumer lag - falling behind indicates scaling issues"
+                ]
+              },
+              bestFor: [
+                "Microservices needing loose coupling",
+                "Scalable, async processing workflows",
+                "Event sourcing and audit requirements",
+                "Fan-out scenarios (one event, many consumers)",
+                "When eventual consistency is acceptable"
+              ],
+              notIdealFor: [
+                "Immediate response required (use sync APIs)",
+                "Simple request-response patterns",
+                "Strong consistency requirements",
+                "When debugging needs to be straightforward",
+                "Small applications with few services"
+              ]
+            }}
           />
         </div>
       </section>
