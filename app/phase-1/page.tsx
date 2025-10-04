@@ -22,15 +22,7 @@ export default function Phase1() {
 
       {/* API Categories */}
       <section className="mb-12">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-3xl font-bold text-white">API Categories</h2>
-          <a 
-            href="/phase-1/categories"
-            className="px-6 py-2 bg-gradient-to-r from-blue-500 to-cyan-500 text-white rounded-lg font-semibold hover:shadow-lg hover:scale-105 transition-all"
-          >
-            🎮 Try Interactive Demos
-          </a>
-        </div>
+        <h2 className="text-3xl font-bold text-white mb-6">API Categories</h2>
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           <ConceptCard
             icon={Network}
@@ -43,6 +35,7 @@ export default function Phase1() {
               "Wide adoption and tooling support"
             ]}
             color="from-blue-500 to-cyan-500"
+            demoLink="/phase-1/categories#rest"
           />
           <ConceptCard
             icon={GitBranch}
@@ -55,6 +48,7 @@ export default function Phase1() {
               "Real-time updates with subscriptions"
             ]}
             color="from-purple-500 to-pink-500"
+            demoLink="/phase-1/categories#graphql"
           />
           <ConceptCard
             icon={Zap}
@@ -67,6 +61,7 @@ export default function Phase1() {
               "Ideal for microservices"
             ]}
             color="from-orange-500 to-red-500"
+            demoLink="/phase-1/categories#grpc"
           />
           <ConceptCard
             icon={RefreshCw}
@@ -79,6 +74,7 @@ export default function Phase1() {
               "Perfect for chat and live updates"
             ]}
             color="from-green-500 to-emerald-500"
+            demoLink="/phase-1/categories#websocket"
           />
           <ConceptCard
             icon={Database}
@@ -91,6 +87,7 @@ export default function Phase1() {
               "Event sourcing patterns"
             ]}
             color="from-yellow-500 to-amber-500"
+            demoLink="/phase-1/categories#event-driven"
           />
         </div>
       </section>

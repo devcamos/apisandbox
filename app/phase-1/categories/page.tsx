@@ -404,75 +404,85 @@ await consumer.run({
       <section className="mb-12">
         <h2 className="text-3xl font-bold text-white mb-6">API Categories - Click to Explore</h2>
         <div className="space-y-6">
-          <InteractiveCategory
-            icon={Network}
-            title="REST"
-            description="Resource-oriented architecture using HTTP methods"
-            items={[
-              "Stateless communication",
-              "Standard HTTP methods (GET, POST, PUT, DELETE)",
-              "JSON/XML response formats",
-              "Wide adoption and tooling support"
-            ]}
-            color="from-blue-500 to-cyan-500"
-            demoContent={restDemo}
-          />
+          <div id="rest" className="scroll-mt-24">
+            <InteractiveCategory
+              icon={Network}
+              title="REST"
+              description="Resource-oriented architecture using HTTP methods"
+              items={[
+                "Stateless communication",
+                "Standard HTTP methods (GET, POST, PUT, DELETE)",
+                "JSON/XML response formats",
+                "Wide adoption and tooling support"
+              ]}
+              color="from-blue-500 to-cyan-500"
+              demoContent={restDemo}
+            />
+          </div>
 
-          <InteractiveCategory
-            icon={GitBranch}
-            title="GraphQL"
-            description="Query language for APIs with flexible data fetching"
-            items={[
-              "Request exactly what you need",
-              "Single endpoint for all operations",
-              "Strong typing system",
-              "Real-time updates with subscriptions"
-            ]}
-            color="from-purple-500 to-pink-500"
-            demoContent={graphqlDemo}
-          />
+          <div id="graphql" className="scroll-mt-24">
+            <InteractiveCategory
+              icon={GitBranch}
+              title="GraphQL"
+              description="Query language for APIs with flexible data fetching"
+              items={[
+                "Request exactly what you need",
+                "Single endpoint for all operations",
+                "Strong typing system",
+                "Real-time updates with subscriptions"
+              ]}
+              color="from-purple-500 to-pink-500"
+              demoContent={graphqlDemo}
+            />
+          </div>
 
-          <InteractiveCategory
-            icon={Zap}
-            title="gRPC"
-            description="High-performance RPC framework using Protocol Buffers"
-            items={[
-              "Binary protocol for efficiency",
-              "Bi-directional streaming",
-              "Strong typing with protobuf",
-              "Ideal for microservices"
-            ]}
-            color="from-orange-500 to-red-500"
-            demoContent={grpcDemo}
-          />
+          <div id="grpc" className="scroll-mt-24">
+            <InteractiveCategory
+              icon={Zap}
+              title="gRPC"
+              description="High-performance RPC framework using Protocol Buffers"
+              items={[
+                "Binary protocol for efficiency",
+                "Bi-directional streaming",
+                "Strong typing with protobuf",
+                "Ideal for microservices"
+              ]}
+              color="from-orange-500 to-red-500"
+              demoContent={grpcDemo}
+            />
+          </div>
 
-          <InteractiveCategory
-            icon={RefreshCw}
-            title="WebSocket"
-            description="Full-duplex communication for real-time applications"
-            items={[
-              "Persistent connection",
-              "Low latency messaging",
-              "Server push capabilities",
-              "Perfect for chat and live updates"
-            ]}
-            color="from-green-500 to-emerald-500"
-            demoContent={websocketDemo}
-          />
+          <div id="websocket" className="scroll-mt-24">
+            <InteractiveCategory
+              icon={RefreshCw}
+              title="WebSocket"
+              description="Full-duplex communication for real-time applications"
+              items={[
+                "Persistent connection",
+                "Low latency messaging",
+                "Server push capabilities",
+                "Perfect for chat and live updates"
+              ]}
+              color="from-green-500 to-emerald-500"
+              demoContent={websocketDemo}
+            />
+          </div>
 
-          <InteractiveCategory
-            icon={Database}
-            title="Event-Driven"
-            description="Asynchronous messaging using event streams"
-            items={[
-              "Loose coupling between services",
-              "Scalable event processing",
-              "Message brokers (Kafka, RabbitMQ)",
-              "Event sourcing patterns"
-            ]}
-            color="from-yellow-500 to-amber-500"
-            demoContent={eventDrivenDemo}
-          />
+          <div id="event-driven" className="scroll-mt-24">
+            <InteractiveCategory
+              icon={Database}
+              title="Event-Driven"
+              description="Asynchronous messaging using event streams"
+              items={[
+                "Loose coupling between services",
+                "Scalable event processing",
+                "Message brokers (Kafka, RabbitMQ)",
+                "Event sourcing patterns"
+              ]}
+              color="from-yellow-500 to-amber-500"
+              demoContent={eventDrivenDemo}
+            />
+          </div>
         </div>
       </section>
 
