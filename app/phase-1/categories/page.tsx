@@ -83,7 +83,7 @@ Accept: application/json
       <div className="mt-6 p-4 bg-blue-500/10 border border-blue-500/20 rounded-lg">
         <p className="text-gray-300 text-sm">
           <span className="font-semibold text-blue-400">💡 Tip:</span> These are live API calls to JSONPlaceholder (a free test API). 
-          Click "Try API" on any endpoint to see real responses!
+          Click &ldquo;Try API&rdquo; on any endpoint to see real responses!
         </p>
       </div>
     </div>
@@ -336,7 +336,7 @@ stream.on('data', (user) => {
           </div>
         </div>
         <p className="text-gray-300 text-sm">
-          Events are processed asynchronously - publishers don't wait for consumers!
+          Events are processed asynchronously - publishers don&apos;t wait for consumers!
         </p>
       </div>
     </div>
