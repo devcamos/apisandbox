@@ -1,3 +1,5 @@
+"use client";
+
 import PhaseLayout from "@/components/PhaseLayout";
 import ConceptCard from "@/components/ConceptCard";
 import ProjectCard from "@/components/ProjectCard";
