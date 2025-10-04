@@ -417,6 +417,17 @@ await consumer.run({
       icon={Brain}
       color="from-blue-500 to-cyan-500"
     >
+      {/* Back Button */}
+      <div className="mb-8">
+        <a 
+          href="/phase-1"
+          className="inline-flex items-center gap-2 px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-lg font-semibold transition-all border border-slate-700 hover:border-slate-600"
+        >
+          <span className="text-lg">←</span>
+          Back to Phase 1 Overview
+        </a>
+      </div>
+
       {/* Goal Section */}
       <div className="bg-blue-500/10 border border-blue-500/20 rounded-xl p-6 mb-12">
         <h2 className="text-2xl font-bold text-white mb-3">🎯 Interactive Learning</h2>
@@ -512,13 +523,14 @@ await consumer.run({
         </div>
       </section>
 
-      {/* Back Button */}
-      <div className="text-center">
+      {/* Back Button Bottom */}
+      <div className="text-center mt-12">
         <a 
           href="/phase-1"
-          className="inline-block px-8 py-3 bg-slate-700 hover:bg-slate-600 text-white rounded-lg font-semibold transition-all"
+          className="inline-flex items-center gap-2 px-8 py-3 bg-slate-800 hover:bg-slate-700 text-white rounded-lg font-semibold transition-all border border-slate-700 hover:border-slate-600"
         >
-          ← Back to Phase 1 Overview
+          <span className="text-lg">←</span>
+          Back to Phase 1 Overview
         </a>
       </div>
     </PhaseLayout>
