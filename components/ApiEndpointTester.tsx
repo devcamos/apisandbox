@@ -25,7 +25,7 @@ export default function ApiEndpointTester({
   const [isResponseExpanded, setIsResponseExpanded] = useState(true);
   const [responseTime, setResponseTime] = useState<number | null>(null);
   const [copied, setCopied] = useState(false);
-  const [showHeaders, setShowHeaders] = useState(false);
+  const [isHeadersExpanded, setIsHeadersExpanded] = useState(false);
   const [headers, setHeaders] = useState<Record<string, string>>({
     "Content-Type": "application/json",
     "Accept": "application/json"
@@ -128,13 +128,6 @@ export default function ApiEndpointTester({
         </div>
         <div className="flex items-center gap-2">
           <button
-            onClick={() => setShowHeaders(!showHeaders)}
-            className="p-2 text-gray-400 hover:text-white hover:bg-slate-800 rounded-lg transition-all"
-            title="Configure headers"
-          >
-            <Settings className="w-4 h-4" />
-          </button>
-          <button
             onClick={handleTryApi}
             disabled={loading}
             className={`px-4 py-2 ${buttonColors[method]} text-white rounded-lg font-semibold transition-all flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed`}
@@ -156,21 +149,37 @@ export default function ApiEndpointTester({
 
       <p className="text-gray-400 text-xs mb-3">{description}</p>
 
-      {showHeaders && (
-        <div className="mb-3 p-3 bg-slate-800 rounded-lg border border-slate-700 animate-slideDown">
-          <div className="flex items-center justify-between mb-2">
-            <label className="text-gray-400 text-xs font-semibold">Request Headers:</label>
+      {/* Request Headers - Always visible, collapseable */}
+      <div className="mb-3 bg-slate-800 rounded-lg border border-slate-700">
+        <div className="p-3 flex items-center justify-between border-b border-slate-700">
+          <button
+            onClick={() => setIsHeadersExpanded(!isHeadersExpanded)}
+            className="flex items-center gap-2 hover:opacity-80 transition-opacity"
+          >
+            <Settings className="w-4 h-4 text-gray-400" />
+            <span className="text-gray-400 text-xs font-semibold">
+              Request Headers ({Object.keys(headers).length})
+            </span>
+            {isHeadersExpanded ? (
+              <ChevronUp className="w-4 h-4 text-gray-400" />
+            ) : (
+              <ChevronDown className="w-4 h-4 text-gray-400" />
+            )}
+          </button>
+          {isHeadersExpanded && (
             <button
               onClick={addHeader}
               className="text-xs text-blue-400 hover:text-blue-300 transition-colors"
             >
               + Add Header
             </button>
-          </div>
-          <div className="space-y-2">
+          )}
+        </div>
+        {isHeadersExpanded && (
+          <div className="p-3 space-y-2 animate-slideDown">
             {Object.entries(headers).map(([key, value]) => (
               <div key={key} className="flex items-center gap-2 text-xs">
-                <span className="text-gray-400 font-mono">{key}:</span>
+                <span className="text-gray-400 font-mono w-32 flex-shrink-0">{key}:</span>
                 <input
                   type="text"
                   value={value}
@@ -180,14 +189,15 @@ export default function ApiEndpointTester({
                 <button
                   onClick={() => removeHeader(key)}
                   className="text-red-400 hover:text-red-300 transition-colors px-2"
+                  title="Remove header"
                 >
                   ×
                 </button>
               </div>
             ))}
           </div>
-        </div>
-      )}
+        )}
+      </div>
 
       {(method === "POST" || method === "PUT") && (
         <div className="mb-3">
