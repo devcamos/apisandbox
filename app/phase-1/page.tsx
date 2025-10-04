@@ -436,7 +436,7 @@ channels:
             <h3 className="text-2xl font-bold text-white mb-4">🔗 Loose Coupling</h3>
             <p className="text-gray-300 mb-4">
               Services should be independent and interact through well-defined interfaces. 
-              Changes in one service shouldn't require changes in others.
+              Changes in one service shouldn&apos;t require changes in others.
             </p>
             <div className="grid md:grid-cols-2 gap-4 text-sm">
               <div className="bg-slate-800/50 p-4 rounded-lg">
@@ -468,7 +468,7 @@ POST /orders { "item": "widget" }`}</pre>
           <div className="bg-gradient-to-r from-orange-500/10 to-red-500/10 border border-orange-500/20 rounded-xl p-8">
             <h3 className="text-2xl font-bold text-white mb-4">⏱️ Eventual Consistency</h3>
             <p className="text-gray-300 mb-4">
-              In distributed systems, data doesn't need to be immediately consistent across all nodes.
+              In distributed systems, data doesn&apos;t need to be immediately consistent across all nodes.
               Systems converge to consistency over time.
             </p>
             <div className="grid md:grid-cols-3 gap-4 text-sm mt-4">
