@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Play, Loader2, CheckCircle, XCircle } from "lucide-react";
+import { Play, Loader2, CheckCircle, XCircle, ChevronDown, ChevronUp } from "lucide-react";
 
 interface ApiEndpointTesterProps {
   method: "GET" | "POST" | "PUT" | "DELETE";
@@ -22,6 +22,7 @@ export default function ApiEndpointTester({
   const [response, setResponse] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
   const [requestBody, setRequestBody] = useState(defaultBody || "");
+  const [isResponseExpanded, setIsResponseExpanded] = useState(true);
 
   const methodColors = {
     GET: "text-green-400 border-green-500/30 bg-green-500/10",
@@ -119,16 +120,30 @@ export default function ApiEndpointTester({
       )}
 
       {response && (
-        <div className="mt-3 p-3 bg-slate-800 rounded-lg border border-green-500/30">
-          <div className="flex items-center gap-2 mb-2">
-            <CheckCircle className="w-4 h-4 text-green-400" />
-            <span className="text-green-400 text-xs font-semibold">
-              Response: {response.status} {response.statusText}
-            </span>
-          </div>
-          <pre className="text-gray-300 text-xs overflow-x-auto">
-            {JSON.stringify(response.data, null, 2)}
-          </pre>
+        <div className="mt-3 bg-slate-800 rounded-lg border border-green-500/30">
+          <button
+            onClick={() => setIsResponseExpanded(!isResponseExpanded)}
+            className="w-full p-3 flex items-center justify-between hover:bg-slate-700/50 transition-colors rounded-t-lg"
+          >
+            <div className="flex items-center gap-2">
+              <CheckCircle className="w-4 h-4 text-green-400" />
+              <span className="text-green-400 text-xs font-semibold">
+                Response: {response.status} {response.statusText}
+              </span>
+            </div>
+            {isResponseExpanded ? (
+              <ChevronUp className="w-4 h-4 text-gray-400" />
+            ) : (
+              <ChevronDown className="w-4 h-4 text-gray-400" />
+            )}
+          </button>
+          {isResponseExpanded && (
+            <div className="p-3 pt-0 border-t border-green-500/20 animate-slideDown">
+              <pre className="text-gray-300 text-xs overflow-x-auto max-h-96 overflow-y-auto">
+                {JSON.stringify(response.data, null, 2)}
+              </pre>
+            </div>
+          )}
         </div>
       )}
 
