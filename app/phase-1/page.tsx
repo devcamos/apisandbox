@@ -1,3 +1,5 @@
+"use client";
+
 import PhaseLayout from "@/components/PhaseLayout";
 import ConceptCard from "@/components/ConceptCard";
 import { Brain, Network, GitBranch, Zap, RefreshCw, Database } from "lucide-react";
