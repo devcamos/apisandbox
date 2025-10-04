@@ -3,6 +3,7 @@
 import PhaseLayout from "@/components/PhaseLayout";
 import InteractiveCategory from "@/components/InteractiveCategory";
 import ApiEndpointTester from "@/components/ApiEndpointTester";
+import GraphQLTester from "@/components/GraphQLTester";
 import { Brain, Network, GitBranch, Zap, RefreshCw, Database } from "lucide-react";
 import { useState } from "react";
 
@@ -91,76 +92,70 @@ Accept: application/json
     <div className="space-y-4">
       <h4 className="text-lg font-bold text-white mb-3">🔍 GraphQL Demo</h4>
       <p className="text-gray-300 mb-4">
-        GraphQL allows clients to request exactly the data they need.
+        GraphQL allows clients to request exactly the data they need. Try these interactive queries!
       </p>
       
-      <div className="grid md:grid-cols-2 gap-4">
-        <div>
-          <h5 className="font-semibold text-white mb-2">Query Example</h5>
-          <div className="bg-slate-900 p-4 rounded-lg font-mono text-xs text-gray-300">
-            <pre>{`query GetUser {
+      <div>
+        <h5 className="font-semibold text-white mb-3">Interactive GraphQL Queries - Try Them Live!</h5>
+        <div className="space-y-3">
+          <GraphQLTester
+            title="Get User with Posts"
+            description="Fetch user data with nested posts in a single query"
+            defaultQuery={`query GetUser {
   user(id: "123") {
     id
     name
     email
     posts {
+      id
       title
       createdAt
     }
   }
-}
-
-// Response
-{
-  "data": {
-    "user": {
-      "id": "123",
-      "name": "John Doe",
-      "email": "john@example.com",
-      "posts": [
-        {
-          "title": "GraphQL Intro",
-          "createdAt": "2024-01-15"
-        }
-      ]
-    }
-  }
-}`}</pre>
-          </div>
-        </div>
-
-        <div>
-          <h5 className="font-semibold text-white mb-2">Mutation Example</h5>
-          <div className="bg-slate-900 p-4 rounded-lg font-mono text-xs text-gray-300">
-            <pre>{`mutation CreatePost {
+}`}
+          />
+          
+          <GraphQLTester
+            title="Create Post Mutation"
+            description="Create a new post and return the result"
+            defaultQuery={`mutation CreatePost {
   createPost(
-    title: "New Post"
-    content: "Content here"
+    title: "Building with GraphQL"
+    content: "GraphQL is amazing!"
+    userId: "123"
   ) {
     id
     title
     author {
+      id
       name
     }
+    createdAt
   }
-}`}</pre>
-          </div>
+}`}
+          />
+
+          <GraphQLTester
+            title="Flexible Query with Variables"
+            description="Query users with dynamic filtering"
+            defaultQuery={`query GetUsers($limit: Int, $offset: Int) {
+  users(limit: $limit, offset: $offset) {
+    id
+    name
+    email
+    postsCount
+  }
+}`}
+          />
         </div>
       </div>
 
-      <div className="bg-purple-500/10 border border-purple-500/20 rounded-lg p-4">
-        <h5 className="font-semibold text-white mb-2">✨ Benefits</h5>
-        <ul className="space-y-1 text-sm text-gray-300">
-          <li>• No over-fetching or under-fetching of data</li>
-          <li>• Single endpoint for all operations</li>
-          <li>• Strong type system and introspection</li>
-          <li>• Real-time subscriptions support</li>
-        </ul>
+      <div className="mt-6 p-4 bg-purple-500/10 border border-purple-500/20 rounded-lg">
+        <p className="text-gray-300 text-sm">
+          <span className="font-semibold text-purple-400">💡 Tip:</span> GraphQL uses a single endpoint (/graphql) for all operations. 
+          Notice how you can request exactly the fields you need - no over-fetching!
+        </p>
       </div>
-
-      <button className="mt-4 px-6 py-3 bg-purple-500 hover:bg-purple-600 text-white rounded-lg font-semibold transition-all w-full">
-        Try GraphQL Playground
-      </button>
     </div>
   );
 
