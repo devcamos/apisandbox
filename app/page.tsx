@@ -1,0 +1,161 @@
+import Link from "next/link";
+import { Brain, Plug, Network, Compass } from "lucide-react";
+
+export default function Home() {
+  const phases = [
+    {
+      id: 1,
+      icon: Brain,
+      title: "Integration Mindset",
+      description: "Understand the 'why' behind integrations",
+      topics: ["REST, GraphQL, gRPC", "OpenAPI & protobuf", "Loose coupling & idempotency"],
+      color: "from-blue-500 to-cyan-500",
+      href: "/phase-1"
+    },
+    {
+      id: 2,
+      icon: Plug,
+      title: "Third-Party Integrations",
+      description: "Safely connect and maintain external APIs",
+      topics: ["OAuth2 & JWTs", "Resilience patterns", "Data transformation"],
+      color: "from-purple-500 to-pink-500",
+      href: "/phase-2"
+    },
+    {
+      id: 3,
+      icon: Network,
+      title: "Inter-Service Communication",
+      description: "Master service-to-service patterns",
+      topics: ["Sync vs async", "Event-driven with Kafka", "Distributed tracing"],
+      color: "from-orange-500 to-red-500",
+      href: "/phase-3"
+    },
+    {
+      id: 4,
+      icon: Compass,
+      title: "Principal-Level Architecture",
+      description: "Think like an integration architect",
+      topics: ["Anti-patterns", "Contract testing", "Legacy integration"],
+      color: "from-green-500 to-emerald-500",
+      href: "/phase-4"
+    }
+  ];
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+      {/* Hero Section */}
+      <section className="relative overflow-hidden">
+        <div className="absolute inset-0 bg-grid-pattern opacity-10"></div>
+        <div className="container mx-auto px-6 py-24 relative z-10">
+          <div className="text-center max-w-4xl mx-auto">
+            <h1 className="text-6xl font-bold mb-6 bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 text-transparent bg-clip-text">
+              API Integration Training
+            </h1>
+            <p className="text-xl text-gray-300 mb-8">
+              Master the art of API integrations from fundamentals to principal-level architecture
+            </p>
+            <div className="flex justify-center gap-4">
+              <Link 
+                href="/phase-1"
+                className="px-8 py-3 bg-gradient-to-r from-blue-500 to-cyan-500 text-white rounded-lg font-semibold hover:shadow-lg hover:scale-105 transition-all"
+              >
+                Start Learning
+              </Link>
+              <a 
+                href="#phases"
+                className="px-8 py-3 border border-gray-600 text-gray-300 rounded-lg font-semibold hover:bg-gray-800 transition-all"
+              >
+                Explore Phases
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Phases Grid */}
+      <section id="phases" className="container mx-auto px-6 py-16">
+        <div className="grid md:grid-cols-2 gap-8">
+          {phases.map((phase) => {
+            const Icon = phase.icon;
+            return (
+              <Link key={phase.id} href={phase.href}>
+                <div className="group bg-slate-800/50 backdrop-blur-sm rounded-2xl p-8 border border-slate-700 hover:border-slate-600 transition-all hover:shadow-2xl hover:scale-105 cursor-pointer">
+                  <div className={`inline-flex p-3 rounded-lg bg-gradient-to-r ${phase.color} mb-4`}>
+                    <Icon className="w-8 h-8 text-white" />
+                  </div>
+                  
+                  <div className="flex items-start justify-between mb-4">
+                    <div>
+                      <div className="text-sm font-semibold text-gray-400 mb-1">
+                        Phase {phase.id}
+                      </div>
+                      <h3 className="text-2xl font-bold text-white mb-2">
+                        {phase.title}
+                      </h3>
+                    </div>
+                  </div>
+                  
+                  <p className="text-gray-400 mb-6">
+                    {phase.description}
+                  </p>
+                  
+                  <div className="space-y-2">
+                    {phase.topics.map((topic, idx) => (
+                      <div key={idx} className="flex items-center text-sm text-gray-300">
+                        <span className={`w-1.5 h-1.5 rounded-full bg-gradient-to-r ${phase.color} mr-2`}></span>
+                        {topic}
+                      </div>
+                    ))}
+                  </div>
+                  
+                  <div className="mt-6 text-blue-400 font-semibold flex items-center group-hover:gap-2 transition-all">
+                    Explore Phase
+                    <span className="ml-2 group-hover:translate-x-1 transition-transform">→</span>
+                  </div>
+                </div>
+              </Link>
+            );
+          })}
+        </div>
+      </section>
+
+      {/* Learning Path */}
+      <section className="container mx-auto px-6 py-16">
+        <div className="bg-gradient-to-r from-slate-800 to-slate-700 rounded-2xl p-12 border border-slate-600">
+          <h2 className="text-3xl font-bold text-white mb-8 text-center">Your Learning Journey</h2>
+          <div className="grid md:grid-cols-4 gap-8">
+            <div className="text-center">
+              <div className="w-16 h-16 bg-blue-500 rounded-full flex items-center justify-center mx-auto mb-4 text-white font-bold text-xl">
+                1
+              </div>
+              <h3 className="font-semibold text-white mb-2">Learn Concepts</h3>
+              <p className="text-gray-400 text-sm">Master core principles and patterns</p>
+            </div>
+            <div className="text-center">
+              <div className="w-16 h-16 bg-purple-500 rounded-full flex items-center justify-center mx-auto mb-4 text-white font-bold text-xl">
+                2
+              </div>
+              <h3 className="font-semibold text-white mb-2">Build Projects</h3>
+              <p className="text-gray-400 text-sm">Apply knowledge through hands-on work</p>
+            </div>
+            <div className="text-center">
+              <div className="w-16 h-16 bg-orange-500 rounded-full flex items-center justify-center mx-auto mb-4 text-white font-bold text-xl">
+                3
+              </div>
+              <h3 className="font-semibold text-white mb-2">Test & Debug</h3>
+              <p className="text-gray-400 text-sm">Practice resilience and error handling</p>
+            </div>
+            <div className="text-center">
+              <div className="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-4 text-white font-bold text-xl">
+                4
+              </div>
+              <h3 className="font-semibold text-white mb-2">Architect</h3>
+              <p className="text-gray-400 text-sm">Design enterprise-level solutions</p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+}
+
