@@ -55,22 +55,22 @@ export default function ConceptCard({
             ))}
           </ul>
         )}
-        <div className="space-y-2 mt-4">
+        <div className="grid grid-cols-2 gap-2 mt-4">
           {documentation && (
             <button
               onClick={() => setShowDocs(true)}
-              className="w-full py-3 bg-slate-700 hover:bg-slate-600 text-white rounded-lg font-semibold transition-all flex items-center justify-center gap-2"
+              className="py-3 bg-slate-700 hover:bg-slate-600 text-white rounded-lg font-semibold transition-all flex items-center justify-center gap-2"
             >
               <BookOpen className="w-4 h-4" />
-              Documentation
+              Docs
             </button>
           )}
           {demoLink && (
             <Link 
               href={demoLink}
-              className={`w-full py-3 bg-gradient-to-r ${color} text-white rounded-lg font-semibold text-center hover:shadow-lg hover:scale-105 transition-all block`}
+              className={`py-3 bg-gradient-to-r ${color} text-white rounded-lg font-semibold text-center hover:shadow-lg hover:scale-105 transition-all flex items-center justify-center gap-2`}
             >
-              🎮 Try Interactive Demo
+              🎮 Try Demo
             </Link>
           )}
         </div>
