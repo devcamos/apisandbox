@@ -412,21 +412,15 @@ await consumer.run({
   return (
     <PhaseLayout
       phaseNumber={1}
-      title="Integration Mindset - Interactive Categories"
+      title="Interactive Categories"
       description="Explore each API category with live demos and examples"
       icon={Brain}
       color="from-blue-500 to-cyan-500"
+      breadcrumbs={[
+        { label: "Home", href: "/" },
+        { label: "Phase 1", href: "/phase-1" },
+      ]}
     >
-      {/* Back Button */}
-      <div className="mb-8">
-        <a 
-          href="/phase-1"
-          className="inline-flex items-center gap-2 px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-lg font-semibold transition-all border border-slate-700 hover:border-slate-600"
-        >
-          <span className="text-lg">←</span>
-          Back to Phase 1 Overview
-        </a>
-      </div>
 
       {/* Goal Section */}
       <div className="bg-blue-500/10 border border-blue-500/20 rounded-xl p-6 mb-12">
@@ -523,16 +517,6 @@ await consumer.run({
         </div>
       </section>
 
-      {/* Back Button Bottom */}
-      <div className="text-center mt-12">
-        <a 
-          href="/phase-1"
-          className="inline-flex items-center gap-2 px-8 py-3 bg-slate-800 hover:bg-slate-700 text-white rounded-lg font-semibold transition-all border border-slate-700 hover:border-slate-600"
-        >
-          <span className="text-lg">←</span>
-          Back to Phase 1 Overview
-        </a>
-      </div>
     </PhaseLayout>
   );
 }
