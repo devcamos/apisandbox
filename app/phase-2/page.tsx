@@ -23,6 +23,55 @@ export default function Phase2() {
         </p>
       </div>
 
+      {/* Pareto Principle Summary */}
+      <div className="bg-gradient-to-br from-yellow-500/10 to-orange-500/10 border-2 border-yellow-500/30 rounded-xl p-6 mb-12">
+        <div className="flex items-start gap-4 mb-4">
+          <div className="p-3 bg-yellow-500/20 rounded-lg">
+            <span className="text-3xl">📊</span>
+          </div>
+          <div>
+            <h2 className="text-2xl font-bold text-white mb-2">Pareto Principle: The 20% That Matters</h2>
+            <p className="text-gray-300 text-sm italic">Master these patterns to handle 80% of third-party integration challenges</p>
+          </div>
+        </div>
+        <div className="grid md:grid-cols-2 gap-4">
+          <div className="bg-slate-800/50 rounded-lg p-4">
+            <h3 className="text-lg font-bold text-yellow-400 mb-3">🔐 Auth Essentials</h3>
+            <ul className="space-y-2 text-sm text-gray-300">
+              <li className="flex items-start gap-2">
+                <span className="text-green-400 font-bold">1.</span>
+                <span><strong>OAuth2 + API Keys</strong> - These two cover 95% of third-party auth needs</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-green-400 font-bold">2.</span>
+                <span><strong>Never hardcode secrets</strong> - Use environment variables or secret managers</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-green-400 font-bold">3.</span>
+                <span><strong>Token refresh logic</strong> - Handle expired tokens gracefully with retry</span>
+              </li>
+            </ul>
+          </div>
+          <div className="bg-slate-800/50 rounded-lg p-4">
+            <h3 className="text-lg font-bold text-yellow-400 mb-3">🛡️ Resilience Patterns</h3>
+            <ul className="space-y-2 text-sm text-gray-300">
+              <li className="flex items-start gap-2">
+                <span className="text-blue-400 font-bold">1.</span>
+                <span><strong>Timeouts</strong> - Set for every external call (typically 5-30 seconds)</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-purple-400 font-bold">2.</span>
+                <span><strong>Retries with exponential backoff</strong> - 3 retries covers most transient failures</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-orange-400 font-bold">3.</span>
+                <span><strong>Circuit breakers</strong> - Stop calling failing services to prevent cascading failures</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
       {/* Auth Flows */}
       <section className="mb-12">
         <h2 className="text-3xl font-bold text-white mb-6">Authentication Flows</h2>

@@ -23,6 +23,55 @@ export default function Phase4() {
         </p>
       </div>
 
+      {/* Pareto Principle Summary */}
+      <div className="bg-gradient-to-br from-yellow-500/10 to-orange-500/10 border-2 border-yellow-500/30 rounded-xl p-6 mb-12">
+        <div className="flex items-start gap-4 mb-4">
+          <div className="p-3 bg-yellow-500/20 rounded-lg">
+            <span className="text-3xl">📊</span>
+          </div>
+          <div>
+            <h2 className="text-2xl font-bold text-white mb-2">Pareto Principle: The 20% That Matters</h2>
+            <p className="text-gray-300 text-sm italic">These architectural decisions prevent 80% of production issues at scale</p>
+          </div>
+        </div>
+        <div className="grid md:grid-cols-2 gap-4">
+          <div className="bg-slate-800/50 rounded-lg p-4">
+            <h3 className="text-lg font-bold text-yellow-400 mb-3">🏗️ Architecture Principles</h3>
+            <ul className="space-y-2 text-sm text-gray-300">
+              <li className="flex items-start gap-2">
+                <span className="text-green-400 font-bold">1.</span>
+                <span><strong>API versioning from day 1</strong> - Use /v1/ prefix, plan for breaking changes</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-green-400 font-bold">2.</span>
+                <span><strong>Rate limiting + caching</strong> - Protect APIs and reduce costs by 80%+</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-green-400 font-bold">3.</span>
+                <span><strong>Idempotency keys</strong> - Prevent duplicate operations (critical for payments)</span>
+              </li>
+            </ul>
+          </div>
+          <div className="bg-slate-800/50 rounded-lg p-4">
+            <h3 className="text-lg font-bold text-yellow-400 mb-3">⚠️ Avoid These Anti-Patterns</h3>
+            <ul className="space-y-2 text-sm text-gray-300">
+              <li className="flex items-start gap-2">
+                <span className="text-red-400 font-bold">1.</span>
+                <span><strong>Chatty APIs</strong> - Batch requests, use GraphQL for complex queries</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-red-400 font-bold">2.</span>
+                <span><strong>No circuit breakers</strong> - One slow service kills everything</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-red-400 font-bold">3.</span>
+                <span><strong>Shared databases</strong> - Services should own their data, communicate via APIs</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
       {/* Anti-Patterns */}
       <section className="mb-12">
         <h2 className="text-3xl font-bold text-white mb-6">⚠️ Anti-Patterns to Avoid</h2>

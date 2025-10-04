@@ -22,6 +22,63 @@ export default function Phase1() {
         </p>
       </div>
 
+      {/* Pareto Principle Summary */}
+      <div className="bg-gradient-to-br from-yellow-500/10 to-orange-500/10 border-2 border-yellow-500/30 rounded-xl p-6 mb-12">
+        <div className="flex items-start gap-4 mb-4">
+          <div className="p-3 bg-yellow-500/20 rounded-lg">
+            <span className="text-3xl">📊</span>
+          </div>
+          <div>
+            <h2 className="text-2xl font-bold text-white mb-2">Pareto Principle: The 20% That Matters</h2>
+            <p className="text-gray-300 text-sm italic">Focus on these core concepts to understand 80% of integration scenarios</p>
+          </div>
+        </div>
+        <div className="grid md:grid-cols-2 gap-4">
+          <div className="bg-slate-800/50 rounded-lg p-4">
+            <h3 className="text-lg font-bold text-yellow-400 mb-3">🎯 Master These First</h3>
+            <ul className="space-y-2 text-sm text-gray-300">
+              <li className="flex items-start gap-2">
+                <span className="text-green-400 font-bold">1.</span>
+                <span><strong>REST for CRUD</strong> - 90% of APIs use REST for basic operations (GET, POST, PUT, DELETE)</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-green-400 font-bold">2.</span>
+                <span><strong>HTTP Status Codes</strong> - Know 200, 201, 400, 404, 500. These cover most scenarios</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-green-400 font-bold">3.</span>
+                <span><strong>JSON Format</strong> - De facto standard for data exchange. Master it first</span>
+              </li>
+            </ul>
+          </div>
+          <div className="bg-slate-800/50 rounded-lg p-4">
+            <h3 className="text-lg font-bold text-yellow-400 mb-3">🧭 Decision Framework</h3>
+            <ul className="space-y-2 text-sm text-gray-300">
+              <li className="flex items-start gap-2">
+                <span className="text-blue-400">→</span>
+                <span><strong>Need real-time bidirectional?</strong> Use WebSocket</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-purple-400">→</span>
+                <span><strong>Complex nested queries?</strong> Use GraphQL</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-orange-400">→</span>
+                <span><strong>High-performance internal?</strong> Use gRPC</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-yellow-400">→</span>
+                <span><strong>Decouple services?</strong> Use Event-Driven</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-green-400">→</span>
+                <span><strong>Everything else?</strong> Start with REST</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
       {/* API Categories */}
       <section className="mb-12">
         <h2 className="text-3xl font-bold text-white mb-6">API Categories</h2>

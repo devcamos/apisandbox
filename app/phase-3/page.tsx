@@ -23,6 +23,55 @@ export default function Phase3() {
         </p>
       </div>
 
+      {/* Pareto Principle Summary */}
+      <div className="bg-gradient-to-br from-yellow-500/10 to-orange-500/10 border-2 border-yellow-500/30 rounded-xl p-6 mb-12">
+        <div className="flex items-start gap-4 mb-4">
+          <div className="p-3 bg-yellow-500/20 rounded-lg">
+            <span className="text-3xl">📊</span>
+          </div>
+          <div>
+            <h2 className="text-2xl font-bold text-white mb-2">Pareto Principle: The 20% That Matters</h2>
+            <p className="text-gray-300 text-sm italic">These patterns solve 80% of microservices communication challenges</p>
+          </div>
+        </div>
+        <div className="grid md:grid-cols-2 gap-4">
+          <div className="bg-slate-800/50 rounded-lg p-4">
+            <h3 className="text-lg font-bold text-yellow-400 mb-3">⚡ Communication Patterns</h3>
+            <ul className="space-y-2 text-sm text-gray-300">
+              <li className="flex items-start gap-2">
+                <span className="text-green-400 font-bold">1.</span>
+                <span><strong>Sync for reads, Async for writes</strong> - Simple rule covers most cases</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-green-400 font-bold">2.</span>
+                <span><strong>Message queues for reliability</strong> - Kafka/RabbitMQ handle 99% of event needs</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-green-400 font-bold">3.</span>
+                <span><strong>API Gateway</strong> - Single entry point simplifies auth, routing, rate limiting</span>
+              </li>
+            </ul>
+          </div>
+          <div className="bg-slate-800/50 rounded-lg p-4">
+            <h3 className="text-lg font-bold text-yellow-400 mb-3">🔍 Observability Essentials</h3>
+            <ul className="space-y-2 text-sm text-gray-300">
+              <li className="flex items-start gap-2">
+                <span className="text-blue-400 font-bold">1.</span>
+                <span><strong>Correlation IDs</strong> - Track requests across services (request-id header)</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-purple-400 font-bold">2.</span>
+                <span><strong>Structured logging</strong> - JSON logs with consistent fields enable debugging</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-orange-400 font-bold">3.</span>
+                <span><strong>Health checks</strong> - /health and /ready endpoints are mandatory</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
       {/* Sync vs Async */}
       <section className="mb-12">
         <h2 className="text-3xl font-bold text-white mb-6">Synchronous vs Asynchronous Communication</h2>
