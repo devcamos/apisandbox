@@ -4,6 +4,8 @@ import PhaseLayout from "@/components/PhaseLayout";
 import InteractiveCategory from "@/components/InteractiveCategory";
 import ApiEndpointTester from "@/components/ApiEndpointTester";
 import GraphQLTester from "@/components/GraphQLTester";
+import WebSocketTester from "@/components/WebSocketTester";
+import EventDrivenTester from "@/components/EventDrivenTester";
 import { Brain, Network, GitBranch, Zap, RefreshCw, Database } from "lucide-react";
 import { useState } from "react";
 
@@ -245,78 +247,44 @@ stream.on('data', (user) => {
     <div className="space-y-4">
       <h4 className="text-lg font-bold text-white mb-3">🔄 WebSocket Demo</h4>
       <p className="text-gray-300 mb-4">
-        Real-time, bi-directional communication between client and server.
+        Real-time, bi-directional communication! Connect and start messaging.
       </p>
       
-      <div className="grid md:grid-cols-2 gap-4">
-        <div>
-          <h5 className="font-semibold text-white mb-2">Client Code</h5>
-          <div className="bg-slate-900 p-4 rounded-lg font-mono text-xs text-gray-300">
-            <pre>{`const ws = new WebSocket(
-  'ws://localhost:8080'
-);
+      <div>
+        <h5 className="font-semibold text-white mb-3">Interactive WebSocket Chat - Try It Live!</h5>
+        <WebSocketTester
+          title="Real-Time Chat Connection"
+          description="Experience bidirectional communication - both client and server can send messages anytime"
+        />
+      </div>
 
-ws.onopen = () => {
-  console.log('Connected!');
-  ws.send(JSON.stringify({
-    type: 'subscribe',
-    channel: 'notifications'
-  }));
-};
-
-ws.onmessage = (event) => {
-  const data = JSON.parse(event.data);
-  console.log('Received:', data);
-};
-
-ws.onclose = () => {
-  console.log('Disconnected');
-};`}</pre>
-          </div>
+      <div className="grid md:grid-cols-2 gap-4 mt-6">
+        <div className="bg-green-500/10 border border-green-500/20 rounded-lg p-4">
+          <h5 className="font-semibold text-white mb-2">✨ Key Features</h5>
+          <ul className="space-y-1 text-sm text-gray-300">
+            <li>• Persistent connection (no reconnecting)</li>
+            <li>• Server can push messages anytime</li>
+            <li>• Low latency (no HTTP overhead)</li>
+            <li>• Perfect for real-time apps</li>
+          </ul>
         </div>
-
-        <div>
-          <h5 className="font-semibold text-white mb-2">Server Code (Node.js)</h5>
-          <div className="bg-slate-900 p-4 rounded-lg font-mono text-xs text-gray-300">
-            <pre>{`const WebSocket = require('ws');
-const wss = new WebSocket.Server({ 
-  port: 8080 
-});
-
-wss.on('connection', (ws) => {
-  console.log('Client connected');
-  
-  ws.on('message', (message) => {
-    const data = JSON.parse(message);
-    // Handle message
-  });
-  
-  // Broadcast to all clients
-  wss.clients.forEach((client) => {
-    client.send(JSON.stringify({
-      type: 'update',
-      data: 'New data'
-    }));
-  });
-});`}</pre>
-          </div>
+        <div className="bg-green-500/10 border border-green-500/20 rounded-lg p-4">
+          <h5 className="font-semibold text-white mb-2">📱 Use Cases</h5>
+          <ul className="space-y-1 text-sm text-gray-300">
+            <li>• Chat and messaging apps</li>
+            <li>• Live sports/stock tickers</li>
+            <li>• Real-time collaboration</li>
+            <li>• Online gaming</li>
+          </ul>
         </div>
       </div>
 
-      <div className="bg-green-500/10 border border-green-500/20 rounded-lg p-4">
-        <h5 className="font-semibold text-white mb-2">📱 Use Cases</h5>
-        <ul className="space-y-1 text-sm text-gray-300">
-          <li>• Chat applications and messaging</li>
-          <li>• Live sports scores and updates</li>
-          <li>• Real-time collaboration (Google Docs)</li>
-          <li>• Stock market tickers</li>
-          <li>• Gaming and multiplayer experiences</li>
-        </ul>
+      <div className="mt-4 p-4 bg-green-500/10 border border-green-500/20 rounded-lg">
+        <p className="text-gray-300 text-sm">
+          <span className="font-semibold text-green-400">💡 Tip:</span> WebSocket maintains a persistent connection. 
+          Once connected, both client and server can send messages instantly without request overhead!
+        </p>
       </div>
-
-      <button className="mt-4 px-6 py-3 bg-green-500 hover:bg-green-600 text-white rounded-lg font-semibold transition-all w-full">
-        Launch WebSocket Demo
-      </button>
     </div>
   );
 
@@ -325,62 +293,33 @@ wss.on('connection', (ws) => {
     <div className="space-y-4">
       <h4 className="text-lg font-bold text-white mb-3">📨 Event-Driven Demo</h4>
       <p className="text-gray-300 mb-4">
-        Asynchronous, decoupled communication via message brokers.
+        Asynchronous, decoupled communication! Publish events and watch them flow through the system.
       </p>
       
-      <div className="space-y-4">
-        <div>
-          <h5 className="font-semibold text-white mb-2">Producer (Publish Event)</h5>
-          <div className="bg-slate-900 p-4 rounded-lg font-mono text-xs text-gray-300">
-            <pre>{`// Kafka Producer
-const producer = kafka.producer();
-await producer.connect();
-
-await producer.send({
-  topic: 'user.created',
-  messages: [{
-    key: userId,
-    value: JSON.stringify({
-      userId: '123',
-      email: 'user@example.com',
-      timestamp: new Date()
-    })
-  }]
-});
-
-console.log('Event published!');`}</pre>
-          </div>
-        </div>
-
-        <div>
-          <h5 className="font-semibold text-white mb-2">Consumer (Subscribe to Events)</h5>
-          <div className="bg-slate-900 p-4 rounded-lg font-mono text-xs text-gray-300">
-            <pre>{`// Kafka Consumer
-const consumer = kafka.consumer({ 
-  groupId: 'email-service' 
-});
-
-await consumer.subscribe({ 
-  topic: 'user.created' 
-});
-
-await consumer.run({
-  eachMessage: async ({ message }) => {
-    const event = JSON.parse(
-      message.value.toString()
-    );
-    
-    // Send welcome email
-    await sendEmail(event.email);
-  }
-});`}</pre>
-          </div>
+      <div>
+        <h5 className="font-semibold text-white mb-3">Interactive Event Publishing - Try It Live!</h5>
+        <div className="space-y-3">
+          <EventDrivenTester
+            title="user.created"
+            description="Publish user creation events - multiple services can consume this event"
+            eventType="user.created"
+          />
+          <EventDrivenTester
+            title="order.placed"
+            description="Publish order events - triggers inventory, payment, and email services"
+            eventType="order.placed"
+          />
+          <EventDrivenTester
+            title="payment.processed"
+            description="Publish payment events - update order status and send confirmations"
+            eventType="payment.processed"
+          />
         </div>
       </div>
 
-      <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-lg p-4">
-        <h5 className="font-semibold text-white mb-2">🎯 Event Flow</h5>
-        <div className="flex items-center justify-between text-sm">
+      <div className="mt-6 bg-yellow-500/10 border border-yellow-500/20 rounded-lg p-4">
+        <h5 className="font-semibold text-white mb-3">🎯 Event Flow</h5>
+        <div className="flex items-center justify-between text-sm mb-4">
           <div className="text-center">
             <div className="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center mx-auto mb-2">1</div>
             <div className="text-gray-300">Publisher</div>
@@ -396,11 +335,10 @@ await consumer.run({
             <div className="text-gray-300">Consumers</div>
           </div>
         </div>
+        <p className="text-gray-300 text-sm">
+          Events are processed asynchronously - publishers don't wait for consumers!
+        </p>
       </div>
-
-      <button className="mt-4 px-6 py-3 bg-yellow-500 hover:bg-yellow-600 text-white rounded-lg font-semibold transition-all w-full">
-        Try Event-Driven Example
-      </button>
     </div>
   );
 
