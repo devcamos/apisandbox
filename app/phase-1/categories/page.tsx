@@ -2,6 +2,7 @@
 
 import PhaseLayout from "@/components/PhaseLayout";
 import InteractiveCategory from "@/components/InteractiveCategory";
+import ApiEndpointTester from "@/components/ApiEndpointTester";
 import { Brain, Network, GitBranch, Zap, RefreshCw, Database } from "lucide-react";
 import { useState } from "react";
 
@@ -36,27 +37,52 @@ Accept: application/json
         </div>
 
         <div>
-          <h5 className="font-semibold text-white mb-2">Endpoints</h5>
-          <div className="space-y-2">
-            {[
-              { method: 'GET', path: '/users', desc: 'List all users' },
-              { method: 'POST', path: '/users', desc: 'Create user' },
-              { method: 'PUT', path: '/users/:id', desc: 'Update user' },
-              { method: 'DELETE', path: '/users/:id', desc: 'Delete user' }
-            ].map((endpoint, idx) => (
-              <div key={idx} className="bg-slate-900 p-3 rounded-lg">
-                <span className="text-green-400 font-mono text-sm font-bold">{endpoint.method}</span>
-                <span className="text-blue-400 font-mono text-sm ml-2">{endpoint.path}</span>
-                <p className="text-gray-400 text-xs mt-1">{endpoint.desc}</p>
-              </div>
-            ))}
+          <h5 className="font-semibold text-white mb-3">Interactive Endpoints - Try Them Live!</h5>
+          <div className="space-y-3">
+            <ApiEndpointTester
+              method="GET"
+              path="/users"
+              description="Fetch a list of all users"
+            />
+            <ApiEndpointTester
+              method="GET"
+              path="/users/:id"
+              description="Get a specific user by ID"
+            />
+            <ApiEndpointTester
+              method="POST"
+              path="/users"
+              description="Create a new user"
+              defaultBody={JSON.stringify({
+                name: "John Doe",
+                email: "john@example.com",
+                username: "johndoe"
+              }, null, 2)}
+            />
+            <ApiEndpointTester
+              method="PUT"
+              path="/users/:id"
+              description="Update an existing user"
+              defaultBody={JSON.stringify({
+                name: "Jane Doe",
+                email: "jane@example.com"
+              }, null, 2)}
+            />
+            <ApiEndpointTester
+              method="DELETE"
+              path="/users/:id"
+              description="Delete a user by ID"
+            />
           </div>
         </div>
       </div>
 
-      <button className="mt-4 px-6 py-3 bg-blue-500 hover:bg-blue-600 text-white rounded-lg font-semibold transition-all w-full">
-        Try REST API Sandbox
-      </button>
+      <div className="mt-6 p-4 bg-blue-500/10 border border-blue-500/20 rounded-lg">
+        <p className="text-gray-300 text-sm">
+          <span className="font-semibold text-blue-400">💡 Tip:</span> These are live API calls to JSONPlaceholder (a free test API). 
+          Click "Try API" on any endpoint to see real responses!
+        </p>
+      </div>
     </div>
   );
 
