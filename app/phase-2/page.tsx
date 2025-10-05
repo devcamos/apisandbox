@@ -285,6 +285,49 @@ app.use((req, res, next) => {
               "Jitter to prevent thundering herd"
             ]}
             color="from-green-500 to-emerald-500"
+            demoLink="/phase-2/demos/retry"
+            documentation={{
+              overview: "Retry logic with exponential backoff is a resilience pattern that automatically retries failed requests with increasing delays between attempts. This handles transient failures gracefully without overwhelming the failing service.",
+              description: [
+                "Exponential backoff doubles delay each retry: 1s, 2s, 4s, 8s",
+                "Jitter adds randomness to prevent thundering herd",
+                "Only retry idempotent operations (GET, PUT, DELETE)",
+                "Set maximum retry attempts (typically 3-5)",
+                "Retry on transient errors (5xx, timeouts, connection errors)",
+                "Don't retry client errors (4xx except 429)"
+              ],
+              useCases: [
+                "Network glitches and temporary connectivity issues",
+                "Service temporarily overloaded",
+                "Rate limiting (429 Too Many Requests)",
+                "Database connection failures",
+                "Distributed system temporary inconsistencies"
+              ],
+              paretoKnowledge: {
+                title: "The 20% You Need to Know",
+                points: [
+                  "3 retries covers 99% of transient failures - more is usually excessive",
+                  "Exponential backoff prevents overwhelming recovering services",
+                  "Add jitter (random ±25%) to prevent synchronized retries",
+                  "Only retry safe operations (GET, PUT, DELETE) - not POST unless idempotent",
+                  "Use libraries (Axios interceptors, Polly, retry-axios) - don't roll your own"
+                ]
+              },
+              bestFor: [
+                "Transient network failures",
+                "Services with occasional hiccups",
+                "Idempotent operations",
+                "Distributed systems",
+                "Third-party API calls"
+              ],
+              notIdealFor: [
+                "User-interactive operations (too slow)",
+                "Non-idempotent operations without special handling",
+                "When immediate failure feedback is needed",
+                "Operations with strict time constraints",
+                "Permanent failures (will just delay error)"
+              ]
+            }}
           />
           
           <ConceptCard
@@ -298,6 +341,49 @@ app.use((req, res, next) => {
               "Resilience4j implementation"
             ]}
             color="from-red-500 to-pink-500"
+            demoLink="/phase-2/demos/circuit-breaker"
+            documentation={{
+              overview: "Circuit Breaker is a resilience pattern that prevents cascading failures by stopping requests to a failing service. It monitors for failures and 'opens the circuit' to fail fast, giving the downstream service time to recover.",
+              description: [
+                "Closed state: Requests flow normally",
+                "Open state: All requests fail immediately (circuit 'tripped')",
+                "Half-Open state: Test requests to check if service recovered",
+                "Opens after threshold consecutive failures (e.g., 5 failures)",
+                "Stays open for timeout period (e.g., 60 seconds)",
+                "Transitions to half-open to test recovery"
+              ],
+              useCases: [
+                "Microservices calling other microservices",
+                "Third-party API integrations",
+                "Database connection pools",
+                "Payment gateway calls",
+                "Any external dependency that might fail"
+              ],
+              paretoKnowledge: {
+                title: "The 20% You Need to Know",
+                points: [
+                  "Threshold of 5 failures works for most cases - adjust based on traffic",
+                  "Open timeout of 30-60 seconds gives service time to recover",
+                  "Always have fallback behavior - cached data, default values, or friendly error",
+                  "Use circuit breaker libraries (Resilience4j, Polly, Hystrix) - complex to implement",
+                  "Monitor circuit state - if often open, investigate root cause"
+                ]
+              },
+              bestFor: [
+                "Services with cascading failure risk",
+                "External dependencies (third-party APIs)",
+                "High-traffic applications",
+                "Microservice architectures",
+                "When fast failure is better than slow failure"
+              ],
+              notIdealFor: [
+                "Single-service applications",
+                "When you need to try every request (e.g., financial transactions)",
+                "Low-traffic services (not enough data for good decisions)",
+                "When failures are always transient (use retries)",
+                "Simple request-response with no cascading risk"
+              ]
+            }}
           />
           
           <ConceptCard
