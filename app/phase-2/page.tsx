@@ -87,6 +87,7 @@ export default function Phase2() {
               "Scope-based permissions"
             ]}
             color="from-purple-500 to-pink-500"
+            demoLink="/phase-2/integrations#oauth2"
           />
           <ConceptCard
             icon={Key}
@@ -99,6 +100,7 @@ export default function Phase2() {
               "Key rotation strategies"
             ]}
             color="from-blue-500 to-cyan-500"
+            demoLink="/phase-2/integrations#api-keys"
           />
           <ConceptCard
             icon={Shield}
