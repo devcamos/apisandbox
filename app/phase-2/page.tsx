@@ -87,7 +87,48 @@ export default function Phase2() {
               "Scope-based permissions"
             ]}
             color="from-purple-500 to-pink-500"
-            demoLink="/phase-2/integrations#oauth2"
+            demoLink="/phase-2/demos/oauth2"
+            documentation={{
+              overview: "OAuth 2.0 is the industry-standard protocol for authorization. It enables applications to obtain limited access to user accounts on an HTTP service. OAuth2 works by delegating user authentication to the service that hosts the user account.",
+              description: [
+                "Authorization code flow is the most secure for server-side apps",
+                "Client credentials flow for machine-to-machine communication",
+                "Access tokens are short-lived (typically 1 hour)",
+                "Refresh tokens can obtain new access tokens without re-authentication",
+                "Scopes limit what the application can access",
+                "State parameter prevents CSRF attacks"
+              ],
+              useCases: [
+                "Social login (Sign in with Google, GitHub, Facebook)",
+                "Third-party app authorization (e.g., Zapier accessing your Gmail)",
+                "Mobile app authentication",
+                "Single Sign-On (SSO) systems",
+                "API access delegation"
+              ],
+              paretoKnowledge: {
+                title: "The 20% You Need to Know",
+                points: [
+                  "Authorization Code Flow - use for web/mobile apps (95% of cases)",
+                  "Never expose client_secret in frontend - always server-side",
+                  "Always use HTTPS for OAuth flows - tokens are sensitive",
+                  "Implement token refresh logic - access tokens expire",
+                  "Use PKCE for mobile/SPA apps - prevents authorization code interception"
+                ]
+              },
+              bestFor: [
+                "User-facing applications requiring delegated access",
+                "Third-party integrations",
+                "Applications needing fine-grained permissions (scopes)",
+                "Mobile and single-page applications",
+                "When you need to avoid storing user passwords"
+              ],
+              notIdealFor: [
+                "Simple internal services (use API keys)",
+                "Machine-to-machine with no user context (use client credentials or mTLS)",
+                "Real-time applications (adds latency)",
+                "When you control both client and server (simpler auth may suffice)"
+              ]
+            }}
           />
           <ConceptCard
             icon={Key}
@@ -100,7 +141,49 @@ export default function Phase2() {
               "Key rotation strategies"
             ]}
             color="from-blue-500 to-cyan-500"
-            demoLink="/phase-2/integrations#api-keys"
+            demoLink="/phase-2/demos/api-keys"
+            documentation={{
+              overview: "API Keys are simple authentication tokens that identify the calling application. They're static strings passed in request headers or query parameters, providing a straightforward way to authenticate API requests.",
+              description: [
+                "Unique identifier for each application or user",
+                "Can be passed in Authorization header (preferred) or query params",
+                "Easy to implement and understand",
+                "Supports rate limiting per key",
+                "Should be rotated regularly for security",
+                "Never commit keys to version control"
+              ],
+              useCases: [
+                "Third-party API access (OpenWeatherMap, Stripe, SendGrid)",
+                "Internal microservice authentication",
+                "Development and testing environments",
+                "Simple machine-to-machine communication",
+                "APIs with basic security requirements"
+              ],
+              paretoKnowledge: {
+                title: "The 20% You Need to Know",
+                points: [
+                  "Always use headers (X-API-Key) not query params - headers don't appear in logs",
+                  "Store keys in environment variables - never hardcode",
+                  "Implement rate limiting per key - prevents abuse",
+                  "Use different keys for dev/staging/prod - isolate environments",
+                  "Rotate keys regularly - monthly or after suspected compromise"
+                ]
+              },
+              bestFor: [
+                "Simple authentication needs",
+                "Internal service-to-service calls",
+                "Third-party API integration",
+                "When OAuth is overkill",
+                "Development and testing"
+              ],
+              notIdealFor: [
+                "User-facing applications (use OAuth2)",
+                "When you need fine-grained permissions",
+                "High-security requirements (keys can be stolen)",
+                "Browser-based apps (keys get exposed)",
+                "When you need user context"
+              ]
+            }}
           />
           <ConceptCard
             icon={Shield}
