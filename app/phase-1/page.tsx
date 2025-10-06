@@ -367,66 +367,6 @@ export default function Phase1() {
       </section>
 
 
-      {/* Core Principles */}
-      <section className="mb-12">
-        <h2 className="text-3xl font-bold text-white mb-6">Core Principles</h2>
-        <div className="space-y-6">
-          <div className="bg-gradient-to-r from-blue-500/10 to-cyan-500/10 border border-blue-500/20 rounded-xl p-8">
-            <h3 className="text-2xl font-bold text-white mb-4">🔗 Loose Coupling</h3>
-            <p className="text-gray-300 mb-4">
-              Services should be independent and interact through well-defined interfaces. 
-              Changes in one service shouldn&apos;t require changes in others.
-            </p>
-            <div className="grid md:grid-cols-2 gap-4 text-sm">
-              <div className="bg-slate-800/50 p-4 rounded-lg">
-                <div className="font-semibold text-green-400 mb-2">✓ Good Practice</div>
-                <p className="text-gray-300">Use abstract interfaces and dependency injection</p>
-              </div>
-              <div className="bg-slate-800/50 p-4 rounded-lg">
-                <div className="font-semibold text-red-400 mb-2">✗ Avoid</div>
-                <p className="text-gray-300">Tight coupling with direct class dependencies</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-gradient-to-r from-purple-500/10 to-pink-500/10 border border-purple-500/20 rounded-xl p-8">
-            <h3 className="text-2xl font-bold text-white mb-4">🔄 Idempotency</h3>
-            <p className="text-gray-300 mb-4">
-              An operation that can be performed multiple times without changing the result beyond the initial application.
-              Critical for reliable distributed systems.
-            </p>
-            <div className="bg-slate-800/50 p-4 rounded-lg font-mono text-sm text-gray-300">
-              <pre>{`// Idempotent: Safe to retry
-PUT /users/123 { "name": "John" }
-
-// NOT Idempotent: Multiple calls create different results
-POST /orders { "item": "widget" }`}</pre>
-            </div>
-          </div>
-
-          <div className="bg-gradient-to-r from-orange-500/10 to-red-500/10 border border-orange-500/20 rounded-xl p-8">
-            <h3 className="text-2xl font-bold text-white mb-4">⏱️ Eventual Consistency</h3>
-            <p className="text-gray-300 mb-4">
-              In distributed systems, data doesn&apos;t need to be immediately consistent across all nodes.
-              Systems converge to consistency over time.
-            </p>
-            <div className="grid md:grid-cols-3 gap-4 text-sm mt-4">
-              <div className="bg-slate-800/50 p-4 rounded-lg text-center">
-                <div className="text-2xl mb-2">1️⃣</div>
-                <p className="text-gray-300">User updates profile</p>
-              </div>
-              <div className="bg-slate-800/50 p-4 rounded-lg text-center">
-                <div className="text-2xl mb-2">2️⃣</div>
-                <p className="text-gray-300">Event propagates</p>
-              </div>
-              <div className="bg-slate-800/50 p-4 rounded-lg text-center">
-                <div className="text-2xl mb-2">3️⃣</div>
-                <p className="text-gray-300">All services sync</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
 
       {/* Decision Framework */}
       <section>
