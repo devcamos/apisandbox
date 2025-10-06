@@ -1,9 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { ArrowLeft, Play, BookOpen, Copy, Check } from "lucide-react";
+import { ArrowLeft, Play, BookOpen, Copy, Check, ChevronDown, ExternalLink } from "lucide-react";
 import Link from "next/link";
-import DemoSelector from "@/components/DemoSelector";
 
 const restDemos = [
   {
@@ -75,6 +74,10 @@ const restDemos = [
 export default function RestPracticePage() {
   const [selectedDemo, setSelectedDemo] = useState(restDemos[0]);
   const [copiedStates, setCopiedStates] = useState<Record<string, boolean>>({});
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [selectedEndpoint, setSelectedEndpoint] = useState<string | null>(null);
+  const [response, setResponse] = useState<any>(null);
+  const [loading, setLoading] = useState(false);
 
   const copyToClipboard = async (text: string, key: string) => {
     try {
@@ -85,6 +88,37 @@ export default function RestPracticePage() {
       }, 2000);
     } catch (err) {
       console.error('Failed to copy: ', err);
+    }
+  };
+
+  const handleDemoSelect = (demo: any) => {
+    const foundDemo = restDemos.find(d => d.id === demo.id);
+    if (foundDemo) {
+      setSelectedDemo(foundDemo);
+      setSelectedEndpoint(null);
+      setResponse(null);
+    }
+    setIsDropdownOpen(false);
+  };
+
+  const makeApiCall = async (method: string, url: string, body?: any) => {
+    setLoading(true);
+    try {
+      // Simulate API call with mock data
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      const mockResponse = selectedDemo.examples[method as keyof typeof selectedDemo.examples]?.response || {
+        message: "API call successful",
+        method,
+        url,
+        timestamp: new Date().toISOString()
+      };
+      
+      setResponse(mockResponse);
+    } catch (error) {
+      setResponse({ error: "Failed to make API call" });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -113,14 +147,76 @@ export default function RestPracticePage() {
 
         {/* Demo Selector */}
         <div className="max-w-4xl mx-auto mb-12">
-          <DemoSelector 
-            apiType="rest" 
-            onDemoSelect={(demo) => {
-              const foundDemo = restDemos.find(d => d.id === demo.id);
-              if (foundDemo) setSelectedDemo(foundDemo);
-            }} 
-          />
+          <div className="relative">
+            {/* Demo Selector Button */}
+            <button
+              onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+              className="w-full px-4 py-3 bg-gradient-to-r from-blue-500 to-cyan-500 text-white rounded-lg font-semibold flex items-center justify-between hover:shadow-lg transition-all hover:scale-105"
+            >
+              <div className="flex items-center gap-2">
+                <Play className="w-4 h-4" />
+                <span>🎮 Try Interactive Demo</span>
+              </div>
+              <ChevronDown className={`w-4 h-4 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} />
+            </button>
+
+            {/* Dropdown Menu */}
+            {isDropdownOpen && (
+              <div className="absolute top-full left-0 right-0 mt-2 bg-slate-800 border border-slate-600 rounded-lg shadow-2xl z-50 max-h-96 overflow-y-auto">
+                <div className="p-2">
+                  <div className="text-xs text-gray-400 mb-2 px-2">Choose a demo to explore:</div>
+                  {restDemos.map((demo) => (
+                    <button
+                      key={demo.id}
+                      onClick={() => handleDemoSelect(demo)}
+                      className="w-full text-left p-3 rounded-lg hover:bg-slate-700 transition-colors group"
+                    >
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <h4 className="font-semibold text-white group-hover:text-blue-400 transition-colors">
+                            {demo.title}
+                          </h4>
+                          <p className="text-sm text-gray-400 mt-1">
+                            {demo.description}
+                          </p>
+                          <div className="flex items-center gap-4 mt-2 text-xs text-gray-500">
+                            <span className="bg-slate-700 px-2 py-1 rounded">
+                              {demo.endpoint}
+                            </span>
+                            <span className="bg-slate-700 px-2 py-1 rounded">
+                              {demo.method}
+                            </span>
+                          </div>
+                        </div>
+                        <ExternalLink className="w-4 h-4 text-gray-500 group-hover:text-blue-400 transition-colors ml-2" />
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
         </div>
+
+        {/* Selected Demo Preview */}
+        {selectedDemo && (
+          <div className="max-w-4xl mx-auto mb-8">
+            <div className="bg-slate-800/50 backdrop-blur-sm rounded-lg p-6 border border-slate-700">
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="font-semibold text-white">Selected Demo: {selectedDemo.title}</h3>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs bg-blue-500/20 text-blue-400 px-2 py-1 rounded">
+                    {selectedDemo.endpoint}
+                  </span>
+                  <span className="text-xs bg-green-500/20 text-green-400 px-2 py-1 rounded">
+                    {selectedDemo.method}
+                  </span>
+                </div>
+              </div>
+              <p className="text-sm text-gray-400">{selectedDemo.description}</p>
+            </div>
+          </div>
+        )}
 
         {/* Selected Demo Content */}
         <div className="max-w-6xl mx-auto">
@@ -181,16 +277,73 @@ export default function RestPracticePage() {
                 
                 <div className="bg-slate-700/50 rounded-lg p-6">
                   <p className="text-gray-400 mb-4">
-                    This demo shows how REST APIs work in practice. Click the button below to see the live demo.
+                    Test the API endpoints directly. Select an endpoint and make a request to see the response.
                   </p>
                   
-                  <Link
-                    href="/phase-1/categories#rest"
-                    className="inline-flex items-center gap-2 px-6 py-3 bg-blue-500 hover:bg-blue-600 text-white rounded-lg font-semibold transition-all hover:scale-105"
-                  >
-                    <Play className="w-4 h-4" />
-                    Launch Interactive Demo
-                  </Link>
+                  {/* Endpoint Selector */}
+                  <div className="mb-4">
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                      Select Endpoint to Test:
+                    </label>
+                    <div className="space-y-2">
+                      {Object.entries(selectedDemo.examples).map(([method, example]) => (
+                        <button
+                          key={method}
+                          onClick={() => {
+                            setSelectedEndpoint(method);
+                            makeApiCall(method, example.url, example.body);
+                          }}
+                          disabled={loading}
+                          className={`w-full text-left p-3 rounded-lg border transition-all ${
+                            selectedEndpoint === method
+                              ? 'border-blue-500 bg-blue-500/10'
+                              : 'border-slate-600 hover:border-slate-500 hover:bg-slate-600/50'
+                          } ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                        >
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <div className="font-semibold text-white">{example.url}</div>
+                              <div className="text-sm text-gray-400">{example.description}</div>
+                            </div>
+                            <div className="text-xs bg-slate-700 px-2 py-1 rounded">
+                              {method.toUpperCase()}
+                            </div>
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Response Display */}
+                  {response && (
+                    <div className="mt-4">
+                      <div className="flex items-center justify-between mb-2">
+                        <h4 className="font-semibold text-white">Response:</h4>
+                        <button
+                          onClick={() => copyToClipboard(JSON.stringify(response, null, 2), 'response')}
+                          className="flex items-center gap-1 px-2 py-1 bg-slate-600 hover:bg-slate-500 rounded text-sm transition-colors"
+                        >
+                          {copiedStates.response ? (
+                            <Check className="w-4 h-4 text-green-400" />
+                          ) : (
+                            <Copy className="w-4 h-4" />
+                          )}
+                        </button>
+                      </div>
+                      <pre className="bg-slate-900 p-3 rounded text-sm text-gray-300 overflow-x-auto">
+                        {JSON.stringify(response, null, 2)}
+                      </pre>
+                    </div>
+                  )}
+
+                  {loading && (
+                    <div className="mt-4 text-center">
+                      <div className="inline-flex items-center gap-2 text-blue-400">
+                        <div className="w-4 h-4 border-2 border-blue-400 border-t-transparent rounded-full animate-spin"></div>
+                        Making API call...
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 {/* Key Concepts */}
