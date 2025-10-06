@@ -366,67 +366,6 @@ export default function Phase1() {
         </div>
       </section>
 
-      {/* Contract Styles */}
-      <section className="mb-12">
-        <h2 className="text-3xl font-bold text-white mb-6">Contract Styles</h2>
-        <div className="grid md:grid-cols-3 gap-6">
-          <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border border-slate-700">
-            <h3 className="text-xl font-bold text-white mb-3">OpenAPI</h3>
-            <p className="text-gray-400 mb-4">Standard specification for REST APIs with interactive documentation</p>
-            <div className="bg-slate-900/50 p-4 rounded-lg font-mono text-sm text-gray-300">
-              <pre>{`openapi: 3.0.0
-info:
-  title: User API
-  version: 1.0.0
-paths:
-  /users:
-    get:
-      summary: List users
-      responses:
-        '200':
-          description: Success`}</pre>
-            </div>
-          </div>
-          
-          <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border border-slate-700">
-            <h3 className="text-xl font-bold text-white mb-3">Protobuf</h3>
-            <p className="text-gray-400 mb-4">Binary serialization format for gRPC with strong typing</p>
-            <div className="bg-slate-900/50 p-4 rounded-lg font-mono text-sm text-gray-300">
-              <pre>{`syntax = "proto3";
-
-message User {
-  int32 id = 1;
-  string name = 2;
-  string email = 3;
-}
-
-service UserService {
-  rpc GetUser(UserId) 
-    returns (User);
-}`}</pre>
-            </div>
-          </div>
-          
-          <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border border-slate-700">
-            <h3 className="text-xl font-bold text-white mb-3">AsyncAPI</h3>
-            <p className="text-gray-400 mb-4">Specification for event-driven and asynchronous APIs</p>
-            <div className="bg-slate-900/50 p-4 rounded-lg font-mono text-sm text-gray-300">
-              <pre>{`asyncapi: 2.6.0
-info:
-  title: Order Events
-  version: 1.0.0
-channels:
-  order/created:
-    publish:
-      message:
-        payload:
-          type: object
-          properties:
-            orderId: string`}</pre>
-            </div>
-          </div>
-        </div>
-      </section>
 
       {/* Core Principles */}
       <section className="mb-12">

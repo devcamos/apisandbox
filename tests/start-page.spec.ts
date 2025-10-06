@@ -20,6 +20,20 @@ test.describe('Start Page', () => {
     await expect(page.getByRole('heading', { name: 'Choose Your Learning Path' })).toBeInViewport();
   });
 
+  test('should explain what phases are', async ({ page }) => {
+    await expect(page.getByRole('heading', { name: 'Choose Your Learning Path' })).toBeVisible();
+    
+    // Check that we explain what phases are
+    await expect(page.getByText('4 progressive phases')).toBeVisible();
+    await expect(page.getByText('from API basics to advanced architecture patterns')).toBeVisible();
+    
+    // Check skill level indicators
+    await expect(page.getByText('Phase 1 • Beginner')).toBeVisible();
+    await expect(page.getByText('Phase 2 • Intermediate')).toBeVisible();
+    await expect(page.getByText('Phase 3 • Advanced')).toBeVisible();
+    await expect(page.getByText('Phase 4 • Expert')).toBeVisible();
+  });
+
   test('should display all 4 phase cards', async ({ page }) => {
     await expect(page.getByRole('heading', { name: 'Choose Your Learning Path' })).toBeVisible();
     

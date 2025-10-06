@@ -79,9 +79,14 @@ export default function StartPage() {
       <section id="phases" className="container mx-auto px-6 py-16">
         <div className="text-center mb-12">
           <h2 className="text-4xl font-bold text-white mb-4">Choose Your Learning Path</h2>
-          <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-            Start with any phase that matches your current skill level. Each phase builds upon the previous one, but you can jump in anywhere.
+          <p className="text-xl text-gray-300 max-w-3xl mx-auto mb-6">
+            Our training is organized into <strong className="text-white">4 progressive phases</strong> that take you from API basics to advanced architecture patterns. Each phase focuses on specific skills and real-world scenarios.
           </p>
+          <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-4 max-w-2xl mx-auto">
+            <p className="text-blue-200 text-sm">
+              <strong>💡 New to APIs?</strong> Start with Phase 1. <strong>Already comfortable with REST?</strong> Jump to Phase 2. <strong>Building microservices?</strong> Phase 3 is for you.
+            </p>
+          </div>
         </div>
         
         <div className="grid md:grid-cols-2 gap-8">
@@ -97,7 +102,7 @@ export default function StartPage() {
                   <div className="flex items-start justify-between mb-4">
                     <div>
                       <div className="text-sm font-semibold text-gray-400 mb-1">
-                        Phase {phase.id}
+                        Phase {phase.id} • {phase.id === 1 ? 'Beginner' : phase.id === 2 ? 'Intermediate' : phase.id === 3 ? 'Advanced' : 'Expert'}
                       </div>
                       <h3 className="text-2xl font-bold text-white mb-2">
                         {phase.title}
@@ -119,7 +124,7 @@ export default function StartPage() {
                   </div>
                   
                   <div className="mt-6 text-blue-400 font-semibold flex items-center group-hover:gap-2 transition-all">
-                    Start Learning
+                    Explore Phase {phase.id}
                     <span className="ml-2 group-hover:translate-x-1 transition-transform">→</span>
                   </div>
                 </div>

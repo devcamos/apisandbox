@@ -1,0 +1,22 @@
+<testsuites id="" name="" tests="5" failures="0" skipped="0" errors="0" time="3.172538">
+<testsuite name="navigation.spec.ts" timestamp="2025-10-06T18:22:16.756Z" hostname="chromium" tests="1" failures="0" skipped="0" time="1.106" errors="0">
+<testcase name="Navigation › should navigate from homepage to start page" classname="navigation.spec.ts" time="1.106">
+</testcase>
+</testsuite>
+<testsuite name="navigation.spec.ts" timestamp="2025-10-06T18:22:16.756Z" hostname="firefox" tests="1" failures="0" skipped="0" time="1.55" errors="0">
+<testcase name="Navigation › should navigate from homepage to start page" classname="navigation.spec.ts" time="1.55">
+</testcase>
+</testsuite>
+<testsuite name="navigation.spec.ts" timestamp="2025-10-06T18:22:16.756Z" hostname="webkit" tests="1" failures="0" skipped="0" time="1.637" errors="0">
+<testcase name="Navigation › should navigate from homepage to start page" classname="navigation.spec.ts" time="1.637">
+</testcase>
+</testsuite>
+<testsuite name="navigation.spec.ts" timestamp="2025-10-06T18:22:16.756Z" hostname="Mobile Chrome" tests="1" failures="0" skipped="0" time="1.269" errors="0">
+<testcase name="Navigation › should navigate from homepage to start page" classname="navigation.spec.ts" time="1.269">
+</testcase>
+</testsuite>
+<testsuite name="navigation.spec.ts" timestamp="2025-10-06T18:22:16.756Z" hostname="Mobile Safari" tests="1" failures="0" skipped="0" time="1.563" errors="0">
+<testcase name="Navigation › should navigate from homepage to start page" classname="navigation.spec.ts" time="1.563">
+</testcase>
+</testsuite>
+</testsuites>
