@@ -103,7 +103,10 @@ export default function Phase1() {
                 "Stateless - server doesn't store client context between requests",
                 "Responses typically in JSON or XML format",
                 "Cacheable responses improve performance",
-                "Layered system architecture for scalability"
+                "Layered system architecture for scalability",
+                "🔗 Loose Coupling: Services interact through well-defined HTTP interfaces",
+                "🔄 Idempotency: PUT and DELETE operations should be idempotent for reliable retries",
+                "📋 OpenAPI: Standard specification format for REST API documentation"
               ],
               useCases: [
                 "Public APIs for web and mobile apps",
@@ -215,7 +218,9 @@ export default function Phase1() {
                 "Bi-directional streaming support",
                 "Strong typing enforced by .proto files",
                 "Automatic client and server code generation",
-                "Built-in authentication, load balancing, and health checking"
+                "Built-in authentication, load balancing, and health checking",
+                "🔗 Loose Coupling: Protocol Buffers provide strong contracts between services",
+                "📋 Protobuf: Binary serialization format with schema definition"
               ],
               useCases: [
                 "High-performance internal microservices",
@@ -327,7 +332,9 @@ export default function Phase1() {
                 "Message brokers (Kafka, RabbitMQ, SQS) handle delivery",
                 "Events represent state changes (user.created, order.placed)",
                 "Support for replay and event sourcing",
-                "At-least-once or exactly-once delivery guarantees"
+                "At-least-once or exactly-once delivery guarantees",
+                "⏱️ Eventual Consistency: Systems converge to consistency over time",
+                "📋 AsyncAPI: Standard specification format for event-driven APIs"
               ],
               useCases: [
                 "Microservices requiring loose coupling",
