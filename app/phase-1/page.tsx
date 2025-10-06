@@ -153,7 +153,8 @@ export default function Phase1() {
                 "High-performance internal microservices (consider gRPC)",
                 "Operations requiring streaming data",
                 "When you need strong typing guarantees"
-              ]
+              ],
+              demoLink: "/phase-1/categories#rest"
             }}
           />
           <ConceptCard
@@ -282,7 +283,8 @@ export default function Phase1() {
                 "When HTTP caching is important",
                 "Small, simple services (overhead not worth it)",
                 "Teams unfamiliar with binary protocols"
-              ]
+              ],
+              demoLink: "/phase-1/categories#grpc"
             }}
           />
           <ConceptCard
@@ -411,7 +413,8 @@ export default function Phase1() {
                 "Strong consistency requirements",
                 "When debugging needs to be straightforward",
                 "Small applications with few services"
-              ]
+              ],
+              demoLink: "/phase-1/categories#event-driven"
             }}
           />
         </div>
