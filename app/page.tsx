@@ -54,26 +54,15 @@ export default function Home() {
             <p className="text-xl text-gray-300 mb-8">
               Master the art of API integrations from fundamentals to principal-level architecture
             </p>
-            <div className="flex justify-center gap-4">
+            <div className="flex justify-center">
               <Link 
                 href="/phase-1"
-                className="px-8 py-3 bg-gradient-to-r from-blue-500 to-cyan-500 text-white rounded-lg font-semibold hover:shadow-lg hover:scale-105 transition-all"
+                className="group relative px-12 py-4 bg-gradient-to-r from-blue-500 to-cyan-500 text-white rounded-xl font-bold text-lg hover:shadow-2xl hover:scale-105 transition-all duration-300 animate-pulse hover:animate-none"
               >
-                Start Learning
+                <span className="relative z-10">Start Learning</span>
+                <div className="absolute inset-0 bg-gradient-to-r from-blue-400 to-cyan-400 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-blue-500 to-cyan-500 animate-ping opacity-20"></div>
               </Link>
-              <Link 
-                href="/observability"
-                className="px-8 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg font-semibold hover:shadow-lg hover:scale-105 transition-all flex items-center gap-2"
-              >
-                <BarChart3 className="w-4 h-4" />
-                View Dashboard
-              </Link>
-              <a 
-                href="#phases"
-                className="px-8 py-3 border border-gray-600 text-gray-300 rounded-lg font-semibold hover:bg-gray-800 transition-all"
-              >
-                Explore Phases
-              </a>
             </div>
           </div>
         </div>
@@ -116,7 +105,7 @@ export default function Home() {
                   </div>
                   
                   <div className="mt-6 text-blue-400 font-semibold flex items-center group-hover:gap-2 transition-all">
-                    Explore Phase
+                    Start Learning
                     <span className="ml-2 group-hover:translate-x-1 transition-transform">→</span>
                   </div>
                 </div>
