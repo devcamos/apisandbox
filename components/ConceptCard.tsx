@@ -13,7 +13,6 @@ interface ConceptCardProps {
   items?: string[];
   color?: string;
   demoLink?: string;
-  apiType?: "rest" | "graphql" | "grpc" | "websocket" | "event-driven";
   documentation?: {
     overview: string;
     description: string[];
@@ -32,7 +31,6 @@ interface ConceptCardProps {
     };
     bestFor: string[];
     notIdealFor: string[];
-    demoLink?: string;
   };
 }
 
@@ -43,7 +41,6 @@ export default function ConceptCard({
   items,
   color = "from-blue-500 to-cyan-500",
   demoLink,
-  apiType = "rest",
   documentation
 }: ConceptCardProps) {
   const [showDocs, setShowDocs] = useState(false);
@@ -93,7 +90,6 @@ export default function ConceptCard({
           onClose={() => setShowDocs(false)}
           title={title}
           color={color}
-          apiType={apiType}
           documentation={documentation}
         />
       )}

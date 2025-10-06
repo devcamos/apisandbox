@@ -2,14 +2,12 @@
 
 import { X, BookOpen, CheckCircle, Lightbulb, Target } from "lucide-react";
 import { useEffect } from "react";
-import DemoSelector from "./DemoSelector";
 
 interface DocumentationModalProps {
   isOpen: boolean;
   onClose: () => void;
   title: string;
   color: string;
-  apiType: "rest" | "graphql" | "grpc" | "websocket" | "event-driven";
   documentation: {
     overview: string;
     description: string[];
@@ -28,7 +26,6 @@ interface DocumentationModalProps {
     };
     bestFor: string[];
     notIdealFor: string[];
-    demoLink?: string;
   };
 }
 
@@ -37,7 +34,6 @@ export default function DocumentationModal({
   onClose,
   title,
   color,
-  apiType,
   documentation,
 }: DocumentationModalProps) {
   // Close on escape key
@@ -132,23 +128,12 @@ export default function DocumentationModal({
                 <CheckCircle className="w-6 h-6 text-blue-400" />
                 {documentation.corePrinciples.title}
               </h3>
-              <div className="space-y-3 mb-6">
+              <div className="space-y-3">
                 {documentation.corePrinciples.points.map((principle, idx) => (
                   <div key={idx} className="bg-blue-500/10 border border-blue-500/20 p-4 rounded-lg">
                     <p className="text-gray-300 text-sm">{principle}</p>
                   </div>
                 ))}
-              </div>
-              
-              {/* Interactive Demo Selector */}
-              <div className="border-t border-blue-500/20 pt-4">
-                <DemoSelector 
-                  apiType={apiType} 
-                  onDemoSelect={(demo) => {
-                    // Handle demo selection - could open in new tab or show preview
-                    window.open(demo.link, '_blank');
-                  }} 
-                />
               </div>
             </section>
           )}
