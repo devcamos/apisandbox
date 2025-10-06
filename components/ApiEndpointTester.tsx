@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Play, Loader2, CheckCircle, XCircle, ChevronDown, ChevronUp, Copy, Check, Settings } from "lucide-react";
+import { collectHttpRequest, collectError } from "@/lib/metrics";
 
 interface ApiEndpointTesterProps {
   method: "GET" | "POST" | "PUT" | "DELETE";
@@ -79,8 +80,29 @@ export default function ApiEndpointTester({
         statusText: res.statusText,
         data: data,
       });
+
+      // Collect metrics for observability dashboard
+      collectHttpRequest({
+        method: method,
+        url: url,
+        status: res.status,
+        duration: duration,
+        timestamp: Date.now(),
+        phase: "Phase 1",
+        demo: `${method} ${path}`
+      });
     } catch (err) {
-      setError(err instanceof Error ? err.message : "An error occurred");
+      const errorMessage = err instanceof Error ? err.message : "An error occurred";
+      setError(errorMessage);
+
+      // Collect error metrics
+      collectError({
+        message: errorMessage,
+        type: "API_ERROR",
+        timestamp: Date.now(),
+        phase: "Phase 1",
+        demo: `${method} ${path}`
+      });
     } finally {
       setLoading(false);
     }

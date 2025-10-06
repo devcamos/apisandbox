@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Play, Square, CheckCircle, Activity } from "lucide-react";
+import { collectHttpRequest, collectError } from "@/lib/metrics";
 
 interface WebSocketTesterProps {
   title: string;
@@ -18,6 +19,17 @@ export default function WebSocketTester({ title, description }: WebSocketTesterP
     setMessages([
       { type: "system", data: "✅ Connected to WebSocket server", time: new Date().toLocaleTimeString() }
     ]);
+    
+    // Collect metrics for WebSocket connection
+    collectHttpRequest({
+      method: "WS_CONNECT",
+      url: "ws://localhost:8080/websocket",
+      status: 200,
+      duration: 50, // Simulated connection time
+      timestamp: Date.now(),
+      phase: "Phase 1",
+      demo: "WebSocket Connection"
+    });
     
     // Simulate incoming messages
     setTimeout(() => {
@@ -46,6 +58,17 @@ export default function WebSocketTester({ title, description }: WebSocketTesterP
       data: message,
       time: new Date().toLocaleTimeString()
     }]);
+    
+    // Collect metrics for WebSocket message
+    collectHttpRequest({
+      method: "WS_SEND",
+      url: "ws://localhost:8080/websocket",
+      status: 200,
+      duration: 25, // Simulated send time
+      timestamp: Date.now(),
+      phase: "Phase 1",
+      demo: "WebSocket Message"
+    });
     
     // Simulate server response
     setTimeout(() => {

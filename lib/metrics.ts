@@ -43,6 +43,79 @@ class MetricsCollector {
   private metrics: Metric[] = [];
   private listeners: ((metrics: Metric[]) => void)[] = [];
 
+  constructor() {
+    // Add some sample metrics to demonstrate the dashboard
+    this.addSampleMetrics();
+  }
+
+  private addSampleMetrics() {
+    const now = Date.now();
+    const sampleMetrics = [
+      {
+        type: 'http_request' as const,
+        data: {
+          method: 'GET',
+          url: 'https://jsonplaceholder.typicode.com/posts',
+          status: 200,
+          duration: 245,
+          timestamp: now - 30000,
+          phase: 'Phase 1',
+          demo: 'GET /posts'
+        }
+      },
+      {
+        type: 'http_request' as const,
+        data: {
+          method: 'POST',
+          url: 'https://jsonplaceholder.typicode.com/posts',
+          status: 201,
+          duration: 189,
+          timestamp: now - 25000,
+          phase: 'Phase 1',
+          demo: 'POST /posts'
+        }
+      },
+      {
+        type: 'http_request' as const,
+        data: {
+          method: 'WS_CONNECT',
+          url: 'ws://localhost:8080/websocket',
+          status: 200,
+          duration: 50,
+          timestamp: now - 20000,
+          phase: 'Phase 1',
+          demo: 'WebSocket Connection'
+        }
+      },
+      {
+        type: 'http_request' as const,
+        data: {
+          method: 'EVENT_PUBLISH',
+          url: 'kafka://localhost:9092/user.created',
+          status: 200,
+          duration: 15,
+          timestamp: now - 15000,
+          phase: 'Phase 1',
+          demo: 'Event: user.created'
+        }
+      },
+      {
+        type: 'error' as const,
+        data: {
+          message: 'Connection timeout',
+          type: 'TIMEOUT_ERROR',
+          timestamp: now - 10000,
+          phase: 'Phase 1',
+          demo: 'GET /users'
+        }
+      }
+    ];
+
+    sampleMetrics.forEach(metric => {
+      this.addMetric(metric.type, metric.data);
+    });
+  }
+
   // Add a new metric
   addMetric(type: Metric['type'], data: any) {
     const metric: Metric = {

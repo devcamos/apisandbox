@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Send, CheckCircle, Clock, Archive } from "lucide-react";
+import { collectHttpRequest, collectError } from "@/lib/metrics";
 
 interface EventDrivenTesterProps {
   title: string;
@@ -23,6 +24,17 @@ export default function EventDrivenTester({ title, description, eventType }: Eve
     };
     
     setEvents(prev => [newEvent, ...prev]);
+    
+    // Collect metrics for event publishing
+    collectHttpRequest({
+      method: "EVENT_PUBLISH",
+      url: `kafka://localhost:9092/${eventType}`,
+      status: 200,
+      duration: 15, // Simulated publish time
+      timestamp: Date.now(),
+      phase: "Phase 1",
+      demo: `Event: ${eventType}`
+    });
     
     // Simulate event processing
     setTimeout(() => {
