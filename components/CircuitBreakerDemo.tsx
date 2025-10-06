@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Play, Zap, AlertCircle, CheckCircle, XCircle } from "lucide-react";
+import { collectCircuitBreaker } from "@/lib/metrics";
 
 interface CircuitBreakerDemoProps {
   title: string;
@@ -61,11 +62,27 @@ export default function CircuitBreakerDemo({ title, description }: CircuitBreake
       if (newFailureCount >= failureThreshold && circuitState === "closed") {
         setCircuitState("open");
         
+        // Collect circuit breaker metric
+        collectCircuitBreaker({
+          state: "open",
+          failureCount: newFailureCount,
+          timestamp: Date.now(),
+          service: "demo-service"
+        });
+        
         // Auto-transition to half-open after 5 seconds
         setTimeout(() => {
           setCircuitState("half-open");
           setFailureCount(0);
           setSuccessCount(0);
+          
+          // Collect half-open metric
+          collectCircuitBreaker({
+            state: "half-open",
+            failureCount: 0,
+            timestamp: Date.now(),
+            service: "demo-service"
+          });
         }, 5000);
       }
     } else {
@@ -85,6 +102,14 @@ export default function CircuitBreakerDemo({ title, description }: CircuitBreake
         setCircuitState("closed");
         setFailureCount(0);
         setSuccessCount(0);
+        
+        // Collect circuit closed metric
+        collectCircuitBreaker({
+          state: "closed",
+          failureCount: 0,
+          timestamp: Date.now(),
+          service: "demo-service"
+        });
       }
     }
   };

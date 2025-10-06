@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Play, RefreshCw, CheckCircle, XCircle, Clock } from "lucide-react";
+import { collectRetry } from "@/lib/metrics";
 
 interface RetryDemoProps {
   title: string;
@@ -65,6 +66,15 @@ export default function RetryDemo({ title, description }: RetryDemoProps) {
           )
         );
         
+        // Collect retry metric
+        collectRetry({
+          attempt: i + 1,
+          success: !shouldFail,
+          delay: i === 0 ? 0 : calculateDelay(i),
+          timestamp: Date.now(),
+          demo: "retry-demo"
+        });
+        
         if (!shouldFail) {
           break; // Success, stop retrying
         }
@@ -75,6 +85,15 @@ export default function RetryDemo({ title, description }: RetryDemoProps) {
             idx === prev.length - 1 ? { ...a, status: "failed" } : a
           )
         );
+        
+        // Collect retry metric
+        collectRetry({
+          attempt: i + 1,
+          success: false,
+          delay: i === 0 ? 0 : calculateDelay(i),
+          timestamp: Date.now(),
+          demo: "retry-demo"
+        });
       }
     }
 
