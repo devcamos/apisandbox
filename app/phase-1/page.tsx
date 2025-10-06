@@ -94,7 +94,7 @@ export default function Phase1() {
               "Wide adoption and tooling support"
             ]}
             color="from-blue-500 to-cyan-500"
-            demoLink="/phase-1/practice/rest"
+            demoLink="/phase-1/categories#rest"
             documentation={{
               overview: "REST (Representational State Transfer) is an architectural style for designing networked applications. It uses HTTP protocols and standard methods to create, read, update, and delete resources. REST APIs are stateless, meaning each request contains all information needed to process it.",
               description: [
@@ -167,7 +167,7 @@ export default function Phase1() {
               "Real-time updates with subscriptions"
             ]}
             color="from-purple-500 to-pink-500"
-            demoLink="/phase-1/practice/graphql"
+            demoLink="/phase-1/categories#graphql"
             documentation={{
               overview: "GraphQL is a query language and runtime for APIs that enables clients to request exactly the data they need. Unlike REST, which has multiple endpoints, GraphQL uses a single endpoint with a powerful query syntax to fetch nested and related data in one request.",
               description: [
@@ -223,7 +223,7 @@ export default function Phase1() {
               "Ideal for microservices"
             ]}
             color="from-orange-500 to-red-500"
-            demoLink="/phase-1/practice/grpc"
+            demoLink="/phase-1/categories#grpc"
             documentation={{
               overview: "gRPC (Google Remote Procedure Call) is a high-performance, language-agnostic RPC framework that uses Protocol Buffers for serialization and HTTP/2 for transport. It's designed for efficient communication between microservices.",
               description: [
@@ -296,7 +296,7 @@ export default function Phase1() {
               "Perfect for chat and live updates"
             ]}
             color="from-green-500 to-emerald-500"
-            demoLink="/phase-1/practice/websocket"
+            demoLink="/phase-1/categories#websocket"
             documentation={{
               overview: "WebSocket is a protocol providing full-duplex communication channels over a single TCP connection. Unlike HTTP's request-response model, WebSocket enables real-time, bidirectional communication between client and server.",
               description: [
@@ -352,7 +352,7 @@ export default function Phase1() {
               "Event sourcing patterns"
             ]}
             color="from-yellow-500 to-amber-500"
-            demoLink="/phase-1/practice/event-driven"
+            demoLink="/phase-1/categories#event-driven"
             documentation={{
               overview: "Event-Driven Architecture is a design pattern where services communicate through events - significant changes in state. Services publish events to message brokers, and interested services subscribe to these events, enabling loose coupling and asynchronous processing.",
               description: [

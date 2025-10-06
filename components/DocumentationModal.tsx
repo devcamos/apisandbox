@@ -8,6 +8,7 @@ interface DocumentationModalProps {
   onClose: () => void;
   title: string;
   color: string;
+  apiType: "rest" | "graphql" | "grpc" | "websocket" | "event-driven";
   documentation: {
     overview: string;
     description: string[];
