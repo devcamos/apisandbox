@@ -55,14 +55,12 @@ export default function Home() {
               Master the art of API integrations from fundamentals to principal-level architecture
             </p>
             <div className="flex justify-center">
-              <Link 
-                href="/phase-1"
-                className="group relative px-12 py-4 bg-gradient-to-r from-blue-500 to-cyan-500 text-white rounded-xl font-bold text-lg hover:shadow-2xl hover:scale-105 transition-all duration-300 animate-pulse hover:animate-none"
+              <a 
+                href="#phases"
+                className="px-12 py-4 bg-gradient-to-r from-blue-500 to-cyan-500 text-white rounded-xl font-bold text-lg hover:shadow-lg hover:scale-102 transition-all duration-200"
               >
-                <span className="relative z-10">Start Learning</span>
-                <div className="absolute inset-0 bg-gradient-to-r from-blue-400 to-cyan-400 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-blue-500 to-cyan-500 animate-ping opacity-20"></div>
-              </Link>
+                Start Learning
+              </a>
             </div>
           </div>
         </div>
@@ -70,6 +68,13 @@ export default function Home() {
 
       {/* Phases Grid */}
       <section id="phases" className="container mx-auto px-6 py-16">
+        <div className="text-center mb-12">
+          <h2 className="text-4xl font-bold text-white mb-4">Choose Your Learning Path</h2>
+          <p className="text-xl text-gray-300 max-w-3xl mx-auto">
+            Start with any phase that matches your current skill level. Each phase builds upon the previous one, but you can jump in anywhere.
+          </p>
+        </div>
+        
         <div className="grid md:grid-cols-2 gap-8">
           {phases.map((phase) => {
             const Icon = phase.icon;
@@ -79,7 +84,7 @@ export default function Home() {
                   <div className={`inline-flex p-3 rounded-lg bg-gradient-to-r ${phase.color} mb-4`}>
                     <Icon className="w-8 h-8 text-white" />
                   </div>
-                  
+
                   <div className="flex items-start justify-between mb-4">
                     <div>
                       <div className="text-sm font-semibold text-gray-400 mb-1">
@@ -90,11 +95,11 @@ export default function Home() {
                       </h3>
                     </div>
                   </div>
-                  
+
                   <p className="text-gray-400 mb-6">
                     {phase.description}
                   </p>
-                  
+
                   <div className="space-y-2">
                     {phase.topics.map((topic, idx) => (
                       <div key={idx} className="flex items-center text-sm text-gray-300">

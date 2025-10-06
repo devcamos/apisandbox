@@ -4,21 +4,19 @@
 
 ### What We Have:
 ```tsx
-<Link 
-  href="/phase-1"
-  className="group relative px-12 py-4 bg-gradient-to-r from-blue-500 to-cyan-500 text-white rounded-xl font-bold text-lg hover:shadow-2xl hover:scale-105 transition-all duration-300 animate-pulse hover:animate-none"
+<a 
+  href="#phases"
+  className="px-12 py-4 bg-gradient-to-r from-blue-500 to-cyan-500 text-white rounded-xl font-bold text-lg hover:shadow-lg hover:scale-102 transition-all duration-200"
 >
-  <span className="relative z-10">Start Learning</span>
-  <div className="absolute inset-0 bg-gradient-to-r from-blue-400 to-cyan-400 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-  <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-blue-500 to-cyan-500 animate-ping opacity-20"></div>
-</Link>
+  Start Learning
+</a>
 ```
 
 ### Animation Effects:
-1. **Breathing Effect**: `animate-pulse` (stops on hover)
-2. **Hover Scale**: `hover:scale-105` (grows 5% on hover)
-3. **Hover Glow**: Gradient overlay appears on hover
-4. **Ping Effect**: Subtle pulsing ring with `animate-ping`
+1. **Gentle Hover Scale**: `hover:scale-102` (grows 2% on hover)
+2. **Hover Shadow**: `hover:shadow-lg` (subtle shadow on hover)
+3. **Smooth Transition**: `transition-all duration-200` (200ms smooth animation)
+4. **No Breathing**: Removed pulsing animations for cleaner feel
 
 ---
 
@@ -57,15 +55,16 @@
 
 ### ✅ **Good:**
 - Clear visual hierarchy (larger, more prominent)
-- Hover states provide feedback
+- Gentle hover states provide subtle feedback
 - Gradient makes it stand out
-- Breathing draws attention
+- Clean, professional appearance
+- Smooth 200ms transitions
+- No overwhelming animations
 
 ### ⚠️ **Potential Issues:**
-- Multiple overlapping animations might be overwhelming
-- `animate-ping` might be too aggressive
-- No `prefers-reduced-motion` support
-- Animation might not work well on all devices
+- Very subtle hover effect (might not be noticeable enough)
+- No breathing animation to draw attention
+- Button might blend into background
 
 ---
 
