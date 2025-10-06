@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Brain, Plug, Network, Compass, ArrowRight, BookOpen, Play } from "lucide-react";
+import { Brain, Plug, Network, Compass, ArrowRight, BookOpen, Play, Star, Shield, Zap, Target } from "lucide-react";
 
 export default function StartPage() {
       const phases = [
