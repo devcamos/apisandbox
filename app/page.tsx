@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Brain, Plug, Network, Compass } from "lucide-react";
+import { Brain, Plug, Network, Compass, BarChart3 } from "lucide-react";
 
 export default function Home() {
   const phases = [
@@ -60,6 +60,13 @@ export default function Home() {
                 className="px-8 py-3 bg-gradient-to-r from-blue-500 to-cyan-500 text-white rounded-lg font-semibold hover:shadow-lg hover:scale-105 transition-all"
               >
                 Start Learning
+              </Link>
+              <Link 
+                href="/observability"
+                className="px-8 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg font-semibold hover:shadow-lg hover:scale-105 transition-all flex items-center gap-2"
+              >
+                <BarChart3 className="w-4 h-4" />
+                View Dashboard
               </Link>
               <a 
                 href="#phases"
