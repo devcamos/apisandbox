@@ -4,44 +4,64 @@ import Link from "next/link";
 import { Brain, Plug, Network, Compass, ArrowRight, BookOpen, Play } from "lucide-react";
 
 export default function StartPage() {
-  const phases = [
-    {
-      id: 1,
-      icon: Brain,
-      title: "Integration Mindset",
-      description: "Understand the 'why' behind integrations",
-      topics: ["REST, GraphQL, gRPC", "OpenAPI & protobuf", "Loose coupling & idempotency"],
-      color: "from-blue-500 to-cyan-500",
-      href: "/phase-1"
-    },
-    {
-      id: 2,
-      icon: Plug,
-      title: "Third-Party Integrations",
-      description: "Safely connect and maintain external APIs",
-      topics: ["OAuth2 & JWTs", "Resilience patterns", "Data transformation"],
-      color: "from-purple-500 to-pink-500",
-      href: "/phase-2"
-    },
-    {
-      id: 3,
-      icon: Network,
-      title: "Inter-Service Communication",
-      description: "Master service-to-service patterns",
-      topics: ["Sync vs async", "Event-driven with Kafka", "Distributed tracing"],
-      color: "from-orange-500 to-red-500",
-      href: "/phase-3"
-    },
-    {
-      id: 4,
-      icon: Compass,
-      title: "Principal-Level Architecture",
-      description: "Think like an integration architect",
-      topics: ["Anti-patterns", "Contract testing", "Legacy integration"],
-      color: "from-green-500 to-emerald-500",
-      href: "/phase-4"
-    }
-  ];
+      const phases = [
+        {
+          id: 1,
+          icon: Brain,
+          title: "Integration Mindset",
+          description: "Understand the 'why' behind integrations",
+          topics: ["REST, GraphQL, gRPC", "OpenAPI & protobuf", "Loose coupling & idempotency"],
+          color: "from-blue-500 to-cyan-500",
+          href: "/phase-1",
+          level: "Beginner",
+          levelIcon: Star,
+          levelColor: "text-green-400",
+          estimatedTime: "2-3 hours",
+          skills: ["API Fundamentals", "HTTP Methods", "JSON/XML", "Basic Authentication"]
+        },
+        {
+          id: 2,
+          icon: Plug,
+          title: "Third-Party Integrations",
+          description: "Safely connect and maintain external APIs",
+          topics: ["OAuth2 & JWTs", "Resilience patterns", "Data transformation"],
+          color: "from-purple-500 to-pink-500",
+          href: "/phase-2",
+          level: "Intermediate",
+          levelIcon: Shield,
+          levelColor: "text-blue-400",
+          estimatedTime: "3-4 hours",
+          skills: ["OAuth2", "JWT Tokens", "Rate Limiting", "Error Handling"]
+        },
+        {
+          id: 3,
+          icon: Network,
+          title: "Inter-Service Communication",
+          description: "Master service-to-service patterns",
+          topics: ["Sync vs async", "Event-driven with Kafka", "Distributed tracing"],
+          color: "from-orange-500 to-red-500",
+          href: "/phase-3",
+          level: "Advanced",
+          levelIcon: Zap,
+          levelColor: "text-orange-400",
+          estimatedTime: "4-5 hours",
+          skills: ["Microservices", "Event Streaming", "Circuit Breakers", "Distributed Tracing"]
+        },
+        {
+          id: 4,
+          icon: Compass,
+          title: "Principal-Level Architecture",
+          description: "Think like an integration architect",
+          topics: ["Anti-patterns", "Contract testing", "Legacy integration"],
+          color: "from-green-500 to-emerald-500",
+          href: "/phase-4",
+          level: "Expert",
+          levelIcon: Target,
+          levelColor: "text-purple-400",
+          estimatedTime: "5-6 hours",
+          skills: ["System Design", "Architecture Patterns", "Performance Optimization", "Legacy Migration"]
+        }
+      ];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
@@ -89,49 +109,76 @@ export default function StartPage() {
           </div>
         </div>
         
-        <div className="grid md:grid-cols-2 gap-8">
-          {phases.map((phase) => {
-            const Icon = phase.icon;
-            return (
-              <Link key={phase.id} href={phase.href}>
-                <div className="group bg-slate-800/50 backdrop-blur-sm rounded-2xl p-8 border border-slate-700 hover:border-slate-600 transition-all hover:shadow-2xl hover:scale-105 cursor-pointer">
-                  <div className={`inline-flex p-3 rounded-lg bg-gradient-to-r ${phase.color} mb-4`}>
-                    <Icon className="w-8 h-8 text-white" />
-                  </div>
+            <div className="grid md:grid-cols-2 gap-8">
+              {phases.map((phase) => {
+                const Icon = phase.icon;
+                const LevelIcon = phase.levelIcon;
+                return (
+                  <Link key={phase.id} href={phase.href}>
+                    <div className="group bg-slate-800/50 backdrop-blur-sm rounded-2xl p-8 border border-slate-700 hover:border-slate-600 transition-all hover:shadow-2xl hover:scale-105 cursor-pointer relative overflow-hidden">
+                      {/* Character Selection Style Background */}
+                      <div className="absolute inset-0 bg-gradient-to-br from-transparent via-transparent to-slate-700/20 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                      
+                      <div className="relative z-10">
+                        <div className="flex items-start justify-between mb-4">
+                          <div className={`inline-flex p-3 rounded-lg bg-gradient-to-r ${phase.color} mb-4`}>
+                            <Icon className="w-8 h-8 text-white" />
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <LevelIcon className={`w-4 h-4 ${phase.levelColor}`} />
+                            <span className={`text-sm font-semibold ${phase.levelColor}`}>
+                              {phase.level}
+                            </span>
+                          </div>
+                        </div>
 
-                  <div className="flex items-start justify-between mb-4">
-                    <div>
-                      <div className="text-sm font-semibold text-gray-400 mb-1">
-                        Phase {phase.id} • {phase.id === 1 ? 'Beginner' : phase.id === 2 ? 'Intermediate' : phase.id === 3 ? 'Advanced' : 'Expert'}
+                        <div className="mb-4">
+                          <div className="text-sm font-semibold text-gray-400 mb-1">
+                            Phase {phase.id}
+                          </div>
+                          <h3 className="text-2xl font-bold text-white mb-2">
+                            {phase.title}
+                          </h3>
+                          <p className="text-gray-400 mb-4">
+                            {phase.description}
+                          </p>
+                        </div>
+
+                        {/* Skills Tags */}
+                        <div className="flex flex-wrap gap-2 mb-4">
+                          {phase.skills.map((skill, idx) => (
+                            <span key={idx} className="px-2 py-1 bg-slate-700/50 text-xs text-gray-300 rounded">
+                              {skill}
+                            </span>
+                          ))}
+                        </div>
+
+                        {/* Topics */}
+                        <div className="space-y-2 mb-6">
+                          {phase.topics.map((topic, idx) => (
+                            <div key={idx} className="flex items-center text-sm text-gray-300">
+                              <span className={`w-1.5 h-1.5 rounded-full bg-gradient-to-r ${phase.color} mr-2`}></span>
+                              {topic}
+                            </div>
+                          ))}
+                        </div>
+
+                        {/* Time Estimate */}
+                        <div className="flex items-center justify-between">
+                          <div className="text-xs text-gray-500">
+                            ⏱️ {phase.estimatedTime}
+                          </div>
+                          <div className="text-blue-400 font-semibold flex items-center group-hover:gap-2 transition-all">
+                            Start Learning
+                            <span className="ml-2 group-hover:translate-x-1 transition-transform">→</span>
+                          </div>
+                        </div>
                       </div>
-                      <h3 className="text-2xl font-bold text-white mb-2">
-                        {phase.title}
-                      </h3>
                     </div>
-                  </div>
-
-                  <p className="text-gray-400 mb-6">
-                    {phase.description}
-                  </p>
-
-                  <div className="space-y-2">
-                    {phase.topics.map((topic, idx) => (
-                      <div key={idx} className="flex items-center text-sm text-gray-300">
-                        <span className={`w-1.5 h-1.5 rounded-full bg-gradient-to-r ${phase.color} mr-2`}></span>
-                        {topic}
-                      </div>
-                    ))}
-                  </div>
-                  
-                  <div className="mt-6 text-blue-400 font-semibold flex items-center group-hover:gap-2 transition-all">
-                    Explore Phase {phase.id}
-                    <span className="ml-2 group-hover:translate-x-1 transition-transform">→</span>
-                  </div>
-                </div>
-              </Link>
-            );
-          })}
-        </div>
+                  </Link>
+                );
+              })}
+            </div>
       </section>
 
       {/* Learning Path */}
