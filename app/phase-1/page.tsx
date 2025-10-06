@@ -103,11 +103,25 @@ export default function Phase1() {
                 "Stateless - server doesn't store client context between requests",
                 "Responses typically in JSON or XML format",
                 "Cacheable responses improve performance",
-                "Layered system architecture for scalability",
-                "🔗 Loose Coupling: Services interact through well-defined HTTP interfaces",
-                "🔄 Idempotency: PUT and DELETE operations should be idempotent for reliable retries",
-                "📋 OpenAPI: Standard specification format for REST API documentation"
+                "Layered system architecture for scalability"
               ],
+              corePrinciples: {
+                title: "Core Principles",
+                points: [
+                  "🔗 Loose Coupling: Services interact through well-defined HTTP interfaces, enabling independent evolution",
+                  "🔄 Idempotency: PUT and DELETE operations should be idempotent for reliable retries",
+                  "📊 Stateless: Each request contains all information needed to process it",
+                  "🎯 Uniform Interface: Consistent interaction patterns across all resources"
+                ]
+              },
+              contractStyles: {
+                title: "Contract Styles",
+                points: [
+                  "📋 OpenAPI: Standard specification format for REST API documentation and code generation",
+                  "🔧 Swagger UI: Interactive API documentation and testing interface",
+                  "📝 JSON Schema: Data validation and documentation for request/response formats"
+                ]
+              },
               useCases: [
                 "Public APIs for web and mobile apps",
                 "CRUD operations on database resources",
@@ -218,10 +232,25 @@ export default function Phase1() {
                 "Bi-directional streaming support",
                 "Strong typing enforced by .proto files",
                 "Automatic client and server code generation",
-                "Built-in authentication, load balancing, and health checking",
-                "🔗 Loose Coupling: Protocol Buffers provide strong contracts between services",
-                "📋 Protobuf: Binary serialization format with schema definition"
+                "Built-in authentication, load balancing, and health checking"
               ],
+              corePrinciples: {
+                title: "Core Principles",
+                points: [
+                  "🔗 Loose Coupling: Protocol Buffers provide strong contracts between services",
+                  "⚡ High Performance: Binary serialization and HTTP/2 for maximum efficiency",
+                  "🛡️ Strong Typing: Compile-time type safety with automatic code generation",
+                  "🔄 Streaming: Support for real-time bidirectional communication"
+                ]
+              },
+              contractStyles: {
+                title: "Contract Styles",
+                points: [
+                  "📋 Protocol Buffers (.proto): Interface definition language with schema evolution",
+                  "🔧 gRPC Reflection: Runtime service discovery and debugging capabilities",
+                  "📊 Binary Format: Efficient serialization with backward/forward compatibility"
+                ]
+              },
               useCases: [
                 "High-performance internal microservices",
                 "Real-time streaming applications",
@@ -332,10 +361,25 @@ export default function Phase1() {
                 "Message brokers (Kafka, RabbitMQ, SQS) handle delivery",
                 "Events represent state changes (user.created, order.placed)",
                 "Support for replay and event sourcing",
-                "At-least-once or exactly-once delivery guarantees",
-                "⏱️ Eventual Consistency: Systems converge to consistency over time",
-                "📋 AsyncAPI: Standard specification format for event-driven APIs"
+                "At-least-once or exactly-once delivery guarantees"
               ],
+              corePrinciples: {
+                title: "Core Principles",
+                points: [
+                  "⏱️ Eventual Consistency: Systems converge to consistency over time, enabling high availability",
+                  "🔗 Loose Coupling: Publishers and subscribers are completely decoupled",
+                  "📊 Event Sourcing: Store state changes as a sequence of events",
+                  "🔄 Asynchronous Processing: Non-blocking communication for better scalability"
+                ]
+              },
+              contractStyles: {
+                title: "Contract Styles",
+                points: [
+                  "📋 AsyncAPI: Standard specification format for event-driven APIs (like OpenAPI for events)",
+                  "🔧 Schema Registry: Centralized schema management for event evolution",
+                  "📝 Event Schema: JSON Schema or Avro for event payload validation"
+                ]
+              },
               useCases: [
                 "Microservices requiring loose coupling",
                 "Event sourcing and CQRS implementations",

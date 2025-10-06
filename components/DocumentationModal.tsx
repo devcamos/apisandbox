@@ -12,6 +12,14 @@ interface DocumentationModalProps {
     overview: string;
     description: string[];
     useCases: string[];
+    corePrinciples?: {
+      title: string;
+      points: string[];
+    };
+    contractStyles?: {
+      title: string;
+      points: string[];
+    };
     paretoKnowledge: {
       title: string;
       points: string[];
@@ -112,6 +120,40 @@ export default function DocumentationModal({
               ))}
             </div>
           </section>
+
+          {/* Core Principles */}
+          {documentation.corePrinciples && (
+            <section className="bg-gradient-to-r from-blue-500/10 to-cyan-500/10 border border-blue-500/20 rounded-xl p-6">
+              <h3 className="text-2xl font-bold text-white mb-4 flex items-center gap-2">
+                <CheckCircle className="w-6 h-6 text-blue-400" />
+                {documentation.corePrinciples.title}
+              </h3>
+              <div className="space-y-3">
+                {documentation.corePrinciples.points.map((principle, idx) => (
+                  <div key={idx} className="bg-blue-500/10 border border-blue-500/20 p-4 rounded-lg">
+                    <p className="text-gray-300 text-sm">{principle}</p>
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
+
+          {/* Contract Styles */}
+          {documentation.contractStyles && (
+            <section className="bg-gradient-to-r from-green-500/10 to-emerald-500/10 border border-green-500/20 rounded-xl p-6">
+              <h3 className="text-2xl font-bold text-white mb-4 flex items-center gap-2">
+                <BookOpen className="w-6 h-6 text-green-400" />
+                {documentation.contractStyles.title}
+              </h3>
+              <div className="space-y-3">
+                {documentation.contractStyles.points.map((style, idx) => (
+                  <div key={idx} className="bg-green-500/10 border border-green-500/20 p-4 rounded-lg">
+                    <p className="text-gray-300 text-sm">{style}</p>
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
 
           {/* Pareto Knowledge (80/20 Rule) */}
           <section className="bg-gradient-to-r from-yellow-500/10 to-orange-500/10 border border-yellow-500/20 rounded-xl p-6">
