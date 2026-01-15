@@ -1,0 +1,32 @@
+# Docker Compose for Local Development
+# Mono-Environment: PostgreSQL for all environments
+
+services:
+  # PostgreSQL Database (Local Development)
+  postgres-dev:
+    image: postgres:15-alpine
+    container_name: apisandbox-postgres-dev
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: apisandbox_dev
+    ports:
+      - "5433:5432"  # External port 5433 to avoid conflicts with local PostgreSQL
+    volumes:
+      - postgres_dev_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - apisandbox-network
+    restart: unless-stopped
+
+volumes:
+  postgres_dev_data:
+    driver: local
+
+networks:
+  apisandbox-network:
+    driver: bridge

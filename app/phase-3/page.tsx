@@ -3,17 +3,19 @@
 import PhaseLayout from "@/components/PhaseLayout";
 import ConceptCard from "@/components/ConceptCard";
 import ProjectCard from "@/components/ProjectCard";
+import { SubscriptionGate } from "@/components/SubscriptionGate";
 import { Network, Zap, MessageSquare, GitBranch, Activity, Eye } from "lucide-react";
 
 export default function Phase3() {
   return (
-    <PhaseLayout
-      phaseNumber={3}
-      title="Inter-Service Communication"
-      description="Master service-to-service patterns"
-      icon={Network}
-      color="from-orange-500 to-red-500"
-    >
+    <SubscriptionGate phaseNumber={3} lockedContentName="Phase 3: Inter-Service Communication">
+      <PhaseLayout
+        phaseNumber={3}
+        title="Inter-Service Communication"
+        description="Master service-to-service patterns"
+        icon={Network}
+        color="from-orange-500 to-red-500"
+      >
       {/* Goal Section */}
       <div className="bg-orange-500/10 border border-orange-500/20 rounded-xl p-6 mb-12">
         <h2 className="text-2xl font-bold text-white mb-3">🕸️ Phase Goal</h2>
@@ -183,7 +185,7 @@ consumer.on('message', async (msg) => {
           </div>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-6">
+        <div className="grid md:grid-cols-2 gap-6 mb-6">
           <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border border-slate-700">
             <h3 className="text-xl font-bold text-white mb-4">Proto Definition</h3>
             <div className="bg-slate-900/50 p-4 rounded-lg font-mono text-xs text-gray-300 overflow-x-auto">
@@ -258,6 +260,132 @@ server.bindAsync(
             </div>
           </div>
         </div>
+
+        {/* Java gRPC Examples */}
+        <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border border-slate-700">
+          <h3 className="text-xl font-bold text-white mb-4">Java gRPC Implementation</h3>
+          <div className="grid md:grid-cols-2 gap-6">
+            <div>
+              <div className="flex items-center gap-2 mb-3">
+                <span className="text-lg">☕</span>
+                <h4 className="text-lg font-bold text-white">Java gRPC Server</h4>
+              </div>
+              <div className="bg-slate-900/50 p-4 rounded-lg font-mono text-xs text-gray-300 overflow-x-auto">
+                <pre>{`import io.grpc.Server;
+import io.grpc.ServerBuilder;
+import user.v1.UserServiceGrpc;
+import user.v1.UserOuterClass.*;
+
+@GrpcService
+public class UserServiceImpl 
+    extends UserServiceGrpc.UserServiceImplBase {
+    
+    @Autowired
+    private UserRepository userRepository;
+    
+    @Override
+    public void getUser(
+        GetUserRequest request,
+        StreamObserver<User> responseObserver) {
+        
+        try {
+            UserEntity entity = userRepository
+                .findById(request.getId());
+            
+            User user = User.newBuilder()
+                .setId(entity.getId())
+                .setName(entity.getName())
+                .setEmail(entity.getEmail())
+                .setCreatedAt(entity.getCreatedAt())
+                .build();
+            
+            responseObserver.onNext(user);
+            responseObserver.onCompleted();
+        } catch (Exception e) {
+            responseObserver.onError(
+                Status.NOT_FOUND
+                    .withDescription("User not found")
+                    .asRuntimeException());
+        }
+    }
+    
+    @Override
+    public void listUsers(
+        ListUsersRequest request,
+        StreamObserver<User> responseObserver) {
+        // Server streaming
+        userRepository.findAll().forEach(user -> {
+            responseObserver.onNext(
+                convertToProto(user));
+        });
+        responseObserver.onCompleted();
+    }
+}
+
+// Server startup
+@SpringBootApplication
+public class Application {
+    public static void main(String[] args) {
+        Server server = ServerBuilder
+            .forPort(50051)
+            .addService(new UserServiceImpl())
+            .build();
+        server.start();
+    }
+}`}</pre>
+              </div>
+            </div>
+
+            <div>
+              <div className="flex items-center gap-2 mb-3">
+                <span className="text-lg">☕</span>
+                <h4 className="text-lg font-bold text-white">Java gRPC Client</h4>
+              </div>
+              <div className="bg-slate-900/50 p-4 rounded-lg font-mono text-xs text-gray-300 overflow-x-auto">
+                <pre>{`import io.grpc.ManagedChannel;
+import io.grpc.ManagedChannelBuilder;
+import user.v1.UserServiceGrpc;
+import user.v1.UserOuterClass.*;
+
+@Service
+public class UserClientService {
+    
+    private ManagedChannel channel;
+    private UserServiceGrpc.UserServiceBlockingStub stub;
+    
+    @PostConstruct
+    public void init() {
+        channel = ManagedChannelBuilder
+            .forAddress("localhost", 50051)
+            .usePlaintext()
+            .build();
+        stub = UserServiceGrpc.newBlockingStub(channel);
+    }
+    
+    public User getUser(String id) {
+        GetUserRequest request = GetUserRequest
+            .newBuilder()
+            .setId(id)
+            .build();
+        
+        return stub.getUser(request);
+    }
+    
+    public List<User> listUsers() {
+        ListUsersRequest request = 
+            ListUsersRequest.getDefaultInstance();
+        
+        Iterator<User> users = stub.listUsers(request);
+        return StreamSupport.stream(
+            Spliterators.spliteratorUnknownSize(
+                users, Spliterator.ORDERED), false)
+            .collect(Collectors.toList());
+    }
+}`}</pre>
+              </div>
+            </div>
+          </div>
+        </div>
       </section>
 
       {/* Event-Driven Architecture */}
@@ -302,10 +430,16 @@ server.bindAsync(
           />
         </div>
 
-        <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border border-slate-700">
+        <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border border-slate-700 mb-6">
           <h3 className="text-xl font-bold text-white mb-4">Kafka Implementation Example</h3>
-          <div className="bg-slate-900/50 p-4 rounded-lg font-mono text-xs text-gray-300 overflow-x-auto">
-            <pre>{`import { Kafka } from 'kafkajs';
+          <div className="grid md:grid-cols-2 gap-6">
+            <div>
+              <div className="flex items-center gap-2 mb-3">
+                <span className="text-lg">⚛️</span>
+                <h4 className="text-lg font-bold text-white">TypeScript/Node.js</h4>
+              </div>
+              <div className="bg-slate-900/50 p-4 rounded-lg font-mono text-xs text-gray-300 overflow-x-auto">
+                <pre>{`import { Kafka } from 'kafkajs';
 
 const kafka = new Kafka({
   clientId: 'order-service',
@@ -362,6 +496,171 @@ await consumer.run({
     });
   }
 });`}</pre>
+              </div>
+            </div>
+
+            <div>
+              <div className="flex items-center gap-2 mb-3">
+                <span className="text-lg">☕</span>
+                <h4 className="text-lg font-bold text-white">Java Spring Boot</h4>
+              </div>
+              <div className="bg-slate-900/50 p-4 rounded-lg font-mono text-xs text-gray-300 overflow-x-auto">
+                <pre>{`import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.kafka.support.KafkaHeaders;
+import org.springframework.messaging.handler.annotation.Header;
+import org.springframework.messaging.handler.annotation.Payload;
+
+@Service
+public class OrderService {
+    
+    @Autowired
+    private KafkaTemplate<String, String> kafkaTemplate;
+    
+    // Producer
+    public void createOrder(Order order) {
+        OrderEvent event = new OrderEvent(
+            order.getId(),
+            order.getUserId(),
+            order.getItems(),
+            order.getTotal()
+        );
+        
+        kafkaTemplate.send(
+            "order.created",
+            order.getId(),
+            objectMapper.writeValueAsString(event)
+        );
+    }
+}
+
+// Consumer
+@Component
+public class InventoryService {
+    
+    @Autowired
+    private InventoryRepository inventoryRepo;
+    
+    @Autowired
+    private KafkaTemplate<String, String> kafkaTemplate;
+    
+    @KafkaListener(
+        topics = "order.created",
+        groupId = "inventory-service"
+    )
+    public void handleOrderCreated(
+        @Payload String message,
+        @Header(KafkaHeaders.RECEIVED_KEY) String key) {
+        
+        OrderEvent order = objectMapper
+            .readValue(message, OrderEvent.class);
+        
+        // Process order - reserve inventory
+        reserveInventory(order);
+        
+        // Emit next event
+        InventoryReservedEvent event = 
+            new InventoryReservedEvent(
+                order.getOrderId(), "reserved");
+        
+        kafkaTemplate.send(
+            "inventory.reserved",
+            order.getOrderId(),
+            objectMapper.writeValueAsString(event)
+        );
+    }
+}
+
+// Configuration
+@Configuration
+public class KafkaConfig {
+    @Bean
+    public ProducerFactory<String, String> 
+        producerFactory() {
+        Map<String, Object> config = new HashMap<>();
+        config.put(
+            ProducerConfig.BOOTSTRAP_SERVERS_CONFIG,
+            "kafka1:9092,kafka2:9092");
+        config.put(
+            ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG,
+            StringSerializer.class);
+        config.put(
+            ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG,
+            StringSerializer.class);
+        return new DefaultKafkaProducerFactory<>(config);
+    }
+}`}</pre>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Docker Examples */}
+        <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border border-slate-700">
+          <h3 className="text-xl font-bold text-white mb-4">🐳 Docker Containerization</h3>
+          <div className="grid md:grid-cols-2 gap-6">
+            <div>
+              <h4 className="text-lg font-bold text-white mb-3">Dockerfile for Java Spring Boot</h4>
+              <div className="bg-slate-900/50 p-4 rounded-lg font-mono text-xs text-gray-300 overflow-x-auto">
+                <pre>{`# Multi-stage build for Java
+FROM maven:3.9-eclipse-temurin-17 AS build
+WORKDIR /app
+COPY pom.xml .
+COPY src ./src
+RUN mvn clean package -DskipTests
+
+# Runtime stage
+FROM eclipse-temurin:17-jre-alpine
+WORKDIR /app
+COPY --from=build /app/target/*.jar app.jar
+EXPOSE 8080
+ENTRYPOINT ["java", "-jar", "app.jar"]`}</pre>
+              </div>
+            </div>
+
+            <div>
+              <h4 className="text-lg font-bold text-white mb-3">Docker Compose for Microservices</h4>
+              <div className="bg-slate-900/50 p-4 rounded-lg font-mono text-xs text-gray-300 overflow-x-auto">
+                <pre>{`version: '3.8'
+
+services:
+  java-api:
+    build: ./backend
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+    depends_on:
+      - kafka
+      - postgres
+  
+  react-frontend:
+    build: ./frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - REACT_APP_API_URL=http://java-api:8080
+    depends_on:
+      - java-api
+  
+  kafka:
+    image: confluentinc/cp-kafka:latest
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+  
+  postgres:
+    image: postgres:15
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: myapp
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password`}</pre>
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -524,6 +823,7 @@ async function processOrder(orderId: string) {
         />
       </section>
     </PhaseLayout>
+    </SubscriptionGate>
   );
 }
 

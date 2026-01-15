@@ -105,7 +105,7 @@ export default function EventDrivenTester({ title, description, eventType }: Eve
       <div className="space-y-2 max-h-64 overflow-y-auto">
         {events.length === 0 ? (
           <div className="text-center py-8 text-gray-500 text-xs">
-            No events yet. Click "Publish Event" to start!
+            No events yet. Click &quot;Publish Event&quot; to start!
           </div>
         ) : (
           events.map((event, idx) => (

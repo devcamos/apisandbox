@@ -206,7 +206,7 @@ export default function ApiEndpointTester({
                   type="text"
                   value={value}
                   onChange={(e) => setHeaders({ ...headers, [key]: e.target.value })}
-                  className="flex-1 bg-slate-900 text-gray-300 border border-slate-600 rounded px-2 py-1 font-mono"
+                  className="flex-1 bg-black text-gray-300 border border-slate-600 rounded px-2 py-1 font-mono"
                 />
                 <button
                   onClick={() => removeHeader(key)}
@@ -229,7 +229,7 @@ export default function ApiEndpointTester({
           <textarea
             value={requestBody}
             onChange={(e) => setRequestBody(e.target.value)}
-            className="w-full bg-slate-800 text-gray-300 border border-slate-700 rounded-lg p-2 font-mono text-xs"
+            className="w-full bg-black text-gray-300 border border-slate-700 rounded-lg p-2 font-mono text-xs"
             rows={4}
             placeholder='{"title": "foo", "body": "bar", "userId": 1}'
           />

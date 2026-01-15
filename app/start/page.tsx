@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Brain, Plug, Network, Compass, ArrowRight, BookOpen, Play, Star, Shield, Zap, Target } from "lucide-react";
+import { Brain, Plug, Network, Compass, ArrowRight, BookOpen, Play, Star, Shield, Zap, Target, Cloud } from "lucide-react";
 
 export default function StartPage() {
       const phases = [
@@ -104,12 +104,12 @@ export default function StartPage() {
           </p>
           <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-4 max-w-2xl mx-auto">
             <p className="text-blue-200 text-sm">
-              <strong>💡 New to APIs?</strong> Start with Phase 1. <strong>Already comfortable with REST?</strong> Jump to Phase 2. <strong>Building microservices?</strong> Phase 3 is for you.
+              <strong>💡 New to APIs?</strong> Start with Phase 1. <strong>Already comfortable with REST?</strong> Jump to Phase 2. <strong>Building microservices?</strong> Phase 3 is for you. <strong>Ready for cloud?</strong> Explore the Cloud section.
             </p>
           </div>
         </div>
         
-            <div className="grid md:grid-cols-2 gap-8">
+            <div className="grid md:grid-cols-2 gap-8 mb-8">
               {phases.map((phase) => {
                 const Icon = phase.icon;
                 const LevelIcon = phase.levelIcon;
@@ -179,6 +179,90 @@ export default function StartPage() {
                 );
               })}
             </div>
+      </section>
+
+      {/* Cloud Section Card */}
+      <section className="container mx-auto px-6 py-8">
+        <div className="text-center mb-8">
+          <h2 className="text-3xl font-bold text-white mb-4">Cloud Migration</h2>
+          <p className="text-gray-300 max-w-2xl mx-auto">
+            Learn how to migrate your applications to AWS cloud
+          </p>
+        </div>
+        <Link href="/cloud">
+          <div className="group bg-slate-800/50 backdrop-blur-sm rounded-2xl p-8 border-2 border-slate-700 hover:border-orange-500 transition-all hover:shadow-2xl hover:scale-105 cursor-pointer relative overflow-hidden max-w-4xl mx-auto">
+            <div className="absolute inset-0 bg-gradient-to-br from-transparent via-transparent to-orange-500/20 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+            
+            <div className="relative z-10">
+              <div className="flex items-start justify-between mb-4">
+                <div className="inline-flex p-3 rounded-lg bg-gradient-to-r from-orange-500 to-red-500 mb-4">
+                  <Cloud className="w-8 h-8 text-white" />
+                </div>
+                <div className="flex items-center gap-2">
+                  <Target className="w-4 h-4 text-orange-400" />
+                  <span className="text-sm font-semibold text-orange-400">
+                    Cloud
+                  </span>
+                </div>
+              </div>
+
+              <div className="mb-4">
+                <div className="text-sm font-semibold text-gray-400 mb-1">
+                  Cloud Section
+                </div>
+                <h3 className="text-2xl font-bold text-white mb-2">
+                  AWS Cloud Migration
+                </h3>
+                <p className="text-gray-400 mb-4">
+                  Master AWS cloud integration and learn how to migrate your applications to the cloud
+                </p>
+              </div>
+
+              {/* Skills Tags */}
+              <div className="flex flex-wrap gap-2 mb-4">
+                <span className="px-2 py-1 bg-slate-700/50 text-xs text-gray-300 rounded">
+                  AWS Services
+                </span>
+                <span className="px-2 py-1 bg-slate-700/50 text-xs text-gray-300 rounded">
+                  Migration Strategies
+                </span>
+                <span className="px-2 py-1 bg-slate-700/50 text-xs text-gray-300 rounded">
+                  Cost Optimization
+                </span>
+                <span className="px-2 py-1 bg-slate-700/50 text-xs text-gray-300 rounded">
+                  Architecture
+                </span>
+              </div>
+
+              {/* Topics */}
+              <div className="space-y-2 mb-6">
+                <div className="flex items-center text-sm text-gray-300">
+                  <span className="w-1.5 h-1.5 rounded-full bg-gradient-to-r from-orange-500 to-red-500 mr-2"></span>
+                  EC2, S3, RDS, Lambda, API Gateway
+                </div>
+                <div className="flex items-center text-sm text-gray-300">
+                  <span className="w-1.5 h-1.5 rounded-full bg-gradient-to-r from-orange-500 to-red-500 mr-2"></span>
+                  Lift & Shift, Re-platform, Refactor
+                </div>
+                <div className="flex items-center text-sm text-gray-300">
+                  <span className="w-1.5 h-1.5 rounded-full bg-gradient-to-r from-orange-500 to-red-500 mr-2"></span>
+                  Migration Dashboard & Tools
+                </div>
+              </div>
+
+              {/* Time Estimate */}
+              <div className="flex items-center justify-between">
+                <div className="text-xs text-gray-500">
+                  ⏱️ Self-paced
+                </div>
+                <div className="text-orange-400 font-semibold flex items-center group-hover:gap-2 transition-all">
+                  Explore Cloud
+                  <span className="ml-2 group-hover:translate-x-1 transition-transform">→</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </Link>
       </section>
 
       {/* Learning Path */}

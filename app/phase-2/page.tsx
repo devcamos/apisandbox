@@ -3,17 +3,19 @@
 import PhaseLayout from "@/components/PhaseLayout";
 import ConceptCard from "@/components/ConceptCard";
 import ProjectCard from "@/components/ProjectCard";
-import { Plug, Key, Shield, RefreshCw, Zap, Database } from "lucide-react";
+import { SubscriptionGate } from "@/components/SubscriptionGate";
+import { Plug, Key, Shield, RefreshCw, Zap, Database, CreditCard, Mail, Folder } from "lucide-react";
 
 export default function Phase2() {
   return (
-    <PhaseLayout
-      phaseNumber={2}
-      title="Third-Party Integrations"
-      description="Safely connect and maintain external APIs"
-      icon={Plug}
-      color="from-purple-500 to-pink-500"
-    >
+    <SubscriptionGate phaseNumber={2} lockedContentName="Phase 2: Third-Party Integrations">
+      <PhaseLayout
+        phaseNumber={2}
+        title="Third-Party Integrations"
+        description="Safely connect and maintain external APIs"
+        icon={Plug}
+        color="from-purple-500 to-pink-500"
+      >
       {/* Goal Section */}
       <div className="bg-purple-500/10 border border-purple-500/20 rounded-xl p-6 mb-12">
         <h2 className="text-2xl font-bold text-white mb-3">⚙️ Phase Goal</h2>
@@ -203,11 +205,18 @@ export default function Phase2() {
       {/* Auth Code Examples */}
       <section className="mb-12">
         <h2 className="text-3xl font-bold text-white mb-6">Implementation Examples</h2>
-        <div className="grid md:grid-cols-2 gap-6">
-          <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border border-slate-700">
-            <h3 className="text-xl font-bold text-white mb-4">OAuth2 Flow</h3>
-            <div className="bg-slate-900/50 p-4 rounded-lg font-mono text-xs text-gray-300 overflow-x-auto">
-              <pre>{`// 1. Redirect to authorization endpoint
+        
+        {/* OAuth2 Examples */}
+        <div className="mb-6">
+          <h3 className="text-2xl font-bold text-white mb-4">OAuth2 Flow</h3>
+          <div className="grid md:grid-cols-2 gap-6">
+            <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border border-slate-700">
+              <div className="flex items-center gap-2 mb-3">
+                <span className="text-lg">⚛️</span>
+                <h4 className="text-lg font-bold text-white">TypeScript/Node.js</h4>
+              </div>
+              <div className="bg-slate-900/50 p-4 rounded-lg font-mono text-xs text-gray-300 overflow-x-auto">
+                <pre>{`// 1. Redirect to authorization endpoint
 const authUrl = \`https://auth.example.com/authorize?
   client_id=\${clientId}&
   redirect_uri=\${redirectUri}&
@@ -230,13 +239,63 @@ const tokenResponse = await fetch(
 
 const { access_token, refresh_token } = 
   await tokenResponse.json();`}</pre>
+              </div>
+            </div>
+
+            <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border border-slate-700">
+              <div className="flex items-center gap-2 mb-3">
+                <span className="text-lg">☕</span>
+                <h4 className="text-lg font-bold text-white">Java Spring Boot</h4>
+              </div>
+              <div className="bg-slate-900/50 p-4 rounded-lg font-mono text-xs text-gray-300 overflow-x-auto">
+                <pre>{`@RestController
+@RequestMapping("/api/auth")
+public class OAuth2Controller {
+    
+    @Autowired
+    private OAuth2AuthorizedClientService clientService;
+    
+    @GetMapping("/authorize")
+    public String authorize() {
+        // Build authorization URL
+        String authUrl = "https://auth.example.com/authorize" +
+            "?client_id=" + clientId +
+            "&redirect_uri=" + redirectUri +
+            "&response_type=code" +
+            "&scope=read write";
+        return authUrl;
+    }
+    
+    @GetMapping("/callback")
+    public ResponseEntity<TokenResponse> callback(
+        @RequestParam String code) {
+        
+        // Exchange code for token
+        OAuth2AccessTokenResponse response = 
+            oauth2Service.getAccessToken(code);
+        
+        return ResponseEntity.ok(new TokenResponse(
+            response.getAccessToken().getTokenValue(),
+            response.getRefreshToken().getTokenValue()
+        ));
+    }
+}`}</pre>
+              </div>
             </div>
           </div>
+        </div>
 
-          <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border border-slate-700">
-            <h3 className="text-xl font-bold text-white mb-4">JWT Validation</h3>
-            <div className="bg-slate-900/50 p-4 rounded-lg font-mono text-xs text-gray-300 overflow-x-auto">
-              <pre>{`import jwt from 'jsonwebtoken';
+        {/* JWT Validation Examples */}
+        <div>
+          <h3 className="text-2xl font-bold text-white mb-4">JWT Validation</h3>
+          <div className="grid md:grid-cols-2 gap-6">
+            <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border border-slate-700">
+              <div className="flex items-center gap-2 mb-3">
+                <span className="text-lg">⚛️</span>
+                <h4 className="text-lg font-bold text-white">TypeScript/Node.js</h4>
+              </div>
+              <div className="bg-slate-900/50 p-4 rounded-lg font-mono text-xs text-gray-300 overflow-x-auto">
+                <pre>{`import jwt from 'jsonwebtoken';
 
 // Verify JWT token
 function verifyToken(token: string) {
@@ -265,7 +324,411 @@ app.use((req, res, next) => {
   req.user = verifyToken(token);
   next();
 });`}</pre>
+              </div>
             </div>
+
+            <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border border-slate-700">
+              <div className="flex items-center gap-2 mb-3">
+                <span className="text-lg">☕</span>
+                <h4 className="text-lg font-bold text-white">Java Spring Boot</h4>
+              </div>
+              <div className="bg-slate-900/50 p-4 rounded-lg font-mono text-xs text-gray-300 overflow-x-auto">
+                <pre>{`import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.Claims;
+
+@Service
+public class JwtService {
+    
+    private String secret = System.getenv("JWT_SECRET");
+    
+    public Claims verifyToken(String token) {
+        try {
+            return Jwts.parser()
+                .setSigningKey(secret)
+                .parseClaimsJws(token)
+                .getBody();
+        } catch (Exception e) {
+            throw new InvalidTokenException("Invalid token");
+        }
+    }
+}
+
+// Filter/Interceptor
+@Component
+public class JwtAuthenticationFilter 
+    extends OncePerRequestFilter {
+    
+    @Autowired
+    private JwtService jwtService;
+    
+    @Override
+    protected void doFilterInternal(
+        HttpServletRequest request,
+        HttpServletResponse response,
+        FilterChain filterChain) {
+        
+        String token = extractToken(request);
+        if (token != null) {
+            Claims claims = jwtService.verifyToken(token);
+            // Set authentication context
+        }
+        filterChain.doFilter(request, response);
+    }
+}`}</pre>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Where Backend Meets Frontend: React + Java */}
+      <section className="mb-12">
+        <h2 className="text-3xl font-bold text-white mb-6">
+          Where Backend Meets Frontend: React + Java
+        </h2>
+        
+        {/* Introduction */}
+        <div className="bg-gradient-to-br from-purple-500/10 to-pink-500/10 border-2 border-purple-500/30 rounded-xl p-6 mb-6">
+          <div className="flex items-start gap-4">
+            <div className="p-3 bg-purple-500/20 rounded-lg">
+              <span className="text-3xl">🤝</span>
+            </div>
+            <div>
+              <h3 className="text-2xl font-bold text-white mb-2">The Meeting Point</h3>
+              <p className="text-gray-300">
+                Your <strong>React frontend</strong> and <strong>Java backend</strong> don't need to know 
+                about each other's internal implementation. They meet at the <strong>API contract</strong> - 
+                a simple agreement on HTTP methods, endpoints, and JSON structure. This contract is what 
+                enables them to communicate seamlessly.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* The Contract - Visual Representation */}
+        <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border border-slate-700 mb-6">
+          <h3 className="text-xl font-bold text-white mb-4">📋 The API Contract</h3>
+          <div className="grid md:grid-cols-3 gap-4 mb-4">
+            <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-4 text-center">
+              <div className="text-2xl mb-2">⚛️</div>
+              <div className="font-semibold text-white mb-1">React Frontend</div>
+              <div className="text-gray-400 text-xs">Makes HTTP requests</div>
+            </div>
+            <div className="bg-green-500/10 border border-green-500/20 rounded-lg p-4 text-center">
+              <div className="text-2xl mb-2">📡</div>
+              <div className="font-semibold text-white mb-1">API Contract</div>
+              <div className="text-gray-400 text-xs">HTTP + JSON</div>
+            </div>
+            <div className="bg-orange-500/10 border border-orange-500/20 rounded-lg p-4 text-center">
+              <div className="text-2xl mb-2">☕</div>
+              <div className="font-semibold text-white mb-1">Java Backend</div>
+              <div className="text-gray-400 text-xs">Returns JSON responses</div>
+            </div>
+          </div>
+          
+          <div className="bg-slate-900/50 p-4 rounded-lg font-mono text-xs text-gray-300">
+            <div className="text-green-400 mb-2">Contract Definition:</div>
+            <div className="space-y-1">
+              <div>GET /api/users/{`{id}`} → Returns User JSON</div>
+              <div>POST /api/users → Accepts User JSON, Returns Created User</div>
+              <div>PUT /api/users/{`{id}`} → Accepts User JSON, Returns Updated User</div>
+              <div>DELETE /api/users/{`{id}`} → Returns 204 No Content</div>
+            </div>
+          </div>
+        </div>
+
+        {/* Complete Example: Get User */}
+        <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border border-slate-700 mb-6">
+          <h3 className="text-xl font-bold text-white mb-4">Complete Example: Fetching a User</h3>
+          
+          <div className="grid md:grid-cols-2 gap-6">
+            {/* React Frontend */}
+            <div>
+              <div className="flex items-center gap-2 mb-3">
+                <span className="text-2xl">⚛️</span>
+                <h4 className="text-lg font-bold text-white">React Frontend</h4>
+              </div>
+              <div className="bg-slate-900/50 p-4 rounded-lg font-mono text-xs text-gray-300 overflow-x-auto">
+                <pre>{`import { useState, useEffect } from 'react';
+
+function UserProfile({ userId }) {
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  
+  useEffect(() => {
+    // Making request to API contract
+    fetch(\`http://localhost:8080/api/users/\${userId}\`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': \`Bearer \${token}\`
+      }
+    })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error(\`HTTP error! status: \${response.status}\`);
+      }
+      return response.json(); // Expecting JSON from contract
+    })
+    .then(data => {
+      setUser(data);  // data matches contract structure
+      setLoading(false);
+    })
+    .catch(err => {
+      setError(err.message);
+      setLoading(false);
+    });
+  }, [userId]);
+  
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div>Error: {error}</div>;
+  
+  return (
+    <div>
+      <h2>{user.name}</h2>
+      <p>{user.email}</p>
+    </div>
+  );
+}`}</pre>
+              </div>
+              <div className="mt-3 p-3 bg-blue-500/10 border border-blue-500/20 rounded text-xs text-gray-300">
+                <strong className="text-blue-400">Key Point:</strong> React doesn't care if the backend 
+                is Java, Python, or Node.js. It only cares about the HTTP + JSON contract.
+              </div>
+            </div>
+
+            {/* Java Backend */}
+            <div>
+              <div className="flex items-center gap-2 mb-3">
+                <span className="text-2xl">☕</span>
+                <h4 className="text-lg font-bold text-white">Java Backend</h4>
+              </div>
+              <div className="bg-slate-900/50 p-4 rounded-lg font-mono text-xs text-gray-300 overflow-x-auto">
+                <pre>{`@RestController
+@RequestMapping("/api/users")
+public class UserController {
+    
+    @Autowired
+    private UserService userService;
+    
+    @GetMapping("/{id}")
+    public ResponseEntity<User> getUser(
+        @PathVariable String id,
+        @RequestHeader("Authorization") String auth) {
+        
+        // Validate token (internal logic)
+        if (!isValidToken(auth)) {
+            return ResponseEntity.status(401).build();
+        }
+        
+        // Business logic (internal implementation)
+        User user = userService.findById(id);
+        
+        if (user == null) {
+            return ResponseEntity.notFound().build();
+        }
+        
+        // Return JSON matching contract
+        // Spring Boot automatically serializes to JSON
+        return ResponseEntity.ok(user);
+    }
+}
+
+// User entity - automatically serialized to JSON
+@Entity
+public class User {
+    private String id;
+    private String name;
+    private String email;
+    private LocalDateTime createdAt;
+    
+    // Getters and setters
+    // Spring Boot uses these to create JSON
+    public String getId() { return id; }
+    public String getName() { return name; }
+    public String getEmail() { return email; }
+    // ...
+}`}</pre>
+              </div>
+              <div className="mt-3 p-3 bg-orange-500/10 border border-orange-500/20 rounded text-xs text-gray-300">
+                <strong className="text-orange-400">Key Point:</strong> Java doesn't care if the frontend 
+                is React, Vue, or Angular. It only needs to fulfill the HTTP + JSON contract.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* The JSON Contract */}
+        <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border border-slate-700 mb-6">
+          <h3 className="text-xl font-bold text-white mb-4">📦 The JSON Contract Structure</h3>
+          <div className="grid md:grid-cols-2 gap-6">
+            <div>
+              <h4 className="font-semibold text-white mb-2 text-sm">Request (React → Java)</h4>
+              <div className="bg-slate-900/50 p-4 rounded-lg font-mono text-xs text-gray-300 overflow-x-auto">
+                <pre>{`// POST /api/users
+{
+  "name": "John Doe",
+  "email": "john@example.com"
+}`}</pre>
+              </div>
+            </div>
+            <div>
+              <h4 className="font-semibold text-white mb-2 text-sm">Response (Java → React)</h4>
+              <div className="bg-slate-900/50 p-4 rounded-lg font-mono text-xs text-gray-300 overflow-x-auto">
+                <pre>{`// 200 OK
+{
+  "id": "123",
+  "name": "John Doe",
+  "email": "john@example.com",
+  "createdAt": "2024-01-15T10:30:00Z"
+}`}</pre>
+              </div>
+            </div>
+          </div>
+          <div className="mt-4 p-4 bg-green-500/10 border border-green-500/20 rounded">
+            <p className="text-gray-300 text-sm">
+              <strong className="text-green-400">This JSON structure is the contract.</strong> As long as 
+              both React and Java agree on this structure, they can work together regardless of their 
+              internal implementations.
+            </p>
+          </div>
+        </div>
+
+        {/* More Examples */}
+        <div className="grid md:grid-cols-2 gap-6 mb-6">
+          {/* Create User Example */}
+          <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border border-slate-700">
+            <h3 className="text-xl font-bold text-white mb-4">Creating a User</h3>
+            
+            <div className="space-y-4">
+              <div>
+                <p className="text-gray-400 text-xs mb-2">React:</p>
+                <div className="bg-slate-900/50 p-3 rounded-lg font-mono text-xs text-gray-300 overflow-x-auto">
+                  <pre>{`const createUser = async (userData) => {
+  const response = await fetch('/api/users', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(userData)
+  });
+  return response.json();
+};`}</pre>
+                </div>
+              </div>
+              
+              <div>
+                <p className="text-gray-400 text-xs mb-2">Java:</p>
+                <div className="bg-slate-900/50 p-3 rounded-lg font-mono text-xs text-gray-300 overflow-x-auto">
+                  <pre>{`@PostMapping
+public ResponseEntity<User> createUser(
+    @RequestBody User user) {
+    User created = userService.save(user);
+    return ResponseEntity
+        .status(201)
+        .body(created);
+}`}</pre>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Error Handling Example */}
+          <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border border-slate-700">
+            <h3 className="text-xl font-bold text-white mb-4">Error Handling</h3>
+            
+            <div className="space-y-4">
+              <div>
+                <p className="text-gray-400 text-xs mb-2">React:</p>
+                <div className="bg-slate-900/50 p-3 rounded-lg font-mono text-xs text-gray-300 overflow-x-auto">
+                  <pre>{`try {
+  const response = await fetch('/api/users/123');
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.message);
+  }
+  const user = await response.json();
+} catch (error) {
+  console.error('Failed:', error);
+}`}</pre>
+                </div>
+              </div>
+              
+              <div>
+                <p className="text-gray-400 text-xs mb-2">Java:</p>
+                <div className="bg-slate-900/50 p-3 rounded-lg font-mono text-xs text-gray-300 overflow-x-auto">
+                  <pre>{`@GetMapping("/{id}")
+public ResponseEntity<?> getUser(@PathVariable String id) {
+    try {
+        User user = userService.findById(id);
+        return ResponseEntity.ok(user);
+    } catch (UserNotFoundException e) {
+        return ResponseEntity
+            .status(404)
+            .body(new ErrorResponse("User not found"));
+    }
+}`}</pre>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Key Takeaways */}
+        <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-xl p-6">
+          <h3 className="text-xl font-bold text-white mb-4">💡 Key Takeaways</h3>
+          <div className="grid md:grid-cols-2 gap-4">
+            <div>
+              <p className="text-gray-300 text-sm mb-2">
+                <strong className="text-yellow-400">1. Contract First:</strong> Define the API contract 
+                (HTTP methods, endpoints, JSON structure) before implementation.
+              </p>
+              <p className="text-gray-300 text-sm mb-2">
+                <strong className="text-yellow-400">2. Independence:</strong> React and Java teams can 
+                work independently as long as they agree on the contract.
+              </p>
+            </div>
+            <div>
+              <p className="text-gray-300 text-sm mb-2">
+                <strong className="text-yellow-400">3. Universal Standards:</strong> HTTP + JSON are 
+                universal technologies that work across all platforms.
+              </p>
+              <p className="text-gray-300 text-sm mb-2">
+                <strong className="text-yellow-400">4. Internal Details Don't Matter:</strong> React 
+                doesn't need to know about Spring Boot, and Java doesn't need to know about React hooks.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Technology Portability Disclaimer */}
+        <div className="bg-blue-500/10 border border-blue-500/20 rounded-xl p-6 mt-6">
+          <h3 className="text-xl font-bold text-white mb-4">💡 Key Technology Benefit: Platform Independence</h3>
+          <p className="text-gray-300 text-sm mb-4">
+            One of the major benefits of using modern, standardized technologies like <strong className="text-blue-400">Next.js</strong>, 
+            <strong className="text-blue-400"> Spring Boot</strong>, and <strong className="text-blue-400">Prisma</strong>: 
+            <strong> your application code doesn't care where services live.</strong>
+          </p>
+          <div className="grid md:grid-cols-3 gap-4 text-sm">
+            <div className="bg-slate-800/50 rounded-lg p-4">
+              <p className="text-blue-400 font-semibold mb-2">Next.js</p>
+              <p className="text-gray-300">Runs identically on local dev, Vercel, AWS, Docker - same codebase, different deployment targets.</p>
+            </div>
+            <div className="bg-slate-800/50 rounded-lg p-4">
+              <p className="text-blue-400 font-semibold mb-2">Spring Boot</p>
+              <p className="text-gray-300">Deploy anywhere Java runs: local, Docker, AWS, Azure, GCP - just configure environment variables.</p>
+            </div>
+            <div className="bg-slate-800/50 rounded-lg p-4">
+              <p className="text-blue-400 font-semibold mb-2">Prisma</p>
+              <p className="text-gray-300">Works with SQLite locally, PostgreSQL in production - only `DATABASE_URL` changes, zero code changes.</p>
+            </div>
+          </div>
+          <div className="mt-4 p-3 bg-blue-500/20 rounded border border-blue-500/30">
+            <p className="text-gray-300 text-sm">
+              <strong>The key principle:</strong> Configure through environment variables, not code changes. 
+              This enables seamless local development and flexible deployment options.
+            </p>
           </div>
         </div>
       </section>
@@ -417,11 +880,18 @@ app.use((req, res, next) => {
       {/* Resilience Code Examples */}
       <section className="mb-12">
         <h2 className="text-3xl font-bold text-white mb-6">Resilience Implementation</h2>
-        <div className="space-y-6">
-          <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border border-slate-700">
-            <h3 className="text-xl font-bold text-white mb-4">Retry with Exponential Backoff</h3>
-            <div className="bg-slate-900/50 p-4 rounded-lg font-mono text-xs text-gray-300 overflow-x-auto">
-              <pre>{`async function fetchWithRetry(
+        
+        {/* Retry with Exponential Backoff */}
+        <div className="mb-6">
+          <h3 className="text-2xl font-bold text-white mb-4">Retry with Exponential Backoff</h3>
+          <div className="grid md:grid-cols-2 gap-6">
+            <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border border-slate-700">
+              <div className="flex items-center gap-2 mb-3">
+                <span className="text-lg">⚛️</span>
+                <h4 className="text-lg font-bold text-white">TypeScript/Node.js</h4>
+              </div>
+              <div className="bg-slate-900/50 p-4 rounded-lg font-mono text-xs text-gray-300 overflow-x-auto">
+                <pre>{`async function fetchWithRetry(
   url: string, 
   options: RequestInit = {}, 
   maxRetries = 3
@@ -459,13 +929,68 @@ app.use((req, res, next) => {
   
   throw lastError;
 }`}</pre>
+              </div>
+            </div>
+
+            <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border border-slate-700">
+              <div className="flex items-center gap-2 mb-3">
+                <span className="text-lg">☕</span>
+                <h4 className="text-lg font-bold text-white">Java Spring Boot (Resilience4j)</h4>
+              </div>
+              <div className="bg-slate-900/50 p-4 rounded-lg font-mono text-xs text-gray-300 overflow-x-auto">
+                <pre>{`import io.github.resilience4j.retry.annotation.Retry;
+import io.github.resilience4j.retry.RetryConfig;
+
+@Service
+public class ExternalApiService {
+    
+    @Retry(name = "externalApi", fallbackMethod = "fallback")
+    public ResponseEntity<String> callExternalApi(String url) {
+        RestTemplate restTemplate = new RestTemplate();
+        return restTemplate.getForEntity(url, String.class);
+    }
+    
+    // Fallback method
+    public ResponseEntity<String> fallback(
+        String url, Exception ex) {
+        return ResponseEntity
+            .status(503)
+            .body("Service temporarily unavailable");
+    }
+}
+
+// Configuration
+@Configuration
+public class RetryConfig {
+    @Bean
+    public RetryConfig retryConfiguration() {
+        return RetryConfig.custom()
+            .maxAttempts(3)
+            .waitDuration(Duration.ofSeconds(1))
+            .intervalFunction(IntervalFunction
+                .ofExponentialBackoff(
+                    Duration.ofSeconds(1), 2))
+            .retryOnException(e -> 
+                e instanceof HttpServerErrorException)
+            .build();
+    }
+}`}</pre>
+              </div>
             </div>
           </div>
+        </div>
 
-          <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border border-slate-700">
-            <h3 className="text-xl font-bold text-white mb-4">Circuit Breaker Pattern</h3>
-            <div className="bg-slate-900/50 p-4 rounded-lg font-mono text-xs text-gray-300 overflow-x-auto">
-              <pre>{`class CircuitBreaker {
+        {/* Circuit Breaker Pattern */}
+        <div>
+          <h3 className="text-2xl font-bold text-white mb-4">Circuit Breaker Pattern</h3>
+          <div className="grid md:grid-cols-2 gap-6">
+            <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border border-slate-700">
+              <div className="flex items-center gap-2 mb-3">
+                <span className="text-lg">⚛️</span>
+                <h4 className="text-lg font-bold text-white">TypeScript/Node.js</h4>
+              </div>
+              <div className="bg-slate-900/50 p-4 rounded-lg font-mono text-xs text-gray-300 overflow-x-auto">
+                <pre>{`class CircuitBreaker {
   private state: 'CLOSED' | 'OPEN' | 'HALF_OPEN' = 'CLOSED';
   private failureCount = 0;
   private lastFailureTime?: number;
@@ -508,6 +1033,54 @@ app.use((req, res, next) => {
     }
   }
 }`}</pre>
+              </div>
+            </div>
+
+            <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border border-slate-700">
+              <div className="flex items-center gap-2 mb-3">
+                <span className="text-lg">☕</span>
+                <h4 className="text-lg font-bold text-white">Java Spring Boot (Resilience4j)</h4>
+              </div>
+              <div className="bg-slate-900/50 p-4 rounded-lg font-mono text-xs text-gray-300 overflow-x-auto">
+                <pre>{`import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import io.github.resilience4j.circuitbreaker.CircuitBreakerConfig;
+
+@Service
+public class PaymentService {
+    
+    @CircuitBreaker(
+        name = "paymentService",
+        fallbackMethod = "fallbackPayment"
+    )
+    public PaymentResult processPayment(
+        PaymentRequest request) {
+        // Call external payment gateway
+        return paymentGateway.charge(request);
+    }
+    
+    // Fallback when circuit is open
+    public PaymentResult fallbackPayment(
+        PaymentRequest request, Exception ex) {
+        // Return cached/default response
+        return PaymentResult.failed("Service unavailable");
+    }
+}
+
+// Configuration
+@Configuration
+public class CircuitBreakerConfig {
+    @Bean
+    public CircuitBreakerConfig circuitBreaker() {
+        return CircuitBreakerConfig.custom()
+            .failureRateThreshold(50) // Open after 50% failures
+            .waitDurationInOpenState(
+                Duration.ofSeconds(60))
+            .slidingWindowSize(10)
+            .minimumNumberOfCalls(5)
+            .build();
+    }
+}`}</pre>
+              </div>
             </div>
           </div>
         </div>
@@ -570,6 +1143,379 @@ function mapToUser(external: any): User {
         </div>
       </section>
 
+      {/* Payment Integration */}
+      <section className="mb-12">
+        <h2 className="text-3xl font-bold text-white mb-6">Payment Integration (Stripe)</h2>
+        <ConceptCard
+          icon={Shield}
+          title="Stripe Payments"
+          description="Industry-standard payment processing for subscriptions and one-time payments"
+          items={[
+            "Checkout sessions",
+            "Webhook handling",
+            "Subscription management",
+            "Customer portal"
+          ]}
+          color="from-indigo-500 to-purple-500"
+          documentation={{
+            overview: "Stripe is the industry standard for payment processing. It handles PCI compliance, fraud detection, and global payments automatically.",
+            description: [
+              "Checkout sessions for secure payment collection",
+              "Webhooks for real-time payment events",
+              "Subscription management with automatic billing",
+              "Customer portal for self-service",
+              "Multi-currency support",
+              "PCI compliance handled automatically"
+            ],
+            useCases: [
+              "SaaS subscriptions",
+              "One-time purchases",
+              "Marketplace payments",
+              "Donations",
+              "Invoicing"
+            ],
+            paretoKnowledge: {
+              title: "The 20% You Need to Know",
+              points: [
+                "Pricing: 2.9% + $0.30 per transaction",
+                "Checkout sessions = secure payment pages",
+                "Webhooks = real-time payment events",
+                "Customer portal = self-service billing",
+                "Test mode = use test cards for development"
+              ]
+            },
+            bestFor: [
+              "Most payment needs",
+              "Subscriptions",
+              "International payments",
+              "When you need PCI compliance"
+            ],
+            notIdealFor: [
+              "Very high volume (consider direct processors)",
+              "When you need to handle tax/VAT (consider Paddle)",
+              "Simple donation-only apps"
+            ]
+          }}
+        />
+        
+        {/* Stripe Code Examples */}
+        <div className="mt-6 grid md:grid-cols-2 gap-6">
+          <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border border-slate-700">
+            <h4 className="text-lg font-bold text-white mb-3">Create Checkout Session</h4>
+            <div className="bg-slate-900/50 p-4 rounded-lg font-mono text-xs text-gray-300 overflow-x-auto">
+              <pre>{`import Stripe from 'stripe'
+
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
+
+// Create checkout session
+const session = await stripe.checkout.sessions.create({
+  payment_method_types: ['card'],
+  line_items: [{
+    price: 'price_xxx', // From Stripe dashboard
+    quantity: 1,
+  }],
+  mode: 'subscription',
+  success_url: 'https://yourapp.com/success',
+  cancel_url: 'https://yourapp.com/cancel',
+})
+
+// Redirect user to session.url`}</pre>
+            </div>
+          </div>
+          <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border border-slate-700">
+            <h4 className="text-lg font-bold text-white mb-3">Webhook Handler</h4>
+            <div className="bg-slate-900/50 p-4 rounded-lg font-mono text-xs text-gray-300 overflow-x-auto">
+              <pre>{`// app/api/stripe/webhook/route.ts
+import { stripe } from '@/lib/stripe'
+
+export async function POST(request: Request) {
+  const body = await request.text()
+  const signature = request.headers.get('stripe-signature')!
+  
+  const event = stripe.webhooks.constructEvent(
+    body,
+    signature,
+    process.env.STRIPE_WEBHOOK_SECRET!
+  )
+  
+  switch (event.type) {
+    case 'checkout.session.completed':
+      // Handle successful payment
+      break
+    case 'customer.subscription.updated':
+      // Handle subscription changes
+      break
+  }
+  
+  return Response.json({ received: true })
+}`}</pre>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Email Integration */}
+      <section className="mb-12">
+        <h2 className="text-3xl font-bold text-white mb-6">Email Integration (Resend)</h2>
+        <ConceptCard
+          icon={Zap}
+          title="Resend Email Service"
+          description="Modern email API for transactional and marketing emails"
+          items={[
+            "React Email support",
+            "TypeScript SDK",
+            "Webhooks for delivery",
+            "Simple API"
+          ]}
+          color="from-blue-500 to-cyan-500"
+          documentation={{
+            overview: "Resend provides the best developer experience for sending emails. It supports React Email templates and has excellent TypeScript support.",
+            description: [
+              "React Email support (component-based templates)",
+              "TypeScript SDK with full type safety",
+              "Webhooks for delivery tracking",
+              "Domain verification for production",
+              "Email analytics and insights",
+              "Simple, intuitive API"
+            ],
+            useCases: [
+              "Email verification",
+              "Password reset",
+              "Welcome emails",
+              "Transaction notifications",
+              "Marketing emails"
+            ],
+            paretoKnowledge: {
+              title: "The 20% You Need to Know",
+              points: [
+                "Free tier: 3,000 emails/month",
+                "React Email = component-based templates",
+                "Webhooks = delivery status updates",
+                "Domain verification = required for production",
+                "Simple API = sendEmail({ to, subject, html })"
+              ]
+            },
+            bestFor: [
+              "Modern applications",
+              "React/Next.js apps",
+              "When you want great DX",
+              "Transactional emails"
+            ],
+            notIdealFor: [
+              "Very high volume (>100k/month - use AWS SES)",
+              "Enterprise features (consider SendGrid)",
+              "Simple SMTP needs"
+            ]
+          }}
+        />
+        
+        {/* Resend Code Examples */}
+        <div className="mt-6 grid md:grid-cols-2 gap-6">
+          <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border border-slate-700">
+            <h4 className="text-lg font-bold text-white mb-3">Send Email</h4>
+            <div className="bg-slate-900/50 p-4 rounded-lg font-mono text-xs text-gray-300 overflow-x-auto">
+              <pre>{`import { Resend } from 'resend'
+
+const resend = new Resend(process.env.RESEND_API_KEY)
+
+await resend.emails.send({
+  from: 'onboarding@yourdomain.com',
+  to: user.email,
+  subject: 'Welcome!',
+  html: '<h1>Welcome to our app!</h1>',
+})`}</pre>
+            </div>
+          </div>
+          <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border border-slate-700">
+            <h4 className="text-lg font-bold text-white mb-3">Email Service Wrapper</h4>
+            <div className="bg-slate-900/50 p-4 rounded-lg font-mono text-xs text-gray-300 overflow-x-auto">
+              <pre>{`// lib/email.ts
+export async function sendEmail({
+  to,
+  subject,
+  html,
+}: {
+  to: string
+  subject: string
+  html: string
+}) {
+  if (!process.env.RESEND_API_KEY) {
+    console.warn('Email not sent - API key missing')
+    return { success: false }
+  }
+  
+  const result = await resend.emails.send({
+    from: process.env.RESEND_FROM_EMAIL!,
+    to,
+    subject,
+    html,
+  })
+  
+  return { success: true, id: result.data?.id }
+}`}</pre>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* File Storage Integration */}
+      <section className="mb-12">
+        <h2 className="text-3xl font-bold text-white mb-6">File Storage Integration</h2>
+        <div className="grid md:grid-cols-3 gap-6">
+          <ConceptCard
+            icon={Database}
+            title="AWS S3"
+            description="Industry-standard object storage"
+            items={[
+              "Unlimited storage",
+              "99.999999999% durability",
+              "Multiple storage classes",
+              "Global CDN integration"
+            ]}
+            color="from-orange-500 to-red-500"
+            documentation={{
+              overview: "Amazon S3 is the industry standard for object storage. It provides unlimited, durable storage with multiple storage classes for cost optimization.",
+              description: [
+                "Unlimited storage capacity",
+                "99.999999999% (11 9's) durability",
+                "Multiple storage classes (Standard, IA, Glacier)",
+                "Versioning and lifecycle policies",
+                "Static website hosting",
+                "Global CDN integration (CloudFront)"
+              ],
+              useCases: [
+                "File uploads",
+                "Backup and archival",
+                "Static website hosting",
+                "Data lakes",
+                "Content delivery"
+              ],
+              paretoKnowledge: {
+                title: "The 20% You Need to Know",
+                points: [
+                  "Buckets = containers (globally unique names)",
+                  "Storage classes = cost optimization",
+                  "Pre-signed URLs = temporary public access",
+                  "Lifecycle policies = automatic transitions",
+                  "CloudFront = global CDN"
+                ]
+              },
+              bestFor: [
+                "Enterprise applications",
+                "High volume storage",
+                "When you need AWS integration",
+                "Compliance requirements"
+              ],
+              notIdealFor: [
+                "Simple apps (use Vercel Blob)",
+                "When you want simpler pricing",
+                "Non-AWS infrastructure"
+              ]
+            }}
+          />
+          <ConceptCard
+            icon={Zap}
+            title="Vercel Blob"
+            description="Simple file storage for Vercel apps"
+            items={[
+              "Zero configuration",
+              "Automatic CDN",
+              "Simple API",
+              "Integrated with Vercel"
+            ]}
+            color="from-black to-gray-700"
+            documentation={{
+              overview: "Vercel Blob is the simplest way to store files in Vercel applications. It requires zero configuration and provides automatic CDN.",
+              description: [
+                "Zero configuration needed",
+                "Automatic global CDN",
+                "Simple, intuitive API",
+                "Integrated with Vercel",
+                "Automatic optimization",
+                "Built-in security"
+              ],
+              useCases: [
+                "File uploads in Next.js apps",
+                "Image storage",
+                "Document storage",
+                "Simple file hosting"
+              ],
+              paretoKnowledge: {
+                title: "The 20% You Need to Know",
+                points: [
+                  "Zero config = works out of the box",
+                  "Automatic CDN = fast global delivery",
+                  "Simple API = put() and get()",
+                  "Integrated = works with Vercel deployments",
+                  "Free tier available"
+                ]
+              },
+              bestFor: [
+                "Vercel applications",
+                "Simple file storage needs",
+                "When you want zero config",
+                "Next.js apps"
+              ],
+              notIdealFor: [
+                "Very high volume",
+                "Complex storage requirements",
+                "Non-Vercel deployments"
+              ]
+            }}
+          />
+          <ConceptCard
+            icon={Database}
+            title="Cloudflare R2"
+            description="S3-compatible storage with no egress fees"
+            items={[
+              "S3-compatible API",
+              "No egress fees",
+              "Global distribution",
+              "Cost-effective"
+            ]}
+            color="from-orange-500 to-amber-500"
+            documentation={{
+              overview: "Cloudflare R2 is S3-compatible object storage with no egress fees. It's cost-effective for high-traffic applications.",
+              description: [
+                "S3-compatible API (drop-in replacement)",
+                "No egress fees (unlike S3)",
+                "Global distribution",
+                "Automatic scaling",
+                "Cost-effective pricing",
+                "Integrated with Cloudflare CDN"
+              ],
+              useCases: [
+                "High-traffic file serving",
+                "S3 replacement",
+                "Cost optimization",
+                "Global content delivery"
+              ],
+              paretoKnowledge: {
+                title: "The 20% You Need to Know",
+                points: [
+                  "S3-compatible = use S3 SDKs",
+                  "No egress fees = save on bandwidth",
+                  "Global = fast everywhere",
+                  "Cost-effective = cheaper than S3 for high traffic",
+                  "Cloudflare integration = automatic CDN"
+                ]
+              },
+              bestFor: [
+                "High-traffic applications",
+                "When egress costs matter",
+                "Cloudflare users",
+                "S3-compatible needs"
+              ],
+              notIdealFor: [
+                "Simple apps (use Vercel Blob)",
+                "AWS-only infrastructure",
+                "When you need AWS-specific features"
+              ]
+            }}
+          />
+        </div>
+      </section>
+
       {/* Project */}
       <section>
         <h2 className="text-3xl font-bold text-white mb-6">🧩 Phase Project</h2>
@@ -589,6 +1535,7 @@ function mapToUser(external: any): User {
         />
       </section>
     </PhaseLayout>
+    </SubscriptionGate>
   );
 }
 

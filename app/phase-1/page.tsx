@@ -79,6 +79,381 @@ export default function Phase1() {
         </div>
       </div>
 
+      {/* Universal Technologies Section */}
+      <section className="mb-12">
+        <h2 className="text-3xl font-bold text-white mb-6">Universal Technologies: The Foundation of Modern APIs</h2>
+        
+        {/* Introduction */}
+        <div className="bg-gradient-to-br from-indigo-500/10 to-purple-500/10 border-2 border-indigo-500/30 rounded-xl p-6 mb-6">
+          <div className="flex items-start gap-4 mb-4">
+            <div className="p-3 bg-indigo-500/20 rounded-lg">
+              <span className="text-3xl">🌍</span>
+            </div>
+            <div>
+              <h3 className="text-2xl font-bold text-white mb-2">What Are Universal Technologies?</h3>
+              <p className="text-gray-300">
+                <strong>Universal technologies</strong> are standards that work everywhere, regardless of 
+                programming language, operating system, or infrastructure. They form the foundation 
+                that enables different systems to communicate seamlessly. Think of them as the "common 
+                language" that allows Java, Python, JavaScript, Go, and any other technology to 
+                understand each other.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Core Universal Technologies */}
+        <div className="grid md:grid-cols-2 gap-6 mb-6">
+          {/* HTTP */}
+          <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border border-slate-700">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="p-2 bg-blue-500/20 rounded-lg">
+                <span className="text-2xl">🌐</span>
+              </div>
+              <h3 className="text-xl font-bold text-white">HTTP - Universal Protocol</h3>
+            </div>
+            <p className="text-gray-300 mb-4 text-sm">
+              The universal protocol for web communication. Every language, every platform, 
+              every infrastructure supports HTTP. It's the transport layer that carries data 
+              between systems.
+            </p>
+            <div className="bg-slate-900/50 p-4 rounded-lg font-mono text-xs text-gray-300 mb-4">
+              <div className="text-green-400 mb-2">✓ Works with: Java, Python, JavaScript, Go, C#, Ruby, PHP...</div>
+              <div className="text-green-400 mb-2">✓ Works on: Web, Mobile, Desktop, Cloud, IoT...</div>
+              <div className="text-green-400">✓ Works across: AWS, Azure, GCP, On-premise...</div>
+            </div>
+            <div className="bg-slate-900/50 p-4 rounded-lg font-mono text-xs text-gray-300">
+              <div className="text-blue-400 mb-2">Standard Methods:</div>
+              <div>GET    /api/users</div>
+              <div>POST   /api/users</div>
+              <div>PUT    /api/users/123</div>
+              <div>DELETE /api/users/123</div>
+            </div>
+          </div>
+
+          {/* JSON */}
+          <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border border-slate-700">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="p-2 bg-green-500/20 rounded-lg">
+                <span className="text-2xl">📦</span>
+              </div>
+              <h3 className="text-xl font-bold text-white">JSON - Universal Data Format</h3>
+            </div>
+            <p className="text-gray-300 mb-4 text-sm">
+              The universal data interchange format. Every language can read and write JSON. 
+              It's the "language" that all systems understand, regardless of their internal 
+              data structures.
+            </p>
+            <div className="bg-slate-900/50 p-4 rounded-lg font-mono text-xs text-gray-300 mb-4">
+              <div className="text-green-400 mb-2">✓ Human-readable and lightweight</div>
+              <div className="text-green-400 mb-2">✓ Language-independent</div>
+              <div className="text-green-400">✓ Standard across all modern APIs</div>
+            </div>
+            <div className="bg-slate-900/50 p-4 rounded-lg font-mono text-xs text-gray-300 overflow-x-auto">
+              <pre>{`{
+  "id": "123",
+  "name": "John Doe",
+  "email": "john@example.com"
+}`}</pre>
+            </div>
+          </div>
+        </div>
+
+        {/* HTTP + JSON Together */}
+        <div className="bg-gradient-to-r from-blue-500/10 to-green-500/10 border border-blue-500/20 rounded-xl p-6 mb-6">
+          <h3 className="text-2xl font-bold text-white mb-4">
+            🔗 HTTP + JSON = Universal API Communication
+          </h3>
+          <p className="text-gray-300 mb-4">
+            When you combine HTTP (universal protocol) with JSON (universal data format), 
+            you create a communication system that works across <strong>any</strong> technology stack:
+          </p>
+          <div className="grid md:grid-cols-3 gap-4 mb-4">
+            <div className="bg-slate-800/50 p-4 rounded-lg">
+              <p className="font-semibold text-white mb-2 text-sm">Languages:</p>
+              <p className="text-gray-400 text-xs">Java, Python, JavaScript, Go, C#, Ruby, PHP, Rust...</p>
+            </div>
+            <div className="bg-slate-800/50 p-4 rounded-lg">
+              <p className="font-semibold text-white mb-2 text-sm">Platforms:</p>
+              <p className="text-gray-400 text-xs">Web, Mobile (iOS/Android), Desktop, Cloud, IoT...</p>
+            </div>
+            <div className="bg-slate-800/50 p-4 rounded-lg">
+              <p className="font-semibold text-white mb-2 text-sm">Infrastructures:</p>
+              <p className="text-gray-400 text-xs">AWS, Azure, GCP, On-premise, Hybrid, Multi-cloud...</p>
+            </div>
+          </div>
+          
+          {/* Example: Java + React */}
+          <div className="bg-slate-800/50 rounded-lg p-4 border border-slate-700">
+            <h4 className="font-semibold text-white mb-3">Example: Java Backend + React Frontend</h4>
+            <div className="grid md:grid-cols-2 gap-4">
+              <div>
+                <p className="text-gray-400 text-xs mb-2">Java Backend (Spring Boot):</p>
+                <div className="bg-slate-900/50 p-3 rounded font-mono text-xs text-gray-300 overflow-x-auto">
+                  <pre>{`@RestController
+@RequestMapping("/api/users")
+public class UserController {
+    @GetMapping("/{id}")
+    public ResponseEntity<User> getUser(
+        @PathVariable String id) {
+        User user = userService.findById(id);
+        return ResponseEntity.ok(user);
+        // Automatically serialized to JSON
+    }
+}`}</pre>
+                </div>
+              </div>
+              <div>
+                <p className="text-gray-400 text-xs mb-2">React Frontend:</p>
+                <div className="bg-slate-900/50 p-3 rounded font-mono text-xs text-gray-300 overflow-x-auto">
+                  <pre>{`function UserProfile({ userId }) {
+  const [user, setUser] = useState(null);
+  
+  useEffect(() => {
+    fetch(\`/api/users/\${userId}\`)
+      .then(res => res.json())  // HTTP + JSON
+      .then(data => setUser(data))
+      .catch(err => console.error(err));
+  }, [userId]);
+  
+  return <div>{user?.name}</div>;
+}`}</pre>
+                </div>
+              </div>
+            </div>
+            <p className="text-gray-400 text-xs mt-3">
+              <strong>Key Point:</strong> Java and React don't need to know about each other's 
+              internal implementation. They only need to agree on the HTTP + JSON contract.
+            </p>
+          </div>
+        </div>
+
+        {/* JSON Communicator Subsection */}
+        <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border border-slate-700 mb-6">
+          <h3 className="text-xl font-bold text-white mb-4">📡 JSON Communicator: The Universal Data Interchange Format</h3>
+          
+          <div className="bg-gradient-to-br from-green-500/10 to-emerald-500/10 border-2 border-green-500/30 rounded-xl p-4 mb-4">
+            <p className="text-gray-300 text-sm">
+              <strong>JSON Communicator</strong> refers to JSON's role as the <strong>universal data interchange format</strong> 
+              that enables different systems, languages, and infrastructures to exchange data seamlessly. 
+              It's the "translator" that allows Java, Python, Node.js, React, and any other technology 
+              to understand each other.
+            </p>
+          </div>
+
+          {/* Why JSON in Large Infrastructures */}
+          <div className="grid md:grid-cols-3 gap-4 mb-6">
+            <div className="bg-slate-900/50 rounded-lg p-4">
+              <div className="text-2xl mb-2">🌐</div>
+              <h4 className="text-lg font-bold text-white mb-2">Language Agnostic</h4>
+              <p className="text-gray-400 text-xs">
+                Every major language has JSON support. Java, Python, JavaScript, Go, C# - 
+                they all speak JSON fluently.
+              </p>
+            </div>
+            
+            <div className="bg-slate-900/50 rounded-lg p-4">
+              <div className="text-2xl mb-2">⚡</div>
+              <h4 className="text-lg font-bold text-white mb-2">Lightweight</h4>
+              <p className="text-gray-400 text-xs">
+                Human-readable, compact format. Perfect for APIs where bandwidth and 
+                parsing speed matter.
+              </p>
+            </div>
+            
+            <div className="bg-slate-900/50 rounded-lg p-4">
+              <div className="text-2xl mb-2">🔗</div>
+              <h4 className="text-lg font-bold text-white mb-2">Universal Standard</h4>
+              <p className="text-gray-400 text-xs">
+                Works across networks, protocols, and infrastructures. The de facto 
+                standard for modern APIs.
+              </p>
+            </div>
+          </div>
+
+          {/* JSON in Large Infrastructures */}
+          <div className="space-y-4">
+            <div className="bg-slate-900/50 p-4 rounded-lg">
+              <h4 className="font-semibold text-white mb-2 text-sm">1. Microservices Communication</h4>
+              <p className="text-gray-300 text-xs mb-3">
+                In microservices architectures, JSON enables services written in different 
+                languages to communicate:
+              </p>
+              <div className="bg-slate-800/50 p-3 rounded font-mono text-xs text-gray-300 overflow-x-auto">
+                <pre>{`Service A (Java) → HTTP + JSON → Service B (Python)
+Service B (Python) → HTTP + JSON → Service C (Node.js)
+Service C (Node.js) → HTTP + JSON → Service D (Go)`}</pre>
+              </div>
+            </div>
+
+            <div className="bg-slate-900/50 p-4 rounded-lg">
+              <h4 className="font-semibold text-white mb-2 text-sm">2. Frontend-Backend Separation</h4>
+              <p className="text-gray-300 text-xs mb-3">
+                JSON allows frontend and backend teams to work independently:
+              </p>
+              <div className="bg-slate-800/50 p-3 rounded font-mono text-xs text-gray-300 overflow-x-auto">
+                <pre>{`React Team → Defines expected JSON structure
+Java Team → Implements API returning that JSON structure
+Both teams agree on the contract, work independently`}</pre>
+              </div>
+            </div>
+
+            <div className="bg-slate-900/50 p-4 rounded-lg">
+              <h4 className="font-semibold text-white mb-2 text-sm">3. Third-Party Integrations</h4>
+              <p className="text-gray-300 text-xs mb-3">
+                JSON is the standard for integrating with external services:
+              </p>
+              <div className="bg-slate-800/50 p-3 rounded font-mono text-xs text-gray-300 overflow-x-auto">
+                <pre>{`Your Java App → JSON → Stripe API (Ruby)
+Your Java App → JSON → GitHub API (Go)
+Your Java App → JSON → AWS API (Various)`}</pre>
+              </div>
+            </div>
+
+            <div className="bg-slate-900/50 p-4 rounded-lg">
+              <h4 className="font-semibold text-white mb-2 text-sm">4. Event-Driven Systems</h4>
+              <p className="text-gray-300 text-xs mb-3">
+                JSON messages flow through message queues and event streams:
+              </p>
+              <div className="bg-slate-800/50 p-3 rounded font-mono text-xs text-gray-300 overflow-x-auto">
+                <pre>{`Kafka Topic: "user.created"
+Message: {"userId": "123", "email": "user@example.com"}
+
+Any service can consume this JSON message, regardless of language`}</pre>
+              </div>
+            </div>
+          </div>
+
+          {/* JSON Schema Example */}
+          <div className="mt-6 bg-slate-900/50 rounded-lg p-4 border border-slate-700">
+            <h4 className="font-semibold text-white mb-3 text-sm">JSON Schema: The Contract Definition</h4>
+            <p className="text-gray-300 text-xs mb-4">
+              JSON Schema defines the structure of JSON data, serving as the contract 
+              between systems:
+            </p>
+            <div className="grid md:grid-cols-2 gap-4">
+              <div>
+                <p className="text-gray-400 text-xs mb-2">JSON Schema Definition:</p>
+                <div className="bg-slate-800/50 p-3 rounded-lg font-mono text-xs text-gray-300 overflow-x-auto">
+                  <pre>{`{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "id": { "type": "string" },
+    "name": { "type": "string" },
+    "email": { "type": "string", "format": "email" },
+    "createdAt": { "type": "string", "format": "date-time" }
+  },
+  "required": ["id", "name", "email"]
+}`}</pre>
+                </div>
+              </div>
+              <div>
+                <p className="text-gray-400 text-xs mb-2">Actual JSON Data:</p>
+                <div className="bg-slate-800/50 p-3 rounded-lg font-mono text-xs text-gray-300 overflow-x-auto">
+                  <pre>{`{
+  "id": "123",
+  "name": "John Doe",
+  "email": "john@example.com",
+  "createdAt": "2024-01-15T10:30:00Z"
+}`}</pre>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Other Universal Technologies */}
+        <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border border-slate-700 mb-6">
+          <h3 className="text-xl font-bold text-white mb-4">Other Universal Technologies</h3>
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="bg-slate-900/50 p-4 rounded-lg">
+              <div className="text-2xl mb-2">🔄</div>
+              <h4 className="font-semibold text-white mb-2 text-sm">REST</h4>
+              <p className="text-gray-400 text-xs">
+                Universal architectural style for APIs
+              </p>
+            </div>
+            <div className="bg-slate-900/50 p-4 rounded-lg">
+              <div className="text-2xl mb-2">🔐</div>
+              <h4 className="font-semibold text-white mb-2 text-sm">OAuth2</h4>
+              <p className="text-gray-400 text-xs">
+                Universal authorization protocol
+              </p>
+            </div>
+            <div className="bg-slate-900/50 p-4 rounded-lg">
+              <div className="text-2xl mb-2">🎫</div>
+              <h4 className="font-semibold text-white mb-2 text-sm">JWT</h4>
+              <p className="text-gray-400 text-xs">
+                Universal token format
+              </p>
+            </div>
+            <div className="bg-slate-900/50 p-4 rounded-lg">
+              <div className="text-2xl mb-2">📋</div>
+              <h4 className="font-semibold text-white mb-2 text-sm">OpenAPI</h4>
+              <p className="text-gray-400 text-xs">
+                Universal API specification format
+              </p>
+            </div>
+            <div className="bg-slate-900/50 p-4 rounded-lg">
+              <div className="text-2xl mb-2">🐳</div>
+              <h4 className="font-semibold text-white mb-2 text-sm">Docker</h4>
+              <p className="text-gray-400 text-xs">
+                Universal containerization standard
+              </p>
+            </div>
+            <div className="bg-slate-900/50 p-4 rounded-lg">
+              <div className="text-2xl mb-2">☁️</div>
+              <h4 className="font-semibold text-white mb-2 text-sm">Cloud APIs</h4>
+              <p className="text-gray-400 text-xs">
+                Universal cloud service interfaces
+              </p>
+            </div>
+            <div className="bg-slate-900/50 p-4 rounded-lg">
+              <div className="text-2xl mb-2">🔌</div>
+              <h4 className="font-semibold text-white mb-2 text-sm">WebSocket</h4>
+              <p className="text-gray-400 text-xs">
+                Universal real-time protocol
+              </p>
+            </div>
+            <div className="bg-slate-900/50 p-4 rounded-lg">
+              <div className="text-2xl mb-2">📡</div>
+              <h4 className="font-semibold text-white mb-2 text-sm">gRPC</h4>
+              <p className="text-gray-400 text-xs">
+                Universal RPC framework
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Why Universal Technologies Matter */}
+        <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-xl p-6">
+          <h3 className="text-xl font-bold text-white mb-3">💡 Why Universal Technologies Matter</h3>
+          <div className="grid md:grid-cols-2 gap-4">
+            <div>
+              <p className="text-gray-300 text-sm mb-2">
+                <strong className="text-yellow-400">1. Language Independence:</strong> Write your backend in Java, 
+                frontend in React, and they communicate seamlessly through HTTP + JSON.
+              </p>
+              <p className="text-gray-300 text-sm mb-2">
+                <strong className="text-yellow-400">2. Platform Flexibility:</strong> Deploy on AWS, Azure, or 
+                on-premise - universal technologies work everywhere.
+              </p>
+            </div>
+            <div>
+              <p className="text-gray-300 text-sm mb-2">
+                <strong className="text-yellow-400">3. Team Autonomy:</strong> Frontend and backend teams can work 
+                independently, agreeing only on the API contract.
+              </p>
+              <p className="text-gray-300 text-sm mb-2">
+                <strong className="text-yellow-400">4. Future-Proof:</strong> Universal standards evolve slowly, 
+                ensuring long-term compatibility.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* API Categories */}
       <section className="mb-12">
         <h2 className="text-3xl font-bold text-white mb-6">API Categories</h2>
@@ -153,7 +528,42 @@ export default function Phase1() {
                 "High-performance internal microservices (consider gRPC)",
                 "Operations requiring streaming data",
                 "When you need strong typing guarantees"
-              ]
+              ],
+              notableTechnologies: {
+                title: "REST APIs Power These Technologies",
+                technologies: [
+                  {
+                    name: "Stripe API",
+                    description: "Payment processing with RESTful endpoints for charges, customers, and subscriptions",
+                    category: "Payments"
+                  },
+                  {
+                    name: "GitHub API",
+                    description: "Repository management, issues, pull requests, and webhooks using REST principles",
+                    category: "Developer Tools"
+                  },
+                  {
+                    name: "Slack API",
+                    description: "Chat, channels, and messaging with REST endpoints and real-time WebSocket events",
+                    category: "Communication"
+                  },
+                  {
+                    name: "AWS S3",
+                    description: "Object storage with RESTful HTTP interface for file operations",
+                    category: "Cloud Storage"
+                  },
+                  {
+                    name: "Twilio API",
+                    description: "SMS, voice, and communication services with RESTful endpoints",
+                    category: "Telecommunications"
+                  },
+                  {
+                    name: "Shopify API",
+                    description: "E-commerce platform with REST endpoints for products, orders, and customers",
+                    category: "E-commerce"
+                  }
+                ]
+              }
             }}
           />
           <ConceptCard
@@ -209,7 +619,42 @@ export default function Phase1() {
                 "Caching scenarios (more complex than REST)",
                 "When HTTP caching is critical",
                 "Teams unfamiliar with GraphQL paradigm"
-              ]
+              ],
+              notableTechnologies: {
+                title: "GraphQL Powers Modern Applications",
+                technologies: [
+                  {
+                    name: "GitHub GraphQL API",
+                    description: "Query repository data, issues, and pull requests with precise field selection",
+                    category: "Developer Tools"
+                  },
+                  {
+                    name: "Shopify Admin API",
+                    description: "Flexible queries for e-commerce data including products, orders, and inventory",
+                    category: "E-commerce"
+                  },
+                  {
+                    name: "Facebook Marketing API",
+                    description: "Complex ad campaign management with nested data relationships",
+                    category: "Advertising"
+                  },
+                  {
+                    name: "Apollo GraphQL",
+                    description: "Client-side GraphQL library with caching and state management",
+                    category: "Libraries"
+                  },
+                  {
+                    name: "Hasura",
+                    description: "Instant GraphQL APIs over PostgreSQL with real-time subscriptions",
+                    category: "Backend as a Service"
+                  },
+                  {
+                    name: "Relay",
+                    description: "React framework for building data-driven applications with GraphQL",
+                    category: "Frontend Framework"
+                  }
+                ]
+              }
             }}
           />
           <ConceptCard
@@ -282,7 +727,42 @@ export default function Phase1() {
                 "When HTTP caching is important",
                 "Small, simple services (overhead not worth it)",
                 "Teams unfamiliar with binary protocols"
-              ]
+              ],
+              notableTechnologies: {
+                title: "gRPC Powers High-Performance Systems",
+                technologies: [
+                  {
+                    name: "Google Cloud APIs",
+                    description: "Internal microservice communication across Google's infrastructure",
+                    category: "Cloud Services"
+                  },
+                  {
+                    name: "Netflix Zuul",
+                    description: "API gateway with gRPC for high-throughput internal communication",
+                    category: "Microservices"
+                  },
+                  {
+                    name: "Istio Service Mesh",
+                    description: "Service-to-service communication in Kubernetes environments",
+                    category: "Infrastructure"
+                  },
+                  {
+                    name: "TensorFlow Serving",
+                    description: "High-performance model inference with gRPC endpoints",
+                    category: "Machine Learning"
+                  },
+                  {
+                    name: "Kubernetes Control Plane",
+                    description: "Internal API communication between kubelet and API server",
+                    category: "Container Orchestration"
+                  },
+                  {
+                    name: "Apache Kafka Streams",
+                    description: "Real-time stream processing with gRPC for service communication",
+                    category: "Data Streaming"
+                  }
+                ]
+              }
             }}
           />
           <ConceptCard

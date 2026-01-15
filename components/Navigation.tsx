@@ -2,19 +2,92 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Menu, X } from "lucide-react";
-import { useState } from "react";
+import { useSession, signOut } from "next-auth/react";
+import { Menu, X, LogOut, User, ChevronDown, BookOpen, Cloud, Brain, Compass, Settings, CreditCard, Sparkles, Lock, Shield } from "lucide-react";
+import { useState, useRef, useEffect } from "react";
+import { PageSearch } from "./PageSearch";
 
 export default function Navigation() {
   const pathname = usePathname();
+  const { data: session, status } = useSession();
   const [isOpen, setIsOpen] = useState(false);
+  const [exploreOpen, setExploreOpen] = useState(false);
+  const [profileOpen, setProfileOpen] = useState(false);
+  const [subscription, setSubscription] = useState<{ tier: "FREE" | "PREMIUM"; isExpired: boolean } | null>(null);
+  const exploreRef = useRef<HTMLDivElement>(null);
+  const profileRef = useRef<HTMLDivElement>(null);
 
-  const navItems = [
+  // MENTOR NOTE: Conditional Navigation
+  // Show different nav items based on authentication status
+  const publicNavItems = [
     { name: "Home", href: "/" },
+  ];
+
+  const protectedNavItems = [
+    { name: "Dashboard", href: "/dashboard" },
+    { name: "Phase 0", href: "/phase-0" },
     { name: "Phase 1", href: "/phase-1" },
     { name: "Phase 2", href: "/phase-2" },
     { name: "Phase 3", href: "/phase-3" },
     { name: "Phase 4", href: "/phase-4" },
+    { name: "Cloud", href: "/cloud" },
+    { name: "AI", href: "/ai" },
+    { name: "Security", href: "/cloud/security" },
+    { name: "Architecture", href: "/docs/architecture" },
+  ];
+
+  const navItems = session ? protectedNavItems : publicNavItems;
+
+  // Fetch subscription status
+  useEffect(() => {
+    if (session?.user?.id) {
+      fetch("/api/subscription/status")
+        .then(res => res.json())
+        .then(data => setSubscription(data))
+        .catch(() => setSubscription({ tier: "FREE", isExpired: false }));
+    }
+  }, [session]);
+
+  // Close explore dropdown when clicking outside
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (exploreRef.current && !exploreRef.current.contains(event.target as Node)) {
+        setExploreOpen(false);
+      }
+      if (profileRef.current && !profileRef.current.contains(event.target as Node)) {
+        setProfileOpen(false);
+      }
+    }
+
+    if (exploreOpen || profileOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+      return () => document.removeEventListener("mousedown", handleClickOutside);
+    }
+  }, [exploreOpen, profileOpen]);
+
+  // Explore menu sections
+  const exploreSections = [
+    {
+      title: "Phases",
+      icon: BookOpen,
+      items: [
+        { name: "Phase 0: Fundamentals", href: "/phase-0", badge: "Free" },
+        { name: "Phase 1: Integration Mindset", href: "/phase-1", badge: "Free" },
+        { name: "Phase 2: Third-Party Integrations", href: "/phase-2", badge: "Premium" },
+        { name: "Phase 3: Inter-Service Communication", href: "/phase-3", badge: "Premium" },
+        { name: "Phase 4: Principal-Level Architecture", href: "/phase-4", badge: "Premium" },
+      ]
+    },
+    {
+      title: "Advanced Topics",
+      icon: Compass,
+      items: [
+        { name: "Cloud Migration", href: "/cloud", badge: "Premium" },
+        { name: "AI Learning", href: "/ai", badge: "Premium" },
+        { name: "Security", href: "/cloud/security", badge: "Premium" },
+        { name: "Architecture", href: "/docs/architecture", badge: "Docs" },
+      ]
+    }
   ];
 
   return (
@@ -29,19 +102,214 @@ export default function Navigation() {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-1">
-            {navItems.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={`px-4 py-2 rounded-lg transition-all ${
-                  pathname === item.href
-                    ? "bg-blue-500/10 text-blue-400 font-semibold"
-                    : "text-gray-300 hover:text-white hover:bg-slate-800"
-                }`}
-              >
-                {item.name}
-              </Link>
-            ))}
+            {session && (
+              <div className="relative" ref={exploreRef}>
+                <button
+                  onClick={() => setExploreOpen(!exploreOpen)}
+                  className={`px-4 py-2 rounded-lg transition-all flex items-center gap-1 ${
+                    pathname.startsWith("/phase") || pathname.startsWith("/cloud") || pathname.startsWith("/ai")
+                      ? "bg-blue-500/10 text-blue-400 font-semibold"
+                      : "text-gray-300 hover:text-white hover:bg-slate-800"
+                  }`}
+                >
+                  Explore
+                  <ChevronDown className={`w-4 h-4 transition-transform ${exploreOpen ? "rotate-180" : ""}`} />
+                </button>
+
+                {/* Explore Dropdown */}
+                {exploreOpen && (
+                  <div className="absolute top-full left-0 mt-2 w-96 bg-slate-800 border border-slate-700 rounded-xl shadow-2xl z-50 overflow-hidden">
+                    <div className="p-4">
+                      {exploreSections.map((section, idx) => {
+                        const SectionIcon = section.icon;
+                        return (
+                          <div key={section.title} className={idx > 0 ? "mt-6 pt-6 border-t border-slate-700" : ""}>
+                            <div className="flex items-center gap-2 mb-3">
+                              <SectionIcon className="w-4 h-4 text-blue-400" />
+                              <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wide">
+                                {section.title}
+                              </h3>
+                            </div>
+                            <div className="space-y-1">
+                              {section.items.map((item) => (
+                                <Link
+                                  key={item.href}
+                                  href={item.href}
+                                  onClick={() => setExploreOpen(false)}
+                                  className={`block px-3 py-2 rounded-lg transition-all group ${
+                                    pathname === item.href
+                                      ? "bg-blue-500/10 text-blue-400"
+                                      : "text-gray-300 hover:text-white hover:bg-slate-700"
+                                  }`}
+                                >
+                                  <div className="flex items-center justify-between">
+                                    <span className="text-sm">{item.name}</span>
+                                    <span className={`text-xs px-2 py-0.5 rounded ${
+                                      item.badge === "Free"
+                                        ? "bg-green-500/20 text-green-400"
+                                        : "bg-purple-500/20 text-purple-400"
+                                    }`}>
+                                      {item.badge}
+                                    </span>
+                                  </div>
+                                </Link>
+                              ))}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                    <div className="border-t border-slate-700 p-4 bg-slate-900/50">
+                      <Link
+                        href="/dashboard"
+                        onClick={() => setExploreOpen(false)}
+                        className="block text-center px-4 py-2 bg-gradient-to-r from-blue-500 to-cyan-500 text-white rounded-lg font-semibold hover:shadow-lg transition-all text-sm"
+                      >
+                        View All in Dashboard
+                      </Link>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+            
+            {navItems.map((item) => {
+              // Skip individual phase items if user is logged in (they're in Explore dropdown)
+              if (session && (item.name.startsWith("Phase") || item.name === "Cloud" || item.name === "AI")) {
+                return null;
+              }
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={`px-4 py-2 rounded-lg transition-all ${
+                    pathname === item.href
+                      ? "bg-blue-500/10 text-blue-400 font-semibold"
+                      : "text-gray-300 hover:text-white hover:bg-slate-800"
+                  }`}
+                >
+                  {item.name}
+                </Link>
+              );
+            })}
+
+            {/* Search */}
+            {session && (
+              <div className="mx-4">
+                <PageSearch />
+              </div>
+            )}
+
+            {/* Auth Buttons */}
+            {status === "loading" ? (
+              <div className="px-4 py-2 text-gray-400">Loading...</div>
+            ) : session ? (
+              <div className="flex items-center gap-2 ml-4 pl-4 border-l border-slate-700">
+                {/* User Profile Dropdown */}
+                <div className="relative" ref={profileRef}>
+                  <button
+                    onClick={() => setProfileOpen(!profileOpen)}
+                    className="flex items-center gap-2 px-3 py-2 rounded-lg text-gray-300 hover:text-white hover:bg-slate-800 transition-all"
+                  >
+                    <div className="flex items-center gap-2">
+                      <div className="w-8 h-8 rounded-full bg-gradient-to-r from-blue-500 to-cyan-500 flex items-center justify-center text-white font-semibold text-sm">
+                        {(session.user?.name || session.user?.email || "U")[0].toUpperCase()}
+                      </div>
+                      <span className="text-sm font-medium hidden lg:block">
+                        {session.user?.name || session.user?.email}
+                      </span>
+                    </div>
+                    <ChevronDown className={`w-4 h-4 transition-transform ${profileOpen ? "rotate-180" : ""}`} />
+                  </button>
+
+                  {/* Profile Dropdown */}
+                  {profileOpen && (
+                    <div className="absolute top-full right-0 mt-2 w-80 bg-slate-800 border border-slate-700 rounded-xl shadow-2xl z-50 overflow-hidden">
+                      {/* Profile Header */}
+                      <div className="p-4 bg-gradient-to-r from-slate-800 to-slate-700 border-b border-slate-700">
+                        <div className="flex items-center gap-3 mb-3">
+                          <div className="w-12 h-12 rounded-full bg-gradient-to-r from-blue-500 to-cyan-500 flex items-center justify-center text-white font-bold text-lg">
+                            {(session.user?.name || session.user?.email || "U")[0].toUpperCase()}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-white font-semibold truncate">
+                              {session.user?.name || "User"}
+                            </p>
+                            <p className="text-gray-400 text-sm truncate">
+                              {session.user?.email}
+                            </p>
+                          </div>
+                        </div>
+                        {/* Subscription Badge */}
+                        {subscription && (
+                          <div className="flex items-center gap-2">
+                            {subscription.tier === "PREMIUM" ? (
+                              <div className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-gradient-to-r from-purple-500/20 to-pink-500/20 border border-purple-500/30 rounded-lg">
+                                <Sparkles className="w-3.5 h-3.5 text-purple-400" />
+                                <span className="text-purple-300 text-xs font-semibold">Premium Member</span>
+                              </div>
+                            ) : (
+                              <div className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-slate-700/50 border border-slate-600 rounded-lg">
+                                <Lock className="w-3.5 h-3.5 text-gray-400" />
+                                <span className="text-gray-400 text-xs font-semibold">Free Plan</span>
+                              </div>
+                            )}
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Profile Menu Items */}
+                      <div className="p-2">
+                        <Link
+                          href="/dashboard"
+                          onClick={() => setProfileOpen(false)}
+                          className="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-300 hover:text-white hover:bg-slate-700 transition-all"
+                        >
+                          <User className="w-4 h-4" />
+                          <span className="text-sm">Dashboard</span>
+                        </Link>
+                        <Link
+                          href="/upgrade"
+                          onClick={() => setProfileOpen(false)}
+                          className="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-300 hover:text-white hover:bg-slate-700 transition-all"
+                        >
+                          <CreditCard className="w-4 h-4" />
+                          <span className="text-sm">
+                            {subscription?.tier === "PREMIUM" ? "Manage Subscription" : "Upgrade to Premium"}
+                          </span>
+                        </Link>
+                        <div className="border-t border-slate-700 my-2"></div>
+                        <button
+                          onClick={() => {
+                            setProfileOpen(false);
+                            signOut({ callbackUrl: "/" });
+                          }}
+                          className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-all"
+                        >
+                          <LogOut className="w-4 h-4" />
+                          <span className="text-sm">Sign Out</span>
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            ) : (
+              <div className="flex items-center gap-2 ml-4 pl-4 border-l border-slate-700">
+                <Link
+                  href="/login"
+                  className="px-4 py-2 rounded-lg text-gray-300 hover:text-white hover:bg-slate-800 transition-all"
+                >
+                  Sign In
+                </Link>
+                <Link
+                  href="/signup"
+                  className="px-4 py-2 rounded-lg bg-gradient-to-r from-blue-500 to-cyan-500 text-white font-semibold hover:shadow-lg transition-all"
+                >
+                  Sign Up
+                </Link>
+              </div>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
@@ -56,20 +324,147 @@ export default function Navigation() {
         {/* Mobile Navigation */}
         {isOpen && (
           <div className="md:hidden py-4 space-y-2">
-            {navItems.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                onClick={() => setIsOpen(false)}
-                className={`block px-4 py-2 rounded-lg transition-all ${
-                  pathname === item.href
-                    ? "bg-blue-500/10 text-blue-400 font-semibold"
-                    : "text-gray-300 hover:text-white hover:bg-slate-800"
-                }`}
-              >
-                {item.name}
-              </Link>
-            ))}
+            {session && (
+              <div className="px-4 py-2">
+                <div className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2 flex items-center gap-2">
+                  <BookOpen className="w-3 h-3" />
+                  Explore
+                </div>
+                <div className="space-y-1 ml-4">
+                  {exploreSections.flatMap(section => section.items).map((item) => (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      onClick={() => setIsOpen(false)}
+                      className={`block px-3 py-2 rounded-lg transition-all ${
+                        pathname === item.href
+                          ? "bg-blue-500/10 text-blue-400 font-semibold"
+                          : "text-gray-300 hover:text-white hover:bg-slate-800"
+                      }`}
+                    >
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm">{item.name}</span>
+                        <span className={`text-xs px-2 py-0.5 rounded ${
+                          item.badge === "Free"
+                            ? "bg-green-500/20 text-green-400"
+                            : "bg-purple-500/20 text-purple-400"
+                        }`}>
+                          {item.badge}
+                        </span>
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Mobile Search */}
+            {session && (
+              <div className="px-4 py-4 border-t border-slate-700">
+                <PageSearch />
+              </div>
+            )}
+
+            {navItems.map((item) => {
+              // Skip individual phase items if user is logged in (they're in Explore dropdown)
+              if (session && (item.name.startsWith("Phase") || item.name === "Cloud" || item.name === "AI")) {
+                return null;
+              }
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  onClick={() => setIsOpen(false)}
+                  className={`block px-4 py-2 rounded-lg transition-all ${
+                    pathname === item.href
+                      ? "bg-blue-500/10 text-blue-400 font-semibold"
+                      : "text-gray-300 hover:text-white hover:bg-slate-800"
+                  }`}
+                >
+                  {item.name}
+                </Link>
+              );
+            })}
+            
+            {/* Mobile Auth Buttons */}
+            {status === "loading" ? (
+              <div className="px-4 py-2 text-gray-400">Loading...</div>
+            ) : session ? (
+              <div className="px-4 py-2 space-y-2 border-t border-slate-700 mt-4 pt-4">
+                {/* Mobile Profile Section */}
+                <div className="bg-slate-800/50 rounded-lg p-3 mb-3">
+                  <div className="flex items-center gap-3 mb-2">
+                    <div className="w-10 h-10 rounded-full bg-gradient-to-r from-blue-500 to-cyan-500 flex items-center justify-center text-white font-semibold">
+                      {(session.user?.name || session.user?.email || "U")[0].toUpperCase()}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-white font-semibold text-sm truncate">
+                        {session.user?.name || "User"}
+                      </p>
+                      <p className="text-gray-400 text-xs truncate">
+                        {session.user?.email}
+                      </p>
+                    </div>
+                  </div>
+                  {subscription && (
+                    <div className="flex items-center gap-2">
+                      {subscription.tier === "PREMIUM" ? (
+                        <div className="inline-flex items-center gap-1.5 px-2 py-0.5 bg-gradient-to-r from-purple-500/20 to-pink-500/20 border border-purple-500/30 rounded text-xs">
+                          <Sparkles className="w-3 h-3 text-purple-400" />
+                          <span className="text-purple-300 font-semibold">Premium</span>
+                        </div>
+                      ) : (
+                        <div className="inline-flex items-center gap-1.5 px-2 py-0.5 bg-slate-700/50 border border-slate-600 rounded text-xs">
+                          <Lock className="w-3 h-3 text-gray-400" />
+                          <span className="text-gray-400 font-semibold">Free</span>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+                <Link
+                  href="/dashboard"
+                  onClick={() => setIsOpen(false)}
+                  className="block px-4 py-2 rounded-lg text-gray-300 hover:text-white hover:bg-slate-800 transition-all text-center"
+                >
+                  Dashboard
+                </Link>
+                <Link
+                  href="/upgrade"
+                  onClick={() => setIsOpen(false)}
+                  className="block px-4 py-2 rounded-lg text-gray-300 hover:text-white hover:bg-slate-800 transition-all text-center"
+                >
+                  {subscription?.tier === "PREMIUM" ? "Manage Subscription" : "Upgrade to Premium"}
+                </Link>
+                <button
+                  onClick={() => {
+                    setIsOpen(false)
+                    signOut({ callbackUrl: "/" })
+                  }}
+                  className="w-full px-4 py-2 rounded-lg text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-all flex items-center justify-center gap-2"
+                >
+                  <LogOut className="w-4 h-4" />
+                  Sign Out
+                </button>
+              </div>
+            ) : (
+              <div className="px-4 py-2 space-y-2 border-t border-slate-700 mt-4 pt-4">
+                <Link
+                  href="/login"
+                  onClick={() => setIsOpen(false)}
+                  className="block px-4 py-2 rounded-lg text-gray-300 hover:text-white hover:bg-slate-800 transition-all text-center"
+                >
+                  Sign In
+                </Link>
+                <Link
+                  href="/signup"
+                  onClick={() => setIsOpen(false)}
+                  className="block px-4 py-2 rounded-lg bg-gradient-to-r from-blue-500 to-cyan-500 text-white font-semibold hover:shadow-lg transition-all text-center"
+                >
+                  Sign Up
+                </Link>
+              </div>
+            )}
           </div>
         )}
       </div>

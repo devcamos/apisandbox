@@ -3,17 +3,19 @@
 import PhaseLayout from "@/components/PhaseLayout";
 import ConceptCard from "@/components/ConceptCard";
 import ProjectCard from "@/components/ProjectCard";
+import { SubscriptionGate } from "@/components/SubscriptionGate";
 import { Compass, AlertTriangle, Shield, GitMerge, Clock, Archive } from "lucide-react";
 
 export default function Phase4() {
   return (
-    <PhaseLayout
-      phaseNumber={4}
-      title="Principal-Level Architecture"
-      description="Think like an integration architect"
-      icon={Compass}
-      color="from-green-500 to-emerald-500"
-    >
+    <SubscriptionGate phaseNumber={4} lockedContentName="Phase 4: Principal-Level Architecture">
+      <PhaseLayout
+        phaseNumber={4}
+        title="Principal-Level Architecture"
+        description="Think like an integration architect"
+        icon={Compass}
+        color="from-green-500 to-emerald-500"
+      >
       {/* Goal Section */}
       <div className="bg-green-500/10 border border-green-500/20 rounded-xl p-6 mb-12">
         <h2 className="text-2xl font-bold text-white mb-3">🧭 Phase Goal</h2>
@@ -175,7 +177,7 @@ export default function Phase4() {
             Consumer-driven contract testing ensures API compatibility between services.
           </p>
         </div>
-        <div className="grid md:grid-cols-2 gap-6">
+        <div className="grid md:grid-cols-2 gap-6 mb-6">
           <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border border-slate-700">
             <h3 className="text-xl font-bold text-white mb-4">Consumer Contract</h3>
             <div className="bg-slate-900/50 p-4 rounded-lg font-mono text-xs text-gray-300 overflow-x-auto">
@@ -220,7 +222,7 @@ describe('Pact Verification', () => {
   it('validates pacts', () => {
     return new Verifier({
       provider: 'UserService',
-      providerBaseUrl: 'http://localhost:3000',
+      providerBaseUrl: 'http://localhost:4000',
       pactUrls: ['./pacts/order-user.json'],
       stateHandlers: {
         'user 123 exists': () => {
@@ -237,12 +239,97 @@ describe('Pact Verification', () => {
             </div>
           </div>
         </div>
+
+        {/* Java Pact Examples */}
+        <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border border-slate-700">
+          <h3 className="text-xl font-bold text-white mb-4">Java Contract Testing with Pact</h3>
+          <div className="grid md:grid-cols-2 gap-6">
+            <div>
+              <div className="flex items-center gap-2 mb-3">
+                <span className="text-lg">☕</span>
+                <h4 className="text-lg font-bold text-white">Java Consumer (JUnit)</h4>
+              </div>
+              <div className="bg-slate-900/50 p-4 rounded-lg font-mono text-xs text-gray-300 overflow-x-auto">
+                <pre>{`import au.com.dius.pact.consumer.MockServer;
+import au.com.dius.pact.consumer.dsl.PactDslWithProvider;
+import au.com.dius.pact.consumer.junit5.PactConsumerTestExt;
+import au.com.dius.pact.consumer.junit5.PactTestFor;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+
+@ExtendWith(PactConsumerTestExt.class)
+public class UserServiceContractTest {
+    
+    @Test
+    @PactTestFor(providerName = "UserService")
+    void testGetUser(PactDslWithProvider builder) {
+        builder
+            .given("user 123 exists")
+            .uponReceiving("get user 123")
+            .path("/api/users/123")
+            .method("GET")
+            .willRespondWith()
+            .status(200)
+            .body(new PactDslJsonBody()
+                .stringType("id", "123")
+                .stringType("name", "John Doe")
+                .stringType("email", "john@example.com"));
+        
+        // Test consumer code
+        UserServiceClient client = 
+            new UserServiceClient(mockServer.getUrl());
+        User user = client.getUser("123");
+        
+        assertEquals("John Doe", user.getName());
+    }
+}`}</pre>
+              </div>
+            </div>
+
+            <div>
+              <div className="flex items-center gap-2 mb-3">
+                <span className="text-lg">☕</span>
+                <h4 className="text-lg font-bold text-white">Java Provider Verification</h4>
+              </div>
+              <div className="bg-slate-900/50 p-4 rounded-lg font-mono text-xs text-gray-300 overflow-x-auto">
+                <pre>{`import au.com.dius.pact.provider.junit5.PactVerificationContext;
+import au.com.dius.pact.provider.junit5.PactVerificationInvocationContextProvider;
+import au.com.dius.pact.provider.junitsupport.Provider;
+import au.com.dius.pact.provider.junitsupport.State;
+import au.com.dius.pact.provider.junitsupport.loader.PactFolder;
+import org.junit.jupiter.api.TestTemplate;
+import org.junit.jupiter.api.extension.ExtendWith;
+
+@Provider("UserService")
+@PactFolder("pacts")
+@SpringBootTest(webEnvironment = 
+    SpringBootTest.WebEnvironment.DEFINED_PORT)
+public class UserServiceProviderTest {
+    
+    @TestTemplate
+    @ExtendWith(PactVerificationInvocationContextProvider.class)
+    void pactVerificationTestTemplate(
+        PactVerificationContext context) {
+        context.verifyInteraction();
+    }
+    
+    @State("user 123 exists")
+    void setupUser123() {
+        // Setup test data
+        userRepository.save(new User(
+            "123", "John Doe", "john@example.com"));
+    }
+}`}</pre>
+              </div>
+            </div>
+          </div>
+        </div>
       </section>
 
       {/* Versioning */}
       <section className="mb-12">
         <h2 className="text-3xl font-bold text-white mb-6">API Versioning Strategies</h2>
-        <div className="grid md:grid-cols-3 gap-6">
+        <div className="grid md:grid-cols-3 gap-6 mb-6">
           <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border border-slate-700">
             <h3 className="text-xl font-bold text-white mb-3">URL Versioning</h3>
             <div className="bg-slate-900/50 p-3 rounded-lg font-mono text-xs text-gray-300 mb-3">
@@ -265,6 +352,83 @@ describe('Pact Verification', () => {
               <pre>/api/users?version=2</pre>
             </div>
             <p className="text-sm text-gray-400">Simple, easy to test in browser</p>
+          </div>
+        </div>
+
+        {/* Java API Versioning Examples */}
+        <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border border-slate-700">
+          <h3 className="text-xl font-bold text-white mb-4">Java Spring Boot API Versioning</h3>
+          <div className="grid md:grid-cols-2 gap-6">
+            <div>
+              <h4 className="text-lg font-bold text-white mb-3">URL Versioning</h4>
+              <div className="bg-slate-900/50 p-4 rounded-lg font-mono text-xs text-gray-300 overflow-x-auto">
+                <pre>{`@RestController
+@RequestMapping("/api/v1/users")
+public class UserControllerV1 {
+    
+    @GetMapping("/{id}")
+    public ResponseEntity<UserV1> getUser(@PathVariable String id) {
+        User user = userService.findById(id);
+        return ResponseEntity.ok(
+            new UserV1(user.getId(), user.getName()));
+    }
+}
+
+@RestController
+@RequestMapping("/api/v2/users")
+public class UserControllerV2 {
+    
+    @GetMapping("/{id}")
+    public ResponseEntity<UserV2> getUser(@PathVariable String id) {
+        User user = userService.findById(id);
+        return ResponseEntity.ok(new UserV2(
+            user.getId(), 
+            user.getName(), 
+            user.getEmail(),
+            user.getCreatedAt()));
+    }
+}`}</pre>
+              </div>
+            </div>
+
+            <div>
+              <h4 className="text-lg font-bold text-white mb-3">Header Versioning</h4>
+              <div className="bg-slate-900/50 p-4 rounded-lg font-mono text-xs text-gray-300 overflow-x-auto">
+                <pre>{`@RestController
+@RequestMapping("/api/users")
+public class UserController {
+    
+    @GetMapping(value = "/{id}", 
+        headers = "API-Version=1")
+    public ResponseEntity<UserV1> getUserV1(
+        @PathVariable String id) {
+        // V1 response
+    }
+    
+    @GetMapping(value = "/{id}", 
+        headers = "API-Version=2")
+    public ResponseEntity<UserV2> getUserV2(
+        @PathVariable String id) {
+        // V2 response
+    }
+    
+    // Or using Accept header
+    @GetMapping(value = "/{id}",
+        produces = {
+            "application/vnd.api.v1+json",
+            "application/vnd.api.v2+json"
+        })
+    public ResponseEntity<?> getUser(
+        @PathVariable String id,
+        @RequestHeader("Accept") String accept) {
+        if (accept.contains("v2")) {
+            return ResponseEntity.ok(getUserV2(id));
+        }
+        return ResponseEntity.ok(getUserV1(id));
+    }
+}`}</pre>
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -335,6 +499,7 @@ class LegacyUserAdapter {
         />
       </section>
     </PhaseLayout>
+    </SubscriptionGate>
   );
 }
 

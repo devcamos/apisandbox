@@ -26,6 +26,14 @@ interface DocumentationModalProps {
     };
     bestFor: string[];
     notIdealFor: string[];
+    notableTechnologies?: {
+      title: string;
+      technologies: {
+        name: string;
+        description: string;
+        category?: string;
+      }[];
+    };
   };
 }
 
@@ -201,6 +209,36 @@ export default function DocumentationModal({
               </ul>
             </div>
           </section>
+
+          {/* Notable Technologies */}
+          {documentation.notableTechnologies && (
+            <section>
+              <h3 className="text-2xl font-bold text-white mb-6 flex items-center gap-2">
+                <Lightbulb className="w-6 h-6 text-yellow-400" />
+                Notable Technologies Using {title}
+              </h3>
+              <div className="bg-gradient-to-r from-purple-500/10 to-pink-500/10 border border-purple-500/20 rounded-xl p-6">
+                <h4 className="text-lg font-bold text-purple-400 mb-4">
+                  {documentation.notableTechnologies.title}
+                </h4>
+                <div className="grid gap-4">
+                  {documentation.notableTechnologies.technologies.map((tech, idx) => (
+                    <div key={idx} className="bg-slate-800/50 rounded-lg p-4 border border-slate-600/50">
+                      <div className="flex items-start justify-between mb-2">
+                        <h5 className="text-white font-semibold">{tech.name}</h5>
+                        {tech.category && (
+                          <span className="text-xs px-2 py-1 bg-purple-500/20 text-purple-300 rounded-full">
+                            {tech.category}
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-gray-300 text-sm">{tech.description}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </section>
+          )}
         </div>
       </div>
     </div>

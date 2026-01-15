@@ -145,7 +145,7 @@ export default function WebSocketTester({ title, description }: WebSocketTesterP
             onChange={(e) => setMessage(e.target.value)}
             onKeyPress={(e) => e.key === 'Enter' && handleSend()}
             placeholder="Type a message..."
-            className="flex-1 bg-slate-800 text-gray-300 border border-slate-700 rounded-lg px-3 py-2 text-sm"
+            className="flex-1 bg-black text-gray-300 border border-slate-700 rounded-lg px-3 py-2 text-sm"
           />
           <button
             onClick={handleSend}

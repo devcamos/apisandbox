@@ -155,7 +155,7 @@ export default function ApiKeyTester({ title, description }: ApiKeyTesterProps) 
                     value={apiKey}
                     onChange={(e) => setApiKey(e.target.value)}
                     placeholder="Enter your API key"
-                    className="flex-1 bg-slate-900 text-gray-300 border border-slate-600 rounded px-3 py-2 text-sm"
+                    className="flex-1 bg-black text-gray-300 border border-slate-600 rounded px-3 py-2 text-sm"
                   />
                   <button
                     onClick={saveApiKey}

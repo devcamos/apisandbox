@@ -211,7 +211,7 @@ export default function CircuitBreakerDemo({ title, description }: CircuitBreake
           value={failureRate}
           onChange={(e) => setFailureRate(Number(e.target.value))}
           disabled={isRunning}
-          className="w-full bg-slate-800 text-gray-300 border border-slate-700 rounded px-3 py-2 text-sm"
+          className="w-full bg-black text-gray-300 border border-slate-700 rounded px-3 py-2 text-sm"
         >
           <option value={20}>20% - Healthy Service</option>
           <option value={50}>50% - Degraded Service</option>

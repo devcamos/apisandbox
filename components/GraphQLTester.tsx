@@ -107,7 +107,7 @@ export default function GraphQLTester({ title, defaultQuery, description }: Grap
         <textarea
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          className="w-full bg-slate-800 text-gray-300 border border-slate-700 rounded-lg p-3 font-mono text-xs"
+          className="w-full bg-black text-gray-300 border border-slate-700 rounded-lg p-3 font-mono text-xs"
           rows={8}
         />
       </div>

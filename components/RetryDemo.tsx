@@ -137,7 +137,7 @@ export default function RetryDemo({ title, description }: RetryDemoProps) {
             value={maxRetries}
             onChange={(e) => setMaxRetries(Number(e.target.value))}
             disabled={isRunning}
-            className="w-full bg-slate-800 text-gray-300 border border-slate-700 rounded px-3 py-2 text-sm"
+            className="w-full bg-black text-gray-300 border border-slate-700 rounded px-3 py-2 text-sm"
           >
             <option value={1}>1</option>
             <option value={2}>2</option>
@@ -152,7 +152,7 @@ export default function RetryDemo({ title, description }: RetryDemoProps) {
             value={failureRate}
             onChange={(e) => setFailureRate(Number(e.target.value))}
             disabled={isRunning}
-            className="w-full bg-slate-800 text-gray-300 border border-slate-700 rounded px-3 py-2 text-sm"
+            className="w-full bg-black text-gray-300 border border-slate-700 rounded px-3 py-2 text-sm"
           >
             <option value={30}>30% (Easy)</option>
             <option value={50}>50% (Medium)</option>
