@@ -19,7 +19,6 @@
 import { useSession } from "next-auth/react"
 import { useEffect, useState } from "react"
 import { UpgradePrompt } from "./UpgradePrompt"
-import { useRouter } from "next/navigation"
 
 interface SubscriptionGateProps {
   children: React.ReactNode
@@ -33,7 +32,6 @@ export function SubscriptionGate({
   lockedContentName 
 }: SubscriptionGateProps) {
   const { data: session, status } = useSession()
-  const router = useRouter()
   const [accessCheck, setAccessCheck] = useState<{
     hasAccess: boolean
     tier: "FREE" | "PREMIUM"
@@ -43,12 +41,20 @@ export function SubscriptionGate({
 
   useEffect(() => {
     if (status === "loading") return
+
+    // No session: free phases open, premium show upgrade (no login redirect)
     if (!session?.user?.id) {
-      router.push("/login")
+      const isFreePhase = phaseNumber === 0 || phaseNumber === 1
+      setAccessCheck({
+        hasAccess: isFreePhase,
+        tier: "FREE",
+        upgradeRequired: !isFreePhase,
+      })
+      setIsLoading(false)
       return
     }
 
-    // Check access
+    // Check access for signed-in users
     fetch(`/api/subscription/check?phase=${phaseNumber}`)
       .then(res => res.json())
       .then(data => {
@@ -58,7 +64,7 @@ export function SubscriptionGate({
       .catch(() => {
         setIsLoading(false)
       })
-  }, [session, status, phaseNumber, router])
+  }, [session, status, phaseNumber])
 
   if (status === "loading" || isLoading) {
     return (

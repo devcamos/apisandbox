@@ -77,16 +77,30 @@ export default defineConfig({
     //   name: 'Google Chrome',
     //   use: { ...devices['Desktop Chrome'], channel: 'chrome' },
     // },
+
+    /* Staging: run against already-running staging (e.g. Docker). Add with: STAGING_TEST=1 npm run test:staging */
+    ...(process.env.STAGING_TEST
+      ? [
+          {
+            name: 'staging',
+            use: {
+              baseURL: process.env.STAGING_URL || 'http://localhost:4000',
+            },
+          },
+        ]
+      : []),
   ],
 
-  /* Run your local dev server before starting the tests */
-  webServer: {
-    command: 'npm run dev',
-    url: 'http://localhost:4000',
-    reuseExistingServer: !process.env.CI,
-    timeout: 120 * 1000,
-    env: {
-      NODE_ENV: 'test',
-    },
-  },
+  /* Run your local dev server before starting the tests (skip when running staging tests) */
+  webServer: process.env.STAGING_TEST
+    ? undefined
+    : {
+        command: 'npm run dev',
+        url: 'http://localhost:4000',
+        reuseExistingServer: !process.env.CI,
+        timeout: 120 * 1000,
+        env: {
+          NODE_ENV: 'test',
+        },
+      },
 });

@@ -20,10 +20,9 @@
 import NextAuth, { type NextAuthConfig } from "next-auth"
 import CredentialsProvider from "next-auth/providers/credentials"
 import GoogleProvider from "next-auth/providers/google"
-import { PrismaAdapter } from "@auth/prisma-adapter"
+import { OAuth2Client } from "google-auth-library"
 import { prisma } from "@/lib/prisma"
 import { verifyPassword } from "@/lib/auth"
-import { z } from "zod"
 
 // MENTOR NOTE: Environment variables for OAuth
 // In production, set these in your hosting platform:
@@ -32,6 +31,9 @@ import { z } from "zod"
 // - Docker: docker-compose.yml or .env file
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID
 const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET
+const googleOAuth2Client = GOOGLE_CLIENT_ID
+  ? new OAuth2Client(GOOGLE_CLIENT_ID)
+  : null
 
 export const authConfig: NextAuthConfig = {
   // MENTOR NOTE: Base path configuration
@@ -65,19 +67,58 @@ export const authConfig: NextAuthConfig = {
     CredentialsProvider({
       name: "Email & Password",
       credentials: {
-        email: { 
-          label: "Email", 
-          type: "email",
-          placeholder: "you@example.com"
-        },
-        password: { 
-          label: "Password", 
-          type: "password" 
-        }
+        email: { label: "Email", type: "email", placeholder: "you@example.com" },
+        password: { label: "Password", type: "password" },
+        googleIdToken: { label: "Google ID Token", type: "text" },
       },
       async authorize(credentials) {
-        // MENTOR NOTE: Input Validation
-        // Always validate user input before processing
+        // Google Sign-In (life-world-os style: verify id_token, find or create user)
+        const googleIdToken = credentials?.googleIdToken as string | undefined
+        if (googleIdToken && googleOAuth2Client && GOOGLE_CLIENT_ID) {
+          try {
+            const ticket = await googleOAuth2Client.verifyIdToken({
+              idToken: googleIdToken,
+              audience: GOOGLE_CLIENT_ID,
+            })
+            const payload = ticket.getPayload()
+            if (!payload?.email) {
+              throw new Error("Google did not provide an email")
+            }
+            const email = payload.email
+            const name = payload.name ?? undefined
+            const image = payload.picture ?? undefined
+
+            let user = await prisma.user.findUnique({ where: { email } })
+            if (!user) {
+              user = await prisma.user.create({
+                data: {
+                  email,
+                  name: name ?? email.split("@")[0],
+                  image,
+                  passwordHash: null,
+                },
+              })
+            } else if (!user.image && image) {
+              user = await prisma.user.update({
+                where: { id: user.id },
+                data: { image, ...(name && !user.name ? { name } : {}) },
+              })
+            }
+            return {
+              id: user.id,
+              email: user.email,
+              name: user.name,
+              image: user.image,
+            }
+          } catch (err) {
+            console.error("Google id_token verification failed", err)
+            throw new Error(
+              err instanceof Error ? err.message : "Google sign-in failed"
+            )
+          }
+        }
+
+        // Email/password flow
         if (!credentials?.email || !credentials?.password) {
           throw new Error("Email and password are required")
         }

@@ -1,39 +1,26 @@
 /**
- * Protected Dashboard Page
- * 
- * MENTOR NOTE: Protected Route Pattern
- * 
- * This page:
- * 1. Requires authentication (handled by middleware)
- * 2. Shows user's learning path
- * 3. Displays progress
- * 4. Provides access to all phases
- * 
- * The learning path content was moved from /start to here
- * so it's only accessible to authenticated users.
+ * Dashboard Page – Explore free/premium
+ *
+ * Open to all (no sign-in required). Shows all phases + Cloud + AI.
+ * Free: only Phase 0 & 1 open; premium content links to /upgrade.
+ * Premium: all phases and sections open.
  */
 
 "use client"
 
 import { useSession } from "next-auth/react"
-import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { Brain, Plug, Network, Compass, ArrowRight, BookOpen, Play, Star, Shield, Zap, Target, Cloud, Lock, Sparkles, GraduationCap } from "lucide-react"
 import { useEffect, useState } from "react"
 
+const isPremiumPhase = (phaseId: number) => phaseId > 1
+
 export default function DashboardPage() {
   const { data: session, status } = useSession()
-  const router = useRouter()
   const [subscription, setSubscription] = useState<{
     tier: "FREE" | "PREMIUM"
     isExpired: boolean
   } | null>(null)
-
-  useEffect(() => {
-    if (status === "unauthenticated") {
-      router.push("/login")
-    }
-  }, [status, router])
 
   useEffect(() => {
     if (session?.user?.id) {
@@ -41,8 +28,13 @@ export default function DashboardPage() {
         .then(res => res.json())
         .then(data => setSubscription(data))
         .catch(() => setSubscription({ tier: "FREE", isExpired: false }))
+    } else {
+      setSubscription({ tier: "FREE", isExpired: false })
     }
   }, [session])
+
+  const tier = subscription?.tier ?? "FREE"
+  const isPremium = tier === "PREMIUM"
 
   if (status === "loading") {
     return (
@@ -50,10 +42,6 @@ export default function DashboardPage() {
         <div className="text-white text-xl">Loading...</div>
       </div>
     )
-  }
-
-  if (!session) {
-    return null
   }
 
   const phases = [
@@ -137,10 +125,10 @@ export default function DashboardPage() {
               <div className="container mx-auto px-6 py-12 relative z-10">
                 <div className="text-center max-w-4xl mx-auto">
                   <h1 className="text-5xl font-bold mb-4 bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 text-transparent bg-clip-text">
-                    Welcome back, {session.user?.name || session.user?.email}!
+                    {session ? `Welcome back, ${session.user?.name || session.user?.email}!` : "Explore your learning path"}
                   </h1>
                   <p className="text-xl text-gray-300 mb-4">
-                    Continue your API integration learning journey
+                    {session ? "Continue your API integration learning journey" : "All phases and topics in one place. Free: Phase 0 & 1. Premium: unlock all."}
                   </p>
                   
                   {/* Pareto Principle Badge */}
@@ -241,8 +229,11 @@ export default function DashboardPage() {
           {phases.map((phase) => {
             const Icon = phase.icon
             const LevelIcon = phase.levelIcon
+            const premiumOnly = isPremiumPhase(phase.id)
+            const canOpen = !premiumOnly || isPremium
+            const href = canOpen ? phase.href : "/upgrade"
             return (
-              <Link key={phase.id} href={phase.href}>
+              <Link key={phase.id} href={href}>
                 <div className="group bg-slate-800/50 backdrop-blur-sm rounded-2xl p-8 border border-slate-700 hover:border-slate-600 transition-all hover:shadow-2xl hover:scale-105 cursor-pointer relative overflow-hidden">
                   <div className="absolute inset-0 bg-gradient-to-br from-transparent via-transparent to-slate-700/20 opacity-0 group-hover:opacity-100 transition-opacity"></div>
                   
@@ -252,7 +243,7 @@ export default function DashboardPage() {
                         <Icon className="w-8 h-8 text-white" />
                       </div>
                       <div className="flex items-center gap-2">
-                        {phase.id > 1 && subscription?.tier === "FREE" && (
+                        {premiumOnly && !isPremium && (
                           <Lock className="w-4 h-4 text-yellow-400" />
                         )}
                         <LevelIcon className={`w-4 h-4 ${phase.levelColor}`} />
@@ -267,7 +258,7 @@ export default function DashboardPage() {
                         <span className="text-sm font-semibold text-gray-400">
                           Phase {phase.id}
                         </span>
-                        {phase.id > 1 && subscription?.tier === "FREE" && (
+                        {premiumOnly && !isPremium && (
                           <span className="px-2 py-0.5 bg-yellow-500/20 border border-yellow-500/30 rounded text-xs text-yellow-400 font-semibold">
                             Premium
                           </span>
@@ -302,8 +293,8 @@ export default function DashboardPage() {
                       <div className="text-xs text-gray-500">
                         ⏱️ {phase.estimatedTime}
                       </div>
-                      <div className="text-blue-400 font-semibold flex items-center group-hover:gap-2 transition-all">
-                        Start Learning
+                      <div className={`font-semibold flex items-center group-hover:gap-2 transition-all ${canOpen ? "text-blue-400" : "text-yellow-400"}`}>
+                        {canOpen ? "Start Learning" : "Upgrade to unlock"}
                         <span className="ml-2 group-hover:translate-x-1 transition-transform">→</span>
                       </div>
                     </div>
@@ -323,10 +314,14 @@ export default function DashboardPage() {
             Learn how to migrate your applications to AWS cloud
           </p>
         </div>
-        <Link href="/cloud">
+        <Link href={isPremium ? "/cloud" : "/upgrade"}>
           <div className="group bg-slate-800/50 backdrop-blur-sm rounded-2xl p-8 border-2 border-slate-700 hover:border-orange-500 transition-all hover:shadow-2xl hover:scale-105 cursor-pointer relative overflow-hidden max-w-4xl mx-auto">
             <div className="absolute inset-0 bg-gradient-to-br from-transparent via-transparent to-orange-500/20 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-            
+            {!isPremium && (
+              <div className="absolute top-4 right-4">
+                <Lock className="w-5 h-5 text-yellow-400" />
+              </div>
+            )}
             <div className="relative z-10">
               <div className="flex items-start justify-between mb-4">
                 <div className="inline-flex p-3 rounded-lg bg-gradient-to-r from-orange-500 to-red-500 mb-4">
@@ -386,8 +381,8 @@ export default function DashboardPage() {
                 <div className="text-xs text-gray-500">
                   ⏱️ Self-paced
                 </div>
-                <div className="text-orange-400 font-semibold flex items-center group-hover:gap-2 transition-all">
-                  Explore Cloud
+                <div className={`font-semibold flex items-center group-hover:gap-2 transition-all ${isPremium ? "text-orange-400" : "text-yellow-400"}`}>
+                  {isPremium ? "Explore Cloud" : "Upgrade to unlock"}
                   <span className="ml-2 group-hover:translate-x-1 transition-transform">→</span>
                 </div>
               </div>
@@ -404,10 +399,14 @@ export default function DashboardPage() {
             Master AI through its core components: Heart, Brain, Context, and Instructions
           </p>
         </div>
-        <Link href="/ai">
+        <Link href={isPremium ? "/ai" : "/upgrade"}>
           <div className="group bg-slate-800/50 backdrop-blur-sm rounded-2xl p-8 border-2 border-slate-700 hover:border-purple-500 transition-all hover:shadow-2xl hover:scale-105 cursor-pointer relative overflow-hidden max-w-4xl mx-auto">
             <div className="absolute inset-0 bg-gradient-to-br from-transparent via-transparent to-purple-500/20 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-            
+            {!isPremium && (
+              <div className="absolute top-4 right-4">
+                <Lock className="w-5 h-5 text-yellow-400" />
+              </div>
+            )}
             <div className="relative z-10">
               <div className="flex items-start justify-between mb-4">
                 <div className="inline-flex p-3 rounded-lg bg-gradient-to-r from-purple-500 to-pink-500 mb-4">
@@ -471,8 +470,8 @@ export default function DashboardPage() {
                 <div className="text-xs text-gray-500">
                   ⏱️ Self-paced
                 </div>
-                <div className="text-purple-400 font-semibold flex items-center group-hover:gap-2 transition-all">
-                  Explore AI
+                <div className={`font-semibold flex items-center group-hover:gap-2 transition-all ${isPremium ? "text-purple-400" : "text-yellow-400"}`}>
+                  {isPremium ? "Explore AI" : "Upgrade to unlock"}
                   <span className="ml-2 group-hover:translate-x-1 transition-transform">→</span>
                 </div>
               </div>

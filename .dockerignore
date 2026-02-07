@@ -1,0 +1,16 @@
+node_modules
+.next
+.git
+*.md
+!README.md
+.env
+.env.*
+!.env.example
+!config/environments/*.env.example
+playwright-report
+coverage
+.vercel
+*.log
+.DS_Store
+tests
+mobile
