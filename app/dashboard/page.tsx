@@ -12,6 +12,7 @@ import { useSession } from "next-auth/react"
 import Link from "next/link"
 import { Brain, Plug, Network, Compass, ArrowRight, BookOpen, Play, Star, Shield, Zap, Target, Cloud, Lock, Sparkles, GraduationCap } from "lucide-react"
 import { useEffect, useState } from "react"
+import { signupRequiredForPremium } from "@/config/featureFlags"
 
 const isPremiumPhase = (phaseId: number) => phaseId > 1
 
@@ -34,7 +35,8 @@ export default function DashboardPage() {
   }, [session])
 
   const tier = subscription?.tier ?? "FREE"
-  const isPremium = tier === "PREMIUM"
+  // When signup not required (staging), unlock all so navigation works; when live, gate by tier
+  const isPremium = !signupRequiredForPremium || tier === "PREMIUM"
 
   if (status === "loading") {
     return (

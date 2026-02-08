@@ -19,6 +19,7 @@
 import { useSession } from "next-auth/react"
 import { useEffect, useState } from "react"
 import { UpgradePrompt } from "./UpgradePrompt"
+import { signupRequiredForPremium } from "@/config/featureFlags"
 
 interface SubscriptionGateProps {
   children: React.ReactNode
@@ -42,19 +43,25 @@ export function SubscriptionGate({
   useEffect(() => {
     if (status === "loading") return
 
-    // No session: free phases open, premium show upgrade (no login redirect)
+    // No session: when signup not required, unlock all for navigation; else free-only
     if (!session?.user?.id) {
       const isFreePhase = phaseNumber === 0 || phaseNumber === 1
+      const unlockAll = !signupRequiredForPremium
       setAccessCheck({
-        hasAccess: isFreePhase,
+        hasAccess: unlockAll || isFreePhase,
         tier: "FREE",
-        upgradeRequired: !isFreePhase,
+        upgradeRequired: !unlockAll && !isFreePhase,
       })
       setIsLoading(false)
       return
     }
 
-    // Check access for signed-in users
+    // Signed-in: when signup not required, unlock all; else use API
+    if (!signupRequiredForPremium) {
+      setAccessCheck({ hasAccess: true, tier: "FREE", upgradeRequired: false })
+      setIsLoading(false)
+      return
+    }
     fetch(`/api/subscription/check?phase=${phaseNumber}`)
       .then(res => res.json())
       .then(data => {
