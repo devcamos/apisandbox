@@ -15,25 +15,17 @@
  */
 
 import { NextRequest, NextResponse } from "next/server"
-import { auth } from "@/app/api/auth/[...nextauth]/route"
+import { requireAuthenticatedUser } from "@/lib/auth/jwt-auth-middleware"
 import { upgradeToPremium } from "@/lib/subscription"
+import { handleRouteError } from "@/lib/http/responses"
 
 export async function POST(request: NextRequest) {
   try {
-    // MENTOR NOTE: Get session from server
-    // This ensures the user is authenticated
-    const session = await auth()
-
-    if (!session?.user?.id) {
-      return NextResponse.json(
-        { error: "Unauthorized" },
-        { status: 401 }
-      )
-    }
+    const user = await requireAuthenticatedUser(request)
 
     // MENTOR NOTE: In production, verify payment here
     // For demo, we'll upgrade immediately
-    await upgradeToPremium(session.user.id)
+    await upgradeToPremium(user.id)
 
     return NextResponse.json({
       success: true,
@@ -41,11 +33,6 @@ export async function POST(request: NextRequest) {
       tier: "PREMIUM",
     })
   } catch (error) {
-    console.error("Upgrade error:", error)
-    return NextResponse.json(
-      { error: "Failed to upgrade. Please try again." },
-      { status: 500 }
-    )
+    return handleRouteError(error)
   }
 }
-

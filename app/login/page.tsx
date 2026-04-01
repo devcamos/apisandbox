@@ -15,10 +15,10 @@
 
 import { useState, useEffect, useRef, Suspense } from "react"
 import Script from "next/script"
-import { signIn } from "next-auth/react"
 import { useRouter, useSearchParams } from "next/navigation"
 import Link from "next/link"
 import { ArrowRight, Mail, Lock, AlertCircle, CheckCircle, XCircle, Loader2 } from "lucide-react"
+import { useAuthSessionWriter } from "@/components/providers/SessionProvider"
 
 declare global {
   interface Window {
@@ -46,6 +46,7 @@ interface ErrorInfo {
 function LoginForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
+  const { setSessionFromAuthResponse } = useAuthSessionWriter()
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [error, setError] = useState<ErrorInfo | null>(null)
@@ -263,30 +264,25 @@ function LoginForm() {
     setIsLoading(true)
 
     try {
-      // Add timeout for the request
-      const timeoutPromise = new Promise((_, reject) => {
-        setTimeout(() => reject(new Error("Request timeout. Please try again.")), 30000) // 30 second timeout
+      const response = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: email.trim().toLowerCase(),
+          password,
+        }),
       })
-
-      const signInPromise = signIn("credentials", {
-        email: email.trim().toLowerCase(),
-        password,
-        redirect: false,
-      })
-
-      const result = await Promise.race([signInPromise, timeoutPromise]) as any
-
-      if (result?.error) {
-        const errorInfo = parseError(result.error)
+      const payload = await response.json()
+      if (!response.ok) {
+        const errorInfo = parseError(payload?.error?.message || "Login failed")
         setError(errorInfo)
         setIsLoading(false)
         return
       }
+      setSessionFromAuthResponse(payload.data)
 
-      // Success - redirect to callbackUrl (defaults to dashboard)
-      // MENTOR NOTE: Using window.location.href ensures a full page reload
-      // which allows the middleware to see the new session cookie immediately
-      window.location.href = callbackUrl
+      router.push(callbackUrl)
+      router.refresh()
     } catch (err) {
       // Handle timeout and network errors
       let errorMessage = "An unexpected error occurred. Please try again."
@@ -311,17 +307,21 @@ function LoginForm() {
     setError(null)
     setIsLoading(true)
     try {
-      const result = await signIn("credentials", {
-        googleIdToken: credential,
-        redirect: false,
+      const response = await fetch("/api/auth/google", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ idToken: credential }),
       })
-      if (result?.error) {
-        const errorInfo = parseError(result.error)
+      const payload = await response.json()
+      if (!response.ok) {
+        const errorInfo = parseError(payload?.error?.message || "Google sign-in failed")
         setError(errorInfo)
         setIsLoading(false)
         return
       }
-      window.location.href = callbackUrl
+      setSessionFromAuthResponse(payload.data)
+      router.push(callbackUrl)
+      router.refresh()
     } catch (err) {
       const errorInfo = parseError(
         err instanceof Error ? err.message : "Failed to sign in with Google. Please try again."
@@ -597,4 +597,3 @@ export default function LoginPage() {
     </Suspense>
   )
 }
-

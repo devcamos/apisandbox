@@ -15,9 +15,9 @@
 import { useState, useEffect, useRef } from "react"
 import Script from "next/script"
 import { useRouter } from "next/navigation"
-import { signIn } from "next-auth/react"
 import Link from "next/link"
 import { ArrowRight, Mail, Lock, User, AlertCircle, CheckCircle } from "lucide-react"
+import { useAuthSessionWriter } from "@/components/providers/SessionProvider"
 
 declare global {
   interface Window {
@@ -34,6 +34,7 @@ declare global {
 
 export default function SignupPage() {
   const router = useRouter()
+  const { setSessionFromAuthResponse } = useAuthSessionWriter()
   const googleButtonRef = useRef<HTMLDivElement>(null)
   const googleClientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ?? ""
   const [formData, setFormData] = useState({
@@ -83,7 +84,7 @@ export default function SignupPage() {
     setIsLoading(true)
 
     try {
-      const response = await fetch("/api/auth/signup", {
+      const response = await fetch("/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -96,13 +97,16 @@ export default function SignupPage() {
       const data = await response.json()
 
       if (!response.ok) {
-        setErrors(Array.isArray(data.details) ? data.details : [data.error || "Signup failed"])
+        const details = data?.error?.details
+        const message = data?.error?.message || "Signup failed"
+        setErrors(Array.isArray(details) ? details : [message])
         setIsLoading(false)
         return
       }
 
-      // Success - redirect to login
-      router.push("/login?registered=true")
+      setSessionFromAuthResponse(data.data)
+      router.push("/dashboard")
+      router.refresh()
     } catch (err) {
       setErrors(["An unexpected error occurred. Please try again."])
       setIsLoading(false)
@@ -113,16 +117,20 @@ export default function SignupPage() {
     setErrors([])
     setIsLoading(true)
     try {
-      const result = await signIn("credentials", {
-        googleIdToken: credential,
-        redirect: false,
+      const response = await fetch("/api/auth/google", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ idToken: credential }),
       })
-      if (result?.error) {
-        setErrors([result.error])
+      const data = await response.json()
+      if (!response.ok) {
+        setErrors([data?.error?.message || "Google signup failed"])
         setIsLoading(false)
         return
       }
-      window.location.href = "/dashboard"
+      setSessionFromAuthResponse(data.data)
+      router.push("/dashboard")
+      router.refresh()
     } catch {
       setErrors(["Failed to sign up with Google. Please try again."])
       setIsLoading(false)
@@ -364,5 +372,4 @@ export default function SignupPage() {
     </div>
   )
 }
-
 

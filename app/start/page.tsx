@@ -52,14 +52,14 @@ export default function StartPage() {
           icon: Compass,
           title: "Principal-Level Architecture",
           description: "Think like an integration architect",
-          topics: ["Anti-patterns", "Contract testing", "Legacy integration"],
+          topics: ["Constraint-driven design", "Anti-patterns", "Contract testing"],
           color: "from-green-500 to-emerald-500",
           href: "/phase-4",
           level: "Expert",
           levelIcon: Target,
           levelColor: "text-purple-400",
           estimatedTime: "5-6 hours",
-          skills: ["System Design", "Architecture Patterns", "Performance Optimization", "Legacy Migration"]
+          skills: ["Constraint Analysis", "System Design", "Trade-off Reasoning", "Legacy Migration"]
         }
       ];
 

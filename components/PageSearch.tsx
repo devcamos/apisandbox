@@ -90,6 +90,14 @@ const searchData: SearchResult[] = [
     keywords: ["oauth", "oauth2", "authentication", "flow", "demo"]
   },
   {
+    title: "Phase 2: JWT",
+    description: "Decode and explore JSON Web Tokens",
+    href: "/phase-2/demos/jwt",
+    category: "Phase 2",
+    icon: Zap,
+    keywords: ["jwt", "token", "json web token", "authentication", "bearer", "demo"]
+  },
+  {
     title: "Phase 2: Retry Logic",
     description: "Implement retry patterns for API calls",
     href: "/phase-2/demos/retry",

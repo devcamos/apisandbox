@@ -2,6 +2,8 @@
 
 import PhaseLayout from "@/components/PhaseLayout";
 import ConceptCard from "@/components/ConceptCard";
+import PhaseQuiz from "@/components/PhaseQuiz";
+import { LessonTracker } from "@/components/LessonTracker";
 import { BookOpen, Code, Server, Database, GitBranch, Zap, RefreshCw, Lock } from "lucide-react";
 
 export default function Phase0() {
@@ -21,6 +23,8 @@ export default function Phase0() {
           These are the building blocks you'll use in every phase.
         </p>
       </div>
+
+      <LessonTracker phase={0} />
 
       {/* Pareto Principle Summary */}
       <div className="bg-gradient-to-br from-yellow-500/10 to-orange-500/10 border-2 border-yellow-500/30 rounded-xl p-6 mb-12">
@@ -646,6 +650,8 @@ export default function Phase0() {
         </div>
       </section>
 
+      <PhaseQuiz phaseNumber={0} accentClass="from-green-500 to-emerald-500" />
+
       {/* Next Steps */}
       <section className="mb-12">
         <div className="bg-gradient-to-r from-green-500/20 to-emerald-500/20 rounded-xl p-6 border border-green-500/30">
@@ -671,4 +677,3 @@ export default function Phase0() {
     </PhaseLayout>
   );
 }
-

@@ -2,8 +2,10 @@
 
 import PhaseLayout from "@/components/PhaseLayout";
 import ConceptCard from "@/components/ConceptCard";
+import PhaseQuiz from "@/components/PhaseQuiz";
 import ProjectCard from "@/components/ProjectCard";
 import { SubscriptionGate } from "@/components/SubscriptionGate";
+import { LessonTracker } from "@/components/LessonTracker";
 import { Plug, Key, Shield, RefreshCw, Zap, Database, CreditCard, Mail, Folder } from "lucide-react";
 
 export default function Phase2() {
@@ -24,6 +26,8 @@ export default function Phase2() {
           and manage data transformation across different service boundaries.
         </p>
       </div>
+
+      <LessonTracker phase={2} />
 
       {/* Pareto Principle Summary */}
       <div className="bg-gradient-to-br from-yellow-500/10 to-orange-500/10 border-2 border-yellow-500/30 rounded-xl p-6 mb-12">
@@ -198,6 +202,48 @@ export default function Phase2() {
               "Expiration handling"
             ]}
             color="from-orange-500 to-red-500"
+            demoLink="/phase-2/demos/jwt"
+            documentation={{
+              overview: "JSON Web Tokens (JWT) are a compact, URL-safe means of representing claims between two parties. They are self-contained: the token carries identity and optional payload (claims), and can be verified using a shared secret or public key, so servers don't need to store session state.",
+              description: [
+                "Three parts: header (algorithm), payload (claims), signature",
+                "Signed with HMAC (shared secret) or RSA/ECDSA (public/private key)",
+                "Standard claims: sub (subject), exp (expiration), iat (issued at)",
+                "Stateless: server verifies signature instead of looking up session",
+                "Short-lived access tokens (minutes to hours) reduce risk",
+                "Often used with OAuth2 as the format for access tokens"
+              ],
+              useCases: [
+                "API authentication (Bearer token in Authorization header)",
+                "Stateless sessions (no server-side session store)",
+                "OAuth2 access tokens and OpenID Connect ID tokens",
+                "Microservice-to-microservice authentication",
+                "Single Sign-On (SSO) and session sharing across domains"
+              ],
+              paretoKnowledge: {
+                title: "The 20% You Need to Know",
+                points: [
+                  "Verify on every request - check signature and exp (expiration)",
+                  "Use HTTPS only - tokens are sensitive",
+                  "Keep access tokens short-lived (e.g. 15 min); use refresh tokens for longer sessions",
+                  "Never put secrets in the payload - it's base64-encoded, not encrypted",
+                  "Store signing secret server-side only; use strong keys (e.g. 256-bit for HS256)"
+                ]
+              },
+              bestFor: [
+                "Stateless API authentication",
+                "Distributed systems (no shared session store)",
+                "Mobile and SPA backends",
+                "When OAuth2 issues tokens in JWT format",
+                "Service-to-service auth with key pairs"
+              ],
+              notIdealFor: [
+                "Revocation before expiry (no built-in revoke; use short expiry or token blocklist)",
+                "Very large claims (token size grows)",
+                "Highly sensitive data in payload (use encryption or avoid)",
+                "Legacy systems that expect cookies or API keys only"
+              ]
+            }}
           />
         </div>
       </section>
@@ -1516,6 +1562,8 @@ export async function sendEmail({
         </div>
       </section>
 
+      <PhaseQuiz phaseNumber={2} accentClass="from-purple-500 to-pink-500" />
+
       {/* Project */}
       <section>
         <h2 className="text-3xl font-bold text-white mb-6">🧩 Phase Project</h2>
@@ -1538,4 +1586,3 @@ export async function sendEmail({
     </SubscriptionGate>
   );
 }
-
