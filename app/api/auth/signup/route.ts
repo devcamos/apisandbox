@@ -1,132 +1,67 @@
-/**
- * User Registration API Route
- * 
- * MENTOR NOTE: Signup Flow Best Practices
- * 
- * 1. Validate input (email format, password strength)
- * 2. Check if user already exists
- * 3. Hash password BEFORE storing
- * 4. Create user in database
- * 5. Return user (NO password)
- * 6. Optionally send verification email
- * 
- * Security considerations:
- * - Rate limiting (prevent spam signups)
- * - Email verification (prevent fake accounts)
- * - Password strength requirements
- * - Input sanitization
- */
-
-import { NextRequest, NextResponse } from "next/server"
+import { NextRequest } from "next/server"
+import { NextResponse } from "next/server"
 import { z } from "zod"
-import { prisma } from "@/lib/prisma"
-import { hashPassword, validatePasswordStrength } from "@/lib/auth"
-import { rateLimit, getClientIdentifier, rateLimitConfigs } from "@/lib/rate-limit"
+import { registerWithPassword } from "@/lib/services/auth/auth-service"
+import { AppError } from "@/lib/http/errors"
 
-// MENTOR NOTE: Input Validation Schema
-// Zod provides runtime type checking and validation
-const signupSchema = z.object({
-  email: z.string().email("Invalid email address"),
-  password: z.string().min(8, "Password must be at least 8 characters"),
-  name: z.string().optional(),
+const schema = z.object({
+  email: z.string().email(),
+  password: z.string().min(8),
+  name: z.string().trim().optional(),
+  __testForceBootstrapFail: z.boolean().optional(),
 })
 
 export async function POST(request: NextRequest) {
-  // MENTOR NOTE: Rate Limiting
-  // Prevent spam signups and abuse
-  const clientId = getClientIdentifier(request)
-  const rateLimitResult = rateLimit(clientId, rateLimitConfigs.signup)
-
-  if (!rateLimitResult.allowed) {
-    return NextResponse.json(
-      { 
-        error: "Too many signup attempts. Please try again later.",
-        retryAfter: Math.ceil((rateLimitResult.resetTime - Date.now()) / 1000)
-      },
-      { 
-        status: 429,
-        headers: {
-          "X-RateLimit-Limit": rateLimitConfigs.signup.maxRequests.toString(),
-          "X-RateLimit-Remaining": rateLimitResult.remaining.toString(),
-          "X-RateLimit-Reset": new Date(rateLimitResult.resetTime).toISOString(),
-          "Retry-After": Math.ceil((rateLimitResult.resetTime - Date.now()) / 1000).toString(),
-        }
-      }
-    )
-  }
-
   try {
     const body = await request.json()
-    
-    // Validate input
-    const validatedData = signupSchema.parse(body)
-    const { email, password, name } = validatedData
-
-    // MENTOR NOTE: Password Strength Validation
-    // Client-side validation is for UX, but ALWAYS validate server-side!
-    const passwordValidation = validatePasswordStrength(password)
-    if (!passwordValidation.isValid) {
+    const parsed = schema.safeParse(body)
+    if (!parsed.success) {
       return NextResponse.json(
-        { error: "Password does not meet requirements", details: passwordValidation.errors },
+        { error: "Validation failed", details: parsed.error.issues },
         { status: 400 }
       )
     }
 
-    // Check if user already exists
-    const existingUser = await prisma.user.findUnique({
-      where: { email }
+    const parts = (parsed.data.name || "").trim().split(/\s+/).filter(Boolean)
+    const authResponse = await registerWithPassword({
+      email: parsed.data.email,
+      password: parsed.data.password,
+      firstName: parts[0],
+      lastName: parts.length > 1 ? parts.slice(1).join(" ") : undefined,
+      forceBootstrapFailure:
+        process.env.NODE_ENV !== "production" ? parsed.data.__testForceBootstrapFail : false,
     })
 
-    if (existingUser) {
-      // MENTOR NOTE: Security Best Practice
-      // Don't reveal if email exists (prevents user enumeration)
-      // But for signup, it's okay to be specific
-      return NextResponse.json(
-        { error: "An account with this email already exists" },
-        { status: 400 }
-      )
-    }
-
-    // MENTOR NOTE: Hash Password BEFORE Storing
-    // NEVER store plain text passwords!
-    const passwordHash = await hashPassword(password)
-
-    // Create user
-    const user = await prisma.user.create({
-      data: {
-        email,
-        passwordHash, // Only hash stored, NOT plain text
-        name: name || null,
-        isActive: true,
-        loginAttempts: 0,
-      }
-    })
-
-    // MENTOR NOTE: Return User (NO Password)
-    // Never return password or passwordHash to client
-    return NextResponse.json({
-      user: {
-        id: user.id,
-        email: user.email,
-        name: user.name,
+    const response = NextResponse.json(
+      {
+        user: authResponse.user,
+        token: authResponse.token,
+        expiresIn: authResponse.expiresIn,
+        message: "Account created successfully",
       },
-      message: "Account created successfully"
-    }, { status: 201 })
-
+      { status: 201 }
+    )
+    response.cookies.set("auth_token", authResponse.token, {
+      httpOnly: true,
+      sameSite: "lax",
+      secure: process.env.NODE_ENV === "production",
+      path: "/",
+      maxAge: authResponse.expiresIn,
+    })
+    return response
   } catch (error) {
-    // Handle validation errors
-    if (error instanceof z.ZodError) {
+    if (error instanceof AppError) {
       return NextResponse.json(
-        { error: "Validation failed", details: error.issues },
-        { status: 400 }
+        {
+          error: error.message,
+          ...(error.details !== undefined ? { details: error.details } : {}),
+        },
+        { status: error.status }
       )
     }
-
-    console.error("Signup error:", error)
     return NextResponse.json(
       { error: "Failed to create account. Please try again." },
       { status: 500 }
     )
   }
 }
-

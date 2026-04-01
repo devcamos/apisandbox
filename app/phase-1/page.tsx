@@ -2,6 +2,8 @@
 
 import PhaseLayout from "@/components/PhaseLayout";
 import ConceptCard from "@/components/ConceptCard";
+import PhaseQuiz from "@/components/PhaseQuiz";
+import { LessonTracker } from "@/components/LessonTracker";
 import { Brain, Network, GitBranch, Zap, RefreshCw, Database } from "lucide-react";
 
 export default function Phase1() {
@@ -21,6 +23,8 @@ export default function Phase1() {
           concepts behind modern integration patterns.
         </p>
       </div>
+
+      <LessonTracker phase={1} />
 
       {/* Pareto Principle Summary */}
       <div className="bg-gradient-to-br from-yellow-500/10 to-orange-500/10 border-2 border-yellow-500/30 rounded-xl p-6 mb-12">
@@ -941,7 +945,8 @@ Any service can consume this JSON message, regardless of language`}</pre>
           </table>
         </div>
       </section>
+
+      <PhaseQuiz phaseNumber={1} accentClass="from-blue-500 to-cyan-500" />
     </PhaseLayout>
   );
 }
-

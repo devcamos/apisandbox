@@ -8,11 +8,12 @@
 
 "use client"
 
-import { useSession } from "next-auth/react"
+import { useSession } from "@/components/providers/SessionProvider"
 import Link from "next/link"
 import { Brain, Plug, Network, Compass, ArrowRight, BookOpen, Play, Star, Shield, Zap, Target, Cloud, Lock, Sparkles, GraduationCap } from "lucide-react"
 import { useEffect, useState } from "react"
 import { signupRequiredForPremium } from "@/config/featureFlags"
+import PhaseProgressOverview from "@/components/PhaseProgressOverview"
 
 const isPremiumPhase = (phaseId: number) => phaseId > 1
 
@@ -108,14 +109,14 @@ export default function DashboardPage() {
       icon: Compass,
       title: "Principal-Level Architecture",
       description: "Think like an integration architect",
-      topics: ["Anti-patterns", "Contract testing", "Legacy integration"],
+      topics: ["Constraint-driven design", "Anti-patterns", "Contract testing"],
       color: "from-green-500 to-emerald-500",
       href: "/phase-4",
       level: "Expert",
       levelIcon: Target,
       levelColor: "text-purple-400",
       estimatedTime: "5-6 hours",
-      skills: ["System Design", "Architecture Patterns", "Performance Optimization", "Legacy Migration"]
+      skills: ["Constraint Analysis", "System Design", "Trade-off Reasoning", "Legacy Migration"]
     }
   ]
 
@@ -163,6 +164,8 @@ export default function DashboardPage() {
           </div>
         </div>
       </section>
+
+            <PhaseProgressOverview />
 
             {/* Pareto Methodology Section */}
             <section className="container mx-auto px-6 py-8">
@@ -538,4 +541,3 @@ export default function DashboardPage() {
     </div>
   )
 }
-

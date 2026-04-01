@@ -31,6 +31,9 @@ npm run env:local          # Copy environment template
 # Run migrations
 npm run db:migrate
 
+# Create default test users (only if DB is empty)
+npm run db:ensure-test-users
+
 # Run development server
 npm run dev
 ```
@@ -99,6 +102,7 @@ For detailed architecture documentation with visual diagrams:
 - **[Architecture Documentation](./docs/ARCHITECTURE.md)** - Complete system architecture with Mermaid diagrams
 - **[Architecture Viewer](/docs/architecture)** - Interactive architecture diagrams in the app
 - **[Developer Setup](./docs/DEV_SETUP.md)** - How to view diagrams locally for developers
+- **[Test Users](./docs/TEST_USERS.md)** - Local test credentials bootstrap
 
 ### Quick View (Local Development)
 
@@ -245,4 +249,3 @@ Access the Cloud section from the navigation menu or visit `/cloud`.
 ## 📝 License
 
 This project is for educational purposes.
-

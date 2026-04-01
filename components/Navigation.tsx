@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useSession, signOut } from "next-auth/react";
+import { useSession, signOut } from "@/components/providers/SessionProvider";
 import { Menu, X, LogOut, User, ChevronDown, BookOpen, Cloud, Brain, Compass, Settings, CreditCard, Sparkles, Lock, Shield } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import { PageSearch } from "./PageSearch";
@@ -468,4 +468,3 @@ export default function Navigation() {
     </nav>
   );
 }
-

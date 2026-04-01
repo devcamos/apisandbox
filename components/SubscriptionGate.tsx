@@ -16,7 +16,7 @@
 
 "use client"
 
-import { useSession } from "next-auth/react"
+import { useSession } from "@/components/providers/SessionProvider"
 import { useEffect, useState } from "react"
 import { UpgradePrompt } from "./UpgradePrompt"
 import { signupRequiredForPremium } from "@/config/featureFlags"
@@ -107,4 +107,3 @@ export function SubscriptionGate({
   // User has access, render content
   return <>{children}</>
 }
-
