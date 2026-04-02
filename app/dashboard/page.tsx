@@ -10,7 +10,7 @@
 
 import { useSession } from "@/components/providers/SessionProvider"
 import Link from "next/link"
-import { Brain, Plug, Network, Compass, ArrowRight, BookOpen, Play, Star, Shield, Zap, Target, Cloud, Lock, Sparkles, GraduationCap } from "lucide-react"
+import { Brain, Plug, Network, Compass, ArrowRight, BookOpen, Play, Star, Shield, Zap, Target, Cloud, Lock, Sparkles, GraduationCap, BrainCircuit } from "lucide-react"
 import { useEffect, useState } from "react"
 import { signupRequiredForPremium } from "@/config/featureFlags"
 import PhaseProgressOverview from "@/components/PhaseProgressOverview"
@@ -109,14 +109,28 @@ export default function DashboardPage() {
       icon: Compass,
       title: "Principal-Level Architecture",
       description: "Think like an integration architect",
-      topics: ["Constraint-driven design", "Anti-patterns", "Contract testing"],
+      topics: ["Constraint-driven design", "API algorithmic thinking", "Anti-patterns", "Contract testing"],
       color: "from-green-500 to-emerald-500",
       href: "/phase-4",
       level: "Expert",
       levelIcon: Target,
       levelColor: "text-purple-400",
       estimatedTime: "5-6 hours",
-      skills: ["Constraint Analysis", "System Design", "Trade-off Reasoning", "Legacy Migration"]
+      skills: ["Constraint Analysis", "System Design", "Algorithmic Reasoning", "Trade-off Reasoning", "Legacy Migration"]
+    },
+    {
+      id: 5,
+      icon: BrainCircuit,
+      title: "API Algorithms",
+      description: "Master theory by mapping algorithmic thinking to production system design",
+      topics: ["Idempotency & hash maps", "Priority queues", "Rate limiting windows", "Trade-off analysis"],
+      color: "from-cyan-500 to-blue-500",
+      href: "/phase-5",
+      level: "Architect",
+      levelIcon: Target,
+      levelColor: "text-cyan-300",
+      estimatedTime: "4-5 hours",
+      skills: ["Algorithmic Reasoning", "Failure Modeling", "Performance Trade-offs", "Architecture Decisions"]
     }
   ]
 
@@ -221,7 +235,7 @@ export default function DashboardPage() {
               <div className="text-center mb-12">
                 <h2 className="text-4xl font-bold text-white mb-4">Choose Your Learning Path</h2>
                 <p className="text-xl text-gray-300 max-w-3xl mx-auto mb-6">
-                  Our training is organized into <strong className="text-white">5 progressive phases</strong> (Phase 0-4) that take you from fundamentals to advanced architecture patterns. <strong className="text-green-400">Phase 0 and Phase 1 are free</strong> - start your learning journey today!
+                  Our training is organized into <strong className="text-white">6 progressive phases</strong> (Phase 0-5) that take you from fundamentals to architecture-level theory mastery. <strong className="text-green-400">Phase 0 and Phase 1 are free</strong> - start your learning journey today!
                 </p>
           <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-4 max-w-2xl mx-auto">
             <p className="text-blue-200 text-sm">

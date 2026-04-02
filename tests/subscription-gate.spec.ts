@@ -70,6 +70,25 @@ test.describe('Subscription Gate', () => {
     await expect(page.getByText(/phase 4.*requires premium/i)).toBeVisible();
   });
 
+  test('should show upgrade prompt for free users on Phase 5', async ({ page, request }) => {
+    const uniqueEmail = `test-${Date.now()}-${Math.random().toString(36).substring(7)}@example.com`;
+    await request.post('/api/auth/signup', {
+      data: {
+        email: uniqueEmail,
+        password: 'Test1234!@#$',
+      }
+    });
+
+    await page.goto('/login');
+    await page.getByLabel(/email address/i).fill(uniqueEmail);
+    await page.getByLabel(/^password$/i).fill('Test1234!@#$');
+    await page.getByRole('button', { name: /sign in/i }).click();
+    await page.waitForURL(/\/dashboard/);
+
+    await page.goto('/phase-5');
+    await expect(page.getByText(/phase 5.*requires premium/i)).toBeVisible();
+  });
+
   test('should show upgrade prompt for free users on Cloud section', async ({ page, request }) => {
     const uniqueEmail = `test-${Date.now()}-${Math.random().toString(36).substring(7)}@example.com`;
     await request.post('/api/auth/signup', {
@@ -145,7 +164,9 @@ test.describe('Subscription Gate', () => {
 
     await page.goto('/phase-4');
     await expect(page.getByText(/principal-level architecture/i)).toBeVisible();
+
+    await page.goto('/phase-5');
+    await expect(page.getByText(/api algorithms/i)).toBeVisible();
   });
 });
-
 

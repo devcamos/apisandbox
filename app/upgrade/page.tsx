@@ -90,7 +90,7 @@ export default function UpgradePage() {
               </li>
               <li className="flex items-center gap-2 text-gray-500">
                 <Lock className="w-5 h-5" />
-                <span className="line-through">Phases 2-4</span>
+                <span className="line-through">Phases 2-5</span>
               </li>
               <li className="flex items-center gap-2 text-gray-500">
                 <Lock className="w-5 h-5" />
@@ -122,7 +122,7 @@ export default function UpgradePage() {
             <ul className="space-y-3 mb-6">
               <li className="flex items-center gap-2 text-white">
                 <Check className="w-5 h-5 text-green-400" />
-                <strong>All 4 Learning Phases</strong>
+                <strong>All 5 Learning Phases</strong>
               </li>
               <li className="flex items-center gap-2 text-white">
                 <Check className="w-5 h-5 text-green-400" />
@@ -199,8 +199,8 @@ export default function UpgradePage() {
                 <h3 className="text-xl font-bold text-white">All Learning Phases</h3>
               </div>
               <p className="text-gray-400 text-sm">
-                Access to Phases 2, 3, and 4 covering OAuth2, microservices, 
-                distributed systems, and principal-level architecture.
+                Access to Phases 2, 3, 4, and 5 covering OAuth2, microservices,
+                distributed systems, principal-level architecture, and API algorithms.
               </p>
             </div>
 
@@ -261,4 +261,3 @@ export default function UpgradePage() {
     </div>
   )
 }
-

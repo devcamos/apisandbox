@@ -89,12 +89,12 @@ test.describe('Dashboard', () => {
     await page.getByRole('button', { name: /sign in/i }).click();
     await page.waitForURL(/\/dashboard/);
 
-    // Should see premium badges on phases 2-4
+    // Should see premium badges on phases 2-5
     await expect(page.getByText(/phase 2/i)).toBeVisible();
     // Check for premium indicator (lock icon or premium badge)
   });
 
-  test('should display all 4 learning phases', async ({ page, request }) => {
+  test('should display all 5 learning phases', async ({ page, request }) => {
     const uniqueEmail = `test-${Date.now()}-${Math.random().toString(36).substring(7)}@example.com`;
     await request.post('/api/auth/signup', {
       data: {
@@ -113,6 +113,7 @@ test.describe('Dashboard', () => {
     await expect(page.getByText(/phase 2/i)).toBeVisible();
     await expect(page.getByText(/phase 3/i)).toBeVisible();
     await expect(page.getByText(/phase 4/i)).toBeVisible();
+    await expect(page.getByText(/phase 5/i)).toBeVisible();
   });
 
   test('should have links to all phases', async ({ page, request }) => {
@@ -136,5 +137,4 @@ test.describe('Dashboard', () => {
     await expect(phase1Link).toHaveAttribute('href', '/phase-1');
   });
 });
-
 

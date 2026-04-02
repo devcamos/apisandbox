@@ -30,6 +30,7 @@ export default function Navigation() {
     { name: "Phase 2", href: "/phase-2" },
     { name: "Phase 3", href: "/phase-3" },
     { name: "Phase 4", href: "/phase-4" },
+    { name: "Phase 5", href: "/phase-5" },
     { name: "Cloud", href: "/cloud" },
     { name: "AI", href: "/ai" },
     { name: "Security", href: "/cloud/security" },
@@ -77,6 +78,7 @@ export default function Navigation() {
         { name: "Phase 2: Third-Party Integrations", href: "/phase-2", badge: "Premium" },
         { name: "Phase 3: Inter-Service Communication", href: "/phase-3", badge: "Premium" },
         { name: "Phase 4: Principal-Level Architecture", href: "/phase-4", badge: "Premium" },
+        { name: "Phase 5: API Algorithms", href: "/phase-5", badge: "Premium" },
       ]
     },
     {

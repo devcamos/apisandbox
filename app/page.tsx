@@ -410,7 +410,7 @@ export default function Home() {
             <ul className="space-y-3 mb-6">
               <li className="flex items-center gap-2 text-gray-300">
                 <Check className="w-5 h-5 text-green-400" />
-                Explore all phases (2-4)
+                Explore all phases (2-5)
               </li>
               <li className="flex items-center gap-2 text-gray-300">
                 <Check className="w-5 h-5 text-green-400" />
