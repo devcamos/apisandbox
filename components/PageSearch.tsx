@@ -201,6 +201,14 @@ const searchData: SearchResult[] = [
     icon: Brain,
     keywords: ["phase 4", "architecture", "patterns", "anti-patterns", "principal", "advanced"]
   },
+  {
+    title: "Phase 5: API Algorithms",
+    description: "LeetCode concepts mapped to production API system design",
+    href: "/phase-5",
+    category: "Phase 5",
+    icon: Brain,
+    keywords: ["phase 5", "api algorithms", "leetcode", "theory", "caching", "rate limiter", "idempotency", "queue", "trade-offs"]
+  },
 
   // Cloud Section
   {
@@ -389,6 +397,7 @@ export function PageSearch() {
       'Phase 2': 'bg-yellow-100 text-yellow-800',
       'Phase 3': 'bg-red-100 text-red-800',
       'Phase 4': 'bg-indigo-100 text-indigo-800',
+      'Phase 5': 'bg-sky-100 text-sky-800',
       'Cloud': 'bg-cyan-100 text-cyan-800',
       'AI': 'bg-pink-100 text-pink-800',
       'Databases': 'bg-orange-100 text-orange-800',

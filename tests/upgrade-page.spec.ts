@@ -31,7 +31,7 @@ test.describe('Upgrade Page', () => {
     await expect(page.getByText(/phase 1.*integration mindset/i)).toBeVisible();
     
     // Premium tier features
-    await expect(page.getByText(/all 4 learning phases/i)).toBeVisible();
+    await expect(page.getByText(/all 5 learning phases/i)).toBeVisible();
     await expect(page.getByText(/aws cloud migration/i)).toBeVisible();
     await expect(page.getByText(/advanced observability/i)).toBeVisible();
   });
@@ -89,5 +89,4 @@ test.describe('Upgrade Page', () => {
     await expect(backLink).toHaveAttribute('href', '/dashboard');
   });
 });
-
 

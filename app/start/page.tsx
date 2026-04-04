@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Brain, Plug, Network, Compass, ArrowRight, BookOpen, Play, Star, Shield, Zap, Target, Cloud } from "lucide-react";
+import { Brain, Plug, Network, Compass, ArrowRight, BookOpen, Play, Star, Shield, Zap, Target, Cloud, BrainCircuit } from "lucide-react";
 
 export default function StartPage() {
       const phases = [
@@ -52,14 +52,28 @@ export default function StartPage() {
           icon: Compass,
           title: "Principal-Level Architecture",
           description: "Think like an integration architect",
-          topics: ["Constraint-driven design", "Anti-patterns", "Contract testing"],
+          topics: ["Constraint-driven design", "API algorithmic thinking", "Anti-patterns", "Contract testing"],
           color: "from-green-500 to-emerald-500",
           href: "/phase-4",
           level: "Expert",
           levelIcon: Target,
           levelColor: "text-purple-400",
           estimatedTime: "5-6 hours",
-          skills: ["Constraint Analysis", "System Design", "Trade-off Reasoning", "Legacy Migration"]
+          skills: ["Constraint Analysis", "System Design", "Algorithmic Reasoning", "Trade-off Reasoning", "Legacy Migration"]
+        },
+        {
+          id: 5,
+          icon: BrainCircuit,
+          title: "API Algorithms",
+          description: "Map algorithmic concepts to production architecture trade-offs",
+          topics: ["Idempotency keys", "Queue scheduling", "Rate limiter mechanics"],
+          color: "from-cyan-500 to-blue-500",
+          href: "/phase-5",
+          level: "Architect",
+          levelIcon: Target,
+          levelColor: "text-cyan-300",
+          estimatedTime: "4-5 hours",
+          skills: ["Constraint Thinking", "Algorithm Selection", "Failure Analysis", "System Trade-offs"]
         }
       ];
 
@@ -100,7 +114,7 @@ export default function StartPage() {
         <div className="text-center mb-12">
           <h2 className="text-4xl font-bold text-white mb-4">Choose Your Learning Path</h2>
           <p className="text-xl text-gray-300 max-w-3xl mx-auto mb-6">
-            Our training is organized into <strong className="text-white">4 progressive phases</strong> that take you from API basics to advanced architecture patterns. Each phase focuses on specific skills and real-world scenarios.
+            Our training is organized into <strong className="text-white">5 progressive phases</strong> that take you from API basics to architecture-level theory mastery. Each phase focuses on specific skills and real-world scenarios.
           </p>
           <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-4 max-w-2xl mx-auto">
             <p className="text-blue-200 text-sm">

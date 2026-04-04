@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import PhaseLayout from "@/components/PhaseLayout";
 import ConceptCard from "@/components/ConceptCard";
 import ConceptVisuals from "@/components/ConceptVisuals";
@@ -8,7 +9,7 @@ import ProjectCard from "@/components/ProjectCard";
 import { SubscriptionGate } from "@/components/SubscriptionGate";
 import { LessonTracker } from "@/components/LessonTracker";
 import SystemDesignTracker from "@/components/SystemDesignTracker";
-import { Compass, AlertTriangle, Shield, GitMerge, Clock, Archive, Target, Workflow, Gauge, Siren, Scale } from "lucide-react";
+import { Compass, AlertTriangle, Shield, GitMerge, Clock, Archive, Target, Workflow, Gauge, Siren, Scale, BrainCircuit, ArrowRight } from "lucide-react";
 
 export default function Phase4() {
   return (
@@ -30,6 +31,31 @@ export default function Phase4() {
       </div>
 
       <LessonTracker phase={4} />
+
+      <section className="mb-12">
+        <div className="bg-gradient-to-br from-cyan-500/10 via-emerald-500/10 to-blue-500/10 border border-cyan-500/30 rounded-2xl p-6">
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+            <div>
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-300 text-sm font-semibold mb-3">
+                <BrainCircuit className="w-4 h-4" />
+                API Algorithms
+              </div>
+              <h2 className="text-2xl font-bold text-white mb-2">Master theory, then prove it in project systems</h2>
+              <p className="text-gray-300 max-w-3xl">
+                Continue into Phase 5 for API Algorithms: a dedicated theory track that connects LeetCode-style thinking to
+                caching, queueing, rate limiting, idempotency, and operations decisions.
+              </p>
+            </div>
+            <Link
+              href="/phase-5"
+              className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-gradient-to-r from-cyan-500 to-emerald-500 text-white font-semibold hover:opacity-95 transition-opacity"
+            >
+              Open Phase 5
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+          </div>
+        </div>
+      </section>
 
       <ConceptVisuals conceptId="caching" />
 
