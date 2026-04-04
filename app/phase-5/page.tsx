@@ -6,6 +6,8 @@ import PhaseLayout from "@/components/PhaseLayout"
 import { SubscriptionGate } from "@/components/SubscriptionGate"
 import { LessonTracker } from "@/components/LessonTracker"
 import { apiAlgorithmLessons } from "@/lib/learning/api-algorithms"
+import PatternArchitectureAnimator from "@/components/PatternArchitectureAnimator"
+import LeetCodePatternGraph from "@/components/LeetCodePatternGraph"
 
 export default function Phase5Page() {
   return (
@@ -42,6 +44,8 @@ export default function Phase5Page() {
           </div>
         </section>
 
+        <LeetCodePatternGraph />
+
         <LessonTracker phase={5} />
 
         <section className="space-y-8">
@@ -51,6 +55,8 @@ export default function Phase5Page() {
                 <h3 className="text-2xl font-bold text-white">{lesson.title}</h3>
                 <p className="text-cyan-300 text-sm mt-1">System: {lesson.systemName}</p>
               </div>
+
+              <PatternArchitectureAnimator lessonId={lesson.id} title={lesson.systemName} />
 
               <div className="grid md:grid-cols-2 gap-4 mb-4">
                 <div className="bg-slate-900/60 border border-slate-700 rounded-xl p-4">

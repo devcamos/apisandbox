@@ -121,7 +121,16 @@ export default function Navigation() {
               {/* Explore Dropdown */}
               {exploreOpen && (
                 <div className="absolute top-full left-0 mt-2 w-96 bg-slate-800 border border-slate-700 rounded-xl shadow-2xl z-50 overflow-hidden">
-                  <div className="p-4">
+                  <div className="p-4 border-b border-slate-700 bg-slate-900/60">
+                    <Link
+                      href="/phase-5"
+                      onClick={() => setExploreOpen(false)}
+                      className="block px-3 py-2 rounded-lg bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/20 transition-all"
+                    >
+                      <span className="text-sm font-semibold">New: Phase 5 - API Algorithms</span>
+                    </Link>
+                  </div>
+                  <div className="p-4 max-h-[70vh] overflow-y-auto">
                     {exploreSections.map((section, idx) => {
                       const SectionIcon = section.icon;
                       return (
@@ -175,8 +184,13 @@ export default function Navigation() {
             </div>
 
             {navItems.map((item) => {
-              // When logged in, phase/cloud/ai are in Explore dropdown; when logged out, show Home + Upgrade
-              if (session && (item.name.startsWith("Phase") || item.name === "Cloud" || item.name === "AI")) {
+              // Keep Phase 5 directly visible in top nav; other phase/cloud/ai links stay in Explore.
+              const hideInTopNav =
+                session &&
+                ((item.name.startsWith("Phase") && item.name !== "Phase 5") ||
+                  item.name === "Cloud" ||
+                  item.name === "AI")
+              if (hideInTopNav) {
                 return null;
               }
               return (
@@ -326,6 +340,13 @@ export default function Navigation() {
         {isOpen && (
           <div className="md:hidden py-4 space-y-2">
             <div className="px-4 py-2">
+              <Link
+                href="/phase-5"
+                onClick={() => setIsOpen(false)}
+                className="block mb-3 px-3 py-2 rounded-lg bg-cyan-500/10 border border-cyan-500/30 text-cyan-300"
+              >
+                New: Phase 5 - API Algorithms
+              </Link>
               <div className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2 flex items-center gap-2">
                 <BookOpen className="w-3 h-3" />
                 Explore
@@ -365,8 +386,13 @@ export default function Navigation() {
             )}
 
             {navItems.map((item) => {
-              // Skip individual phase items if user is logged in (they're in Explore dropdown)
-              if (session && (item.name.startsWith("Phase") || item.name === "Cloud" || item.name === "AI")) {
+              // Keep Phase 5 directly visible in mobile nav; other phase/cloud/ai links stay in Explore.
+              const hideInMobileNav =
+                session &&
+                ((item.name.startsWith("Phase") && item.name !== "Phase 5") ||
+                  item.name === "Cloud" ||
+                  item.name === "AI")
+              if (hideInMobileNav) {
                 return null;
               }
               return (
