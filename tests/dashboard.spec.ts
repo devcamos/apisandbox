@@ -1,140 +1,55 @@
 /**
  * Dashboard Tests
- * 
- * Tests for the protected dashboard page
+ *
+ * Tests for the public dashboard page and learning explorer
  */
 
 import { test, expect } from '@playwright/test';
 
 test.describe('Dashboard', () => {
-  test('should redirect to login when not authenticated', async ({ page }) => {
+  test('should be publicly accessible for unauthenticated visitors', async ({ page }) => {
     await page.goto('/dashboard');
-    await expect(page).toHaveURL(/\/login/);
+    await expect(page).toHaveURL(/\/dashboard/);
+    await expect(page.getByRole('heading', { name: /explore your learning path/i })).toBeVisible();
   });
 
-  test('should display dashboard for authenticated users', async ({ page, request }) => {
-    // Create and login user
-    const uniqueEmail = `test-${Date.now()}-${Math.random().toString(36).substring(7)}@example.com`;
-    await request.post('/api/auth/signup', {
-      data: {
-        email: uniqueEmail,
-        password: 'Test1234!@#$',
-      }
-    });
-
-    await page.goto('/login');
-    await page.getByLabel(/email address/i).fill(uniqueEmail);
-    await page.getByLabel(/^password$/i).fill('Test1234!@#$');
-    await page.getByRole('button', { name: /sign in/i }).click();
-    await page.waitForURL(/\/dashboard/);
-
-    // Should see dashboard content
-    await expect(page.getByRole('heading', { name: /welcome back/i })).toBeVisible();
+  test('should display dashboard explorer content for visitors', async ({ page }) => {
+    await page.goto('/dashboard');
     await expect(page.getByText(/choose your learning path/i)).toBeVisible();
+    await expect(page.getByRole('heading', { name: /find the next lesson that fits your level/i })).toBeVisible();
+    await expect(page.getByRole('button', { name: /^beginner$/i })).toBeVisible();
   });
 
-  test('should show subscription tier badge', async ({ page, request }) => {
-    const uniqueEmail = `test-${Date.now()}-${Math.random().toString(36).substring(7)}@example.com`;
-    await request.post('/api/auth/signup', {
-      data: {
-        email: uniqueEmail,
-        password: 'Test1234!@#$',
-      }
-    });
-
-    await page.goto('/login');
-    await page.getByLabel(/email address/i).fill(uniqueEmail);
-    await page.getByLabel(/^password$/i).fill('Test1234!@#$');
-    await page.getByRole('button', { name: /sign in/i }).click();
-    await page.waitForURL(/\/dashboard/);
-
-    // Should show free plan badge
+  test('should show free plan badge to unauthenticated visitors', async ({ page }) => {
+    await page.goto('/dashboard');
     await expect(page.getByText(/free plan/i)).toBeVisible();
   });
 
-  test('should show premium badge for premium users', async ({ page, request }) => {
-    const uniqueEmail = `test-${Date.now()}-${Math.random().toString(36).substring(7)}@example.com`;
-    const signupResponse = await request.post('/api/auth/signup', {
-      data: {
-        email: uniqueEmail,
-        password: 'Test1234!@#$',
-      }
-    });
+  test('should filter the explorer by search query', async ({ page }) => {
+    await page.goto('/dashboard');
 
-    // Upgrade to premium
-    await request.post('/api/subscription/upgrade');
+    const search = page.getByLabel(/search the learning explorer/i);
+    await search.fill('distributed tracing');
 
-    await page.goto('/login');
-    await page.getByLabel(/email address/i).fill(uniqueEmail);
-    await page.getByLabel(/^password$/i).fill('Test1234!@#$');
-    await page.getByRole('button', { name: /sign in/i }).click();
-    await page.waitForURL(/\/dashboard/);
-
-    // Should show premium badge
-    await expect(page.getByText(/premium member/i)).toBeVisible();
+    await expect(page.getByRole('link', { name: /inter-service communication/i })).toBeVisible();
+    await expect(page.getByRole('link', { name: /integration mindset/i })).toHaveCount(0);
+    await expect(page.getByText(/showing 1 of 7 sections/i)).toBeVisible();
   });
 
-  test('should show lock icons on premium phases for free users', async ({ page, request }) => {
-    const uniqueEmail = `test-${Date.now()}-${Math.random().toString(36).substring(7)}@example.com`;
-    await request.post('/api/auth/signup', {
-      data: {
-        email: uniqueEmail,
-        password: 'Test1234!@#$',
-      }
-    });
+  test('should filter the explorer by level and reset filters', async ({ page }) => {
+    await page.goto('/dashboard');
 
-    await page.goto('/login');
-    await page.getByLabel(/email address/i).fill(uniqueEmail);
-    await page.getByLabel(/^password$/i).fill('Test1234!@#$');
-    await page.getByRole('button', { name: /sign in/i }).click();
-    await page.waitForURL(/\/dashboard/);
+    await page.getByRole('button', { name: /^cloud$/i }).click();
+    await expect(page.getByRole('link', { name: /aws cloud migration/i })).toBeVisible();
+    await expect(page.getByRole('link', { name: /integration mindset/i })).toHaveCount(0);
 
-    // Should see premium badges on phases 2-4
-    await expect(page.getByText(/phase 2/i)).toBeVisible();
-    // Check for premium indicator (lock icon or premium badge)
-  });
+    const search = page.getByLabel(/search the learning explorer/i);
+    await search.fill('nonexistent topic');
+    await expect(page.getByRole('heading', { name: /no sections match that search yet/i })).toBeVisible();
 
-  test('should display all 4 learning phases', async ({ page, request }) => {
-    const uniqueEmail = `test-${Date.now()}-${Math.random().toString(36).substring(7)}@example.com`;
-    await request.post('/api/auth/signup', {
-      data: {
-        email: uniqueEmail,
-        password: 'Test1234!@#$',
-      }
-    });
-
-    await page.goto('/login');
-    await page.getByLabel(/email address/i).fill(uniqueEmail);
-    await page.getByLabel(/^password$/i).fill('Test1234!@#$');
-    await page.getByRole('button', { name: /sign in/i }).click();
-    await page.waitForURL(/\/dashboard/);
-
-    await expect(page.getByText(/phase 1/i)).toBeVisible();
-    await expect(page.getByText(/phase 2/i)).toBeVisible();
-    await expect(page.getByText(/phase 3/i)).toBeVisible();
-    await expect(page.getByText(/phase 4/i)).toBeVisible();
-  });
-
-  test('should have links to all phases', async ({ page, request }) => {
-    const uniqueEmail = `test-${Date.now()}-${Math.random().toString(36).substring(7)}@example.com`;
-    await request.post('/api/auth/signup', {
-      data: {
-        email: uniqueEmail,
-        password: 'Test1234!@#$',
-      }
-    });
-
-    await page.goto('/login');
-    await page.getByLabel(/email address/i).fill(uniqueEmail);
-    await page.getByLabel(/^password$/i).fill('Test1234!@#$');
-    await page.getByRole('button', { name: /sign in/i }).click();
-    await page.waitForURL(/\/dashboard/);
-
-    // Check phase links
-    const phase1Link = page.getByRole('link', { name: /integration mindset/i });
-    await expect(phase1Link).toBeVisible();
-    await expect(phase1Link).toHaveAttribute('href', '/phase-1');
+    await page.getByRole('button', { name: /reset filters/i }).click();
+    await expect(search).toHaveValue('');
+    await expect(page.getByRole('link', { name: /integration mindset/i })).toBeVisible();
+    await expect(page.getByRole('link', { name: /aws cloud migration/i })).toBeVisible();
   });
 });
-
-

@@ -1,39 +1,27 @@
 /**
- * Protected Dashboard Page
- * 
- * MENTOR NOTE: Protected Route Pattern
- * 
- * This page:
- * 1. Requires authentication (handled by middleware)
- * 2. Shows user's learning path
- * 3. Displays progress
- * 4. Provides access to all phases
- * 
- * The learning path content was moved from /start to here
- * so it's only accessible to authenticated users.
+ * Dashboard Page – Explore free/premium
+ *
+ * Open to all (no sign-in required). Shows all phases + Cloud + AI.
+ * Free: only Phase 0 & 1 open; premium content links to /upgrade.
+ * Premium: all phases and sections open.
  */
 
 "use client"
 
 import { useSession } from "next-auth/react"
-import { useRouter } from "next/navigation"
 import Link from "next/link"
-import { Brain, Plug, Network, Compass, ArrowRight, BookOpen, Play, Star, Shield, Zap, Target, Cloud, Lock, Sparkles, GraduationCap } from "lucide-react"
+import { Brain, Plug, Network, Compass, ArrowRight, BookOpen, Play, Star, Shield, Zap, Target, Cloud, Lock, Sparkles, GraduationCap, Search, X } from "lucide-react"
 import { useEffect, useState } from "react"
+import { signupRequiredForPremium } from "@/config/featureFlags"
+
+const isPremiumPhase = (phaseId: number) => phaseId > 1
 
 export default function DashboardPage() {
   const { data: session, status } = useSession()
-  const router = useRouter()
   const [subscription, setSubscription] = useState<{
     tier: "FREE" | "PREMIUM"
     isExpired: boolean
   } | null>(null)
-
-  useEffect(() => {
-    if (status === "unauthenticated") {
-      router.push("/login")
-    }
-  }, [status, router])
 
   useEffect(() => {
     if (session?.user?.id) {
@@ -41,8 +29,14 @@ export default function DashboardPage() {
         .then(res => res.json())
         .then(data => setSubscription(data))
         .catch(() => setSubscription({ tier: "FREE", isExpired: false }))
+    } else {
+      setSubscription({ tier: "FREE", isExpired: false })
     }
   }, [session])
+
+  const tier = subscription?.tier ?? "FREE"
+  // When signup not required (staging), unlock all so navigation works; when live, gate by tier
+  const isPremium = !signupRequiredForPremium || tier === "PREMIUM"
 
   if (status === "loading") {
     return (
@@ -50,10 +44,6 @@ export default function DashboardPage() {
         <div className="text-white text-xl">Loading...</div>
       </div>
     )
-  }
-
-  if (!session) {
-    return null
   }
 
   const phases = [
@@ -129,6 +119,76 @@ export default function DashboardPage() {
     }
   ]
 
+  const spotlightSections = [
+    {
+      id: "cloud",
+      title: "AWS Cloud Migration",
+      description: "Master AWS cloud integration and learn how to migrate your applications to the cloud",
+      topics: ["EC2, S3, RDS, Lambda, API Gateway", "Lift & Shift, Re-platform, Refactor", "Migration Dashboard & Tools"],
+      skills: ["AWS Services", "Migration Strategies", "Cost Optimization", "Architecture"],
+      level: "Cloud",
+      href: "/cloud",
+      premiumOnly: true
+    },
+    {
+      id: "ai",
+      title: "AI Components & Learning",
+      description: "Understand AI through Heart, Brain, Context, and Instructions",
+      topics: ["Ethics, Human-Centered Design, Bias Mitigation", "Machine Learning, Neural Networks, NLP", "Prompt Engineering, Instruction Design"],
+      skills: ["Heart", "Brain", "Context", "Instructions"],
+      level: "AI",
+      href: "/ai",
+      premiumOnly: true
+    }
+  ]
+
+  const levelFilters = ["All", "Foundation", "Beginner", "Intermediate", "Advanced", "Expert", "Cloud", "AI"] as const
+  const [searchQuery, setSearchQuery] = useState("")
+  const [selectedLevel, setSelectedLevel] = useState<(typeof levelFilters)[number]>("All")
+
+  const learningExplorerItems = [
+    ...phases.map((phase) => ({
+      id: `phase-${phase.id}`,
+      title: phase.title,
+      description: phase.description,
+      topics: phase.topics,
+      skills: phase.skills,
+      level: phase.level,
+      href: phase.href,
+      premiumOnly: isPremiumPhase(phase.id),
+      estimatedTime: phase.estimatedTime
+    })),
+    ...spotlightSections.map((section) => ({
+      ...section,
+      estimatedTime: "Self-paced"
+    }))
+  ]
+
+  const normalizedQuery = searchQuery.trim().toLowerCase()
+  const filteredExplorerItems = learningExplorerItems.filter((item) => {
+    const matchesLevel = selectedLevel === "All" || item.level === selectedLevel
+    if (!matchesLevel) return false
+    if (!normalizedQuery) return true
+
+    const searchableText = [
+      item.title,
+      item.description,
+      item.level,
+      item.estimatedTime,
+      ...item.topics,
+      ...item.skills
+    ]
+      .join(" ")
+      .toLowerCase()
+
+    return searchableText.includes(normalizedQuery)
+  })
+
+  const clearExplorerFilters = () => {
+    setSearchQuery("")
+    setSelectedLevel("All")
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
             {/* Welcome Section */}
@@ -137,10 +197,10 @@ export default function DashboardPage() {
               <div className="container mx-auto px-6 py-12 relative z-10">
                 <div className="text-center max-w-4xl mx-auto">
                   <h1 className="text-5xl font-bold mb-4 bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 text-transparent bg-clip-text">
-                    Welcome back, {session.user?.name || session.user?.email}!
+                    {session ? `Welcome back, ${session.user?.name || session.user?.email}!` : "Explore your learning path"}
                   </h1>
                   <p className="text-xl text-gray-300 mb-4">
-                    Continue your API integration learning journey
+                    {session ? "Continue your API integration learning journey" : "All phases and topics in one place. Free: Phase 0 & 1. Premium: unlock all."}
                   </p>
                   
                   {/* Pareto Principle Badge */}
@@ -223,6 +283,139 @@ export default function DashboardPage() {
               </div>
             </section>
 
+            <section className="container mx-auto px-6 py-8">
+              <div className="max-w-6xl mx-auto rounded-3xl border border-cyan-500/20 bg-gradient-to-br from-cyan-500/10 via-slate-900/60 to-blue-500/10 p-8 shadow-2xl shadow-cyan-950/30">
+                <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+                  <div className="max-w-2xl">
+                    <p className="mb-3 text-sm font-semibold uppercase tracking-[0.3em] text-cyan-300">
+                      Learning Explorer
+                    </p>
+                    <h2 className="text-3xl font-bold text-white">Find the next lesson that fits your level</h2>
+                    <p className="mt-3 text-gray-300">
+                      Search by topic, skill, or section name and narrow the dashboard to the content that matches what you want to learn right now.
+                    </p>
+                  </div>
+                  <div className="rounded-2xl border border-white/10 bg-slate-950/40 px-5 py-4 text-sm text-gray-300">
+                    Showing <span className="font-semibold text-white">{filteredExplorerItems.length}</span> of{" "}
+                    <span className="font-semibold text-white">{learningExplorerItems.length}</span> sections
+                  </div>
+                </div>
+
+                <div className="mt-8 grid gap-4 lg:grid-cols-[minmax(0,1fr)_auto]">
+                  <label className="block">
+                    <span className="mb-2 block text-sm font-medium text-gray-200">Search the curriculum</span>
+                    <div className="flex items-center gap-3 rounded-2xl border border-slate-700 bg-slate-950/60 px-4 py-3 focus-within:border-cyan-400">
+                      <Search className="h-5 w-5 text-cyan-300" />
+                      <input
+                        type="search"
+                        value={searchQuery}
+                        onChange={(event) => setSearchQuery(event.target.value)}
+                        placeholder="Try OAuth, distributed tracing, AWS, or prompt engineering"
+                        className="w-full bg-transparent text-white outline-none placeholder:text-gray-500"
+                        aria-label="Search the learning explorer"
+                      />
+                    </div>
+                  </label>
+                  <div className="flex items-end">
+                    <button
+                      type="button"
+                      onClick={clearExplorerFilters}
+                      className="inline-flex w-full items-center justify-center gap-2 rounded-2xl border border-slate-700 px-4 py-3 text-sm font-semibold text-gray-200 transition hover:border-slate-500 hover:bg-slate-800/60 lg:w-auto"
+                    >
+                      <X className="h-4 w-4" />
+                      Reset filters
+                    </button>
+                  </div>
+                </div>
+
+                <div className="mt-6">
+                  <p className="mb-3 text-sm font-medium text-gray-200">Filter by level</p>
+                  <div className="flex flex-wrap gap-3">
+                    {levelFilters.map((level) => {
+                      const isActive = selectedLevel === level
+                      return (
+                        <button
+                          key={level}
+                          type="button"
+                          onClick={() => setSelectedLevel(level)}
+                          aria-pressed={isActive}
+                          className={`rounded-full border px-4 py-2 text-sm font-semibold transition ${
+                            isActive
+                              ? "border-cyan-400 bg-cyan-500/20 text-cyan-100"
+                              : "border-slate-700 bg-slate-900/70 text-gray-300 hover:border-slate-500 hover:text-white"
+                          }`}
+                        >
+                          {level}
+                        </button>
+                      )
+                    })}
+                  </div>
+                </div>
+
+                <div className="mt-8 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+                  {filteredExplorerItems.map((item) => {
+                    const href = item.premiumOnly && !isPremium ? "/upgrade" : item.href
+                    const actionLabel = item.premiumOnly && !isPremium ? "Upgrade to unlock" : "Open section"
+                    return (
+                      <Link
+                        key={item.id}
+                        href={href}
+                        className="group rounded-2xl border border-slate-700 bg-slate-950/50 p-5 transition hover:border-cyan-400/60 hover:bg-slate-900/80"
+                      >
+                        <div className="flex items-start justify-between gap-3">
+                          <div>
+                            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-cyan-300">
+                              {item.level}
+                            </p>
+                            <h3 className="mt-2 text-xl font-bold text-white">{item.title}</h3>
+                          </div>
+                          {item.premiumOnly && !isPremium ? (
+                            <Lock className="mt-1 h-4 w-4 text-yellow-400" />
+                          ) : (
+                            <ArrowRight className="mt-1 h-4 w-4 text-cyan-300 transition group-hover:translate-x-1" />
+                          )}
+                        </div>
+
+                        <p className="mt-3 text-sm text-gray-300">{item.description}</p>
+
+                        <div className="mt-4 flex flex-wrap gap-2">
+                          {item.skills.slice(0, 3).map((skill) => (
+                            <span key={skill} className="rounded-full border border-slate-700 bg-slate-900 px-3 py-1 text-xs text-gray-300">
+                              {skill}
+                            </span>
+                          ))}
+                        </div>
+
+                        <div className="mt-4 space-y-2">
+                          {item.topics.slice(0, 2).map((topic) => (
+                            <p key={topic} className="text-sm text-gray-400">
+                              {topic}
+                            </p>
+                          ))}
+                        </div>
+
+                        <div className="mt-5 flex items-center justify-between border-t border-slate-800 pt-4 text-sm">
+                          <span className="text-gray-500">{item.estimatedTime}</span>
+                          <span className={`font-semibold ${item.premiumOnly && !isPremium ? "text-yellow-400" : "text-cyan-300"}`}>
+                            {actionLabel}
+                          </span>
+                        </div>
+                      </Link>
+                    )
+                  })}
+                </div>
+
+                {filteredExplorerItems.length === 0 && (
+                  <div className="mt-8 rounded-2xl border border-dashed border-slate-600 bg-slate-950/50 p-8 text-center">
+                    <h3 className="text-xl font-bold text-white">No sections match that search yet</h3>
+                    <p className="mt-2 text-gray-300">
+                      Try a broader term like REST, AWS, or architecture, or reset the filters to scan the full curriculum.
+                    </p>
+                  </div>
+                )}
+              </div>
+            </section>
+
             {/* Learning Path Section */}
             <section id="phases" className="container mx-auto px-6 py-8">
               <div className="text-center mb-12">
@@ -241,8 +434,11 @@ export default function DashboardPage() {
           {phases.map((phase) => {
             const Icon = phase.icon
             const LevelIcon = phase.levelIcon
+            const premiumOnly = isPremiumPhase(phase.id)
+            const canOpen = !premiumOnly || isPremium
+            const href = canOpen ? phase.href : "/upgrade"
             return (
-              <Link key={phase.id} href={phase.href}>
+              <Link key={phase.id} href={href}>
                 <div className="group bg-slate-800/50 backdrop-blur-sm rounded-2xl p-8 border border-slate-700 hover:border-slate-600 transition-all hover:shadow-2xl hover:scale-105 cursor-pointer relative overflow-hidden">
                   <div className="absolute inset-0 bg-gradient-to-br from-transparent via-transparent to-slate-700/20 opacity-0 group-hover:opacity-100 transition-opacity"></div>
                   
@@ -252,7 +448,7 @@ export default function DashboardPage() {
                         <Icon className="w-8 h-8 text-white" />
                       </div>
                       <div className="flex items-center gap-2">
-                        {phase.id > 1 && subscription?.tier === "FREE" && (
+                        {premiumOnly && !isPremium && (
                           <Lock className="w-4 h-4 text-yellow-400" />
                         )}
                         <LevelIcon className={`w-4 h-4 ${phase.levelColor}`} />
@@ -267,7 +463,7 @@ export default function DashboardPage() {
                         <span className="text-sm font-semibold text-gray-400">
                           Phase {phase.id}
                         </span>
-                        {phase.id > 1 && subscription?.tier === "FREE" && (
+                        {premiumOnly && !isPremium && (
                           <span className="px-2 py-0.5 bg-yellow-500/20 border border-yellow-500/30 rounded text-xs text-yellow-400 font-semibold">
                             Premium
                           </span>
@@ -302,8 +498,8 @@ export default function DashboardPage() {
                       <div className="text-xs text-gray-500">
                         ⏱️ {phase.estimatedTime}
                       </div>
-                      <div className="text-blue-400 font-semibold flex items-center group-hover:gap-2 transition-all">
-                        Start Learning
+                      <div className={`font-semibold flex items-center group-hover:gap-2 transition-all ${canOpen ? "text-blue-400" : "text-yellow-400"}`}>
+                        {canOpen ? "Start Learning" : "Upgrade to unlock"}
                         <span className="ml-2 group-hover:translate-x-1 transition-transform">→</span>
                       </div>
                     </div>
@@ -323,10 +519,14 @@ export default function DashboardPage() {
             Learn how to migrate your applications to AWS cloud
           </p>
         </div>
-        <Link href="/cloud">
+        <Link href={isPremium ? "/cloud" : "/upgrade"}>
           <div className="group bg-slate-800/50 backdrop-blur-sm rounded-2xl p-8 border-2 border-slate-700 hover:border-orange-500 transition-all hover:shadow-2xl hover:scale-105 cursor-pointer relative overflow-hidden max-w-4xl mx-auto">
             <div className="absolute inset-0 bg-gradient-to-br from-transparent via-transparent to-orange-500/20 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-            
+            {!isPremium && (
+              <div className="absolute top-4 right-4">
+                <Lock className="w-5 h-5 text-yellow-400" />
+              </div>
+            )}
             <div className="relative z-10">
               <div className="flex items-start justify-between mb-4">
                 <div className="inline-flex p-3 rounded-lg bg-gradient-to-r from-orange-500 to-red-500 mb-4">
@@ -386,8 +586,8 @@ export default function DashboardPage() {
                 <div className="text-xs text-gray-500">
                   ⏱️ Self-paced
                 </div>
-                <div className="text-orange-400 font-semibold flex items-center group-hover:gap-2 transition-all">
-                  Explore Cloud
+                <div className={`font-semibold flex items-center group-hover:gap-2 transition-all ${isPremium ? "text-orange-400" : "text-yellow-400"}`}>
+                  {isPremium ? "Explore Cloud" : "Upgrade to unlock"}
                   <span className="ml-2 group-hover:translate-x-1 transition-transform">→</span>
                 </div>
               </div>
@@ -404,10 +604,14 @@ export default function DashboardPage() {
             Master AI through its core components: Heart, Brain, Context, and Instructions
           </p>
         </div>
-        <Link href="/ai">
+        <Link href={isPremium ? "/ai" : "/upgrade"}>
           <div className="group bg-slate-800/50 backdrop-blur-sm rounded-2xl p-8 border-2 border-slate-700 hover:border-purple-500 transition-all hover:shadow-2xl hover:scale-105 cursor-pointer relative overflow-hidden max-w-4xl mx-auto">
             <div className="absolute inset-0 bg-gradient-to-br from-transparent via-transparent to-purple-500/20 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-            
+            {!isPremium && (
+              <div className="absolute top-4 right-4">
+                <Lock className="w-5 h-5 text-yellow-400" />
+              </div>
+            )}
             <div className="relative z-10">
               <div className="flex items-start justify-between mb-4">
                 <div className="inline-flex p-3 rounded-lg bg-gradient-to-r from-purple-500 to-pink-500 mb-4">
@@ -471,8 +675,8 @@ export default function DashboardPage() {
                 <div className="text-xs text-gray-500">
                   ⏱️ Self-paced
                 </div>
-                <div className="text-purple-400 font-semibold flex items-center group-hover:gap-2 transition-all">
-                  Explore AI
+                <div className={`font-semibold flex items-center group-hover:gap-2 transition-all ${isPremium ? "text-purple-400" : "text-yellow-400"}`}>
+                  {isPremium ? "Explore AI" : "Upgrade to unlock"}
                   <span className="ml-2 group-hover:translate-x-1 transition-transform">→</span>
                 </div>
               </div>
@@ -537,4 +741,3 @@ export default function DashboardPage() {
     </div>
   )
 }
-
