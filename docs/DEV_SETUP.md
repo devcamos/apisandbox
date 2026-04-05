@@ -1,188 +1,186 @@
 # Developer Setup Guide
 
-## Quick Start for Local Development
+This guide is the quickest way to get productive in the app as a developer.
 
-### 1. Install Dependencies
+## What this app is
+
+`apisandbox` is a Next.js training platform for API integration topics. It combines:
+
+- public marketing and onboarding pages
+- gated learning content for multiple phases
+- interactive demos for auth, retry, circuit breaker, and cloud topics
+- authentication and subscription logic
+- a Prisma-backed data layer
+- Playwright coverage for browser and API flows
+
+## Core stack
+
+- Next.js 16 App Router
+- React 19
+- TypeScript
+- Tailwind CSS
+- Prisma
+- NextAuth
+- Playwright
+
+## First-time setup
+
+### 1. Install dependencies
 
 ```bash
 npm install
 ```
 
-### 2. Start Development Server
+### 2. Create local environment config
+
+```bash
+npm run env:local
+```
+
+This copies the local template into `.env.local`. Fill in the values you need before starting the app.
+
+### 3. Start PostgreSQL
+
+Recommended:
+
+```bash
+npm run db:up
+```
+
+If you prefer a local Postgres install, point `DATABASE_URL` in `.env.local` at that database instead.
+
+### 4. Run migrations
+
+```bash
+npm run db:migrate
+```
+
+### 5. Start the app
 
 ```bash
 npm run dev
 ```
 
-The app will start on `http://localhost:4000`
+The web app runs on `http://localhost:4000`.
 
-### 3. View Architecture Diagrams Locally
+## Important routes
 
-#### Option A: In the Browser (Easiest)
+- `/` landing page
+- `/dashboard` learning hub
+- `/phase-0` through `/phase-4` learning content
+- `/cloud` cloud and migration content
+- `/ai` AI-related content
+- `/docs/architecture` in-app architecture viewer
+- `/login` and `/signup` authentication entry points
 
-Navigate to:
-```
-http://localhost:4000/docs/architecture
-```
+## Repo areas that matter most
 
-All Mermaid diagrams are rendered automatically with dark theme.
+| Path | Purpose |
+| --- | --- |
+| `app/` | App Router pages and API routes |
+| `components/` | Shared UI and interactive demos |
+| `lib/` | Auth, Prisma, rate limiting, metrics, and subscription helpers |
+| `config/` | Environment and feature-flag behavior |
+| `prisma/` | Prisma schema and migrations |
+| `tests/` | Playwright coverage |
+| `docs/` | Architecture, workflow, and setup documentation |
+| `mobile/` | Separate mobile client experiments |
 
-#### Option B: In VS Code/Cursor
+## Developer workflow
 
-1. Open `docs/ARCHITECTURE.md` in your editor
-2. Install "Markdown Preview Mermaid Support" extension
-3. Press `Cmd+Shift+V` (Mac) or `Ctrl+Shift+V` (Windows) to open preview
-4. Diagrams render automatically in the preview pane
+Use the branch model in [GITFLOW.md](/Users/Devonte1/.codex/worktrees/7ca2/apisandbox/docs/GITFLOW.md):
 
-#### Option C: Command Line Preview
+1. Branch from `staging`
+2. Keep changes on a short-lived feature branch
+3. Open PRs into `staging`
+4. Merge to `main` only from `staging`
 
-Use a markdown viewer with Mermaid support:
-
-```bash
-# Install markdown viewer (choose one)
-npm install -g markdown-preview-enhanced
-
-# Or use VS Code CLI
-code docs/ARCHITECTURE.md
-# Then use Cmd+Shift+V to preview
-```
-
-### 4. Edit Architecture Diagrams
-
-To modify diagrams:
-
-1. **Edit in markdown file:**
-   - Open `docs/ARCHITECTURE.md`
-   - Edit the Mermaid code blocks (between ` ```mermaid ` and ` ``` `)
-   - Save the file
-
-2. **Preview changes:**
-   - In browser: Refresh `/docs/architecture` page
-   - In VS Code: The preview updates automatically
-   - Or use https://mermaid.live/ for interactive editing
-
-3. **Test diagram syntax:**
-   ```bash
-   # If you have mermaid-cli installed
-   npx @mermaid-js/mermaid-cli docs/ARCHITECTURE.md -o test.png
-   ```
-
-## Local Development Workflow
-
-### Viewing Diagrams While Developing
-
-1. **Start dev server in one terminal:**
-   ```bash
-   npm run dev
-   ```
-
-2. **Open architecture page in browser:**
-   ```
-   http://localhost:4000/docs/architecture
-   ```
-
-3. **Edit diagrams:**
-   - Edit `docs/ARCHITECTURE.md`
-   - Save file
-   - Refresh browser to see changes
-
-### Hot Reload
-
-The architecture page supports hot reload:
-- Edit `app/docs/architecture/page.tsx` → Hot reloads
-- Edit `docs/ARCHITECTURE.md` → Refresh page to see updates
-
-### Generate Static Images (Optional)
-
-To generate static diagram images for documentation:
+Typical flow:
 
 ```bash
-# Install mermaid CLI globally
-npm install -g @mermaid-js/mermaid-cli
-
-# Generate images from markdown
-mmdc -i docs/ARCHITECTURE.md -o docs/architecture-diagrams.png
-
-# Generate individual diagrams
-# (extract specific mermaid code blocks first)
+git checkout staging
+git pull origin staging
+git checkout -b codex/your-change
 ```
 
-## File Locations
+## Testing and verification
 
-```
-apisandbox/
-├── docs/
-│   ├── ARCHITECTURE.md          # Source of truth (Mermaid code)
-│   ├── VIEWING_ARCHITECTURE.md  # This guide
-│   └── DEV_SETUP.md            # You are here
-├── app/
-│   └── docs/
-│       └── architecture/
-│           └── page.tsx        # Web viewer page
-```
-
-## Troubleshooting Local Viewing
-
-### Diagrams not rendering in browser?
-
-1. **Check if mermaid is installed:**
-   ```bash
-   npm list mermaid
-   ```
-
-2. **Reinstall if needed:**
-   ```bash
-   npm install mermaid
-   ```
-
-3. **Clear Next.js cache:**
-   ```bash
-   rm -rf .next
-   npm run dev
-   ```
-
-### VS Code preview not working?
-
-1. **Install extension:**
-   - Search: "Markdown Preview Mermaid Support"
-   - Install: `bierner.markdown-mermaid` by Matt Bierner
-
-2. **Check markdown preview:**
-   - Make sure you're in preview mode (not just viewing raw markdown)
-   - Use `Cmd+Shift+V` or `Ctrl+Shift+V`
-
-### Need to edit diagrams?
-
-The best workflow for editing:
-
-1. **Copy diagram code** from `docs/ARCHITECTURE.md`
-2. **Paste into https://mermaid.live/**
-3. **Edit and test** in the live editor
-4. **Copy back** to `docs/ARCHITECTURE.md`
-5. **Save and refresh** browser or VS Code preview
-
-## Common Commands
+### Type checking
 
 ```bash
-# Start dev server
-npm run dev
-
-# View in browser
-open http://localhost:4000/docs/architecture
-
-# Type check
 npx tsc --noEmit
+```
 
-# Build (to test production)
-npm run build
+### Linting
 
-# Run tests
+```bash
+npm run lint
+```
+
+If `next lint` behaves unexpectedly after framework upgrades, verify the local Next.js lint command and repo config before assuming your code is the issue.
+
+### Playwright
+
+```bash
 npm test
 ```
 
-## Development Tips
+Helpful variants:
 
-1. **Keep browser open** to `/docs/architecture` while editing
-2. **Use VS Code split view** - markdown on left, preview on right
-3. **Test diagrams** in mermaid.live before committing
-4. **Check console** for any rendering errors in browser DevTools
+```bash
+npm run test:ui
+npm run test:headed
+npm run test:debug
+npm run test:coverage
+```
+
+### Staging smoke tests
+
+```bash
+npm run staging:up
+npm run test:staging
+npm run staging:down
+```
+
+## Architecture docs
+
+You can view the diagrams in either place:
+
+- browser: `http://localhost:4000/docs/architecture`
+- source: [`docs/ARCHITECTURE.md`](/Users/Devonte1/.codex/worktrees/7ca2/apisandbox/docs/ARCHITECTURE.md)
+
+## Troubleshooting
+
+### App fails to boot
+
+- confirm `.env.local` exists
+- confirm Postgres is reachable
+- confirm Prisma migrations have run
+
+### Auth behaves differently between environments
+
+- check values in `.env.local`
+- compare with [`config/environments/local.env.example`](/Users/Devonte1/.codex/worktrees/7ca2/apisandbox/config/environments/local.env.example)
+- review auth behavior in [`lib/auth-config.ts`](/Users/Devonte1/.codex/worktrees/7ca2/apisandbox/lib/auth-config.ts)
+
+### Staging behavior differs from local dev
+
+- compare feature flags in [`config/featureFlags.ts`](/Users/Devonte1/.codex/worktrees/7ca2/apisandbox/config/featureFlags.ts)
+- run the staging stack locally with `npm run staging:up`
+
+### Generated test artifacts clutter the repo
+
+These are safe to clean when they are not needed:
+
+```bash
+rm -rf test-results playwright-report
+```
+
+## Recommended developer checklist
+
+Before opening a PR:
+
+1. Run `npx tsc --noEmit`
+2. Run the most relevant Playwright test slice for your change
+3. Confirm you are branching from `staging`
+4. Update docs when behavior or workflow changes

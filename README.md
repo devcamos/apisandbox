@@ -37,6 +37,14 @@ npm run dev
 
 Open [http://localhost:4000](http://localhost:4000) to see the application.
 
+## 👩‍💻 Developer Docs
+
+If you are working on the app itself, start here:
+
+- [Developer Setup](./docs/DEV_SETUP.md)
+- [Git Workflow](./docs/GITFLOW.md)
+- [Architecture](./docs/ARCHITECTURE.md)
+
 ### Build for Production
 
 ```bash
@@ -98,7 +106,8 @@ For detailed architecture documentation with visual diagrams:
 
 - **[Architecture Documentation](./docs/ARCHITECTURE.md)** - Complete system architecture with Mermaid diagrams
 - **[Architecture Viewer](/docs/architecture)** - Interactive architecture diagrams in the app
-- **[Developer Setup](./docs/DEV_SETUP.md)** - How to view diagrams locally for developers
+- **[Developer Setup](./docs/DEV_SETUP.md)** - Local setup, testing, and app workflow
+- **[Git Workflow](./docs/GITFLOW.md)** - Branching and release flow for contributors
 
 ### Quick View (Local Development)
 
@@ -245,4 +254,3 @@ Access the Cloud section from the navigation menu or visit `/cloud`.
 ## 📝 License
 
 This project is for educational purposes.
-
