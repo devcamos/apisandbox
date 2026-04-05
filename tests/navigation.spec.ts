@@ -63,4 +63,33 @@ test.describe('Navigation', () => {
     await expect(page).toHaveURL('/');
     await expect(page.getByRole('heading', { name: 'API Integration Training' })).toBeVisible();
   });
+
+  test('should show featured quick navigation results when search opens', async ({ page }) => {
+    await page.goto('/');
+
+    const searchInput = page.getByLabel(/search pages, phases, topics/i);
+    await searchInput.click();
+
+    await expect(page.getByText('Featured Pages')).toBeVisible();
+    await expect(page.getByRole('button', { name: /PostgreSQL \+ Prisma/i })).toBeVisible();
+  });
+
+  test('should store recent search selections for quick return navigation', async ({ page }) => {
+    await page.goto('/');
+
+    const searchInput = page.getByLabel(/search pages, phases, topics/i);
+    await searchInput.click();
+    await searchInput.fill('postgres');
+
+    await page.getByRole('button', { name: /PostgreSQL \+ Prisma/i }).click();
+
+    await expect(page).toHaveURL('/phase-2/databases/postgresql');
+
+    const pageSearchInput = page.getByLabel(/search pages, phases, topics/i);
+    await pageSearchInput.click();
+
+    await expect(page.getByText('Recent')).toBeVisible();
+    await expect(page.getByRole('button', { name: /PostgreSQL \+ Prisma/i })).toBeVisible();
+    await expect(page.getByText('Recent', { exact: true })).toBeVisible();
+  });
 });
