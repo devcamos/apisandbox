@@ -43,6 +43,7 @@ If you are working on the app itself, start here:
 
 - [Developer Setup](./docs/DEV_SETUP.md)
 - [Git Workflow](./docs/GITFLOW.md)
+- [Features Workspace](./docs/features/README.md)
 - [Architecture](./docs/ARCHITECTURE.md)
 
 ### Build for Production
