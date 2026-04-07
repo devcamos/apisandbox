@@ -3,6 +3,9 @@ import { defineConfig, devices } from '@playwright/test';
 /**
  * @see https://playwright.dev/docs/test-configuration
  */
+const baseURL = process.env.PLAYWRIGHT_BASE_URL || 'http://localhost:4000';
+const webServerCommand = process.env.PLAYWRIGHT_WEB_SERVER_COMMAND || 'npm run dev';
+
 export default defineConfig({
   testDir: './tests',
   /* Run tests in files in parallel */
@@ -29,7 +32,7 @@ export default defineConfig({
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     /* Base URL to use in actions like `await page.goto('/')`. */
-    baseURL: 'http://localhost:4000',
+    baseURL,
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'on-first-retry',
@@ -77,16 +80,30 @@ export default defineConfig({
     //   name: 'Google Chrome',
     //   use: { ...devices['Desktop Chrome'], channel: 'chrome' },
     // },
+
+    /* Staging: run against already-running staging (e.g. Docker). Add with: STAGING_TEST=1 npm run test:staging */
+    ...(process.env.STAGING_TEST
+      ? [
+          {
+            name: 'staging',
+            use: {
+              baseURL: process.env.STAGING_URL || 'http://localhost:4000',
+            },
+          },
+        ]
+      : []),
   ],
 
-  /* Run your local dev server before starting the tests */
-  webServer: {
-    command: 'npm run dev',
-    url: 'http://localhost:4000',
-    reuseExistingServer: !process.env.CI,
-    timeout: 120 * 1000,
-    env: {
-      NODE_ENV: 'test',
-    },
-  },
+  /* Run your local dev server before starting the tests (skip when running staging tests) */
+  webServer: process.env.STAGING_TEST
+    ? undefined
+    : {
+        command: webServerCommand,
+        url: baseURL,
+        reuseExistingServer: !process.env.CI,
+        timeout: 120 * 1000,
+        env: {
+          NODE_ENV: 'test',
+        },
+      },
 });
