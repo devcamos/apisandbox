@@ -34,6 +34,7 @@ COPY --from=builder --chmod=0555 /app/node_modules/@prisma ./node_modules/@prism
 COPY --from=builder /app/node_modules/prisma ./node_modules/prisma
 COPY --from=builder /app/prisma ./prisma
 COPY --from=builder /app/package.json ./
+RUN chmod -R a-w /app/.next/standalone /app/.next/static /app/node_modules/.prisma /app/node_modules/@prisma
 USER nextjs
 EXPOSE 4000
 ENV PORT=4000
