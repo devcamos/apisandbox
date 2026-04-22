@@ -36,7 +36,8 @@ export default function Navigation() {
     { name: "Architecture", href: "/docs/architecture" },
   ];
 
-  const navItems = session ? protectedNavItems : publicNavItems;
+  // Explore and free/premium options are open to all; show full nav when signed out too
+  const navItems = session ? protectedNavItems : [...publicNavItems, { name: "Upgrade", href: "/upgrade" }];
 
   // Fetch subscription status
   useEffect(() => {
@@ -100,81 +101,79 @@ export default function Navigation() {
             <span className="font-bold text-white text-xl">API Training</span>
           </Link>
 
-          {/* Desktop Navigation */}
+          {/* Desktop Navigation - Explore and free/premium open to all */}
           <div className="hidden md:flex items-center space-x-1">
-            {session && (
-              <div className="relative" ref={exploreRef}>
-                <button
-                  onClick={() => setExploreOpen(!exploreOpen)}
-                  className={`px-4 py-2 rounded-lg transition-all flex items-center gap-1 ${
-                    pathname.startsWith("/phase") || pathname.startsWith("/cloud") || pathname.startsWith("/ai")
-                      ? "bg-blue-500/10 text-blue-400 font-semibold"
-                      : "text-gray-300 hover:text-white hover:bg-slate-800"
-                  }`}
-                >
-                  Explore
-                  <ChevronDown className={`w-4 h-4 transition-transform ${exploreOpen ? "rotate-180" : ""}`} />
-                </button>
+            <div className="relative" ref={exploreRef}>
+              <button
+                onClick={() => setExploreOpen(!exploreOpen)}
+                className={`px-4 py-2 rounded-lg transition-all flex items-center gap-1 ${
+                  pathname.startsWith("/phase") || pathname.startsWith("/cloud") || pathname.startsWith("/ai")
+                    ? "bg-blue-500/10 text-blue-400 font-semibold"
+                    : "text-gray-300 hover:text-white hover:bg-slate-800"
+                }`}
+              >
+                Explore
+                <ChevronDown className={`w-4 h-4 transition-transform ${exploreOpen ? "rotate-180" : ""}`} />
+              </button>
 
-                {/* Explore Dropdown */}
-                {exploreOpen && (
-                  <div className="absolute top-full left-0 mt-2 w-96 bg-slate-800 border border-slate-700 rounded-xl shadow-2xl z-50 overflow-hidden">
-                    <div className="p-4">
-                      {exploreSections.map((section, idx) => {
-                        const SectionIcon = section.icon;
-                        return (
-                          <div key={section.title} className={idx > 0 ? "mt-6 pt-6 border-t border-slate-700" : ""}>
-                            <div className="flex items-center gap-2 mb-3">
-                              <SectionIcon className="w-4 h-4 text-blue-400" />
-                              <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wide">
-                                {section.title}
-                              </h3>
-                            </div>
-                            <div className="space-y-1">
-                              {section.items.map((item) => (
-                                <Link
-                                  key={item.href}
-                                  href={item.href}
-                                  onClick={() => setExploreOpen(false)}
-                                  className={`block px-3 py-2 rounded-lg transition-all group ${
-                                    pathname === item.href
-                                      ? "bg-blue-500/10 text-blue-400"
-                                      : "text-gray-300 hover:text-white hover:bg-slate-700"
-                                  }`}
-                                >
-                                  <div className="flex items-center justify-between">
-                                    <span className="text-sm">{item.name}</span>
-                                    <span className={`text-xs px-2 py-0.5 rounded ${
-                                      item.badge === "Free"
-                                        ? "bg-green-500/20 text-green-400"
-                                        : "bg-purple-500/20 text-purple-400"
-                                    }`}>
-                                      {item.badge}
-                                    </span>
-                                  </div>
-                                </Link>
-                              ))}
-                            </div>
+              {/* Explore Dropdown */}
+              {exploreOpen && (
+                <div className="absolute top-full left-0 mt-2 w-96 bg-slate-800 border border-slate-700 rounded-xl shadow-2xl z-50 overflow-hidden">
+                  <div className="p-4">
+                    {exploreSections.map((section, idx) => {
+                      const SectionIcon = section.icon;
+                      return (
+                        <div key={section.title} className={idx > 0 ? "mt-6 pt-6 border-t border-slate-700" : ""}>
+                          <div className="flex items-center gap-2 mb-3">
+                            <SectionIcon className="w-4 h-4 text-blue-400" />
+                            <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wide">
+                              {section.title}
+                            </h3>
                           </div>
-                        );
-                      })}
-                    </div>
-                    <div className="border-t border-slate-700 p-4 bg-slate-900/50">
-                      <Link
-                        href="/dashboard"
-                        onClick={() => setExploreOpen(false)}
-                        className="block text-center px-4 py-2 bg-gradient-to-r from-blue-500 to-cyan-500 text-white rounded-lg font-semibold hover:shadow-lg transition-all text-sm"
-                      >
-                        View All in Dashboard
-                      </Link>
-                    </div>
+                          <div className="space-y-1">
+                            {section.items.map((item) => (
+                              <Link
+                                key={item.href}
+                                href={item.href}
+                                onClick={() => setExploreOpen(false)}
+                                className={`block px-3 py-2 rounded-lg transition-all group ${
+                                  pathname === item.href
+                                    ? "bg-blue-500/10 text-blue-400"
+                                    : "text-gray-300 hover:text-white hover:bg-slate-700"
+                                }`}
+                              >
+                                <div className="flex items-center justify-between">
+                                  <span className="text-sm">{item.name}</span>
+                                  <span className={`text-xs px-2 py-0.5 rounded ${
+                                    item.badge === "Free"
+                                      ? "bg-green-500/20 text-green-400"
+                                      : "bg-purple-500/20 text-purple-400"
+                                  }`}>
+                                    {item.badge}
+                                  </span>
+                                </div>
+                              </Link>
+                            ))}
+                          </div>
+                        </div>
+                      );
+                    })}
                   </div>
-                )}
-              </div>
-            )}
-            
+                  <div className="border-t border-slate-700 p-4 bg-slate-900/50">
+                    <Link
+                      href="/dashboard"
+                      onClick={() => setExploreOpen(false)}
+                      className="block text-center px-4 py-2 bg-gradient-to-r from-blue-500 to-cyan-500 text-white rounded-lg font-semibold hover:shadow-lg transition-all text-sm"
+                    >
+                      View All in Dashboard
+                    </Link>
+                  </div>
+                </div>
+              )}
+            </div>
+
             {navItems.map((item) => {
-              // Skip individual phase items if user is logged in (they're in Explore dropdown)
+              // When logged in, phase/cloud/ai are in Explore dropdown; when logged out, show Home + Upgrade
               if (session && (item.name.startsWith("Phase") || item.name === "Cloud" || item.name === "AI")) {
                 return null;
               }
@@ -194,11 +193,9 @@ export default function Navigation() {
             })}
 
             {/* Search */}
-            {session && (
-              <div className="mx-4">
-                <PageSearch />
-              </div>
-            )}
+            <div className="mx-4">
+              <PageSearch />
+            </div>
 
             {/* Auth Buttons */}
             {status === "loading" ? (
@@ -316,54 +313,51 @@ export default function Navigation() {
           <button
             onClick={() => setIsOpen(!isOpen)}
             className="md:hidden text-gray-300 hover:text-white"
+            aria-label={isOpen ? "Close menu" : "Open menu"}
           >
             {isOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
         </div>
 
-        {/* Mobile Navigation */}
+        {/* Mobile Navigation - Explore open to all */}
         {isOpen && (
           <div className="md:hidden py-4 space-y-2">
-            {session && (
-              <div className="px-4 py-2">
-                <div className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2 flex items-center gap-2">
-                  <BookOpen className="w-3 h-3" />
-                  Explore
-                </div>
-                <div className="space-y-1 ml-4">
-                  {exploreSections.flatMap(section => section.items).map((item) => (
-                    <Link
-                      key={item.href}
-                      href={item.href}
-                      onClick={() => setIsOpen(false)}
-                      className={`block px-3 py-2 rounded-lg transition-all ${
-                        pathname === item.href
-                          ? "bg-blue-500/10 text-blue-400 font-semibold"
-                          : "text-gray-300 hover:text-white hover:bg-slate-800"
-                      }`}
-                    >
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm">{item.name}</span>
-                        <span className={`text-xs px-2 py-0.5 rounded ${
-                          item.badge === "Free"
-                            ? "bg-green-500/20 text-green-400"
-                            : "bg-purple-500/20 text-purple-400"
-                        }`}>
-                          {item.badge}
-                        </span>
-                      </div>
-                    </Link>
-                  ))}
-                </div>
+            <div className="px-4 py-2">
+              <div className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2 flex items-center gap-2">
+                <BookOpen className="w-3 h-3" />
+                Explore
               </div>
-            )}
+              <div className="space-y-1 ml-4">
+                {exploreSections.flatMap(section => section.items).map((item) => (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    onClick={() => setIsOpen(false)}
+                    className={`block px-3 py-2 rounded-lg transition-all ${
+                      pathname === item.href
+                        ? "bg-blue-500/10 text-blue-400 font-semibold"
+                        : "text-gray-300 hover:text-white hover:bg-slate-800"
+                    }`}
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm">{item.name}</span>
+                      <span className={`text-xs px-2 py-0.5 rounded ${
+                        item.badge === "Free"
+                          ? "bg-green-500/20 text-green-400"
+                          : "bg-purple-500/20 text-purple-400"
+                      }`}>
+                        {item.badge}
+                      </span>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </div>
 
             {/* Mobile Search */}
-            {session && (
-              <div className="px-4 py-4 border-t border-slate-700">
-                <PageSearch />
-              </div>
-            )}
+            <div className="px-4 py-4 border-t border-slate-700">
+              <PageSearch />
+            </div>
 
             {navItems.map((item) => {
               // Skip individual phase items if user is logged in (they're in Explore dropdown)
@@ -471,4 +465,3 @@ export default function Navigation() {
     </nav>
   );
 }
-
