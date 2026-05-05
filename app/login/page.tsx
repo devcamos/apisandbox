@@ -13,7 +13,7 @@
 
 "use client"
 
-import { useState, useEffect, useRef, Suspense } from "react"
+import { useState, useEffect, useRef, useCallback, Suspense } from "react"
 import Script from "next/script"
 import { useRouter, useSearchParams } from "next/navigation"
 import Link from "next/link"
@@ -126,7 +126,7 @@ function LoginForm() {
   }
 
   // Parse error message and categorize it
-  const parseError = (errorMessage: string): ErrorInfo => {
+  const parseError = useCallback((errorMessage: string): ErrorInfo => {
     // Account locked errors (with time remaining)
     if (errorMessage.startsWith("ACCOUNT_LOCKED")) {
       const minutesMatch = errorMessage.match(/:(\d+)/)
@@ -240,7 +240,7 @@ function LoginForm() {
       recoverable: true,
       suggestion: "Please try again. If the problem continues, contact support."
     }
-  }
+  }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -303,33 +303,36 @@ function LoginForm() {
     }
   }
 
-  const handleGoogleCredential = async (credential: string) => {
-    setError(null)
-    setIsLoading(true)
-    try {
-      const response = await fetch("/api/auth/google", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ idToken: credential }),
-      })
-      const payload = await response.json()
-      if (!response.ok) {
-        const errorInfo = parseError(payload?.error?.message || "Google sign-in failed")
+  const handleGoogleCredential = useCallback(
+    async (credential: string) => {
+      setError(null)
+      setIsLoading(true)
+      try {
+        const response = await fetch("/api/auth/google", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ idToken: credential }),
+        })
+        const payload = await response.json()
+        if (!response.ok) {
+          const errorInfo = parseError(payload?.error?.message || "Google sign-in failed")
+          setError(errorInfo)
+          setIsLoading(false)
+          return
+        }
+        setSessionFromAuthResponse(payload.data)
+        router.push(callbackUrl)
+        router.refresh()
+      } catch (err) {
+        const errorInfo = parseError(
+          err instanceof Error ? err.message : "Failed to sign in with Google. Please try again."
+        )
         setError(errorInfo)
         setIsLoading(false)
-        return
       }
-      setSessionFromAuthResponse(payload.data)
-      router.push(callbackUrl)
-      router.refresh()
-    } catch (err) {
-      const errorInfo = parseError(
-        err instanceof Error ? err.message : "Failed to sign in with Google. Please try again."
-      )
-      setError(errorInfo)
-      setIsLoading(false)
-    }
-  }
+    },
+    [callbackUrl, parseError, router, setSessionFromAuthResponse]
+  )
 
   useEffect(() => {
     if (!googleClientId || !googleButtonRef.current) return
@@ -361,7 +364,7 @@ function LoginForm() {
       }, 100)
       setTimeout(() => clearInterval(t), 10000)
     }
-  }, [googleClientId])
+  }, [googleClientId, handleGoogleCredential])
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center px-6 py-12">

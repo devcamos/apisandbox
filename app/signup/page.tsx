@@ -12,7 +12,7 @@
 
 "use client"
 
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect, useRef, useCallback } from "react"
 import Script from "next/script"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
@@ -113,29 +113,32 @@ export default function SignupPage() {
     }
   }
 
-  const handleGoogleCredential = async (credential: string) => {
-    setErrors([])
-    setIsLoading(true)
-    try {
-      const response = await fetch("/api/auth/google", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ idToken: credential }),
-      })
-      const data = await response.json()
-      if (!response.ok) {
-        setErrors([data?.error?.message || "Google signup failed"])
+  const handleGoogleCredential = useCallback(
+    async (credential: string) => {
+      setErrors([])
+      setIsLoading(true)
+      try {
+        const response = await fetch("/api/auth/google", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ idToken: credential }),
+        })
+        const data = await response.json()
+        if (!response.ok) {
+          setErrors([data?.error?.message || "Google signup failed"])
+          setIsLoading(false)
+          return
+        }
+        setSessionFromAuthResponse(data.data)
+        router.push("/dashboard")
+        router.refresh()
+      } catch {
+        setErrors(["Failed to sign up with Google. Please try again."])
         setIsLoading(false)
-        return
       }
-      setSessionFromAuthResponse(data.data)
-      router.push("/dashboard")
-      router.refresh()
-    } catch {
-      setErrors(["Failed to sign up with Google. Please try again."])
-      setIsLoading(false)
-    }
-  }
+    },
+    [router, setSessionFromAuthResponse]
+  )
 
   useEffect(() => {
     if (!googleClientId || !googleButtonRef.current) return
@@ -167,7 +170,7 @@ export default function SignupPage() {
       }, 100)
       setTimeout(() => clearInterval(t), 10000)
     }
-  }, [googleClientId])
+  }, [googleClientId, handleGoogleCredential])
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center px-6 py-12">

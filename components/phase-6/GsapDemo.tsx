@@ -190,21 +190,24 @@ export default function GsapDemo({ algorithm = "binary" }: { algorithm?: SearchA
     [animatePointer, algorithm, arr.length]
   )
 
-  function applyStep(idx: number) {
-    if (idx < 0 || idx >= steps.length) return
-    setStepIdx(idx)
-    animateCells(steps[idx])
-    if (steps[idx].phase === "checking") {
-      setComparisonCount((c) => c + 1)
-    }
-  }
+  const applyStep = useCallback(
+    (idx: number) => {
+      if (idx < 0 || idx >= steps.length) return
+      setStepIdx(idx)
+      animateCells(steps[idx])
+      if (steps[idx].phase === "checking") {
+        setComparisonCount((c) => c + 1)
+      }
+    },
+    [animateCells, steps]
+  )
 
   useEffect(() => {
     if (!isPlaying) return
     if (stepIdx >= steps.length - 1) { setIsPlaying(false); return }
     timerRef.current = setTimeout(() => applyStep(stepIdx + 1), algorithm === "linear" ? 600 : 900)
     return () => { if (timerRef.current) clearTimeout(timerRef.current) }
-  }, [isPlaying, stepIdx, steps.length, algorithm])
+  }, [applyStep, algorithm, isPlaying, stepIdx, steps.length])
 
   function reset() {
     setIsPlaying(false)
