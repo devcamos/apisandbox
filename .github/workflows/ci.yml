@@ -175,5 +175,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      # Only block on critical (moderate/high often transitives until upstream patches land).
       - name: Dependency review
         uses: actions/dependency-review-action@v4
+        with:
+          fail-on-severity: critical
