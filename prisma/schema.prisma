@@ -66,9 +66,12 @@ model User {
   loginAttempts Int       @default(0)
   lockedUntil   DateTime?
   isActive      Boolean   @default(true)
+  // Stripe billing
+  stripeCustomerId     String?   @unique
+  stripeSubscriptionId String?
   // Subscription fields
   subscriptionTier SubscriptionTier @default(FREE)
-  subscriptionExpiresAt DateTime?    // For trial periods or expiring subscriptions
+  subscriptionExpiresAt DateTime?
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 

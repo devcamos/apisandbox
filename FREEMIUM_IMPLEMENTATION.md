@@ -1,291 +1,213 @@
-# 🎓 Freemium Model Implementation
+# Freemium Model — £5/month Premium
 
-## ✅ Implementation Complete
+## Pricing
 
-A complete freemium subscription system has been implemented where:
-- **FREE tier**: Access to Phase 1 only
-- **PREMIUM tier**: Access to all phases (1-4) + Cloud section
+| | Free | Premium (£5/mo) |
+|---|---|---|
+| **Phases** | 0, 1, 7, 8 | All (0–8) |
+| **Interactive visualizers** | No | Yes |
+| **Progress tracking** | No | Yes (Shinobi board, XP) |
+| **Concept side quests** | No | Yes |
+| **Exercises** | No | Yes |
+| **Account required** | No | Yes |
 
 ---
 
-## 📋 What Was Implemented
+## Architecture
 
-### 1. **Database Schema** ✅
+### Feature Flag System
 
-**Subscription Tier Enum**
+All SaaS behaviour is gated behind feature flags in `config/featureFlags.ts`:
+
+```typescript
+isFeatureEnabled("PREMIUM_PAYWALL")   // Require auth for phases 2–6
+isFeatureEnabled("STRIPE_CHECKOUT")   // Real payment flow vs demo mode
+isFeatureEnabled("EMAIL_VERIFICATION")// Email verify on signup
+isFeatureEnabled("RATE_LIMITING")     // Upstash Redis rate limiting
+isFeatureEnabled("ANALYTICS")         // Vercel Analytics
+```
+
+Toggle via environment variables:
+
+```env
+NEXT_PUBLIC_FF_PREMIUM_PAYWALL=true
+NEXT_PUBLIC_FF_STRIPE_CHECKOUT=true
+NEXT_PUBLIC_FF_EMAIL_VERIFICATION=true
+NEXT_PUBLIC_FF_RATE_LIMITING=true
+NEXT_PUBLIC_FF_ANALYTICS=true
+```
+
+When all flags are `false` (default local dev), the app runs fully unlocked with no external dependencies.
+
+### Access Control Flow
+
+```
+Request → Middleware (server-side)
+  ├── PREMIUM_PAYWALL off → pass through
+  ├── Public route → pass through
+  ├── Premium route + no session → redirect to /login
+  └── Protected API + no session → 401
+
+Page render → SubscriptionGate (client-side, defence in depth)
+  ├── PREMIUM_PAYWALL off → render content
+  ├── Free phase → render content
+  ├── Signed in + PREMIUM → render content
+  └── Signed in + FREE → show UpgradePrompt
+```
+
+### Payment Flow (Stripe)
+
+```
+User clicks "Upgrade — £5/month"
+  → POST /api/checkout
+  → Creates Stripe Checkout Session (GBP, mode: subscription)
+  → Redirects to Stripe hosted page
+  → User pays
+  → Stripe fires webhook: checkout.session.completed
+  → POST /api/webhooks/stripe
+  → Updates user: subscriptionTier = PREMIUM
+  → Sends confirmation email via Resend
+  → User returns to /upgrade/success
+```
+
+Cancellation is handled via Stripe Customer Portal:
+- `POST /api/billing/portal` → generates portal session → user manages subscription
+- Webhook `customer.subscription.deleted` → downgrade to FREE
+
+---
+
+## Database Schema
+
 ```prisma
+model User {
+  // ... auth fields
+  stripeCustomerId     String?   @unique
+  stripeSubscriptionId String?
+  subscriptionTier     SubscriptionTier @default(FREE)
+  subscriptionExpiresAt DateTime?
+}
+
 enum SubscriptionTier {
   FREE
   PREMIUM
 }
 ```
 
-**User Model Updates**
-- `subscriptionTier`: Defaults to `FREE`
-- `subscriptionExpiresAt`: For trial periods or expiring subscriptions
+---
 
-### 2. **Subscription Utilities** ✅
+## Infrastructure
 
-**`lib/subscription.ts`**
-- `checkPhaseAccess()`: Checks if user has access to a phase
-- `getUserSubscription()`: Gets user's subscription status
-- `upgradeToPremium()`: Upgrades user to premium (demo mode)
-- `getTierFeatures()`: Returns features available per tier
+| Service | Purpose | Package |
+|---------|---------|---------|
+| Stripe | Payment processing | `stripe` |
+| Upstash Redis | Rate limiting (serverless) | `@upstash/ratelimit`, `@upstash/redis` |
+| Resend | Transactional email | `resend` |
+| Pino | Structured logging | `pino`, `pino-pretty` |
+| Vitest | Unit testing | `vitest`, `@testing-library/react` |
 
-### 3. **Access Control Components** ✅
+### Rate Limiting
 
-**`SubscriptionGate` Component**
-- Wraps premium content
-- Checks subscription tier
-- Shows upgrade prompt if access denied
-- Renders content if access granted
+Uses Upstash Redis sliding window algorithm:
 
-**`UpgradePrompt` Component**
-- Beautiful upgrade prompt
-- Shows locked content name
-- Lists premium benefits
-- Clear CTA to upgrade
+| Endpoint | Limit | Window |
+|----------|-------|--------|
+| Auth (login/signup) | 5 requests | 15 minutes |
+| Signup | 3 requests | 1 hour |
+| General API | 100 requests | 15 minutes |
+| Webhooks | 50 requests | 1 minute |
 
-### 4. **Protected Pages** ✅
+Only active when `NEXT_PUBLIC_FF_RATE_LIMITING=true` and Upstash credentials are configured.
 
-All premium content is now protected:
-- **Phase 2**: Third-Party Integrations
-- **Phase 3**: Inter-Service Communication
-- **Phase 4**: Principal-Level Architecture
-- **Cloud Section**: AWS Migration guides
+### Middleware (server-side protection)
 
-**Phase 1** remains free for everyone.
+When `PREMIUM_PAYWALL` is enabled:
+- `/phase-2` through `/phase-6` require a session cookie — unauthenticated users redirect to `/login`
+- `/api/subscription/*`, `/api/profile/*`, `/api/phase-progress/*` return 401 without auth
+- Security headers added to all responses (X-Content-Type-Options, X-Frame-Options, Referrer-Policy)
 
-### 5. **Upgrade Flow** ✅
+### Email
 
-**Upgrade Page** (`/upgrade`)
-- Feature comparison (Free vs Premium)
-- Clear pricing ($29/month)
-- Upgrade button (demo mode)
-- Trust indicators
-
-**Upgrade API** (`/api/subscription/upgrade`)
-- Verifies authentication
-- Upgrades user to premium
-- Returns success response
-
-### 6. **Dashboard Updates** ✅
-
-**Subscription Status Badge**
-- Shows "Premium Member" or "Free Plan"
-- Quick upgrade link for free users
-- Visual indicators
-
-**Phase Cards**
-- Lock icons for premium phases (free users)
-- "Premium" badges on locked content
-- Clear visual distinction
+Transactional emails via Resend:
+- Welcome email on signup
+- Email verification link (24h expiry)
+- Subscription confirmation
+- Cancellation notification (with end date)
 
 ---
 
-## 🎓 Mentor-Level Insights
-
-### Freemium Model Strategy
-
-**Why This Model Works:**
-1. **Low Barrier to Entry**: Phase 1 is free (removes friction)
-2. **Value Demonstration**: Users see quality before paying
-3. **Natural Upgrade Path**: Users want more after Phase 1
-4. **Clear Value Proposition**: Premium features are clearly defined
-
-**Industry Examples:**
-- **GitHub**: Free public repos, paid private repos
-- **Notion**: Free blocks, paid unlimited
-- **Spotify**: Free with ads, premium ad-free
-- **This App**: Free Phase 1, premium all phases
-
-### Access Control Pattern
-
-**SubscriptionGate Component**
-```tsx
-<SubscriptionGate phaseNumber={2} lockedContentName="Phase 2">
-  <Phase2Content />
-</SubscriptionGate>
-```
-
-**Benefits:**
-- Reusable across all premium content
-- Centralized access logic
-- Consistent UX
-- Easy to maintain
-
-### Database Design
-
-**Why SubscriptionTier Enum?**
-- Type-safe (TypeScript + Prisma)
-- Easy to add new tiers (e.g., PRO, ENTERPRISE)
-- Clear in database schema
-- Prevents invalid values
-
-**Why subscriptionExpiresAt?**
-- Supports trial periods
-- Monthly/annual subscriptions
-- Lifetime subscriptions (null = never expires)
-
----
-
-## 🚀 How It Works
-
-### User Journey
-
-1. **Sign Up** → User gets FREE tier by default
-2. **Access Phase 1** → Free, no restrictions
-3. **Try Phase 2** → Sees upgrade prompt
-4. **Upgrade** → Clicks upgrade, becomes PREMIUM
-5. **Access All Phases** → Full access to everything
-
-### Access Check Flow
+## File Structure
 
 ```
-User requests Phase 2
-  ↓
-SubscriptionGate checks subscription
-  ↓
-Is tier PREMIUM? → Yes → Render content
-  ↓
-No → Show UpgradePrompt
-  ↓
-User clicks upgrade
-  ↓
-Upgrade API upgrades user
-  ↓
-Redirect to Phase 2
-  ↓
-Access granted!
+config/featureFlags.ts           ← Feature flag system
+lib/stripe.ts                    ← Stripe client + plans
+lib/email.ts                     ← Resend email templates
+lib/rate-limit.ts                ← Upstash rate limiting
+lib/logger.ts                    ← Pino structured logging
+lib/subscription.ts              ← Access control logic
+middleware.ts                    ← Server-side route protection
+app/api/checkout/route.ts        ← Create Stripe Checkout session
+app/api/webhooks/stripe/route.ts ← Handle Stripe lifecycle events
+app/api/billing/portal/route.ts  ← Stripe Customer Portal
+app/api/subscription/check/      ← Client-side access check
+app/api/subscription/upgrade/    ← Demo upgrade (when Stripe disabled)
+components/SubscriptionGate.tsx  ← Client-side gate component
+prisma/schema.prisma             ← User model with Stripe fields
+vitest.config.ts                 ← Unit test configuration
+tests/unit/                      ← Unit tests
 ```
 
 ---
 
-## 📁 File Structure
+## Environment Variables (Production)
 
+```env
+# Feature flags — enable all for production
+NEXT_PUBLIC_FF_PREMIUM_PAYWALL=true
+NEXT_PUBLIC_FF_STRIPE_CHECKOUT=true
+NEXT_PUBLIC_FF_EMAIL_VERIFICATION=true
+NEXT_PUBLIC_FF_RATE_LIMITING=true
+NEXT_PUBLIC_FF_ANALYTICS=true
+
+# Stripe
+STRIPE_SECRET_KEY=sk_live_...
+STRIPE_PUBLISHABLE_KEY=pk_live_...
+STRIPE_PRICE_ID=price_...
+STRIPE_WEBHOOK_SECRET=whsec_...
+
+# Upstash Redis
+UPSTASH_REDIS_REST_URL=https://...
+UPSTASH_REDIS_REST_TOKEN=...
+
+# Resend
+RESEND_API_KEY=re_...
+EMAIL_FROM="API Sandbox <hello@yourdomain.com>"
+
+# Logging
+LOG_LEVEL=info
 ```
-apisandbox/
-├── prisma/
-│   └── schema.prisma              # SubscriptionTier enum + User fields
-├── lib/
-│   └── subscription.ts            # Access control utilities
-├── components/
-│   ├── SubscriptionGate.tsx       # Access control wrapper
-│   └── UpgradePrompt.tsx          # Upgrade prompt UI
-├── app/
-│   ├── upgrade/
-│   │   └── page.tsx               # Upgrade/pricing page
-│   ├── api/
-│   │   └── subscription/
-│   │       ├── check/route.ts     # Check access
-│   │       ├── status/route.ts    # Get subscription status
-│   │       └── upgrade/route.ts  # Upgrade endpoint
-│   ├── phase-2/page.tsx           # Protected (wrapped in SubscriptionGate)
-│   ├── phase-3/page.tsx           # Protected
-│   ├── phase-4/page.tsx           # Protected
-│   └── cloud/services/page.tsx    # Protected
+
+---
+
+## Testing
+
+```bash
+npm run test:unit        # Vitest — feature flags, subscription logic
+npm run test:unit:watch  # Vitest in watch mode
+npm run test:ci:smoke    # Playwright E2E smoke
+npm run test             # Full Playwright suite
 ```
 
 ---
 
-## 🧪 Testing
+## Remaining Work
 
-### Test Scenarios
-
-1. **Free User Access**
-   - ✅ Can access Phase 1
-   - ❌ Cannot access Phase 2-4 (sees upgrade prompt)
-   - ❌ Cannot access Cloud section
-
-2. **Premium User Access**
-   - ✅ Can access all phases (1-4)
-   - ✅ Can access Cloud section
-   - ✅ Sees "Premium Member" badge
-
-3. **Upgrade Flow**
-   - ✅ Free user clicks upgrade
-   - ✅ Upgrades to premium
-   - ✅ Can now access all content
-
-4. **Dashboard Display**
-   - ✅ Shows subscription tier
-   - ✅ Shows lock icons on premium phases (free users)
-   - ✅ Shows premium badge (premium users)
-
----
-
-## 💡 Future Enhancements
-
-### Payment Integration
-- **Stripe**: Monthly/annual subscriptions
-- **PayPal**: Alternative payment method
-- **Webhooks**: Handle subscription events
-
-### Trial Periods
-- **7-day free trial**: Premium features
-- **Trial expiration**: Auto-downgrade to FREE
-- **Trial reminders**: Email notifications
-
-### Additional Tiers
-- **PRO**: Advanced features
-- **ENTERPRISE**: Custom pricing
-- **STUDENT**: Discounted pricing
-
-### Analytics
-- **Conversion tracking**: Free → Premium
-- **Feature usage**: Which phases are most popular
-- **Churn analysis**: Why users cancel
-
----
-
-## 🎯 Key Takeaways
-
-### Best Practices Applied
-
-1. **Clear Value Proposition**
-   - Free tier provides real value (Phase 1)
-   - Premium features are clearly defined
-   - Upgrade prompts are non-intrusive but visible
-
-2. **Type Safety**
-   - SubscriptionTier enum (prevents typos)
-   - TypeScript throughout
-   - Prisma schema validation
-
-3. **Reusable Components**
-   - SubscriptionGate (DRY principle)
-   - UpgradePrompt (consistent UX)
-   - Access control utilities
-
-4. **User Experience**
-   - Clear visual indicators (locks, badges)
-   - Smooth upgrade flow
-   - No dead ends (always a path forward)
-
----
-
-## 📚 Resources
-
-- [Freemium Model Best Practices](https://www.productplan.com/glossary/freemium/)
-- [Stripe Subscription Guide](https://stripe.com/docs/billing/subscriptions/overview)
-- [SaaS Pricing Strategies](https://www.priceintelligently.com/blog/saas-pricing-strategy)
-
----
-
-## ✅ Success!
-
-Your freemium model is now:
-- ✅ Fully functional (FREE vs PREMIUM)
-- ✅ Access control implemented
-- ✅ Upgrade flow working
-- ✅ Dashboard shows tier status
-- ✅ All premium content protected
-
-**Next Steps:**
-1. Integrate payment provider (Stripe)
-2. Add trial periods
-3. Set up analytics
-4. Test conversion funnel
-5. Deploy to production!
-
-
+- [ ] Stripe Dashboard: create Product + Price (£5/mo GBP)
+- [ ] Stripe Dashboard: configure Customer Portal
+- [ ] Stripe Dashboard: set webhook endpoint URL
+- [ ] Vercel: set production environment variables
+- [ ] Create proper Prisma migration (replace db push)
+- [ ] Terms of Service + Privacy Policy pages
+- [ ] Custom 404/500 error pages
+- [ ] Landing page with value proposition
+- [ ] SEO metadata per phase
+- [ ] Cookie consent banner

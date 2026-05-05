@@ -1,106 +1,67 @@
-/**
- * Rate Limiting Utility
- * 
- * MENTOR NOTE: Rate Limiting Best Practices
- * 
- * Why rate limiting matters:
- * 1. Prevents brute force attacks
- * 2. Protects against DDoS
- * 3. Prevents spam signups
- * 4. Protects API endpoints
- * 
- * Implementation options:
- * - In-memory (simple, but lost on restart)
- * - Redis (production-ready, scalable)
- * - Database (persistent, but slower)
- * 
- * For production, use Redis or a service like Upstash
- */
+import { Ratelimit } from "@upstash/ratelimit"
+import { Redis } from "@upstash/redis"
+import { isFeatureEnabled } from "@/config/featureFlags"
 
-// Simple in-memory rate limiter (for development)
-// MENTOR NOTE: In production, use Redis or a proper rate limiting service
-const rateLimitMap = new Map<string, { count: number; resetTime: number }>()
+const hasRedisConfig =
+  !!process.env.UPSTASH_REDIS_REST_URL && !!process.env.UPSTASH_REDIS_REST_TOKEN
 
-interface RateLimitOptions {
-  windowMs: number // Time window in milliseconds
-  maxRequests: number // Max requests per window
+function createRedis() {
+  if (!hasRedisConfig) return null
+  return Redis.fromEnv()
 }
 
-export function rateLimit(
+const redis = createRedis()
+
+function createLimiter(
+  tokens: number,
+  window: Parameters<typeof Ratelimit.slidingWindow>[1],
+  prefix: string
+) {
+  if (!redis) return null
+  return new Ratelimit({
+    redis,
+    limiter: Ratelimit.slidingWindow(tokens, window),
+    prefix: `rl:${prefix}`,
+    analytics: true,
+  })
+}
+
+export const authLimiter = createLimiter(5, "15 m", "auth")
+export const signupLimiter = createLimiter(3, "1 h", "signup")
+export const apiLimiter = createLimiter(100, "15 m", "api")
+export const webhookLimiter = createLimiter(50, "1 m", "webhook")
+
+export interface RateLimitResult {
+  allowed: boolean
+  remaining: number
+  resetAt: number
+}
+
+export async function checkRateLimit(
   identifier: string,
-  options: RateLimitOptions
-): { allowed: boolean; remaining: number; resetTime: number } {
-  const now = Date.now()
-  const record = rateLimitMap.get(identifier)
-
-  // Clean up expired records
-  if (record && record.resetTime < now) {
-    rateLimitMap.delete(identifier)
+  limiter: Ratelimit | null
+): Promise<RateLimitResult> {
+  if (!isFeatureEnabled("RATE_LIMITING") || !limiter) {
+    return { allowed: true, remaining: 999, resetAt: 0 }
   }
 
-  const currentRecord = rateLimitMap.get(identifier)
-
-  if (!currentRecord) {
-    // First request in window
-    rateLimitMap.set(identifier, {
-      count: 1,
-      resetTime: now + options.windowMs,
-    })
-    return {
-      allowed: true,
-      remaining: options.maxRequests - 1,
-      resetTime: now + options.windowMs,
-    }
-  }
-
-  if (currentRecord.count >= options.maxRequests) {
-    // Rate limit exceeded
-    return {
-      allowed: false,
-      remaining: 0,
-      resetTime: currentRecord.resetTime,
-    }
-  }
-
-  // Increment count
-  currentRecord.count++
-  rateLimitMap.set(identifier, currentRecord)
-
+  const result = await limiter.limit(identifier)
   return {
-    allowed: true,
-    remaining: options.maxRequests - currentRecord.count,
-    resetTime: currentRecord.resetTime,
+    allowed: result.success,
+    remaining: result.remaining,
+    resetAt: result.reset,
   }
 }
 
-/**
- * Get client identifier for rate limiting
- * MENTOR NOTE: Use IP address or user ID
- */
 export function getClientIdentifier(request: Request): string {
-  // In production, use a proper IP extraction method
   const forwarded = request.headers.get("x-forwarded-for")
-  const ip = forwarded ? forwarded.split(",")[0] : "unknown"
-  return ip
+  const realIp = request.headers.get("x-real-ip")
+  return realIp ?? forwarded?.split(",")[0]?.trim() ?? "unknown"
 }
 
-// MENTOR NOTE: Predefined rate limit configurations
-export const rateLimitConfigs = {
-  // Auth endpoints - strict limits
-  auth: {
-    windowMs: 15 * 60 * 1000, // 15 minutes
-    maxRequests: 5, // 5 attempts per 15 minutes
-  },
-  // Signup endpoint - prevent spam
-  signup: {
-    windowMs: 60 * 60 * 1000, // 1 hour
-    maxRequests: 3, // 3 signups per hour
-  },
-  // General API endpoints
-  api: {
-    windowMs: 15 * 60 * 1000, // 15 minutes
-    maxRequests: 100, // 100 requests per 15 minutes
-  },
+export function rateLimitHeaders(result: RateLimitResult): HeadersInit {
+  return {
+    "X-RateLimit-Remaining": String(result.remaining),
+    "X-RateLimit-Reset": String(result.resetAt),
+  }
 }
-
-
