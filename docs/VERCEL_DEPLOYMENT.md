@@ -221,6 +221,7 @@ npm install
 
 ## 📚 Related Documentation
 
+- [CI/CD with GitHub and Vercel](./CI_CD_GITHUB_VERCEL.md) — PR previews, production branch, GitHub Actions
 - [Environment Variables Reference](./VERCEL_ENV_VARIABLES.md) - Complete list of all env vars
 - [Architecture Documentation](./ARCHITECTURE.md)
 - [Developer Setup](./DEV_SETUP.md)

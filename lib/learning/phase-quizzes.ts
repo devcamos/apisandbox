@@ -224,6 +224,106 @@ export const phaseQuizzes: Record<number, PhaseQuizDefinition> = {
         explanation: "Partial failure is dangerous because parts of the system still appear healthy while the overall behavior degrades."
       }
     ]
+  },
+  7: {
+    phaseNumber: 7,
+    title: "Phase 7 Checkpoint",
+    description: "Test whether you can reason about monetisation strategy before building.",
+    xpPerCorrect: 30,
+    questions: [
+      {
+        id: "saas-metric",
+        prompt: "What is the most important metric for a SaaS business?",
+        options: [
+          "Total lines of code",
+          "Monthly Recurring Revenue (MRR)",
+          "Number of features shipped",
+          "GitHub stars"
+        ],
+        correctIndex: 1,
+        explanation: "MRR is the north star for SaaS — it represents predictable, recurring income that compounds over time."
+      },
+      {
+        id: "mvp-scope",
+        prompt: "What should an MVP include?",
+        options: [
+          "Every feature you can think of",
+          "Auth + one core feature + payment",
+          "A complete admin dashboard",
+          "At least 20 API endpoints"
+        ],
+        correctIndex: 1,
+        explanation: "An MVP is the smallest thing someone will pay for. Auth, one core feature, and payment is the proven formula."
+      },
+      {
+        id: "pricing-strategy",
+        prompt: "Why should you charge from day one?",
+        options: [
+          "To cover server costs immediately",
+          "Because free users give feedback but paying users give signal",
+          "Because investors require it",
+          "To prevent competitors from copying you"
+        ],
+        correctIndex: 1,
+        explanation: "Paying customers prove demand. Free users will say they love it but never convert. Payment is the ultimate validation."
+      }
+    ]
+  },
+  8: {
+    phaseNumber: 8,
+    title: "Phase 8 Checkpoint",
+    description: "Test your understanding of data science in production systems.",
+    xpPerCorrect: 20,
+    questions: [
+      {
+        id: "model-serving",
+        prompt: "What is the most critical mistake when serving an ML model in production?",
+        options: [
+          "Using REST instead of gRPC",
+          "Loading the model on every request instead of once at startup",
+          "Using Python instead of Java",
+          "Not using GPU for inference"
+        ],
+        correctIndex: 1,
+        explanation: "Model loading can take 5-30 seconds. Loading on every request makes the API unusable. Load once at startup and hold in memory."
+      },
+      {
+        id: "training-serving-skew",
+        prompt: "What is training-serving skew?",
+        options: [
+          "When the model takes longer to train than to serve",
+          "When GPU utilization is uneven across nodes",
+          "When features computed during training differ from production",
+          "When the model file is too large for the container"
+        ],
+        correctIndex: 2,
+        explanation: "Training-serving skew is the #1 silent killer of ML models. Feature stores exist to ensure the model sees the same features in training and production."
+      },
+      {
+        id: "data-drift",
+        prompt: "You notice your fraud model suddenly flags 30% of transactions instead of the usual 2%. What is the most likely cause?",
+        options: [
+          "The model file is corrupted",
+          "The API gateway is misconfigured",
+          "Data drift — input feature distributions have shifted",
+          "The database connection pool is exhausted"
+        ],
+        correctIndex: 2,
+        explanation: "A sudden change in prediction distribution almost always means the input data has shifted. This is data drift, and it's why ML monitoring focuses on input distributions."
+      },
+      {
+        id: "ab-testing",
+        prompt: "Why should you NOT peek at A/B test results daily and stop early?",
+        options: [
+          "It costs too much compute to query results frequently",
+          "Early stopping inflates false positive rate — you'll ship things that don't actually work",
+          "The data warehouse can't handle frequent queries",
+          "It violates GDPR regulations"
+        ],
+        correctIndex: 1,
+        explanation: "Peeking and stopping early is called 'optional stopping' and it dramatically inflates false positives. Pre-commit to a run duration based on sample size calculations."
+      }
+    ]
   }
 }
 

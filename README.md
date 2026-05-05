@@ -38,6 +38,14 @@ npm run db:ensure-test-users
 npm run dev
 ```
 
+Or use the lightweight local orchestrator:
+
+```bash
+npm run local-lite
+```
+
+`local-lite` will create `.env.local` if needed, start the Docker Postgres service when `.env.local` points to `localhost:5433`, apply Prisma migrations, ensure default test users exist, and then start the Next.js dev server on port `4000`.
+
 Open [http://localhost:4000](http://localhost:4000) to see the application.
 
 ### Build for Production
@@ -103,6 +111,7 @@ For detailed architecture documentation with visual diagrams:
 - **[Architecture Viewer](/docs/architecture)** - Interactive architecture diagrams in the app
 - **[Developer Setup](./docs/DEV_SETUP.md)** - How to view diagrams locally for developers
 - **[Test Users](./docs/TEST_USERS.md)** - Local test credentials bootstrap
+- **[Feature Management](./docs/FEATURE_MANAGEMENT.md)** - Notion is the source of truth for feature tickets, maintenance work, and delivery status
 
 ### Quick View (Local Development)
 

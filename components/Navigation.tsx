@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useSession, signOut } from "@/components/providers/SessionProvider";
-import { Menu, X, LogOut, User, ChevronDown, BookOpen, Cloud, Brain, Compass, Settings, CreditCard, Sparkles, Lock, Shield } from "lucide-react";
+import { Menu, X, LogOut, User, ChevronDown, BookOpen, Cloud, Brain, Compass, Settings, CreditCard, Sparkles, Lock, Shield, Heart } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import { PageSearch } from "./PageSearch";
 
@@ -68,6 +68,8 @@ export default function Navigation() {
   }, [exploreOpen, profileOpen]);
 
   // Explore menu sections
+  // Phase 5–6 are a separate group so they stay visible between core phases and advanced topics
+  // (and so the menu stays obvious after deploy — older builds only listed 0–4 under "Phases").
   const exploreSections = [
     {
       title: "Phases",
@@ -78,8 +80,17 @@ export default function Navigation() {
         { name: "Phase 2: Third-Party Integrations", href: "/phase-2", badge: "Premium" },
         { name: "Phase 3: Inter-Service Communication", href: "/phase-3", badge: "Premium" },
         { name: "Phase 4: Principal-Level Architecture", href: "/phase-4", badge: "Premium" },
+      ],
+    },
+    {
+      title: "Algorithms & Practice",
+      icon: Sparkles,
+      items: [
         { name: "Phase 5: API Algorithms", href: "/phase-5", badge: "Premium" },
-      ]
+        { name: "Phase 6: Algorithm Visualizer", href: "/phase-6", badge: "Free" },
+        { name: "Phase 7: Monetisation", href: "/phase-7", badge: "Free" },
+        { name: "Phase 8: Data Science", href: "/phase-8", badge: "Free" },
+      ],
     },
     {
       title: "Advanced Topics",
@@ -89,8 +100,8 @@ export default function Navigation() {
         { name: "AI Learning", href: "/ai", badge: "Premium" },
         { name: "Security", href: "/cloud/security", badge: "Premium" },
         { name: "Architecture", href: "/docs/architecture", badge: "Docs" },
-      ]
-    }
+      ],
+    },
   ];
 
   return (
@@ -120,17 +131,8 @@ export default function Navigation() {
 
               {/* Explore Dropdown */}
               {exploreOpen && (
-                <div className="absolute top-full left-0 mt-2 w-96 bg-slate-800 border border-slate-700 rounded-xl shadow-2xl z-50 overflow-hidden">
-                  <div className="p-4 border-b border-slate-700 bg-slate-900/60">
-                    <Link
-                      href="/phase-5"
-                      onClick={() => setExploreOpen(false)}
-                      className="block px-3 py-2 rounded-lg bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/20 transition-all"
-                    >
-                      <span className="text-sm font-semibold">New: Phase 5 - API Algorithms</span>
-                    </Link>
-                  </div>
-                  <div className="p-4 max-h-[70vh] overflow-y-auto">
+                <div className="absolute top-full left-0 mt-2 w-96 max-h-[min(90vh,40rem)] overflow-y-auto bg-slate-800 border border-slate-700 rounded-xl shadow-2xl z-50">
+                  <div className="p-4">
                     {exploreSections.map((section, idx) => {
                       const SectionIcon = section.icon;
                       return (
@@ -158,7 +160,9 @@ export default function Navigation() {
                                   <span className={`text-xs px-2 py-0.5 rounded ${
                                     item.badge === "Free"
                                       ? "bg-green-500/20 text-green-400"
-                                      : "bg-purple-500/20 text-purple-400"
+                                      : item.badge === "Docs"
+                                        ? "bg-slate-500/30 text-slate-300"
+                                        : "bg-purple-500/20 text-purple-400"
                                   }`}>
                                     {item.badge}
                                   </span>
@@ -182,6 +186,18 @@ export default function Navigation() {
                 </div>
               )}
             </div>
+
+            <Link
+              href="/story"
+              className={`px-4 py-2 rounded-lg transition-all flex items-center gap-1.5 ${
+                pathname === "/story"
+                  ? "bg-amber-500/10 text-amber-300 font-semibold"
+                  : "text-amber-300/70 hover:text-amber-200 hover:bg-amber-500/10"
+              }`}
+            >
+              <Heart className="w-4 h-4" />
+              Story
+            </Link>
 
             {navItems.map((item) => {
               // Keep Phase 5 directly visible in top nav; other phase/cloud/ai links stay in Explore.
@@ -217,7 +233,10 @@ export default function Navigation() {
 
             {/* Auth Buttons */}
             {status === "loading" ? (
-              <div className="px-4 py-2 text-gray-400">Loading...</div>
+              <div className="flex items-center gap-2 ml-4 pl-4 border-l border-slate-700">
+                <div className="w-20 h-8 rounded-lg bg-slate-800 animate-pulse" />
+                <div className="w-20 h-8 rounded-lg bg-slate-800 animate-pulse" />
+              </div>
             ) : session ? (
               <div className="flex items-center gap-2 ml-4 pl-4 border-l border-slate-700">
                 {/* User Profile Dropdown */}
@@ -341,40 +360,56 @@ export default function Navigation() {
           <div className="md:hidden py-4 space-y-2">
             <div className="px-4 py-2">
               <Link
-                href="/phase-5"
+                href="/story"
                 onClick={() => setIsOpen(false)}
-                className="block mb-3 px-3 py-2 rounded-lg bg-cyan-500/10 border border-cyan-500/30 text-cyan-300"
+                className="block mb-3 px-3 py-2 rounded-lg bg-amber-500/10 border border-amber-500/25 text-amber-200 flex items-center gap-2"
               >
-                New: Phase 5 - API Algorithms
+                <Heart className="w-4 h-4" />
+                Before You Begin
               </Link>
               <div className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2 flex items-center gap-2">
                 <BookOpen className="w-3 h-3" />
                 Explore
               </div>
-              <div className="space-y-1 ml-4">
-                {exploreSections.flatMap(section => section.items).map((item) => (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    onClick={() => setIsOpen(false)}
-                    className={`block px-3 py-2 rounded-lg transition-all ${
-                      pathname === item.href
-                        ? "bg-blue-500/10 text-blue-400 font-semibold"
-                        : "text-gray-300 hover:text-white hover:bg-slate-800"
-                    }`}
-                  >
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm">{item.name}</span>
-                      <span className={`text-xs px-2 py-0.5 rounded ${
-                        item.badge === "Free"
-                          ? "bg-green-500/20 text-green-400"
-                          : "bg-purple-500/20 text-purple-400"
-                      }`}>
-                        {item.badge}
-                      </span>
+              <div className="space-y-4 ml-2">
+                {exploreSections.map((section) => {
+                  const SectionIcon = section.icon;
+                  return (
+                    <div key={section.title}>
+                      <div className="flex items-center gap-2 mb-2 text-[11px] font-semibold text-gray-500 uppercase tracking-wide">
+                        <SectionIcon className="w-3 h-3 text-blue-400 shrink-0" />
+                        {section.title}
+                      </div>
+                      <div className="space-y-1 border-l border-slate-700 pl-3">
+                        {section.items.map((item) => (
+                          <Link
+                            key={item.href}
+                            href={item.href}
+                            onClick={() => setIsOpen(false)}
+                            className={`block px-3 py-2 rounded-lg transition-all ${
+                              pathname === item.href
+                                ? "bg-blue-500/10 text-blue-400 font-semibold"
+                                : "text-gray-300 hover:text-white hover:bg-slate-800"
+                            }`}
+                          >
+                            <div className="flex items-center justify-between gap-2">
+                              <span className="text-sm">{item.name}</span>
+                              <span className={`shrink-0 text-xs px-2 py-0.5 rounded ${
+                                item.badge === "Free"
+                                  ? "bg-green-500/20 text-green-400"
+                                  : item.badge === "Docs"
+                                    ? "bg-slate-500/30 text-slate-300"
+                                    : "bg-purple-500/20 text-purple-400"
+                              }`}>
+                                {item.badge}
+                              </span>
+                            </div>
+                          </Link>
+                        ))}
+                      </div>
                     </div>
-                  </Link>
-                ))}
+                  );
+                })}
               </div>
             </div>
 
@@ -413,7 +448,10 @@ export default function Navigation() {
             
             {/* Mobile Auth Buttons */}
             {status === "loading" ? (
-              <div className="px-4 py-2 text-gray-400">Loading...</div>
+              <div className="px-4 py-2 space-y-2">
+                <div className="h-10 rounded-lg bg-slate-800 animate-pulse" />
+                <div className="h-10 rounded-lg bg-slate-800 animate-pulse" />
+              </div>
             ) : session ? (
               <div className="px-4 py-2 space-y-2 border-t border-slate-700 mt-4 pt-4">
                 {/* Mobile Profile Section */}

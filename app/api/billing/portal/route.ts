@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { requireAuthenticatedUser } from "@/lib/auth/jwt-auth-middleware"
 import { handleRouteError } from "@/lib/http/responses"
-import { stripe } from "@/lib/stripe"
+import { requireStripeClient } from "@/lib/stripe"
 import { prisma } from "@/lib/prisma"
 import { isFeatureEnabled } from "@/config/featureFlags"
 
@@ -10,6 +10,16 @@ export async function POST(request: NextRequest) {
     if (!isFeatureEnabled("STRIPE_CHECKOUT")) {
       return NextResponse.json(
         { error: "Billing portal is not enabled" },
+        { status: 503 }
+      )
+    }
+
+    let stripe
+    try {
+      stripe = requireStripeClient()
+    } catch {
+      return NextResponse.json(
+        { error: "Billing is not configured" },
         { status: 503 }
       )
     }
@@ -28,9 +38,17 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL?.trim()
+    if (!appUrl) {
+      return NextResponse.json(
+        { error: "Application URL is not configured" },
+        { status: 503 }
+      )
+    }
+
     const session = await stripe.billingPortal.sessions.create({
       customer: dbUser.stripeCustomerId,
-      return_url: `${process.env.NEXT_PUBLIC_APP_URL}/settings`,
+      return_url: `${appUrl}/settings`,
     })
 
     return NextResponse.json({ url: session.url })

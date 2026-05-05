@@ -370,6 +370,80 @@ export const phaseLessonPlans: Record<number, PhaseLessonPlan> = {
       },
     ],
   },
+  7: {
+    phase: 7,
+    title: "Monetisation Tracker",
+    structureLabel: "Revenue Path",
+    modules: [
+      {
+        id: "choosing-a-path",
+        title: "Choosing Your Monetisation Path",
+        urgency: "Deciding before building prevents wasted months on the wrong model.",
+        checkpoints: [
+          { id: "self-audit", label: "Self-Audit", prompt: "Which of the 6 paths best fits your current skills and available time per week?" },
+          { id: "problem-fit", label: "Problem–Market Fit", prompt: "Describe one painful problem your target audience has that you could solve.", expectedLearning: "Revenue starts from pain, not features.", answerGuide: "Name the audience, the pain, and how often they feel it." },
+          { id: "competitor-scan", label: "Competitor Scan", prompt: "Name 2 existing products in your chosen space and what they charge.", expectedLearning: "Existing competition validates demand.", answerGuide: "Name, pricing tier, and one weakness you could improve." },
+        ],
+      },
+      {
+        id: "mvp-and-billing",
+        title: "MVP + Billing Integration",
+        urgency: "Charging from day one separates builders from hobbyists.",
+        checkpoints: [
+          { id: "scope-mvp", label: "Scope the MVP", prompt: "List the exact 3 features your MVP will have — nothing more.", expectedLearning: "An MVP is the smallest thing people will pay for.", answerGuide: "Auth + 1 core feature + payment. Justify each." },
+          { id: "stripe-integration", label: "Stripe Integration", prompt: "Describe the payment flow: what triggers checkout, what webhook confirms it.", expectedLearning: "You understand the Stripe Checkout → webhook → provision loop.", answerGuide: "Mention Checkout Session, webhook event, and where you store subscription state." },
+          { id: "pricing", label: "Pricing Decision", prompt: "What will you charge and why?", expectedLearning: "Pricing is a positioning decision, not a cost calculation.", answerGuide: "State the price, the value it delivers, and one comparable product's price." },
+        ],
+      },
+      {
+        id: "launch-and-iterate",
+        title: "Launch, Measure, Iterate",
+        urgency: "Shipping beats planning. Metrics beat opinions.",
+        checkpoints: [
+          { id: "launch-plan", label: "Launch Plan", prompt: "Name 3 channels where you will announce your product on launch day.", expectedLearning: "Distribution matters as much as the product.", answerGuide: "Be specific: subreddit name, Twitter account, community Slack." },
+          { id: "key-metric", label: "Key Metric", prompt: "What is the one metric that tells you this is working?", expectedLearning: "One north-star metric prevents distraction.", answerGuide: "MRR for SaaS, downloads for digital products, GMV for marketplaces." },
+          { id: "retention", label: "Retention Check", prompt: "How will you know if users are coming back after day 7?", expectedLearning: "Retention is the only metric that matters long-term.", answerGuide: "Describe what 'active' means and how you'll measure weekly retention." },
+        ],
+      },
+    ],
+  },
+  8: {
+    phase: 8,
+    title: "Data Science in Production",
+    structureLabel: "ML Lifecycle",
+    modules: [
+      {
+        id: "model-serving-fundamentals",
+        title: "Model Serving Fundamentals",
+        urgency: "A model in a notebook generates zero revenue. Deploying it as an API is the critical step.",
+        checkpoints: [
+          { id: "serving-vs-training", label: "Serving vs Training", prompt: "Explain the key differences between a model training environment and a model serving environment.", expectedLearning: "Training is batch, GPU-heavy, and offline. Serving is real-time, latency-sensitive, and always on.", answerGuide: "Mention latency budget, concurrency, and model format (ONNX/PMML)." },
+          { id: "online-vs-batch", label: "Online vs Batch Inference", prompt: "When would you choose online inference over batch inference? Give one example of each.", expectedLearning: "Online for real-time decisions, batch for pre-computation.", answerGuide: "Online: fraud detection. Batch: email recommendations." },
+          { id: "model-api-design", label: "Model API Design", prompt: "Design the request/response contract for a fraud detection model endpoint.", expectedLearning: "Model endpoints follow REST conventions with feature vectors as input.", answerGuide: "POST /predict with feature array, returns score + confidence + model version." },
+        ],
+      },
+      {
+        id: "data-pipeline-design",
+        title: "Data Pipeline Design",
+        urgency: "Models are only as good as their data. A broken pipeline means a broken model.",
+        checkpoints: [
+          { id: "pipeline-layers", label: "Bronze/Silver/Gold", prompt: "Explain the three-layer data pipeline pattern and why raw data should never be transformed in place.", expectedLearning: "Immutable raw data enables debugging and backfills.", answerGuide: "Bronze = raw, Silver = cleaned, Gold = aggregated. Raw is the source of truth." },
+          { id: "idempotency", label: "Pipeline Idempotency", prompt: "Why must data pipelines be idempotent? How do you achieve it?", expectedLearning: "Safe re-runs are critical for recovery.", answerGuide: "Use MERGE/upsert, partition by date, deduplicate on ingestion." },
+          { id: "data-quality", label: "Data Quality Gates", prompt: "Name 3 data quality checks you would run between pipeline stages.", expectedLearning: "Proactive data validation prevents garbage-in-garbage-out.", answerGuide: "Null rate thresholds, row count change bounds, schema validation." },
+        ],
+      },
+      {
+        id: "experimentation-monitoring",
+        title: "Experimentation & ML Monitoring",
+        urgency: "Models degrade silently. Without monitoring and experimentation, you're flying blind.",
+        checkpoints: [
+          { id: "ab-test-design", label: "A/B Test Design", prompt: "Design an A/B test for a new recommendation model. What is your primary metric, sample size consideration, and guardrail?", expectedLearning: "Statistical rigor prevents shipping things that don't work.", answerGuide: "Primary: conversion rate. Sample: power calculation for MDE. Guardrail: latency P99." },
+          { id: "drift-detection", label: "Drift Detection", prompt: "Explain the difference between data drift and concept drift. How do you detect each?", expectedLearning: "Drift is the #1 reason deployed models silently degrade.", answerGuide: "Data drift: input distributions shift (PSI). Concept drift: relationship between features and target changes (accuracy drop)." },
+          { id: "retraining-trigger", label: "Retraining Strategy", prompt: "Describe an automated retraining trigger that is safe for production.", expectedLearning: "Automate the trigger, never auto-deploy.", answerGuide: "PSI threshold for N consecutive days → trigger pipeline → human review before promotion." },
+        ],
+      },
+    ],
+  },
 }
 
 export function getPhaseLessonPlan(phase: number): PhaseLessonPlan | null {

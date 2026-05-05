@@ -1,6 +1,6 @@
 "use client"
 
-import { Compass, BrainCircuit, ArrowLeft } from "lucide-react"
+import { Compass, BrainCircuit, ArrowLeft, Heart, BookMarked } from "lucide-react"
 import Link from "next/link"
 import PhaseLayout from "@/components/PhaseLayout"
 import { SubscriptionGate } from "@/components/SubscriptionGate"
@@ -41,6 +41,45 @@ export default function Phase5Page() {
             <p className="text-gray-400 text-sm">
               Every lesson follows the same framework: Trigger, Existence, Mechanics, Contrast, Stress, Failure, Trade-offs, Retrieval, Build.
             </p>
+            <div className="mt-4 flex flex-wrap gap-3">
+              <Link
+                href="/story"
+                className="inline-flex items-center gap-2 px-5 py-2.5 bg-amber-500/10 border border-amber-500/25 rounded-xl text-amber-200 hover:bg-amber-500/20 transition-all text-sm font-medium"
+              >
+                <Heart className="w-4 h-4" />
+                Before You Begin
+              </Link>
+              <Link
+                href="/phase-5/concepts"
+                className="inline-flex items-center gap-2 px-5 py-2.5 bg-violet-500/10 border border-violet-500/25 rounded-xl text-violet-200 hover:bg-violet-500/20 transition-all text-sm font-medium"
+              >
+                <BookMarked className="w-4 h-4" />
+                Concept 101 — Side quests
+              </Link>
+            </div>
+          </div>
+        </section>
+
+        <section className="mb-10 rounded-2xl border border-violet-500/20 bg-violet-500/5 p-6">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div>
+              <h2 className="text-xl font-bold text-white mb-1">Main quest vs side quests</h2>
+              <p className="text-sm text-gray-400 max-w-2xl">
+                <span className="text-emerald-300 font-medium">Main quest:</span> the architecture lessons below + Phase 6 algorithm visualizers (master concrete algorithms and system mappings).
+                {" "}
+                <span className="text-violet-300 font-medium">Side quests:</span> short CS 101 reads — start with{" "}
+                <Link href="/phase-5/concepts/big-o" className="text-violet-200 underline underline-offset-2 hover:text-white">
+                  Big O
+                </Link>
+                , then stability, BFS/DFS, monotonicity — vocabulary that transfers everywhere.
+              </p>
+            </div>
+            <Link
+              href="/phase-5/concepts"
+              className="shrink-0 inline-flex items-center justify-center px-4 py-2.5 rounded-xl bg-violet-500/20 border border-violet-500/35 text-violet-200 text-sm font-semibold hover:bg-violet-500/30 transition-colors"
+            >
+              Open concept 101s
+            </Link>
           </div>
         </section>
 
@@ -109,7 +148,7 @@ export default function Phase5Page() {
                 </ul>
               </div>
 
-              <div className="grid lg:grid-cols-2 gap-4">
+              <div className="grid lg:grid-cols-2 gap-4 mb-4">
                 <div className="bg-slate-900/60 border border-slate-700 rounded-xl p-4">
                   <div className="text-xs uppercase tracking-wide text-emerald-300 mb-2">7. Retrieval</div>
                   <ul className="space-y-2 text-sm text-gray-300">
@@ -123,6 +162,33 @@ export default function Phase5Page() {
                   <p className="text-sm text-gray-300">{lesson.buildTask}</p>
                 </div>
               </div>
+
+              <details className="group border-2 border-green-500/20 rounded-xl overflow-hidden bg-gradient-to-br from-green-900/20 to-emerald-900/10 hover:border-green-500/30 transition-colors">
+                <summary className="flex items-center gap-2.5 px-5 py-3 cursor-pointer select-none">
+                  <span className="text-base">☕</span>
+                  <span className="text-xs uppercase tracking-wide text-green-400 font-bold">Spring Perspective</span>
+                  <span className="text-sm text-green-200/80 flex-1 truncate">{lesson.springContext.headline}</span>
+                  <span className="text-green-500 text-xs group-open:rotate-90 transition-transform">▶</span>
+                </summary>
+                <div className="px-5 pb-4 pt-1 border-t border-green-500/10">
+                  <ul className="space-y-1.5 text-sm text-gray-300 mb-3">
+                    {lesson.springContext.how.map((point) => (
+                      <li key={point} className="flex items-start gap-2">
+                        <span className="text-green-400 mt-0.5 shrink-0">▸</span>
+                        <span>{point}</span>
+                      </li>
+                    ))}
+                  </ul>
+                  <details className="group/code">
+                    <summary className="text-xs text-green-400/80 cursor-pointer hover:text-green-300 transition-colors font-medium">
+                      Show Java code sketch
+                    </summary>
+                    <pre className="mt-2 bg-slate-950/80 border border-slate-700 rounded-lg p-3 text-xs text-gray-300 overflow-x-auto whitespace-pre leading-relaxed">
+                      <code>{lesson.springContext.codeSketch}</code>
+                    </pre>
+                  </details>
+                </div>
+              </details>
             </article>
           ))}
         </section>

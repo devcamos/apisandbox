@@ -2,6 +2,7 @@
 
 import Link from "next/link"
 import { useEffect, useMemo, useState } from "react"
+import { useRouter } from "next/navigation"
 import { motion } from "framer-motion"
 import {
   leetcodePatternNodes,
@@ -32,6 +33,7 @@ function collectNeighbors(node: PatternNode) {
 }
 
 export default function LeetCodePatternGraph() {
+  const router = useRouter()
   const [selectedId, setSelectedId] = useState("arrays-strings")
   const [progress, setProgress] = useState<PatternProgressState>({})
 
@@ -73,6 +75,15 @@ export default function LeetCodePatternGraph() {
   const selectedProgress = getNodeProgress(selected.id)
   const dsaFoundation = dsaFoundationsByPattern[selected.id] || "Core data structures"
 
+  const handleNodeSelect = (nodeId: string) => {
+    if (nodeId === selected.id) {
+      router.push(`/phase-5/fundamentals/${nodeId}`)
+      return
+    }
+
+    setSelectedId(nodeId)
+  }
+
   return (
     <section className="mb-10">
       <div className="bg-slate-800/50 border border-slate-700 rounded-2xl p-6">
@@ -110,7 +121,7 @@ export default function LeetCodePatternGraph() {
                     return (
                       <motion.button
                         key={node.id}
-                        onClick={() => setSelectedId(node.id)}
+                        onClick={() => handleNodeSelect(node.id)}
                         whileHover={{ y: -1.5 }}
                         whileTap={{ scale: 0.985 }}
                         className={`text-left rounded-lg border px-3 py-2 transition-all ${
@@ -225,13 +236,27 @@ export default function LeetCodePatternGraph() {
             </div>
 
             <div className="mt-4">
+              <div className="flex flex-wrap items-center gap-3">
+                <Link
+                  href={`/phase-5/fundamentals/${selected.id}`}
+                  className="inline-flex items-center px-3 py-2 rounded-md bg-emerald-600 text-white text-xs font-semibold hover:bg-emerald-500 transition-colors"
+                >
+                  Read fundamentals
+                </Link>
+                <Link
+                  href={`/phase-5/problems/${selected.id}`}
+                  className="inline-flex items-center px-3 py-2 rounded-md bg-cyan-600 text-white text-xs font-semibold hover:bg-cyan-500 transition-colors"
+                >
+                  Open problems & completion page
+                </Link>
+              </div>
               <Link
-                href={`/phase-5/problems/${selected.id}`}
-                className="inline-flex items-center px-3 py-2 rounded-md bg-cyan-600 text-white text-xs font-semibold hover:bg-cyan-500 transition-colors"
+                href={`/phase-5/fundamentals/${selected.id}`}
+                className="block text-xs text-gray-400 mt-2 hover:text-cyan-300 transition-colors"
               >
-                Open problems & completion page
+                Tip: click the selected node again to jump straight into the study reader.
               </Link>
-              <p className="text-xs text-gray-400 mt-2">
+              <p className="text-xs text-gray-400 mt-1">
                 Progress status: {selectedProgress.completed ? "Completed" : isAvailable(selected) ? "Unlocked" : "Locked"}
               </p>
             </div>

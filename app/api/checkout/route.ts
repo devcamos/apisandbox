@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { requireAuthenticatedUser } from "@/lib/auth/jwt-auth-middleware"
 import { handleRouteError } from "@/lib/http/responses"
-import { stripe, PLANS } from "@/lib/stripe"
+import { requireStripeClient, PLANS } from "@/lib/stripe"
 import { prisma } from "@/lib/prisma"
 import { isFeatureEnabled } from "@/config/featureFlags"
 import { logger } from "@/lib/logger"
@@ -11,6 +11,27 @@ export async function POST(request: NextRequest) {
     if (!isFeatureEnabled("STRIPE_CHECKOUT")) {
       return NextResponse.json(
         { error: "Stripe checkout is not enabled" },
+        { status: 503 }
+      )
+    }
+
+    const priceId = PLANS.PREMIUM_MONTHLY.priceId?.trim()
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL?.trim()
+    if (!priceId || !appUrl) {
+      logger.error("Stripe checkout misconfigured: missing STRIPE_PRICE_ID or NEXT_PUBLIC_APP_URL")
+      return NextResponse.json(
+        { error: "Billing is not configured" },
+        { status: 503 }
+      )
+    }
+
+    let stripe
+    try {
+      stripe = requireStripeClient()
+    } catch {
+      logger.error("Stripe checkout: STRIPE_SECRET_KEY not set")
+      return NextResponse.json(
+        { error: "Billing is not configured" },
         { status: 503 }
       )
     }
@@ -43,9 +64,9 @@ export async function POST(request: NextRequest) {
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
       mode: "subscription",
-      line_items: [{ price: PLANS.PREMIUM_MONTHLY.priceId, quantity: 1 }],
-      success_url: `${process.env.NEXT_PUBLIC_APP_URL}/upgrade/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/upgrade`,
+      line_items: [{ price: priceId, quantity: 1 }],
+      success_url: `${appUrl}/upgrade/success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${appUrl}/upgrade`,
       metadata: { userId: user.id },
       subscription_data: { metadata: { userId: user.id } },
     })

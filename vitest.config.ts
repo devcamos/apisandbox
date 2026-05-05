@@ -9,8 +9,11 @@ export default defineConfig({
     setupFiles: ["./tests/unit/setup.ts"],
     include: ["tests/unit/**/*.test.{ts,tsx}"],
     coverage: {
-      reporter: ["text", "html"],
-      include: ["lib/**", "config/**", "hooks/**"],
+      provider: "v8",
+      reporter: ["text", "html", "lcov"],
+      reportsDirectory: "./coverage",
+      include: ["lib/**", "config/**", "hooks/**", "components/legal/**"],
+      exclude: ["**/node_modules/**", "**/*.env.example"],
     },
   },
   resolve: {

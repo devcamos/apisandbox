@@ -75,8 +75,7 @@ export async function checkPhaseAccess(
   let hasAccess = false
   let upgradeRequired = false
 
-  if (phaseNumber === 0 || phaseNumber === 1) {
-    // Phase 0 (Fundamentals) and Phase 1 are free for everyone
+  if (phaseNumber === 0 || phaseNumber === 1 || phaseNumber === 7 || phaseNumber === 8) {
     hasAccess = true
   } else if (phaseNumber === "cloud" || phaseNumber === "ai") {
     // Cloud and AI sections require premium

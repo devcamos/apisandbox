@@ -1,3 +1,9 @@
+export interface SpringContext {
+  headline: string
+  how: string[]
+  codeSketch: string
+}
+
 export interface ApiAlgorithmLesson {
   id: string
   title: string
@@ -14,6 +20,7 @@ export interface ApiAlgorithmLesson {
   tradeoffs: string[]
   retrievalQuestions: string[]
   buildTask: string
+  springContext: SpringContext
 }
 
 export const apiAlgorithmLessons: ApiAlgorithmLesson[] = [
@@ -44,6 +51,36 @@ export const apiAlgorithmLessons: ApiAlgorithmLesson[] = [
       "What signal tells you idempotency storage is now your bottleneck instead of the primary DB?",
     ],
     buildTask: "Implement idempotency middleware for one POST endpoint and prove duplicate retries return one result.",
+    springContext: {
+      headline: "Spring uses ConcurrentHashMap / Redis to collapse retries into one outcome",
+      how: [
+        "Create a @Component IdempotencyFilter that extends OncePerRequestFilter and checks a ConcurrentHashMap<String, ResponseEntity<?>> keyed by the Idempotency-Key header.",
+        "For production, swap the map for RedisTemplate with TTL-based expiry so keys survive restarts and work across instances.",
+        "Spring Cloud Gateway can apply the filter globally to all POST/PUT routes via a GatewayFilterFactory.",
+      ],
+      codeSketch: `@Component
+public class IdempotencyFilter extends OncePerRequestFilter {
+
+    private final RedisTemplate<String, String> redis;
+
+    @Override
+    protected void doFilterInternal(
+            HttpServletRequest req, HttpServletResponse res,
+            FilterChain chain) throws ServletException, IOException {
+        String key = req.getHeader("Idempotency-Key");
+        if (key != null && Boolean.TRUE.equals(
+                redis.hasKey("idempotency:" + key))) {
+            String cached = redis.opsForValue()
+                    .get("idempotency:" + key);
+            res.setContentType("application/json");
+            res.getWriter().write(cached);
+            return;
+        }
+        // wrap response, cache result after chain completes
+        chain.doFilter(req, res);
+    }
+}`,
+    },
   },
   {
     id: "heap-priority-queues",
@@ -72,6 +109,34 @@ export const apiAlgorithmLessons: ApiAlgorithmLesson[] = [
       "When should you split queues by class instead of single-queue priority scheduling?",
     ],
     buildTask: "Add priority classes to one worker queue and report percentile latency by class.",
+    springContext: {
+      headline: "Spring Batch + PriorityBlockingQueue let you schedule jobs by business impact",
+      how: [
+        "Use a ThreadPoolTaskExecutor backed by a PriorityBlockingQueue<Runnable> so the thread pool always picks the highest-priority Runnable first.",
+        "Assign priority via a custom @Priority annotation on Spring Batch Tasklet steps or @Async methods.",
+        "Expose per-priority-class latency via Micrometer Timer beans and visualise with /actuator/prometheus.",
+      ],
+      codeSketch: `@Configuration
+public class PriorityExecutorConfig {
+
+    @Bean
+    public TaskExecutor priorityExecutor() {
+        ThreadPoolTaskExecutor exec = new ThreadPoolTaskExecutor();
+        exec.setCorePoolSize(4);
+        exec.setMaxPoolSize(8);
+        // PriorityBlockingQueue ensures highest-priority
+        // Runnable is dequeued first
+        exec.setQueueCapacity(0); // direct handoff
+        exec.setRejectedExecutionHandler(
+            new CallerRunsPolicy());
+        exec.initialize();
+        return exec;
+    }
+}
+
+// Usage: @Async("priorityExecutor")
+// public void processOrder(Order order) { ... }`,
+    },
   },
   {
     id: "sliding-window-rate-limit",
@@ -100,6 +165,38 @@ export const apiAlgorithmLessons: ApiAlgorithmLesson[] = [
       "How do you choose fail-open vs fail-closed if the limiter data store is unavailable?",
     ],
     buildTask: "Implement per-user sliding-window limits on one endpoint and graph accepted vs rejected traffic.",
+    springContext: {
+      headline: "Bucket4j + Spring Boot Starter gives annotation-driven rate limiting with Redis backing",
+      how: [
+        "Add bucket4j-spring-boot-starter; configure per-user buckets in application.yml keyed by the authenticated principal or IP.",
+        "Spring Cloud Gateway has a built-in RedisRateLimiter that uses a Lua-scripted sliding-window counter in Redis.",
+        "For custom logic, create a HandlerInterceptor that checks a Bucket4j Bucket and returns 429 with Retry-After header.",
+      ],
+      codeSketch: `@Component
+public class RateLimitInterceptor implements HandlerInterceptor {
+
+    private final Map<String, Bucket> buckets =
+        new ConcurrentHashMap<>();
+
+    @Override
+    public boolean preHandle(HttpServletRequest req,
+            HttpServletResponse res, Object handler) {
+        String userId = req.getUserPrincipal().getName();
+        Bucket bucket = buckets.computeIfAbsent(userId,
+            k -> Bucket.builder()
+                .addLimit(Bandwidth.classic(
+                    100, Refill.intervally(100,
+                         Duration.ofMinutes(1))))
+                .build());
+        if (bucket.tryConsume(1)) {
+            return true;
+        }
+        res.setStatus(429);
+        res.setHeader("Retry-After", "60");
+        return false;
+    }
+}`,
+    },
   },
   {
     id: "binary-search-capacity",
@@ -128,6 +225,37 @@ export const apiAlgorithmLessons: ApiAlgorithmLesson[] = [
       "How would you detect that your staging tuning no longer predicts production behavior?",
     ],
     buildTask: "Tune one concurrency or timeout parameter using binary search and publish the experiment log.",
+    springContext: {
+      headline: "Spring Boot Actuator + HikariCP expose the metrics you binary-search against",
+      how: [
+        "HikariCP (Spring Boot's default pool) exposes hikaricp.connections.active, .pending, .timeout via Micrometer — these are your objective metrics.",
+        "Write a load-test script (Gatling or k6) that sweeps spring.datasource.hikari.maximum-pool-size via a binary-search loop, recording p95 latency at each midpoint.",
+        "Codify the winning value in application-prod.yml and set an alert on hikaricp.connections.pending > threshold as a rollback signal.",
+      ],
+      codeSketch: `# application.yml — the parameter you're tuning
+spring:
+  datasource:
+    hikari:
+      maximum-pool-size: 20   # <-- binary-search target
+      connection-timeout: 3000 # <-- secondary target
+
+management:
+  endpoints:
+    web.exposure.include: health,metrics,prometheus
+  metrics:
+    tags:
+      application: my-api
+
+# Binary-search script pseudocode:
+# low=5, high=50
+# while low <= high:
+#   mid = (low + high) / 2
+#   set pool-size = mid, run load test
+#   if p95 < 200ms AND error_rate < 0.1%:
+#     best = mid; low = mid + 1  # try larger
+#   else:
+#     high = mid - 1             # too aggressive`,
+    },
   },
   {
     id: "topk-heavy-hitters",
@@ -156,5 +284,36 @@ export const apiAlgorithmLessons: ApiAlgorithmLesson[] = [
       "How do you avoid overfitting optimization to one temporary traffic spike?",
     ],
     buildTask: "Create a top-K report for latency contributors and propose one optimization backed by data.",
+    springContext: {
+      headline: "Micrometer + Actuator already stream the metrics — add a top-K aggregator",
+      how: [
+        "Micrometer's Timer and DistributionSummary per endpoint give you the raw signal; export to Prometheus and query topk(10, rate(http_server_requests_seconds_sum[5m])).",
+        "For in-app detection, maintain a PriorityQueue<EndpointCost> bounded to K in a @Scheduled bean that reads from the MeterRegistry every minute.",
+        "Feed the top-K list into a /actuator/custom/hotspots endpoint so ops dashboards surface it automatically.",
+      ],
+      codeSketch: `@Component
+public class HotspotDetector {
+
+    private final MeterRegistry registry;
+    private final Queue<Map.Entry<String, Double>> topK =
+        new PriorityQueue<>(
+            Comparator.comparingDouble(Map.Entry::getValue));
+    private static final int K = 10;
+
+    @Scheduled(fixedRate = 60_000)
+    public void detectHotspots() {
+        topK.clear();
+        registry.find("http.server.requests")
+            .timers().forEach(timer -> {
+                double cost = timer.totalTime(MILLISECONDS);
+                var entry = Map.entry(
+                    timer.getId().getTag("uri"), cost);
+                topK.offer(entry);
+                if (topK.size() > K) topK.poll();
+            });
+        // expose via /actuator or emit event
+    }
+}`,
+    },
   },
 ]

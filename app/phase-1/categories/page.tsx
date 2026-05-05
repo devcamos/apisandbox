@@ -6,6 +6,7 @@ import ApiEndpointTester from "@/components/ApiEndpointTester";
 import GraphQLTester from "@/components/GraphQLTester";
 import WebSocketTester from "@/components/WebSocketTester";
 import EventDrivenTester from "@/components/EventDrivenTester";
+import ApiArchitecturePattern from "@/components/ApiArchitecturePattern";
 import { Brain, Network, GitBranch, Zap, RefreshCw, Database } from "lucide-react";
 import { useState } from "react";
 
@@ -107,6 +108,8 @@ Accept: application/json
           Click &ldquo;Try API&rdquo; on any endpoint to see real responses!
         </p>
       </div>
+
+      <ApiArchitecturePattern categoryId="rest" accentColor="from-blue-500 to-cyan-500" />
     </div>
   );
 
@@ -200,6 +203,8 @@ Accept: application/json
           Notice how you can request exactly the fields you need - no over-fetching!
         </p>
       </div>
+
+      <ApiArchitecturePattern categoryId="graphql" accentColor="from-purple-500 to-pink-500" />
     </div>
   );
 
@@ -305,6 +310,8 @@ stream.on('data', (user) => {
           Use REST for public APIs where browser support is needed!
         </p>
       </div>
+
+      <ApiArchitecturePattern categoryId="grpc" accentColor="from-orange-500 to-red-500" />
     </div>
   );
 
@@ -351,6 +358,8 @@ stream.on('data', (user) => {
           Once connected, both client and server can send messages instantly without request overhead!
         </p>
       </div>
+
+      <ApiArchitecturePattern categoryId="websocket" accentColor="from-green-500 to-emerald-500" />
     </div>
   );
 
@@ -433,6 +442,8 @@ stream.on('data', (user) => {
           One event can trigger multiple independent services without the publisher knowing about them!
         </p>
       </div>
+
+      <ApiArchitecturePattern categoryId="event-driven" accentColor="from-yellow-500 to-amber-500" />
     </div>
   );
 

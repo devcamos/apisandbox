@@ -1,12 +1,8 @@
-import Stripe from "stripe"
-
-if (!process.env.STRIPE_SECRET_KEY && process.env.NODE_ENV === "production") {
-  throw new Error("STRIPE_SECRET_KEY is required in production")
-}
-
-export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY ?? "", {
-  typescript: true,
-})
+/**
+ * Stripe price configuration and client helpers.
+ * Use getStripeClient() / requireStripeClient() from this module (see lib/stripe-client.ts).
+ */
+export { getStripeClient, requireStripeClient } from "@/lib/stripe-client"
 
 export const PLANS = {
   PREMIUM_MONTHLY: {
