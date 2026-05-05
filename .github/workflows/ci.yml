@@ -82,7 +82,8 @@ jobs:
     name: SonarQube Cloud
     runs-on: ubuntu-latest
     needs: [lint-and-build, unit-tests]
-    if: github.event.repository.fork == false
+    # SONAR_TOKEN comes from SonarCloud (bound GitHub repo → Analysis Method → GitHub Actions).
+    if: github.event.repository.fork == false && secrets.SONAR_TOKEN != ''
     permissions:
       contents: read
       pull-requests: write
@@ -98,8 +99,15 @@ jobs:
           name: coverage
           path: coverage
 
+      - name: Cache SonarQube scanner artifacts
+        uses: actions/cache@v4
+        with:
+          path: ~/.sonar/cache
+          key: ${{ runner.os }}-sonar-${{ hashFiles('**/sonar-project.properties', '**/package-lock.json') }}
+          restore-keys: ${{ runner.os }}-sonar-
+
       - name: SonarCloud Scan
-        uses: SonarSource/sonarqube-scan-action@v4
+        uses: SonarSource/sonarqube-scan-action@v8
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
