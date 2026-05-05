@@ -4,6 +4,14 @@ import type { NextRequest } from "next/server"
 const PREMIUM_PHASE_PATTERN = /^\/phase-([2-6])(\/|$)/
 const PROTECTED_API_PATTERN = /^\/api\/(subscription|profile|phase-progress)/
 
+/** Reject open-redirect patterns: only same-origin relative paths from Next.js pathname. */
+function isSafeLoginCallbackPath(pathname: string): boolean {
+  if (pathname.length === 0 || pathname.length > 512) return false
+  if (!pathname.startsWith("/")) return false
+  if (pathname.startsWith("//") || pathname.includes("://") || pathname.includes("\\")) return false
+  return true
+}
+
 function getSessionToken(request: NextRequest): string | null {
   return (
     request.cookies.get("next-auth.session-token")?.value ??
@@ -32,7 +40,9 @@ export function middleware(request: NextRequest) {
 
   if (PREMIUM_PHASE_PATTERN.test(pathname) && !token) {
     const loginUrl = new URL("/login", request.url)
-    loginUrl.searchParams.set("callbackUrl", pathname)
+    if (isSafeLoginCallbackPath(pathname)) {
+      loginUrl.searchParams.set("callbackUrl", pathname)
+    }
     return NextResponse.redirect(loginUrl)
   }
 
