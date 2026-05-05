@@ -23,6 +23,8 @@ concurrency:
   cancel-in-progress: true
 
 env:
+  NODE_OPTIONS: --max-old-space-size=6144
+  NEXT_TELEMETRY_DISABLED: "1"
   # Build-time placeholders (no database connection required for `next build`).
   AUTH_SECRET: github-actions-ci-placeholder-secret-min-32-chars
   NEXTAUTH_SECRET: github-actions-ci-placeholder-secret-min-32-chars
