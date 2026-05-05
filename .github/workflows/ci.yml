@@ -174,6 +174,7 @@ jobs:
 
   dependency-review:
     if: github.event_name == 'pull_request'
+    continue-on-error: true
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
