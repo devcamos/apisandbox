@@ -34,18 +34,10 @@ export default function Home() {
     }
   }, [status, session, router]);
 
-  // Show loading state while checking session
-  if (status === "loading") {
+  if (status === "loading" || status === "authenticated") {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center">
-        <div className="text-white text-xl">Loading...</div>
-      </div>
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900" />
     );
-  }
-
-  // Don't render landing page if authenticated (redirect will happen)
-  if (status === "authenticated") {
-    return null;
   }
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
@@ -372,8 +364,8 @@ export default function Home() {
           <div className="bg-slate-800/50 backdrop-blur-sm rounded-2xl p-8 border border-slate-700">
             <div className="text-center mb-6">
               <h3 className="text-2xl font-bold text-white mb-2">Free</h3>
-              <div className="text-4xl font-bold text-white mb-1">$0</div>
-              <p className="text-gray-400">Always free</p>
+              <div className="text-4xl font-bold text-white mb-1">£0</div>
+              <p className="text-gray-400">No account required</p>
             </div>
             <ul className="space-y-3 mb-6">
               <li className="flex items-center gap-2 text-gray-300">
@@ -404,8 +396,8 @@ export default function Home() {
             </div>
             <div className="text-center mb-6">
               <h3 className="text-2xl font-bold text-white mb-2">Premium</h3>
-              <div className="text-4xl font-bold text-white mb-1">$29</div>
-              <p className="text-gray-400">per month</p>
+              <div className="text-4xl font-bold text-white mb-1">£5</div>
+              <p className="text-gray-400">per month · cancel anytime</p>
             </div>
             <ul className="space-y-3 mb-6">
               <li className="flex items-center gap-2 text-gray-300">
