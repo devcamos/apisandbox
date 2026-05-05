@@ -8,7 +8,7 @@
     "dev:local-lite": "bash ./scripts/local-lite.sh",
     "build": "prisma generate && next build --webpack",
     "start": "next start",
-    "lint": "next lint",
+    "lint": "eslint .",
     "test": "playwright test",
     "test:unit": "vitest run",
     "test:unit:watch": "vitest",

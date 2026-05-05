@@ -15,17 +15,26 @@ export default function ConceptVisuals({ conceptId }: ConceptVisualsProps) {
   const [activeStageId, setActiveStageId] = useState(visual?.stages[0]?.id ?? "");
   const [activeDiagramId, setActiveDiagramId] = useState<"use-case" | "sequence" | "c4">("use-case");
 
-  if (!visual) return null;
+  useEffect(() => {
+    if (!visual?.stages.length) return;
+    const stillValid = visual.stages.some((stage) => stage.id === activeStageId);
+    if (!stillValid) setActiveStageId(visual.stages[0].id);
+  }, [visual, activeStageId]);
 
-  const activeStage = visual.stages.find((stage) => stage.id === activeStageId) ?? visual.stages[0];
-  const activeStageIndex = visual.stages.findIndex((stage) => stage.id === activeStage.id);
-  const activeDiagram = activeStage.diagrams.find((diagram) => diagram.id === activeDiagramId) ?? activeStage.diagrams[0];
+  const activeStage =
+    visual?.stages.find((stage) => stage.id === activeStageId) ?? visual?.stages[0];
+  const activeStageIndex = visual ? visual.stages.findIndex((stage) => stage.id === activeStage?.id) : -1;
+  const activeDiagram =
+    activeStage?.diagrams.find((diagram) => diagram.id === activeDiagramId) ?? activeStage?.diagrams[0];
 
   useEffect(() => {
+    if (!activeStage?.diagrams.length) return;
     if (!activeStage.diagrams.some((diagram) => diagram.id === activeDiagramId)) {
       setActiveDiagramId(activeStage.diagrams[0].id);
     }
   }, [activeDiagramId, activeStage]);
+
+  if (!visual || !activeStage || !activeDiagram) return null;
 
   const diagramIcon = {
     "use-case": Target,

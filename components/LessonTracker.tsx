@@ -188,10 +188,10 @@ export function LessonTracker({ phase }: LessonTrackerProps) {
     if (!plan) return { total: 0, completed: 0 }
     let t = 0
     let c = 0
-    for (const module of plan.modules) {
-      for (const checkpoint of module.checkpoints) {
+    for (const courseModule of plan.modules) {
+      for (const checkpoint of courseModule.checkpoints) {
         t += 1
-        if (progress[module.id]?.[checkpoint.id]?.done) c += 1
+        if (progress[courseModule.id]?.[checkpoint.id]?.done) c += 1
       }
     }
     return { total: t, completed: c }
@@ -200,11 +200,11 @@ export function LessonTracker({ phase }: LessonTrackerProps) {
   const moduleProgress = useMemo(() => {
     if (!plan) return new Map<string, { total: number; completed: number; percent: number }>()
     const map = new Map<string, { total: number; completed: number; percent: number }>()
-    for (const module of plan.modules) {
-      const totalCheckpoints = module.checkpoints.length
-      const completedCheckpoints = module.checkpoints.filter((cp) => progress[module.id]?.[cp.id]?.done).length
+    for (const courseModule of plan.modules) {
+      const totalCheckpoints = courseModule.checkpoints.length
+      const completedCheckpoints = courseModule.checkpoints.filter((cp) => progress[courseModule.id]?.[cp.id]?.done).length
       const percent = totalCheckpoints > 0 ? Math.round((completedCheckpoints / totalCheckpoints) * 100) : 0
-      map.set(module.id, { total: totalCheckpoints, completed: completedCheckpoints, percent })
+      map.set(courseModule.id, { total: totalCheckpoints, completed: completedCheckpoints, percent })
     }
     return map
   }, [plan, progress])

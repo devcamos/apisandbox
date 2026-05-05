@@ -28,6 +28,8 @@ env:
   NEXTAUTH_SECRET: github-actions-ci-placeholder-secret-min-32-chars
   DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/_build_placeholder
   NEXT_PUBLIC_APP_URL: http://localhost:4000
+  # `next build` runs with NODE_ENV=production; lib/email.ts validates this at import time.
+  RESEND_API_KEY: github-actions-ci-resend-placeholder
 
 jobs:
   lint-and-build:

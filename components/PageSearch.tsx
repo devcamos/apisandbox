@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { Search, ArrowRight, BookOpen, Cloud, Brain, Database, Zap, Code, Shield, CreditCard, Mail, Folder } from 'lucide-react';
 
@@ -321,6 +321,15 @@ export function PageSearch() {
   const router = useRouter();
   const searchRef = useRef<HTMLDivElement>(null);
 
+  const handleSelect = useCallback(
+    (result: SearchResult) => {
+      setQuery('');
+      setIsOpen(false);
+      router.push(result.href);
+    },
+    [router],
+  );
+
   // Filter results based on query
   useEffect(() => {
     if (!query.trim()) {
@@ -369,7 +378,7 @@ export function PageSearch() {
 
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen, results, selectedIndex]);
+  }, [handleSelect, isOpen, results, selectedIndex]);
 
   // Close when clicking outside
   useEffect(() => {
@@ -382,12 +391,6 @@ export function PageSearch() {
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
-
-  const handleSelect = (result: SearchResult) => {
-    setQuery('');
-    setIsOpen(false);
-    router.push(result.href);
-  };
 
   const getCategoryColor = (category: string) => {
     const colors: Record<string, string> = {

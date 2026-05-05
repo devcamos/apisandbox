@@ -129,6 +129,11 @@ export default function GsapDemo({ algorithm = "binary" }: { algorithm?: SearchA
   const pointerRef = useRef<HTMLDivElement>(null)
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
+  function resetCellStyles() {
+    gsap.to(cellRefs.current, { scale: 1, opacity: 1, duration: 0.3, borderColor: "#475569", backgroundColor: "rgba(51, 65, 85, 1)" })
+    if (pointerRef.current) gsap.to(pointerRef.current, { opacity: 0, duration: 0.2 })
+  }
+
   useEffect(() => {
     setIsPlaying(false)
     setStepIdx(-1)
@@ -200,11 +205,6 @@ export default function GsapDemo({ algorithm = "binary" }: { algorithm?: SearchA
     timerRef.current = setTimeout(() => applyStep(stepIdx + 1), algorithm === "linear" ? 600 : 900)
     return () => { if (timerRef.current) clearTimeout(timerRef.current) }
   }, [isPlaying, stepIdx, steps.length, algorithm])
-
-  function resetCellStyles() {
-    gsap.to(cellRefs.current, { scale: 1, opacity: 1, duration: 0.3, borderColor: "#475569", backgroundColor: "rgba(51, 65, 85, 1)" })
-    if (pointerRef.current) gsap.to(pointerRef.current, { opacity: 0, duration: 0.2 })
-  }
 
   function reset() {
     setIsPlaying(false)
