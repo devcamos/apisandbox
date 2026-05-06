@@ -84,9 +84,7 @@ jobs:
     name: SonarQube Cloud
     runs-on: ubuntu-latest
     needs: [lint-and-build, unit-tests]
-    continue-on-error: true
-    # SONAR_TOKEN: GitHub secret from SonarCloud (Analysis Method → GitHub Actions). Do not use
-    # secrets.* in job `if` — it can fail the workflow evaluation; this job is continue-on-error.
+    # Blocks merge when SONAR_TOKEN is set and SonarCloud Quality Gate fails (sonar.qualitygate.wait=true).
     if: github.event.repository.fork == false
     permissions:
       contents: read
@@ -121,8 +119,19 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+  docker-compose-validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate staging compose (secrets + interpolation)
+        env:
+          AUTH_SECRET: github-actions-ci-placeholder-secret-min-32-chars
+        run: bash scripts/validate-compose.sh
+
   e2e-smoke:
-    needs: [lint-and-build]
+    needs: [lint-and-build, unit-tests]
     runs-on: ubuntu-latest
     services:
       postgres:

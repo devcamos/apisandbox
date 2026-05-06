@@ -40,4 +40,10 @@ describe("Feature Flags", () => {
     expect(flags.PREMIUM_PAYWALL).toHaveProperty("description")
     expect(flags.PREMIUM_PAYWALL).toHaveProperty("enabled")
   })
+
+  it("isFeatureEnabled returns false for an unknown flag key at runtime", async () => {
+    vi.stubEnv("NEXT_PUBLIC_FF_PREMIUM_PAYWALL", "true")
+    const { isFeatureEnabled } = await import("@/config/featureFlags")
+    expect((isFeatureEnabled as (f: string) => boolean)("NOT_A_FLAG")).toBe(false)
+  })
 })

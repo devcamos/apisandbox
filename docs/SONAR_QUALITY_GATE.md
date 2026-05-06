@@ -22,6 +22,31 @@ This repo mixes **product code** (APIs, auth, billing) with **long-form learning
 4. **CI vs decoration**  
    GitHub Actions uploads analysis + coverage; the **pass/fail** of the SonarCloud check follows the **Quality Gate** you attach to the project. Branch protection should require the gate you actually intend to enforce.
 
+## Local analysis (before push)
+
+Use the same **`sonar-project.properties`** as CI so results match.
+
+1. **Token**  
+   [SonarCloud](https://sonarcloud.io) → **My Account** → **Security** → generate a token. Export it or add `SONAR_TOKEN=...` to **`.env.local`** (gitignored).
+
+2. **Coverage**  
+   The scanner expects **`coverage/lcov.info`**. One-shot:
+
+   ```bash
+   npm run sonar:local:full
+   ```
+
+   Or: `npm run test:unit -- --coverage` then `npm run sonar:local`.
+
+3. **Docker**  
+   `npm run sonar:local` runs **`sonarsource/sonar-scanner-cli`** in Docker (same stack as most CI setups). Override the image with **`SONAR_SCANNER_IMAGE`** if your org pins a tag.
+
+4. **Optional overrides**  
+   Copy **`sonar-project.local.properties.example`** → **`sonar-project.local.properties`** (gitignored). Each `key=value` line becomes a scanner `-D` flag—for example `sonar.qualitygate.wait=false` for a faster upload-only run.
+
+5. **Branch / target**  
+   The script sets **`sonar.branch.name`** from the current Git branch and **`sonar.branch.target`** to **`main`** (override with **`SONAR_BRANCH_NAME`** / **`SONAR_BRANCH_TARGET`** if your default branch differs).
+
 ## Mapping “A → B”
 
 | Condition (example) | Stricter (release) | Pragmatic (while fixing) |

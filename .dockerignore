@@ -7,6 +7,11 @@ node_modules
 .env.*
 !.env.example
 !config/environments/*.env.example
+**/.ssh
+**/*.pem
+**/*.key
+**/id_rsa*
+**/credentials.json
 playwright-report
 coverage
 .vercel

@@ -87,6 +87,8 @@ Examples:
 
 ## Local Staging (Docker)
 
+Create a `.env` file in the repo root (Compose loads it automatically) with at least **`AUTH_SECRET`** (32+ random characters). Staging Postgres and the app listen on **127.0.0.1** only (`5434` and `4000`).
+
 ```bash
 docker-compose -f docker-compose.yml -f docker-compose.staging.yml up -d
 ```

@@ -16,4 +16,16 @@ describe("stripe-client", () => {
     const { requireStripeClient } = await import("@/lib/stripe-client")
     expect(() => requireStripeClient()).toThrow("STRIPE_SECRET_KEY is not configured")
   })
+
+  it("getStripeClient returns a client when STRIPE_SECRET_KEY is set", async () => {
+    vi.stubEnv("STRIPE_SECRET_KEY", "sk_test_placeholder")
+    const { getStripeClient } = await import("@/lib/stripe-client")
+    expect(getStripeClient()).not.toBeNull()
+  })
+
+  it("requireStripeClient returns the client when STRIPE_SECRET_KEY is set", async () => {
+    vi.stubEnv("STRIPE_SECRET_KEY", "sk_test_placeholder")
+    const { requireStripeClient } = await import("@/lib/stripe-client")
+    expect(requireStripeClient()).not.toBeNull()
+  })
 })

@@ -12,8 +12,9 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: apisandbox_dev
+    # Bind to loopback so Postgres is not reachable from other machines on the LAN.
     ports:
-      - "5435:5432"  # 5432=system, 5433=life-db-dev, 5434=staging → 5435 for apisandbox dev
+      - "127.0.0.1:5435:5432" # 5432=system, 5433=life-db-dev, 5434=staging → 5435 for apisandbox dev
     volumes:
       - postgres_dev_data:/var/lib/postgresql/data
     healthcheck:

@@ -1,0 +1,5 @@
+# Copy to sonar-project.local.properties (gitignored) for machine-only Sonar overrides.
+# Lines are passed as -Dkey=value to the scanner. Example:
+#
+# sonar.qualitygate.wait=false
+# sonar.verbose=true
