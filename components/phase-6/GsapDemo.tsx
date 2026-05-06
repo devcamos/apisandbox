@@ -19,7 +19,7 @@ import {
   GsapTransport,
 } from "./gsap-demo-views"
 
-export type { SearchAlgorithm }
+export type { SearchAlgorithm } from "./gsap-demo-model"
 
 export default function GsapDemo({ algorithm = "binary" }: Readonly<{ algorithm?: SearchAlgorithm }>) {
   const meta = algorithmMeta[algorithm]

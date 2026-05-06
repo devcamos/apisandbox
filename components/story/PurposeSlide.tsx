@@ -51,7 +51,7 @@ export default function PurposeSlide() {
           const Icon = piece.icon
           return (
             <motion.div
-              key={i}
+              key={`${piece.color}-${piece.x}-${piece.y}`}
               className="absolute top-1/2 left-1/2"
               style={{ x: 0, y: 0 }}
               custom={i}
@@ -78,9 +78,9 @@ export default function PurposeSlide() {
         {slide.title}
       </motion.h1>
 
-      {slide.body.map((line, i) => (
+      {slide.body.map((line) => (
         <motion.p
-          key={i}
+          key={line}
           className="text-xl md:text-2xl text-gray-300 leading-relaxed"
           variants={childVariants}
         >

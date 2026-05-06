@@ -48,7 +48,7 @@ function TangleToStructure() {
         { cx: 180, cy: 60 },
       ].map((node, i) => (
         <motion.circle
-          key={i}
+          key={`${node.cx}-${node.cy}`}
           cx={node.cx}
           cy={node.cy}
           r="5"
@@ -108,9 +108,9 @@ export default function AlgorithmsSlide() {
         {slide.title}
       </motion.h1>
 
-      {slide.body.map((line, i) => (
+      {slide.body.map((line) => (
         <motion.p
-          key={i}
+          key={line}
           className="text-xl md:text-2xl text-gray-300 leading-relaxed"
           variants={childVariants}
         >

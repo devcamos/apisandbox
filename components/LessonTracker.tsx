@@ -66,9 +66,10 @@ function countBullets(value: string) {
 }
 
 function hasMeasurableDecision(value: string) {
-  const measurablePattern =
-    /(\b\d+(\.\d+)?\s?(ms|s|sec|seconds|minutes|m|hours|h|%|x)\b)|(\bp(95|99)\b)|(\bslo\b)|(\blatency\b)|(\berror rate\b)|(\bcost\b)/i
-  return measurablePattern.test(value)
+  const hasTimedOrRateMetric = /\b\d+(?:\.\d+)?\s?(?:ms|s|sec|seconds|minutes|m|hours|h|%|x)\b/i.test(value)
+  const hasPercentile = /\bp(?:95|99)\b/i.test(value)
+  const hasOpsKeyword = /\b(?:slo|latency|error rate|cost)\b/i.test(value)
+  return hasTimedOrRateMetric || hasPercentile || hasOpsKeyword
 }
 
 function hasFallbackPolicy(value: string) {
@@ -137,7 +138,7 @@ export function LessonTracker({ phase }: LessonTrackerProps) {
   const [collapsedModules, setCollapsedModules] = useState<Record<string, boolean>>({})
 
   useEffect(() => {
-    if (typeof window === "undefined" || !plan) return
+    if (globalThis.window === undefined || !plan) return
     const raw = localStorage.getItem(storageKey)
     if (!raw) {
       setProgress({})
@@ -152,7 +153,7 @@ export function LessonTracker({ phase }: LessonTrackerProps) {
   }, [storageKey, plan])
 
   useEffect(() => {
-    if (typeof window === "undefined" || !plan) return
+    if (globalThis.window === undefined || !plan) return
     localStorage.setItem(storageKey, JSON.stringify(progress))
   }, [progress, storageKey, plan])
 
@@ -228,10 +229,11 @@ export function LessonTracker({ phase }: LessonTrackerProps) {
     setProgress((prev) => {
       const current = prev[moduleId]?.[checkpointId] || emptyProgress()
       const nextPatch = typeof patch === "function" ? patch(current) : patch
+      const moduleProgress = prev[moduleId] ?? {}
       return {
         ...prev,
         [moduleId]: {
-          ...(prev[moduleId] || {}),
+          ...moduleProgress,
           [checkpointId]: {
             ...current,
             ...nextPatch,

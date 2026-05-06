@@ -23,7 +23,7 @@ export default function PatternProblemsPage() {
   const [progress, setProgress] = useState<PatternProgressState>({})
 
   useEffect(() => {
-    if (typeof window === "undefined") return
+    if (globalThis.window === undefined) return
     try {
       const raw = localStorage.getItem(PATTERN_PROGRESS_STORAGE_KEY)
       if (!raw) return
@@ -35,7 +35,7 @@ export default function PatternProblemsPage() {
   }, [])
 
   useEffect(() => {
-    if (typeof window === "undefined") return
+    if (globalThis.window === undefined) return
     localStorage.setItem(PATTERN_PROGRESS_STORAGE_KEY, JSON.stringify(progress))
   }, [progress])
 
@@ -67,6 +67,11 @@ export default function PatternProblemsPage() {
     const status = nodeProgress.problems[p.id]
     return Boolean(status?.completed && status?.understood)
   }).length
+  const areaStatusText = nodeProgress.completed
+    ? "• Area completed"
+    : prereqsComplete
+      ? "• In progress"
+      : "• Locked by prerequisites"
 
   return (
     <SubscriptionGate phaseNumber={5} lockedContentName={`Phase 5: ${pattern.label}`}>
@@ -107,7 +112,7 @@ export default function PatternProblemsPage() {
             <div className="text-xs text-purple-300 mb-2">Problems to complete / understand (no solutions)</div>
             <div className="text-sm text-purple-100 mb-3">
               Progress: {doneCount}/{problems.length}{" "}
-              {nodeProgress.completed ? "• Area completed" : prereqsComplete ? "• In progress" : "• Locked by prerequisites"}
+              {areaStatusText}
             </div>
             {!prereqsComplete && (
               <p className="text-xs text-rose-300 mb-3">Complete prerequisites in the graph before this area can be completed.</p>

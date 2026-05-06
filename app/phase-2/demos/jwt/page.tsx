@@ -21,7 +21,8 @@ function base64UrlDecode(str: string): string {
 
 function base64UrlEncode(obj: object): string {
   const json = JSON.stringify(obj);
-  const b64 = btoa(unescape(encodeURIComponent(json)));
+  const bytes = new TextEncoder().encode(json);
+  const b64 = btoa(String.fromCharCode(...bytes));
   return b64.replaceAll("+", "-").replaceAll("/", "_").replace(/=+$/, "");
 }
 

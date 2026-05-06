@@ -1,4 +1,4 @@
-import crypto from "crypto"
+import crypto from "node:crypto"
 import { AppError } from "@/lib/http/errors"
 import type { AuthPayload } from "@/lib/auth/types"
 

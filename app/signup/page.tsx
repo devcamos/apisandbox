@@ -143,7 +143,7 @@ export default function SignupPage() {
   useEffect(() => {
     if (!googleClientId || !googleButtonRef.current) return
     const init = () => {
-      if (typeof window !== "undefined" && window.google?.accounts?.id && googleButtonRef.current) {
+      if (globalThis.window !== undefined && window.google?.accounts?.id && googleButtonRef.current) {
         window.google.accounts.id.initialize({
           client_id: googleClientId,
           callback: (response: { credential: string }) => {
@@ -159,11 +159,11 @@ export default function SignupPage() {
         })
       }
     }
-    if (window.google?.accounts?.id) {
+    if (globalThis.window !== undefined && window.google?.accounts?.id) {
       init()
     } else {
       const t = setInterval(() => {
-        if (window.google?.accounts?.id) {
+        if (globalThis.window !== undefined && window.google?.accounts?.id) {
           clearInterval(t)
           init()
         }

@@ -1,5 +1,4 @@
-import { NextRequest } from "next/server"
-import { NextResponse } from "next/server"
+import { NextRequest, NextResponse } from "next/server"
 import { z } from "zod"
 import { registerWithPassword } from "@/lib/services/auth/auth-service"
 import { AppError } from "@/lib/http/errors"

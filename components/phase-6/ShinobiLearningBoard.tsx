@@ -16,7 +16,7 @@ interface Props {
   shinobi: ShinobiProgressApi
 }
 
-export default function ShinobiLearningBoard({ shinobi }: Props) {
+export default function ShinobiLearningBoard({ shinobi }: Readonly<Props>) {
   const { state, hydrated, awardQuizAnswer, finishQuizRun, resetProgress } = shinobi
   const [expanded, setExpanded] = useState(true)
   const [quizOpen, setQuizOpen] = useState(false)
@@ -122,7 +122,7 @@ export default function ShinobiLearningBoard({ shinobi }: Props) {
                   <button
                     type="button"
                     onClick={() => {
-                      if (typeof window !== "undefined" && window.confirm("Reset all Shinobi XP and exploration bonuses on this device?")) {
+                      if (globalThis.window !== undefined && window.confirm("Reset all Shinobi XP and exploration bonuses on this device?")) {
                         resetProgress()
                       }
                     }}

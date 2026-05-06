@@ -4,8 +4,7 @@
  * Returns user's current subscription tier and status
  */
 
-import { NextResponse } from "next/server"
-import { NextRequest } from "next/server"
+import { NextRequest, NextResponse } from "next/server"
 import { requireAuthenticatedUser } from "@/lib/auth/jwt-auth-middleware"
 import { getUserSubscription } from "@/lib/subscription"
 import { handleRouteError } from "@/lib/http/responses"

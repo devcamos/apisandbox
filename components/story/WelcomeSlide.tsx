@@ -5,7 +5,7 @@ import { Home } from "lucide-react"
 import StorySlide, { childVariants } from "./StorySlide"
 import { storySlides } from "@/lib/learning/intro-story-content"
 
-function FloatingParticle({ delay, x, y, size }: { delay: number; x: string; y: string; size: number }) {
+function FloatingParticle({ delay, x, y, size }: Readonly<{ delay: number; x: string; y: string; size: number }>) {
   return (
     <motion.div
       className="absolute rounded-full bg-amber-400/15"
@@ -40,8 +40,8 @@ export default function WelcomeSlide() {
 
   return (
     <StorySlide bg={slide.theme.bg}>
-      {particles.map((p, i) => (
-        <FloatingParticle key={i} {...p} />
+      {particles.map((p) => (
+        <FloatingParticle key={`${p.x}-${p.y}-${p.delay}`} {...p} />
       ))}
 
       <motion.div
@@ -70,9 +70,9 @@ export default function WelcomeSlide() {
         {slide.title}
       </motion.h1>
 
-      {slide.body.map((line, i) => (
+      {slide.body.map((line) => (
         <motion.p
-          key={i}
+          key={line}
           className="text-xl md:text-2xl text-gray-300 leading-relaxed"
           variants={childVariants}
         >

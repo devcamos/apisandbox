@@ -5,7 +5,7 @@ import { useSession } from "@/components/providers/SessionProvider"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
 import Link from "next/link"
-import { Check, Sparkles, Lock, ArrowRight, Star, Zap, Brain, BarChart3 } from "lucide-react"
+import { Check, Sparkles, Lock, ArrowRight, Zap, Brain, BarChart3 } from "lucide-react"
 
 export default function UpgradePage() {
   const { data: session } = useSession()
@@ -28,7 +28,9 @@ export default function UpgradePage() {
       if (response.ok) {
         const { url } = await response.json()
         if (typeof url === "string" && isAllowedStripeCheckoutRedirectUrl(url)) {
-          window.location.href = url
+          if (globalThis.window !== undefined) {
+            window.location.href = url
+          }
           return
         }
       }

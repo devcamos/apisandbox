@@ -84,7 +84,7 @@ function getRecommendation(answers: Record<string, string>): Recommendation {
 
 const confidenceColor = { strong: "text-emerald-400 border-emerald-500/30 bg-emerald-500/10", moderate: "text-amber-400 border-amber-500/30 bg-amber-500/10", weak: "text-gray-400 border-slate-600 bg-slate-800/50" }
 
-export default function SearchDecisionChecklist({ onSelectAlgorithm }: { onSelectAlgorithm: (id: string) => void }) {
+export default function SearchDecisionChecklist({ onSelectAlgorithm }: Readonly<{ onSelectAlgorithm: (id: string) => void }>) {
   const [answers, setAnswers] = useState<Record<string, string>>({})
   const [currentStep, setCurrentStep] = useState(0)
 
@@ -121,15 +121,21 @@ export default function SearchDecisionChecklist({ onSelectAlgorithm }: { onSelec
       <p className="text-[11px] text-gray-400">Answer these constraints to find the right search strategy. Pattern recognition beats memorisation.</p>
 
       <div className="flex items-center gap-1 mb-2">
-        {questions.map((q, i) => (
+        {questions.map((q, i) => {
+          let progressClass = "bg-slate-700"
+          if (answers[q.id]) {
+            progressClass = "bg-green-500"
+          } else if (i === currentStep) {
+            progressClass = "bg-green-500/40"
+          }
+          return (
           <button
             key={q.id}
             onClick={() => setCurrentStep(i)}
-            className={`h-1.5 flex-1 rounded-full transition-colors ${
-              answers[q.id] ? "bg-green-500" : i === currentStep ? "bg-green-500/40" : "bg-slate-700"
-            }`}
+            className={`h-1.5 flex-1 rounded-full transition-colors ${progressClass}`}
           />
-        ))}
+          )
+        })}
       </div>
 
       <AnimatePresence mode="wait">

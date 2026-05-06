@@ -72,26 +72,25 @@ async function fetchCurrentUser(token?: string) {
   }
 }
 
-export function SessionProvider({ children }: { children: ReactNode }) {
+export function SessionProvider({ children }: Readonly<{ children: ReactNode }>) {
   const [status, setStatus] = useState<SessionStatus>("loading")
   const [data, setData] = useState<SessionData | null>(null)
 
   const refresh = async () => {
-    const token = typeof window !== "undefined" ? localStorage.getItem(STORAGE_KEY) : null
-    if (!token) {
+    const token = globalThis.window === undefined ? null : localStorage.getItem(STORAGE_KEY)
+    if (token) {
+      try {
+        const user = await fetchCurrentUser(token)
+        setData(mapToSessionData(user))
+        setStatus("authenticated")
+      } catch {
+        localStorage.removeItem(STORAGE_KEY)
+        setData(null)
+        setStatus("unauthenticated")
+      }
+    } else {
       setStatus("unauthenticated")
       setData(null)
-      return
-    }
-
-    try {
-      const user = await fetchCurrentUser(token)
-      setData(mapToSessionData(user))
-      setStatus("authenticated")
-    } catch {
-      localStorage.removeItem(STORAGE_KEY)
-      setData(null)
-      setStatus("unauthenticated")
     }
   }
 
@@ -139,7 +138,7 @@ export function useSession() {
 
 export async function signOut(options?: { callbackUrl?: string }) {
   const callback = getSafeClientRelativeRedirect(options?.callbackUrl, "/")
-  if (typeof window !== "undefined") {
+  if (globalThis.window !== undefined) {
     localStorage.removeItem(STORAGE_KEY)
     try {
       await fetch("/api/auth/logout", { method: "POST" })

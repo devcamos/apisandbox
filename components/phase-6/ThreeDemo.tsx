@@ -134,17 +134,17 @@ function NodeSphere({ node, status, onHover }: Readonly<{ node: TreeNode; status
   return (
     <group position={[node.x, node.y, node.z]}>
       <mesh ref={meshRef} onPointerOver={() => onHover(node.id)} onPointerOut={() => onHover(null)}>
-        <sphereGeometry args={[0.3, 16, 16]} />
+        <sphereGeometry args={[0.3, 16, 16]} />{/* NOSONAR - react-three-fiber intrinsic prop */}
         <meshStandardMaterial color={baseColor} roughness={0.3} metalness={0.6} />
       </mesh>
-      <Text position={[0, 0, 0.35]} fontSize={0.2} color="white" anchorX="center" anchorY="middle" font={undefined}>
+      <Text position={[0, 0, 0.35]} fontSize={0.2} color="white" anchorX="center" anchorY="middle" font={undefined}>{/* NOSONAR - react-three-fiber intrinsic prop */}
         {String(node.value)}
       </Text>
     </group>
   )
 }
 
-function TreeEdges({ tree }: { tree: TreeNode[] }) {
+function TreeEdges({ tree }: Readonly<{ tree: TreeNode[] }>) {
   const edges = useMemo(() => {
     const result: [THREE.Vector3, THREE.Vector3][] = []
     tree.forEach((node) => {
@@ -175,8 +175,8 @@ function Scene({ tree, nodeStatuses, onHover }: SceneProps) {
   return (
     <>
       <ambientLight intensity={0.4} />
-      <directionalLight position={[5, 5, 5]} intensity={0.8} />
-      <pointLight position={[-5, -3, 3]} intensity={0.4} color="#818cf8" />
+      <directionalLight position={[5, 5, 5]} intensity={0.8} />{/* NOSONAR - react-three-fiber intrinsic props */}
+      <pointLight position={[-5, -3, 3]} intensity={0.4} color="#818cf8" />{/* NOSONAR - react-three-fiber intrinsic props */}
       <TreeEdges tree={tree} />
       {tree.map((node) => (
         <NodeSphere key={node.id} node={node} status={nodeStatuses.get(node.id) || "idle"} onHover={onHover} />
@@ -186,7 +186,7 @@ function Scene({ tree, nodeStatuses, onHover }: SceneProps) {
   )
 }
 
-export default function ThreeDemo({ algorithm = "bfs" }: { algorithm?: TraversalAlgorithm }) {
+export default function ThreeDemo({ algorithm = "bfs" }: Readonly<{ algorithm?: TraversalAlgorithm }>) {
   const tree = useMemo(() => buildTree(), [])
   const meta = traversalMeta[algorithm]
   const [visitIndex, setVisitIndex] = useState(-1)
@@ -249,7 +249,12 @@ export default function ThreeDemo({ algorithm = "bfs" }: { algorithm?: Traversal
       <div className="flex items-center justify-center gap-2">
         <button onClick={reset} className="px-3 py-1.5 text-xs font-medium bg-slate-700 border border-slate-600 rounded-lg text-gray-300 hover:bg-slate-600 transition-colors">Reset</button>
         <button onClick={stepForward} disabled={isPlaying || isDone} className="px-3 py-1.5 text-xs font-medium bg-blue-500/20 border border-blue-500/30 rounded-lg text-blue-300 hover:bg-blue-500/30 transition-colors disabled:opacity-40">Step</button>
-        <button onClick={() => { if (visitIndex < 0) setVisitIndex(0); setIsPlaying(!isPlaying) }} disabled={isDone} className="px-4 py-1.5 text-xs font-medium bg-blue-500/20 border border-blue-500/30 rounded-lg text-blue-300 hover:bg-blue-500/30 transition-colors disabled:opacity-40">
+        <button onClick={() => {
+          if (visitIndex < 0) {
+            setVisitIndex(0)
+          }
+          setIsPlaying((p) => !p)
+        }} disabled={isDone} className="px-4 py-1.5 text-xs font-medium bg-blue-500/20 border border-blue-500/30 rounded-lg text-blue-300 hover:bg-blue-500/30 transition-colors disabled:opacity-40">
           {isPlaying ? "Pause" : "Play"}
         </button>
       </div>

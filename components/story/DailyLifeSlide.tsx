@@ -40,9 +40,9 @@ export default function DailyLifeSlide() {
         {slide.title}
       </motion.h1>
 
-      {slide.body.map((line, i) => (
+      {slide.body.map((line) => (
         <motion.p
-          key={i}
+          key={line}
           className="text-xl md:text-2xl text-gray-300 leading-relaxed"
           variants={childVariants}
         >

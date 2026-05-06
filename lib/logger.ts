@@ -1,7 +1,7 @@
 import pino from "pino"
 
 const isProduction = process.env.NODE_ENV === "production"
-const isServer = typeof window === "undefined"
+const isServer = globalThis.window === undefined
 
 export const logger = isServer
   ? pino({

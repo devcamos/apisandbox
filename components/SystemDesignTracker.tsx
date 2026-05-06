@@ -201,10 +201,11 @@ export default function SystemDesignTracker() {
             <h3 className="text-xl font-bold text-white">Priority order</h3>
             <p className="text-gray-400 text-sm">Move from reasoning to systems. Do not treat the components as the design.</p>
           </div>
-          <label className="inline-flex items-center gap-3 text-sm text-gray-300">
+          <label htmlFor="system-design-status-filter" className="inline-flex items-center gap-3 text-sm text-gray-300">
             <Filter className="w-4 h-4 text-cyan-400" />
             Status
             <select
+              id="system-design-status-filter"
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value as TrackerStatus | "all")}
               className="bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white"

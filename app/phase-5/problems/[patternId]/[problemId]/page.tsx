@@ -32,7 +32,7 @@ export default function ProblemDetailPage() {
   const [progress, setProgress] = useState<PatternProgressState>({})
 
   useEffect(() => {
-    if (typeof window === "undefined") return
+    if (globalThis.window === undefined) return
     try {
       const raw = localStorage.getItem(PATTERN_PROGRESS_STORAGE_KEY)
       if (!raw) return
@@ -44,7 +44,7 @@ export default function ProblemDetailPage() {
   }, [])
 
   useEffect(() => {
-    if (typeof window === "undefined") return
+    if (globalThis.window === undefined) return
     localStorage.setItem(PATTERN_PROGRESS_STORAGE_KEY, JSON.stringify(progress))
   }, [progress])
 
@@ -63,7 +63,7 @@ export default function ProblemDetailPage() {
 
   const nodeProgress = {
     ...emptyNodeProgress(),
-    ...(progress[pattern.id] || {}),
+    ...(progress[pattern.id] ?? {}),
   }
   const problemStatus = nodeProgress.problems[problem.id] || { completed: false, understood: false }
   const prereqsComplete = pattern.prerequisites.every((id) => {

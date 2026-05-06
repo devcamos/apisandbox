@@ -38,8 +38,10 @@ function generateBubbleSortSteps(values: number[]): SortStep[] {
     }
     steps.push({ type: "sorted", indices: [n - i - 1], explanation: `Position ${n - i - 1} is final — largest unsorted element bubbled up` })
   }
-  steps.push({ type: "sorted", indices: [0], explanation: "First position is sorted by elimination" })
-  steps.push({ type: "done", indices: [], explanation: "Array is fully sorted" })
+  steps.push(
+    { type: "sorted", indices: [0], explanation: "First position is sorted by elimination" },
+    { type: "done", indices: [], explanation: "Array is fully sorted" }
+  )
   return steps
 }
 
@@ -64,8 +66,10 @@ function generateSelectionSortSteps(values: number[]): SortStep[] {
     }
     steps.push({ type: "sorted", indices: [i], explanation: `Position ${i} is final — smallest remaining element placed` })
   }
-  steps.push({ type: "sorted", indices: [n - 1], explanation: "Last position is sorted by elimination" })
-  steps.push({ type: "done", indices: [], explanation: "Array is fully sorted" })
+  steps.push(
+    { type: "sorted", indices: [n - 1], explanation: "Last position is sorted by elimination" },
+    { type: "done", indices: [], explanation: "Array is fully sorted" }
+  )
   return steps
 }
 
@@ -80,8 +84,10 @@ function generateInsertionSortSteps(values: number[]): SortStep[] {
     steps.push({ type: "compare", indices: [i], explanation: `Pick element ${key} at index ${i} — insert it into the sorted portion` })
     let j = i - 1
     while (j >= 0 && arr[j] > key) {
-      steps.push({ type: "compare", indices: [j, j + 1], explanation: `${arr[j]} > ${key} — shift ${arr[j]} right` })
-      steps.push({ type: "swap", indices: [j, j + 1], explanation: `Move ${arr[j]} from index ${j} to ${j + 1}` })
+      steps.push(
+        { type: "compare", indices: [j, j + 1], explanation: `${arr[j]} > ${key} — shift ${arr[j]} right` },
+        { type: "swap", indices: [j, j + 1], explanation: `Move ${arr[j]} from index ${j} to ${j + 1}` }
+      )
       arr[j + 1] = arr[j]
       j--
     }
@@ -197,7 +203,7 @@ const barColors: Record<BarState["status"], string> = {
   sorted: "from-emerald-500 to-teal-600",
 }
 
-export default function FramerMotionDemo({ algorithm = "bubble" }: { algorithm?: SortAlgorithm }) {
+export default function FramerMotionDemo({ algorithm = "bubble" }: Readonly<{ algorithm?: SortAlgorithm }>) {
   const generate = stepGenerators[algorithm]
   const [bars, setBars] = useState<BarState[]>(() => generateBars(INITIAL_VALUES))
   const [steps, setSteps] = useState<SortStep[]>(() => generate(INITIAL_VALUES))

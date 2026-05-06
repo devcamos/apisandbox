@@ -256,8 +256,8 @@ export default function SearchMicroExercises() {
       </div>
 
       <div className="flex items-center gap-1">
-        {exercises.map((_, i) => (
-          <div key={i} className={`h-1 flex-1 rounded-full ${i < currentIdx ? "bg-green-500" : i === currentIdx ? "bg-green-500/40" : "bg-slate-700"}`} />
+        {exercises.map((item, i) => (
+          <div key={item.id} className={`h-1 flex-1 rounded-full ${i < currentIdx ? "bg-green-500" : i === currentIdx ? "bg-green-500/40" : "bg-slate-700"}`} />
         ))}
       </div>
 
