@@ -59,7 +59,7 @@ echo "For the staging stack use: npm run staging:lite"
 echo ""
 
 # ── Env file ──────────────────────────────────────────────────────────────────
-if [ ! -f ".env.local" ]; then
+if [[ ! -f ".env.local" ]]; then
   cp config/environments/local.env.example .env.local
   log_success "Created .env.local from local.env.example"
 else
