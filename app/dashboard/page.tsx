@@ -10,10 +10,13 @@
 
 import { useSession } from "@/components/providers/SessionProvider"
 import Link from "next/link"
-import { Brain, Plug, Network, Compass, ArrowRight, BookOpen, Play, Star, Shield, Zap, Target, Cloud, Lock, Sparkles, GraduationCap, BrainCircuit } from "lucide-react"
+import { Brain, Lock, Sparkles, Target } from "lucide-react"
 import { useEffect, useState } from "react"
 import { signupRequiredForPremium } from "@/config/featureFlags"
 import PhaseProgressOverview from "@/components/PhaseProgressOverview"
+import QuickStartGuide from "@/components/home/QuickStartGuide"
+import CloudSectionCard from "@/components/home/CloudSectionCard"
+import { getLearningPhases } from "@/lib/learning/dashboard-phase-catalog"
 
 const isPremiumPhase = (phaseId: number) => phaseId > 1
 
@@ -47,92 +50,7 @@ export default function DashboardPage() {
     )
   }
 
-  const phases = [
-    {
-      id: 0,
-      icon: GraduationCap,
-      title: "Fundamentals",
-      description: "Essential building blocks: algorithms, data structures, callbacks, VMs, HTTP",
-      topics: ["Callbacks & Async", "Data Structures", "VMs & EC2", "HTTP Basics", "Git", "Algorithms"],
-      color: "from-green-500 to-emerald-500",
-      href: "/phase-0",
-      level: "Foundation",
-      levelIcon: BookOpen,
-      levelColor: "text-green-400",
-      estimatedTime: "1-2 hours",
-      skills: ["Callbacks", "Data Structures", "VMs", "HTTP", "Git Basics", "Algorithms"]
-    },
-    {
-      id: 1,
-      icon: Brain,
-      title: "Integration Mindset",
-      description: "Understand the 'why' behind integrations",
-      topics: ["REST, GraphQL, gRPC", "OpenAPI & protobuf", "Loose coupling & idempotency"],
-      color: "from-blue-500 to-cyan-500",
-      href: "/phase-1",
-      level: "Beginner",
-      levelIcon: Star,
-      levelColor: "text-green-400",
-      estimatedTime: "2-3 hours",
-      skills: ["API Fundamentals", "HTTP Methods", "JSON/XML", "Basic Authentication"]
-    },
-    {
-      id: 2,
-      icon: Plug,
-      title: "Third-Party Integrations",
-      description: "Safely connect and maintain external APIs",
-      topics: ["OAuth2 & JWTs", "Resilience patterns", "Data transformation"],
-      color: "from-purple-500 to-pink-500",
-      href: "/phase-2",
-      level: "Intermediate",
-      levelIcon: Shield,
-      levelColor: "text-blue-400",
-      estimatedTime: "3-4 hours",
-      skills: ["OAuth2", "JWT Tokens", "Rate Limiting", "Error Handling"]
-    },
-    {
-      id: 3,
-      icon: Network,
-      title: "Inter-Service Communication",
-      description: "Master service-to-service patterns",
-      topics: ["Sync vs async", "Event-driven with Kafka", "Distributed tracing"],
-      color: "from-orange-500 to-red-500",
-      href: "/phase-3",
-      level: "Advanced",
-      levelIcon: Zap,
-      levelColor: "text-orange-400",
-      estimatedTime: "4-5 hours",
-      skills: ["Microservices", "Event Streaming", "Circuit Breakers", "Distributed Tracing"]
-    },
-    {
-      id: 4,
-      icon: Compass,
-      title: "Principal-Level Architecture",
-      description: "Think like an integration architect",
-      topics: ["Constraint-driven design", "API algorithmic thinking", "Anti-patterns", "Contract testing"],
-      color: "from-green-500 to-emerald-500",
-      href: "/phase-4",
-      level: "Expert",
-      levelIcon: Target,
-      levelColor: "text-purple-400",
-      estimatedTime: "5-6 hours",
-      skills: ["Constraint Analysis", "System Design", "Algorithmic Reasoning", "Trade-off Reasoning", "Legacy Migration"]
-    },
-    {
-      id: 5,
-      icon: BrainCircuit,
-      title: "API Algorithms",
-      description: "Master theory by mapping algorithmic thinking to production system design",
-      topics: ["Idempotency & hash maps", "Priority queues", "Rate limiting windows", "Trade-off analysis"],
-      color: "from-cyan-500 to-blue-500",
-      href: "/phase-5",
-      level: "Architect",
-      levelIcon: Target,
-      levelColor: "text-cyan-300",
-      estimatedTime: "4-5 hours",
-      skills: ["Algorithmic Reasoning", "Failure Modeling", "Performance Trade-offs", "Architecture Decisions"]
-    }
-  ]
+  const phases = getLearningPhases(true)
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
@@ -325,90 +243,11 @@ export default function DashboardPage() {
         </div>
       </section>
 
-      {/* Cloud Section Card */}
-      <section className="container mx-auto px-6 py-8">
-        <div className="text-center mb-8">
-          <h2 className="text-3xl font-bold text-white mb-4">Cloud Migration</h2>
-          <p className="text-gray-300 max-w-2xl mx-auto">
-            Learn how to migrate your applications to AWS cloud
-          </p>
-        </div>
-        <Link href={isPremium ? "/cloud" : "/upgrade"}>
-          <div className="group bg-slate-800/50 backdrop-blur-sm rounded-2xl p-8 border-2 border-slate-700 hover:border-orange-500 transition-all hover:shadow-2xl hover:scale-105 cursor-pointer relative overflow-hidden max-w-4xl mx-auto">
-            <div className="absolute inset-0 bg-gradient-to-br from-transparent via-transparent to-orange-500/20 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-            {!isPremium && (
-              <div className="absolute top-4 right-4">
-                <Lock className="w-5 h-5 text-yellow-400" />
-              </div>
-            )}
-            <div className="relative z-10">
-              <div className="flex items-start justify-between mb-4">
-                <div className="inline-flex p-3 rounded-lg bg-gradient-to-r from-orange-500 to-red-500 mb-4">
-                  <Cloud className="w-8 h-8 text-white" />
-                </div>
-                <div className="flex items-center gap-2">
-                  <Target className="w-4 h-4 text-orange-400" />
-                  <span className="text-sm font-semibold text-orange-400">
-                    Cloud
-                  </span>
-                </div>
-              </div>
-
-              <div className="mb-4">
-                <div className="text-sm font-semibold text-gray-400 mb-1">
-                  Cloud Section
-                </div>
-                <h3 className="text-2xl font-bold text-white mb-2">
-                  AWS Cloud Migration
-                </h3>
-                <p className="text-gray-400 mb-4">
-                  Master AWS cloud integration and learn how to migrate your applications to the cloud
-                </p>
-              </div>
-
-              <div className="flex flex-wrap gap-2 mb-4">
-                <span className="px-2 py-1 bg-slate-700/50 text-xs text-gray-300 rounded">
-                  AWS Services
-                </span>
-                <span className="px-2 py-1 bg-slate-700/50 text-xs text-gray-300 rounded">
-                  Migration Strategies
-                </span>
-                <span className="px-2 py-1 bg-slate-700/50 text-xs text-gray-300 rounded">
-                  Cost Optimization
-                </span>
-                <span className="px-2 py-1 bg-slate-700/50 text-xs text-gray-300 rounded">
-                  Architecture
-                </span>
-              </div>
-
-              <div className="space-y-2 mb-6">
-                <div className="flex items-center text-sm text-gray-300">
-                  <span className="w-1.5 h-1.5 rounded-full bg-gradient-to-r from-orange-500 to-red-500 mr-2"></span>
-                  EC2, S3, RDS, Lambda, API Gateway
-                </div>
-                <div className="flex items-center text-sm text-gray-300">
-                  <span className="w-1.5 h-1.5 rounded-full bg-gradient-to-r from-orange-500 to-red-500 mr-2"></span>
-                  Lift & Shift, Re-platform, Refactor
-                </div>
-                <div className="flex items-center text-sm text-gray-300">
-                  <span className="w-1.5 h-1.5 rounded-full bg-gradient-to-r from-orange-500 to-red-500 mr-2"></span>
-                  Migration Dashboard & Tools
-                </div>
-              </div>
-
-              <div className="flex items-center justify-between">
-                <div className="text-xs text-gray-500">
-                  ⏱️ Self-paced
-                </div>
-                <div className={`font-semibold flex items-center group-hover:gap-2 transition-all ${isPremium ? "text-orange-400" : "text-yellow-400"}`}>
-                  {isPremium ? "Explore Cloud" : "Upgrade to unlock"}
-                  <span className="ml-2 group-hover:translate-x-1 transition-transform">→</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </Link>
-      </section>
+      <CloudSectionCard
+        href={isPremium ? "/cloud" : "/upgrade"}
+        locked={!isPremium}
+        ctaText={isPremium ? "Explore Cloud" : "Upgrade to unlock"}
+      />
 
       {/* AI Section Card */}
       <section className="container mx-auto px-6 py-8">
@@ -499,59 +338,7 @@ export default function DashboardPage() {
         </Link>
       </section>
 
-      {/* Quick Start Section */}
-      <section className="container mx-auto px-6 py-16">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold text-white mb-4">Quick Start Guide</h2>
-          <p className="text-gray-300 max-w-2xl mx-auto">
-            New to API integrations? Start here for a guided introduction to the fundamentals.
-          </p>
-        </div>
-        
-        <div className="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto">
-          <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border border-slate-700 text-center">
-            <BookOpen className="w-12 h-12 text-blue-400 mx-auto mb-4" />
-            <h3 className="text-xl font-bold text-white mb-2">Read the Docs</h3>
-            <p className="text-gray-400 text-sm mb-4">
-              Start with our comprehensive documentation covering all integration patterns.
-            </p>
-            <Link 
-              href="/phase-1"
-              className="inline-flex items-center text-blue-400 hover:text-blue-300 font-semibold"
-            >
-              Read More <ArrowRight className="w-4 h-4 ml-1" />
-            </Link>
-          </div>
-          
-          <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border border-slate-700 text-center">
-            <Play className="w-12 h-12 text-purple-400 mx-auto mb-4" />
-            <h3 className="text-xl font-bold text-white mb-2">Try Interactive Demos</h3>
-            <p className="text-gray-400 text-sm mb-4">
-              Hands-on experience with real API calls and interactive examples.
-            </p>
-            <Link 
-              href="/phase-1/categories"
-              className="inline-flex items-center text-purple-400 hover:text-purple-300 font-semibold"
-            >
-              Try Demos <ArrowRight className="w-4 h-4 ml-1" />
-            </Link>
-          </div>
-          
-          <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border border-slate-700 text-center">
-            <Network className="w-12 h-12 text-green-400 mx-auto mb-4" />
-            <h3 className="text-xl font-bold text-white mb-2">Monitor Progress</h3>
-            <p className="text-gray-400 text-sm mb-4">
-              Track your learning with real-time metrics and observability tools.
-            </p>
-            <Link 
-              href="/observability"
-              className="inline-flex items-center text-green-400 hover:text-green-300 font-semibold"
-            >
-              View Dashboard <ArrowRight className="w-4 h-4 ml-1" />
-            </Link>
-          </div>
-        </div>
-      </section>
+      <QuickStartGuide />
     </div>
   )
 }

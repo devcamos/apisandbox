@@ -8,7 +8,7 @@ import PhaseLayout from "@/components/PhaseLayout"
 import Phase5NotFound from "@/components/phase-5/Phase5NotFound"
 import LearningStructureCard from "@/components/phase-5/LearningStructureCard"
 import LinkedStrategyList from "@/components/phase-5/LinkedStrategyList"
-import { CompactBulletListCard } from "@/components/phase-5/BulletListCard"
+import LearnDoSection from "@/components/phase-5/LearnDoSection"
 import {
   getPatternNode,
   getPatternPracticeProblem,
@@ -87,24 +87,7 @@ export default function MappedProblemPage() {
           </section>
         )}
 
-        <section className="grid lg:grid-cols-2 gap-4">
-          <CompactBulletListCard
-            heading="What to learn"
-            items={mappedProblem.learn}
-            containerClass="bg-emerald-500/10 border border-emerald-500/30 rounded-xl p-4"
-            headingClass="text-xs text-emerald-300 mb-2"
-            listClass="space-y-1.5 text-sm text-emerald-100"
-            dotClass="mt-1.5 h-1.5 w-1.5 rounded-full bg-emerald-300"
-          />
-          <CompactBulletListCard
-            heading="What to do"
-            items={mappedProblem.do}
-            containerClass="bg-cyan-500/10 border border-cyan-500/30 rounded-xl p-4"
-            headingClass="text-xs text-cyan-300 mb-2"
-            listClass="space-y-1.5 text-sm text-cyan-100"
-            dotClass="mt-1.5 h-1.5 w-1.5 rounded-full bg-cyan-300"
-          />
-        </section>
+        <LearnDoSection learn={mappedProblem.learn} doItems={mappedProblem.do} />
       </PhaseLayout>
     </SubscriptionGate>
   )
