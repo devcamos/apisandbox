@@ -47,6 +47,19 @@ Use the same **`sonar-project.properties`** as CI so results match.
 5. **Branch / target**  
    The script sets **`sonar.branch.name`** from the current Git branch and **`sonar.branch.target`** to **`main`** (override with **`SONAR_BRANCH_NAME`** / **`SONAR_BRANCH_TARGET`** if your default branch differs).
 
+## IDE: catch issues before the Quality Gate
+
+Install **SonarQube for IDE** (Sonar’s official extension; often still listed as *SonarLint* in marketplaces). In **Connected mode**, the IDE uses the same SonarCloud **quality profile** and rules as the server, so many bugs, hotspots, and smells show up **while you edit**, instead of only after push.
+
+1. Install the extension for your editor ([VS Code](https://marketplace.visualstudio.com/items?itemName=SonarSource.sonarlint-vscode), [JetBrains](https://plugins.jetbrains.com/plugin/7973-sonarlint), [Visual Studio](https://marketplace.visualstudio.com/items?itemName=SonarSource.SonarLintforVisualStudio2022), [Eclipse](https://marketplace.eclipse.org/content/sonarlint-eclipse)).
+2. Open **Connected mode** / **SonarQube Cloud** setup in the extension UI.
+3. Add a connection with a **user token** from SonarCloud → **My Account** → **Security** (same kind of token as for local scan; not a CI-only project token unless your org allows it).
+4. Bind this repo’s folder to SonarCloud project **`devcamos_apisandbox`**, organization **`devcamos`** (see root **`sonar-project.properties`**).
+
+Docs: [Connected mode (VS Code)](https://docs.sonarsource.com/sonarqube-for-ide/vs-code/team-features/connected-mode-setup), [IntelliJ](https://docs.sonarsource.com/sonarqube-for-ide/intellij/team-features/connected-mode), [Visual Studio](https://docs.sonarsource.com/sonarqube-for-ide/visual-studio/team-features/connected-mode).
+
+**Together:** IDE for fast feedback on rules and issues → **`npm run sonar:local:full`** to verify coverage + full analysis → **CI** for the authoritative Quality Gate.
+
 ## Mapping “A → B”
 
 | Condition (example) | Stricter (release) | Pragmatic (while fixing) |
