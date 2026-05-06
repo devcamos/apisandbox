@@ -11,10 +11,10 @@ interface ApiKeyTesterProps {
 export default function ApiKeyTester({ title, description }: ApiKeyTesterProps) {
   const [mode, setMode] = useState<"mock" | "real">("mock");
   const [apiKey, setApiKey] = useState(() => {
-    if (typeof window !== 'undefined') {
-      return localStorage.getItem('openweather_api_key') || '';
+    if (typeof window !== "undefined") {
+      return sessionStorage.getItem("openweather_api_key_session") || "";
     }
-    return '';
+    return "";
   });
   const [showConfig, setShowConfig] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -25,7 +25,7 @@ export default function ApiKeyTester({ title, description }: ApiKeyTesterProps) 
 
   const saveApiKey = () => {
     if (typeof window !== 'undefined') {
-      localStorage.setItem('openweather_api_key', apiKey);
+      sessionStorage.setItem('openweather_api_key_session', apiKey);
     }
   };
 
@@ -197,7 +197,7 @@ export default function ApiKeyTester({ title, description }: ApiKeyTesterProps) 
               <div className="p-3 bg-blue-500/10 border border-blue-500/20 rounded">
                 <p className="text-xs text-gray-300">
                   <Key className="w-3 h-3 inline mr-1" />
-                  <strong>Privacy:</strong> Your API key is stored locally in your browser only.
+                  <strong>Privacy:</strong> Your API key is stored in session storage for this tab only.
                   Get a free key at{" "}
                   <a
                     href="https://openweathermap.org/api"

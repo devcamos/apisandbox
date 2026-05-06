@@ -46,13 +46,18 @@ export default function OAuth2Simulator({ title, description }: OAuth2SimulatorP
 
   const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
+  const randomBase36 = (length: number) => {
+    const bytes = new Uint8Array(length);
+    crypto.getRandomValues(bytes);
+    return Array.from(bytes, (byte) => (byte % 36).toString(36)).join("");
+  };
+
   const generateRandomCode = () => {
-    return 'AUTH_' + Math.random().toString(36).substring(2, 15);
+    return `AUTH_${randomBase36(13)}`;
   };
 
   const generateRandomToken = () => {
-    return 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.' + 
-           Math.random().toString(36).substring(2, 15);
+    return `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.${randomBase36(13)}`;
   };
 
   const steps = [
