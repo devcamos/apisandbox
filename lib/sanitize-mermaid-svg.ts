@@ -18,7 +18,7 @@ export function mountSanitizedMermaidSvg(container: HTMLElement, svg: string): v
     return
   }
   const root = doc.documentElement
-  if (!root || root.tagName.toLowerCase() !== "svg") {
+  if (root?.tagName.toLowerCase() !== "svg") {
     container.replaceChildren()
     return
   }

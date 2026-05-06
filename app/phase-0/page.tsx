@@ -4,7 +4,7 @@ import PhaseLayout from "@/components/PhaseLayout";
 import ConceptCard from "@/components/ConceptCard";
 import PhaseQuiz from "@/components/PhaseQuiz";
 import { LessonTracker } from "@/components/LessonTracker";
-import { BookOpen, Code, Server, Database, GitBranch, Zap, RefreshCw, Lock, type LucideIcon } from "lucide-react";
+import { BookOpen, Code, Server, Database, GitBranch, Zap, RefreshCw, type LucideIcon } from "lucide-react";
 import { useState } from "react";
 
 const springTabs: { id: string; label: string; icon: LucideIcon; items: { term: string; desc: string }[] }[] = [
@@ -49,7 +49,6 @@ const springTabs: { id: string; label: string; icon: LucideIcon; items: { term: 
 export default function Phase0() {
   const [activeSpringTab, setActiveSpringTab] = useState("async");
   const activePanel = springTabs.find((t) => t.id === activeSpringTab)!;
-  const ActiveIcon = activePanel.icon;
 
   return (
     <PhaseLayout

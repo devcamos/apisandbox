@@ -77,12 +77,11 @@ export async function checkPhaseAccess(
 
   if (phaseNumber === 0 || phaseNumber === 1 || phaseNumber === 7 || phaseNumber === 8) {
     hasAccess = true
-  } else if (phaseNumber === "cloud" || phaseNumber === "ai") {
-    // Cloud and AI sections require premium
-    hasAccess = effectiveTier === "PREMIUM"
-    upgradeRequired = !hasAccess
-  } else if (phaseNumber >= 2 && phaseNumber <= 5) {
-    // Phases 2-5 require premium
+  } else if (
+    phaseNumber === "cloud" ||
+    phaseNumber === "ai" ||
+    (typeof phaseNumber === "number" && phaseNumber >= 2 && phaseNumber <= 5)
+  ) {
     hasAccess = effectiveTier === "PREMIUM"
     upgradeRequired = !hasAccess
   }

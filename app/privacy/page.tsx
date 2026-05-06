@@ -55,7 +55,7 @@ export default function PrivacyPage() {
               rel="noopener noreferrer"
             >
               Stripe Privacy Policy
-            </a>
+            </a>{" "}
             )
           </li>
           <li>
@@ -67,7 +67,7 @@ export default function PrivacyPage() {
               rel="noopener noreferrer"
             >
               Vercel Privacy Policy
-            </a>
+            </a>{" "}
             )
           </li>
           <li><strong>Resend:</strong> transactional email delivery</li>

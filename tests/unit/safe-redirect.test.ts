@@ -14,7 +14,7 @@ describe("isSafeRelativeCallbackPath", () => {
   it("rejects open-redirect patterns", () => {
     expect(isSafeRelativeCallbackPath("//evil.com")).toBe(false)
     expect(isSafeRelativeCallbackPath("https://evil.com")).toBe(false)
-    expect(isSafeRelativeCallbackPath("/\\evil")).toBe(false)
+    expect(isSafeRelativeCallbackPath(String.raw`/\evil`)).toBe(false)
     expect(isSafeRelativeCallbackPath("relative")).toBe(false)
   })
 })

@@ -318,10 +318,9 @@ export function LessonTracker({ phase }: LessonTrackerProps) {
 
       {isOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div
-            className="absolute inset-0 bg-black/80 backdrop-blur-sm"
-            role="button"
-            tabIndex={0}
+          <button
+            type="button"
+            className="absolute inset-0 bg-black/80 backdrop-blur-sm cursor-default border-0 p-0 appearance-none"
             aria-label="Close lesson dialog"
             onClick={() => setIsOpen(false)}
             onKeyDown={(e) => {
@@ -570,7 +569,7 @@ export function LessonTracker({ phase }: LessonTrackerProps) {
                                     />
 
                                     <label className="block text-xs text-gray-400">
-                                      Project evidence
+                                      <span className="block mb-1">Project evidence</span>
                                       <input
                                         id={`lt-evidence-${module.id}-${checkpoint.id}`}
                                         value={state.evidence}

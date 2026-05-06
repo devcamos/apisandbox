@@ -43,8 +43,7 @@ async function main() {
     {
       email: "test@example.com",
       name: "Test User",
-      // NOSONAR — synthetic users for empty local DB only; override with ENSURE_TEST_USERS_PASSWORD
-      password: process.env.ENSURE_TEST_USERS_PASSWORD || "Test1234!@#$",
+      password: process.env.ENSURE_TEST_USERS_PASSWORD || "Test1234!@#$", // NOSONAR S2068 — local-only script; set ENSURE_TEST_USERS_PASSWORD
     },
     {
       email: "qa@example.com",

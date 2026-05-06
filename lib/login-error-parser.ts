@@ -12,112 +12,143 @@ export interface LoginErrorInfo {
   suggestion?: string
 }
 
+const COLON_DIGITS = /:(\d+)/
+const ATTEMPTS_IN_MESSAGE = /(\d+)\s*attempt/i
+const MINUTES_IN_MESSAGE = /(\d+)\s*minute/i
+
 function parseAccountLockedPrefix(message: string): LoginErrorInfo | null {
-  if (!message.startsWith("ACCOUNT_LOCKED")) return null
-  const minutesMatch = message.match(/:(\d+)/)
-  const minutes = minutesMatch ? minutesMatch[1] : "30"
-  return {
-    message: "Account temporarily locked",
-    type: "account",
-    recoverable: true,
-    suggestion: `Your account has been temporarily locked due to multiple failed login attempts. Please wait ${minutes} minute${minutes !== "1" ? "s" : ""} before trying again, or contact support if you need immediate access.`,
+  if (message.startsWith("ACCOUNT_LOCKED")) {
+    const m = COLON_DIGITS.exec(message)
+    const minutes = m ? m[1] : "30"
+    const minuteWord = minutes === "1" ? "minute" : "minutes"
+    return {
+      message: "Account temporarily locked",
+      type: "account",
+      recoverable: true,
+      suggestion: `Your account has been temporarily locked due to multiple failed login attempts. Please wait ${minutes} ${minuteWord} before trying again, or contact support if you need immediate access.`,
+    }
   }
+  return null
+}
+
+function passwordIncorrectAttemptsHint(attemptsRemaining: string): string {
+  if (attemptsRemaining === "0") return ""
+  const plural = attemptsRemaining === "1" ? "" : "s"
+  return `You have ${attemptsRemaining} attempt${plural} remaining before your account is locked. `
 }
 
 function parsePasswordIncorrectPrefix(message: string): LoginErrorInfo | null {
-  if (!message.startsWith("PASSWORD_INCORRECT")) return null
-  const attemptsMatch = message.match(/:(\d+)/)
-  const attemptsRemaining = attemptsMatch ? attemptsMatch[1] : "0"
-  return {
-    message: "Incorrect password",
-    type: "authentication",
-    recoverable: true,
-    suggestion: `The password you entered is incorrect. ${attemptsRemaining !== "0" ? `You have ${attemptsRemaining} attempt${attemptsRemaining !== "1" ? "s" : ""} remaining before your account is locked. ` : ""}Please check your password or use "Forgot password" to reset it.`,
+  if (message.startsWith("PASSWORD_INCORRECT")) {
+    const m = COLON_DIGITS.exec(message)
+    const attemptsRemaining = m ? m[1] : "0"
+    const hint = passwordIncorrectAttemptsHint(attemptsRemaining)
+    return {
+      message: "Incorrect password",
+      type: "authentication",
+      recoverable: true,
+      suggestion: `The password you entered is incorrect. ${hint}Please check your password or use "Forgot password" to reset it.`,
+    }
   }
+  return null
 }
 
 function parseCredentialsInvalid(message: string): LoginErrorInfo | null {
-  if (message !== "CREDENTIALS_INVALID") return null
-  return {
-    message: "Invalid login credentials",
-    type: "authentication",
-    recoverable: true,
-    suggestion:
-      "The email address or password you entered is incorrect. Please check both and try again. If you've forgotten your password, use the 'Forgot password' link below. If you don't have an account, please sign up.",
-  }
-}
-
-function parseDeactivated(message: string): LoginErrorInfo | null {
-  if (!message.includes("deactivated")) return null
-  return {
-    message: "Account deactivated",
-    type: "account",
-    recoverable: false,
-    suggestion: "Your account has been deactivated. Please contact support to reactivate your account.",
-  }
-}
-
-function parseOAuthHint(message: string): LoginErrorInfo | null {
-  if (!message.includes("OAuth") && !message.includes("Google")) return null
-  return {
-    message: "Account created with Google",
-    type: "authentication",
-    recoverable: true,
-    suggestion: "This account was created using Google sign-in. Please use the 'Sign in with Google' button below instead of email and password.",
-  }
-}
-
-function parseLegacyInvalidCredentials(message: string): LoginErrorInfo | null {
-  if (!message.includes("Invalid email or password") && !message.includes("invalid")) return null
-  const attemptsMatch = message.match(/(\d+)\s*attempt/i)
-  if (attemptsMatch) {
-    const attempts = attemptsMatch[1]
+  if (message === "CREDENTIALS_INVALID") {
     return {
       message: "Invalid login credentials",
       type: "authentication",
       recoverable: true,
-      suggestion: `${attempts} attempt${attempts !== "1" ? "s" : ""} remaining. The email address or password may be incorrect. Please check both, or use "Forgot password" to reset.`,
+      suggestion:
+        "The email address or password you entered is incorrect. Please check both and try again. If you've forgotten your password, use the 'Forgot password' link below. If you don't have an account, please sign up.",
     }
   }
-  return {
-    message: "Invalid login credentials",
-    type: "authentication",
-    recoverable: true,
-    suggestion:
-      "The email address or password you entered may be incorrect. Please check both and try again, or use 'Forgot password' to reset your password.",
+  return null
+}
+
+function parseDeactivated(message: string): LoginErrorInfo | null {
+  if (message.includes("deactivated")) {
+    return {
+      message: "Account deactivated",
+      type: "account",
+      recoverable: false,
+      suggestion: "Your account has been deactivated. Please contact support to reactivate your account.",
+    }
   }
+  return null
+}
+
+function parseOAuthHint(message: string): LoginErrorInfo | null {
+  if (message.includes("OAuth") || message.includes("Google")) {
+    return {
+      message: "Account created with Google",
+      type: "authentication",
+      recoverable: true,
+      suggestion: "This account was created using Google sign-in. Please use the 'Sign in with Google' button below instead of email and password.",
+    }
+  }
+  return null
+}
+
+function parseLegacyInvalidCredentials(message: string): LoginErrorInfo | null {
+  if (message.includes("Invalid email or password") || message.includes("invalid")) {
+    const attemptsMatch = ATTEMPTS_IN_MESSAGE.exec(message)
+    if (attemptsMatch) {
+      const attempts = attemptsMatch[1]
+      const plural = attempts === "1" ? "" : "s"
+      return {
+        message: "Invalid login credentials",
+        type: "authentication",
+        recoverable: true,
+        suggestion: `${attempts} attempt${plural} remaining. The email address or password may be incorrect. Please check both, or use "Forgot password" to reset.`,
+      }
+    }
+    return {
+      message: "Invalid login credentials",
+      type: "authentication",
+      recoverable: true,
+      suggestion:
+        "The email address or password you entered may be incorrect. Please check both and try again, or use 'Forgot password' to reset your password.",
+    }
+  }
+  return null
 }
 
 function parseLegacyLockout(message: string): LoginErrorInfo | null {
-  if (!message.includes("locked") && !message.includes("lockout")) return null
-  const minutesMatch = message.match(/(\d+)\s*minute/i)
-  const minutes = minutesMatch ? minutesMatch[1] : "30"
-  return {
-    message: "Account temporarily locked",
-    type: "account",
-    recoverable: true,
-    suggestion: `Your account is temporarily locked. Please wait ${minutes} minutes or contact support if you need immediate access.`,
+  if (message.includes("locked") || message.includes("lockout")) {
+    const minutesMatch = MINUTES_IN_MESSAGE.exec(message)
+    const minutes = minutesMatch ? minutesMatch[1] : "30"
+    return {
+      message: "Account temporarily locked",
+      type: "account",
+      recoverable: true,
+      suggestion: `Your account is temporarily locked. Please wait ${minutes} minutes or contact support if you need immediate access.`,
+    }
   }
+  return null
 }
 
 function parseRequiredFields(message: string): LoginErrorInfo | null {
-  if (!message.includes("required")) return null
-  return {
-    message,
-    type: "validation",
-    recoverable: true,
-    suggestion: "Please fill in all required fields.",
+  if (message.includes("required")) {
+    return {
+      message,
+      type: "validation",
+      recoverable: true,
+      suggestion: "Please fill in all required fields.",
+    }
   }
+  return null
 }
 
 function parseNetwork(message: string): LoginErrorInfo | null {
-  if (!message.includes("network") && !message.includes("fetch") && !message.includes("timeout")) return null
-  return {
-    message: "Network error. Please check your connection.",
-    type: "network",
-    recoverable: true,
-    suggestion: "Check your internet connection and try again. If the problem persists, please try again in a few moments.",
+  if (message.includes("network") || message.includes("fetch") || message.includes("timeout")) {
+    return {
+      message: "Network error. Please check your connection.",
+      type: "network",
+      recoverable: true,
+      suggestion: "Check your internet connection and try again. If the problem persists, please try again in a few moments.",
+    }
   }
+  return null
 }
 
 const parsers: Array<(message: string) => LoginErrorInfo | null> = [

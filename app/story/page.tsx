@@ -88,8 +88,8 @@ export default function StoryPage() {
         router.back()
       }
     }
-    window.addEventListener("keydown", handleKeyDown)
-    return () => window.removeEventListener("keydown", handleKeyDown)
+    globalThis.addEventListener("keydown", handleKeyDown)
+    return () => globalThis.removeEventListener("keydown", handleKeyDown)
   }, [goNext, goPrev, router])
 
   const ActiveSlide = slides[current]
@@ -143,9 +143,9 @@ export default function StoryPage() {
 
           {/* Dot indicators */}
           <div className="flex items-center gap-2.5">
-            {storySlides.map((_, i) => (
+            {storySlides.map((slide, i) => (
               <button
-                key={i}
+                key={`story-nav-${slide.id}`}
                 onClick={() => goToSlide(i)}
                 aria-label={`Go to page ${i + 1}`}
                 className="group relative p-1"

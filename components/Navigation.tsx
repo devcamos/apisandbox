@@ -163,13 +163,7 @@ export default function Navigation() {
                               >
                                 <div className="flex items-center justify-between">
                                   <span className="text-sm">{item.name}</span>
-                                  <span className={`text-xs px-2 py-0.5 rounded ${
-                                    item.badge === "Free"
-                                      ? "bg-green-500/20 text-green-400"
-                                      : item.badge === "Docs"
-                                        ? "bg-slate-500/30 text-slate-300"
-                                        : "bg-purple-500/20 text-purple-400"
-                                  }`}>
+                                  <span className={`text-xs px-2 py-0.5 rounded ${mobileExploreBadgeClass(item.badge)}`}>
                                     {item.badge}
                                   </span>
                                 </div>

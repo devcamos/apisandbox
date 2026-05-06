@@ -114,7 +114,7 @@ const traversalMeta: Record<TraversalAlgorithm, { label: string; description: st
   "dfs-postorder": { label: "DFS Post-Order", description: "Post-order visits left subtree, right subtree, then the node. Used for deletion and expression trees." },
 }
 
-function NodeSphere({ node, status, onHover }: { node: TreeNode; status: NodeTraversalStatus; onHover: (id: number | null) => void }) {
+function NodeSphere({ node, status, onHover }: Readonly<{ node: TreeNode; status: NodeTraversalStatus; onHover: (id: number | null) => void }>) {
   const meshRef = useRef<THREE.Mesh>(null)
   const baseColor = useMemo(() => {
     switch (status) {
@@ -134,7 +134,7 @@ function NodeSphere({ node, status, onHover }: { node: TreeNode; status: NodeTra
   return (
     <group position={[node.x, node.y, node.z]}>
       <mesh ref={meshRef} onPointerOver={() => onHover(node.id)} onPointerOut={() => onHover(null)}>
-        <primitive object={new THREE.SphereGeometry(0.3, 16, 16)} attach="geometry" />
+        <sphereGeometry args={[0.3, 16, 16]} />
         <meshStandardMaterial color={baseColor} roughness={0.3} metalness={0.6} />
       </mesh>
       <Text position={[0, 0, 0.35]} fontSize={0.2} color="white" anchorX="center" anchorY="middle" font={undefined}>

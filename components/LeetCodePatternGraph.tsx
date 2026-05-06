@@ -65,7 +65,7 @@ export default function LeetCodePatternGraph() {
   const related = useMemo(() => collectNeighbors(selected), [selected])
 
   useEffect(() => {
-    if (typeof globalThis.window === "undefined") return
+    if (globalThis.window === undefined) return
     try {
       const raw = localStorage.getItem(PATTERN_PROGRESS_STORAGE_KEY)
       if (!raw) return
@@ -77,7 +77,7 @@ export default function LeetCodePatternGraph() {
   }, [])
 
   useEffect(() => {
-    if (typeof globalThis.window === "undefined") return
+    if (globalThis.window === undefined) return
     localStorage.setItem(PATTERN_PROGRESS_STORAGE_KEY, JSON.stringify(progress))
   }, [progress])
 

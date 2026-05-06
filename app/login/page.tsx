@@ -217,7 +217,10 @@ function LoginForm() {
       gsi.initialize({
         client_id: googleClientId,
         callback: (response: { credential: string }) => {
-          if (response.credential) void handleGoogleCredential(response.credential)
+          const cred = response.credential
+          if (cred) {
+            handleGoogleCredential(cred).catch(() => {})
+          }
         },
       })
       gsi.renderButton(el, {
