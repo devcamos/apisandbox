@@ -18,7 +18,7 @@ function EffortBadge({ level }: Readonly<{ level: MonetisationPath["effortLevel"
   );
 }
 
-function PathCard({ path, isSelected, onSelect }: { path: MonetisationPath; isSelected: boolean; onSelect: () => void }) {
+function PathCard({ path, isSelected, onSelect }: Readonly<{ path: MonetisationPath; isSelected: boolean; onSelect: () => void }>) {
   return (
     <button
       onClick={onSelect}
@@ -52,7 +52,7 @@ function PathCard({ path, isSelected, onSelect }: { path: MonetisationPath; isSe
   );
 }
 
-function PathDetail({ path }: { path: MonetisationPath }) {
+function PathDetail({ path }: Readonly<{ path: MonetisationPath }>) {
   const [activeTab, setActiveTab] = useState<"overview" | "start" | "tech" | "examples">("overview");
 
   const tabs = [

@@ -291,11 +291,11 @@ function AlgorithmList({
   category,
   onSelect,
   onClose,
-}: {
+}: Readonly<{
   category: Category
   onSelect: (id: string) => void
   onClose: () => void
-}) {
+}>) {
   const c = colorMap[category.color]
   const Icon = category.icon
 
@@ -394,13 +394,13 @@ function InteractiveLayer({
   onBack,
   onClose,
   onRegisterTabVisit,
-}: {
+}: Readonly<{
   category: Category
   algorithm: AlgorithmKnowledge
   onBack: () => void
   onClose: () => void
   onRegisterTabVisit?: (categoryId: string, algorithmId: string, tab: string) => void
-}) {
+}>) {
   const c = colorMap[category.color]
   const Icon = category.icon
   const isSearching = category.id === "searching"
@@ -573,7 +573,7 @@ function InteractiveLayer({
   )
 }
 
-function RealWorldPanel({ mappings, algorithmName }: { mappings: RealWorldMapping[]; algorithmName: string }) {
+function RealWorldPanel({ mappings, algorithmName }: Readonly<{ mappings: RealWorldMapping[]; algorithmName: string }>) {
   return (
     <div className="space-y-4">
       <div className="flex items-center gap-2 mb-1">
@@ -599,11 +599,11 @@ function VariationsPanel({
   variations,
   algorithmName,
   color,
-}: {
+}: Readonly<{
   variations: Variation[]
   algorithmName: string
   color: { bg: string; border: string; text: string; badge: string; activeBg: string; activeBorder: string; ring: string; glow: string }
-}) {
+}>) {
   return (
     <div className="space-y-4">
       <div className="flex items-center gap-2 mb-1">

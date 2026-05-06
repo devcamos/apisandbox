@@ -5,7 +5,7 @@ import PhaseLayout from "@/components/PhaseLayout";
 import { Database, ArrowRight, Flame, ChevronDown, ExternalLink, AlertTriangle } from "lucide-react";
 import { dsCategories, type DSCategory } from "@/lib/learning/data-science-production";
 
-function CategoryCard({ cat, isSelected, onSelect }: { cat: DSCategory; isSelected: boolean; onSelect: () => void }) {
+function CategoryCard({ cat, isSelected, onSelect }: Readonly<{ cat: DSCategory; isSelected: boolean; onSelect: () => void }>) {
   return (
     <button
       onClick={onSelect}
@@ -29,7 +29,7 @@ function CategoryCard({ cat, isSelected, onSelect }: { cat: DSCategory; isSelect
   );
 }
 
-function CategoryDetail({ cat }: { cat: DSCategory }) {
+function CategoryDetail({ cat }: Readonly<{ cat: DSCategory }>) {
   const [activeTab, setActiveTab] = useState<"overview" | "pipeline" | "tech" | "pitfalls">("overview");
 
   const tabs = [
