@@ -4,6 +4,7 @@ import { motion } from "framer-motion"
 import { Hash, GitBranch, ListOrdered, Network } from "lucide-react"
 import StorySlide, { childVariants } from "./StorySlide"
 import { storySlides } from "@/lib/learning/intro-story-content"
+import { StoryBodyParagraphs, StoryTitle } from "./StorySlideShells"
 
 const dsIcons = [
   { icon: Hash, label: "Hash Map", color: "text-emerald-300", delay: 0.8 },
@@ -101,22 +102,8 @@ export default function AlgorithmsSlide() {
         ))}
       </motion.div>
 
-      <motion.h1
-        className="text-4xl md:text-5xl font-bold text-white"
-        variants={childVariants}
-      >
-        {slide.title}
-      </motion.h1>
-
-      {slide.body.map((line) => (
-        <motion.p
-          key={line}
-          className="text-xl md:text-2xl text-gray-300 leading-relaxed"
-          variants={childVariants}
-        >
-          {line}
-        </motion.p>
-      ))}
+      <StoryTitle title={slide.title} />
+      <StoryBodyParagraphs body={slide.body} keyPrefix="algorithms" />
     </StorySlide>
   )
 }

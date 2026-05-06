@@ -5,6 +5,7 @@ import { DoorOpen, ArrowRight, Sparkles } from "lucide-react"
 import Link from "next/link"
 import StorySlide, { childVariants } from "./StorySlide"
 import { storySlides } from "@/lib/learning/intro-story-content"
+import { StoryBodyParagraphs, StoryTitle } from "./StorySlideShells"
 
 const confettiColors = [
   "bg-cyan-400/30",
@@ -14,7 +15,7 @@ const confettiColors = [
   "bg-sky-400/25",
 ]
 
-function ConfettiParticle({ delay, x, color, size, spin }: { delay: number; x: string; color: string; size: number; spin: number }) {
+function ConfettiParticle({ delay, x, color, size, spin }: Readonly<{ delay: number; x: string; color: string; size: number; spin: number }>) {
   return (
     <motion.div
       className={`absolute rounded-sm ${color}`}
@@ -47,8 +48,8 @@ export default function SendoffSlide() {
 
   return (
     <StorySlide bg={slide.theme.bg}>
-      {confetti.map((c, i) => (
-        <ConfettiParticle key={i} {...c} />
+      {confetti.map((c) => (
+        <ConfettiParticle key={`${c.x}-${c.delay}-${c.size}`} {...c} />
       ))}
 
       <motion.div className="mb-4" variants={childVariants}>
@@ -67,22 +68,8 @@ export default function SendoffSlide() {
         </motion.div>
       </motion.div>
 
-      <motion.h1
-        className="text-4xl md:text-5xl font-bold text-white"
-        variants={childVariants}
-      >
-        {slide.title}
-      </motion.h1>
-
-      {slide.body.map((line, i) => (
-        <motion.p
-          key={i}
-          className="text-xl md:text-2xl text-gray-300 leading-relaxed"
-          variants={childVariants}
-        >
-          {line}
-        </motion.p>
-      ))}
+      <StoryTitle title={slide.title} />
+      <StoryBodyParagraphs body={slide.body} keyPrefix="sendoff" />
 
       <motion.div className="flex flex-col sm:flex-row items-center gap-4 mt-4" variants={childVariants}>
         <motion.div

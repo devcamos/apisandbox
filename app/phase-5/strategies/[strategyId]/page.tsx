@@ -5,6 +5,7 @@ import { useParams } from "next/navigation"
 import { ArrowLeft, BrainCircuit } from "lucide-react"
 import { SubscriptionGate } from "@/components/SubscriptionGate"
 import PhaseLayout from "@/components/PhaseLayout"
+import Phase5NotFound from "@/components/phase-5/Phase5NotFound"
 import {
   getLearningStrategy,
   getPatternNode,
@@ -18,16 +19,7 @@ export default function StrategyDetailPage() {
   const strategy = strategyId ? getLearningStrategy(strategyId) : null
 
   if (!strategy) {
-    return (
-      <SubscriptionGate phaseNumber={5} lockedContentName="Phase 5: API Algorithms">
-        <div className="min-h-screen bg-slate-900 text-white p-8">
-          <p className="mb-4">Strategy not found.</p>
-          <Link href="/phase-5" className="text-cyan-300 underline">
-            Back to Phase 5
-          </Link>
-        </div>
-      </SubscriptionGate>
-    )
+    return <Phase5NotFound message="Strategy not found." />
   }
 
   return (

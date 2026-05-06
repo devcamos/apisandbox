@@ -1,6 +1,7 @@
 import { Prisma } from "@prisma/client"
 import { prisma } from "@/lib/prisma"
 import { AppError } from "@/lib/http/errors"
+import { composeDisplayName } from "@/lib/user-name"
 
 interface BootstrapInput {
   email: string
@@ -9,10 +10,6 @@ interface BootstrapInput {
   lastName: string | null
   avatarUrl?: string | null
   forceBootstrapFailure?: boolean
-}
-
-function composeDisplayName(firstName: string | null, lastName: string | null) {
-  return [firstName, lastName].filter(Boolean).join(" ").trim() || null
 }
 
 export async function createUserWithInitialData(input: BootstrapInput) {

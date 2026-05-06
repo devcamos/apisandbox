@@ -4,6 +4,7 @@ import { motion } from "framer-motion"
 import { Hammer, Code, MessageCircle, Layers, Compass } from "lucide-react"
 import StorySlide, { childVariants } from "./StorySlide"
 import { storySlides } from "@/lib/learning/intro-story-content"
+import { StoryBodyParagraphs, StoryHeroIcon, StoryTitle } from "./StorySlideShells"
 
 const iconMap: Record<string, typeof Hammer> = {
   hammer: Hammer,
@@ -17,38 +18,19 @@ export default function CompletesSlide() {
 
   return (
     <StorySlide bg={slide.theme.bg}>
-      <motion.div variants={childVariants}>
-        <motion.div
-          className="w-20 h-20 rounded-full bg-teal-500/15 border border-teal-500/25 flex items-center justify-center"
-          animate={{
-            boxShadow: [
-              "0 0 20px rgba(20, 184, 166, 0.1)",
-              "0 0 40px rgba(20, 184, 166, 0.2)",
-              "0 0 20px rgba(20, 184, 166, 0.1)",
-            ],
-          }}
-          transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-        >
-          <Compass className="w-10 h-10 text-teal-400" />
-        </motion.div>
-      </motion.div>
+      <StoryHeroIcon
+        Icon={Compass}
+        containerClass="w-20 h-20 rounded-full bg-teal-500/15 border border-teal-500/25 flex items-center justify-center"
+        iconClass="w-10 h-10 text-teal-400"
+        glow={[
+          "0 0 20px rgba(20, 184, 166, 0.1)",
+          "0 0 40px rgba(20, 184, 166, 0.2)",
+          "0 0 20px rgba(20, 184, 166, 0.1)",
+        ]}
+      />
 
-      <motion.h1
-        className="text-4xl md:text-5xl font-bold text-white"
-        variants={childVariants}
-      >
-        {slide.title}
-      </motion.h1>
-
-      {slide.body.map((line, i) => (
-        <motion.p
-          key={i}
-          className="text-xl md:text-2xl text-gray-300 leading-relaxed"
-          variants={childVariants}
-        >
-          {line}
-        </motion.p>
-      ))}
+      <StoryTitle title={slide.title} />
+      <StoryBodyParagraphs body={slide.body} keyPrefix="completes" />
 
       <motion.div className="w-full space-y-3 mt-2" variants={childVariants}>
         {slide.completionPaths?.map((path, i) => {

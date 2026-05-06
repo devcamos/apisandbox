@@ -2,18 +2,10 @@ import { NextRequest } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { verifyJwtToken } from "@/lib/services/auth/token-service"
 import { AppError } from "@/lib/http/errors"
-
-function readTokenFromRequest(request: NextRequest) {
-  const authHeader = request.headers.get("authorization")
-  if (authHeader?.startsWith("Bearer ")) {
-    return authHeader.slice(7)
-  }
-  const cookieToken = request.cookies.get("auth_token")?.value
-  return cookieToken || null
-}
+import { readAuthToken } from "@/lib/http/auth-route-helpers"
 
 export async function requireAuthenticatedUser(request: NextRequest) {
-  const token = readTokenFromRequest(request)
+  const token = readAuthToken(request)
   if (!token) {
     throw new AppError("Missing auth token", 401, "auth_failure")
   }
@@ -30,4 +22,3 @@ export async function requireAuthenticatedUser(request: NextRequest) {
 
   return user
 }
-

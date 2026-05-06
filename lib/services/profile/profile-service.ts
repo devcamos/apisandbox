@@ -2,6 +2,7 @@ import fs from "fs/promises"
 import path from "node:path"
 import { prisma } from "@/lib/prisma"
 import { AppError } from "@/lib/http/errors"
+import { composeDisplayName } from "@/lib/user-name"
 
 interface UpdateProfileInput {
   firstName?: string | null
@@ -9,10 +10,6 @@ interface UpdateProfileInput {
   avatarUrl?: string | null
   roleLabel?: string | null
   identityStatement?: string | null
-}
-
-function normalizeDisplayName(firstName: string | null, lastName: string | null) {
-  return [firstName, lastName].filter(Boolean).join(" ").trim() || null
 }
 
 export async function getProfileByUserId(userId: string) {
@@ -52,7 +49,7 @@ export async function updateProfileByUserId(userId: string, updates: UpdateProfi
       where: { id: userId },
       data: {
         ...(updates.avatarUrl === undefined ? {} : { image: updates.avatarUrl }),
-        name: normalizeDisplayName(nextFirstName ?? null, nextLastName ?? null),
+        name: composeDisplayName(nextFirstName ?? null, nextLastName ?? null),
       },
     }),
   ])

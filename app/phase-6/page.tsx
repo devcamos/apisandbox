@@ -39,6 +39,7 @@ import {
 } from "@/lib/phase-6/algorithm-layer-tabs"
 import { useShinobiProgress } from "@/hooks/useShinobiProgress"
 import ShinobiLearningBoard from "@/components/phase-6/ShinobiLearningBoard"
+import AnimatedTabPanel from "@/components/phase-6/AnimatedTabPanel"
 
 const LAYER_TAB_ICONS: Record<LayerTab, LucideIcon> = {
   overview: BookOpen,
@@ -504,68 +505,33 @@ function InteractiveLayer({
       <div className="p-6">
         <AnimatePresence mode="wait">
           {activeTab === "overview" && (
-            <motion.div
-              key="overview"
-              data-testid="algorithm-layer-panel-overview"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.15 }}
-            >
+            <AnimatedTabPanel tabKey="overview" testId="algorithm-layer-panel-overview">
               <AlgorithmKnowledgePanel knowledge={algorithm} accentClass={c.text} />
-            </motion.div>
+            </AnimatedTabPanel>
           )}
 
           {activeTab === "visualizer" && (
-            <motion.div
-              key="visualizer"
-              data-testid="algorithm-layer-panel-visualizer"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.15 }}
-            >
+            <AnimatedTabPanel tabKey="visualizer" testId="algorithm-layer-panel-visualizer">
               {renderDemo(category.id, algorithm.id)}
-            </motion.div>
+            </AnimatedTabPanel>
           )}
 
           {isSearching && activeTab === "exercises" && (
-            <motion.div
-              key="exercises"
-              data-testid="algorithm-layer-panel-exercises"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.15 }}
-            >
+            <AnimatedTabPanel tabKey="exercises" testId="algorithm-layer-panel-exercises">
               <SearchMicroExercises />
-            </motion.div>
+            </AnimatedTabPanel>
           )}
 
           {isSearching && activeTab === "real-world" && algorithm.realWorld && (
-            <motion.div
-              key="real-world"
-              data-testid="algorithm-layer-panel-real-world"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.15 }}
-            >
+            <AnimatedTabPanel tabKey="real-world" testId="algorithm-layer-panel-real-world">
               <RealWorldPanel mappings={algorithm.realWorld} algorithmName={algorithm.name} />
-            </motion.div>
+            </AnimatedTabPanel>
           )}
 
           {isSearching && activeTab === "variations" && algorithm.variations && (
-            <motion.div
-              key="variations"
-              data-testid="algorithm-layer-panel-variations"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.15 }}
-            >
+            <AnimatedTabPanel tabKey="variations" testId="algorithm-layer-panel-variations">
               <VariationsPanel variations={algorithm.variations} algorithmName={algorithm.name} color={c} />
-            </motion.div>
+            </AnimatedTabPanel>
           )}
         </AnimatePresence>
       </div>

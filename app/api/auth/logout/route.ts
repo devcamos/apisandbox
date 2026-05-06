@@ -1,14 +1,6 @@
 import { okResponse } from "@/lib/http/responses"
+import { clearAuthCookie } from "@/lib/http/auth-route-helpers"
 
 export async function POST() {
-  const response = okResponse({ loggedOut: true })
-  response.cookies.set("auth_token", "", {
-    httpOnly: true,
-    sameSite: "lax",
-    secure: process.env.NODE_ENV === "production",
-    path: "/",
-    expires: new Date(0),
-  })
-  return response
+  return clearAuthCookie(okResponse({ loggedOut: true }))
 }
-

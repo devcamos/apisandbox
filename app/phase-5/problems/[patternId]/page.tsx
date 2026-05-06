@@ -1,18 +1,18 @@
 "use client"
 
 import Link from "next/link"
-import { useEffect, useState } from "react"
 import { useParams } from "next/navigation"
 import { ArrowLeft, CheckCircle2 } from "lucide-react"
 import { SubscriptionGate } from "@/components/SubscriptionGate"
 import PhaseLayout from "@/components/PhaseLayout"
+import Phase5NotFound from "@/components/phase-5/Phase5NotFound"
+import LearningStructureCard from "@/components/phase-5/LearningStructureCard"
+import { usePatternProgress } from "@/hooks/usePatternProgress"
 import {
   getPatternNode,
   dsaFoundationsByPattern,
   practiceProblemsByPattern,
-  PATTERN_PROGRESS_STORAGE_KEY,
   emptyNodeProgress,
-  type PatternProgressState,
   type NodeProgress,
 } from "@/lib/learning/leetcode-pattern-graph"
 
@@ -20,24 +20,7 @@ export default function PatternProblemsPage() {
   const params = useParams<{ patternId: string }>()
   const patternId = params?.patternId
   const pattern = patternId ? getPatternNode(patternId) : null
-  const [progress, setProgress] = useState<PatternProgressState>({})
-
-  useEffect(() => {
-    if (globalThis.window === undefined) return
-    try {
-      const raw = localStorage.getItem(PATTERN_PROGRESS_STORAGE_KEY)
-      if (!raw) return
-      const parsed = JSON.parse(raw) as PatternProgressState
-      setProgress(parsed || {})
-    } catch {
-      setProgress({})
-    }
-  }, [])
-
-  useEffect(() => {
-    if (globalThis.window === undefined) return
-    localStorage.setItem(PATTERN_PROGRESS_STORAGE_KEY, JSON.stringify(progress))
-  }, [progress])
+  const { progress } = usePatternProgress()
 
   const getNodeProgress = (id: string): NodeProgress => ({
     ...emptyNodeProgress(),
@@ -45,16 +28,7 @@ export default function PatternProblemsPage() {
   })
 
   if (!pattern) {
-    return (
-      <SubscriptionGate phaseNumber={5} lockedContentName="Phase 5: API Algorithms">
-        <div className="min-h-screen bg-slate-900 text-white p-8">
-          <p className="mb-4">Pattern not found.</p>
-          <Link href="/phase-5" className="text-cyan-300 underline">
-            Back to Phase 5
-          </Link>
-        </div>
-      </SubscriptionGate>
-    )
+    return <Phase5NotFound message="Pattern not found." />
   }
 
   const dsa = dsaFoundationsByPattern[pattern.id] || "Core data structures"
@@ -88,23 +62,22 @@ export default function PatternProblemsPage() {
             Back to Phase 5 graph
           </Link>
 
-          <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-4">
-            <div className="text-xs text-gray-400 mb-1">Learning structure</div>
-            <div className="text-sm text-cyan-100 mb-1">
-              <span className="font-semibold">DSA:</span> {dsa}
-            </div>
-            <div className="text-sm text-cyan-100">
-              <span className="font-semibold">Algo pattern:</span> {pattern.label}
-            </div>
-            <div className="mt-4">
-              <Link
-                href={`/phase-5/fundamentals/${pattern.id}`}
-                className="inline-flex items-center rounded-md bg-emerald-600 px-3 py-2 text-xs font-semibold text-white hover:bg-emerald-500 transition-colors"
-              >
-                Read fundamentals first
-              </Link>
-            </div>
-          </div>
+          <LearningStructureCard
+            items={[
+              { label: "DSA", value: dsa },
+              { label: "Algo pattern", value: pattern.label },
+            ]}
+            footer={
+              <div className="mt-4">
+                <Link
+                  href={`/phase-5/fundamentals/${pattern.id}`}
+                  className="inline-flex items-center rounded-md bg-emerald-600 px-3 py-2 text-xs font-semibold text-white hover:bg-emerald-500 transition-colors"
+                >
+                  Read fundamentals first
+                </Link>
+              </div>
+            }
+          />
         </section>
 
         <section className="mb-8">

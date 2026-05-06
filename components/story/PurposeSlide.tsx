@@ -4,6 +4,7 @@ import { motion } from "framer-motion"
 import { BrainCircuit, Puzzle, Lightbulb, Eye } from "lucide-react"
 import StorySlide, { childVariants } from "./StorySlide"
 import { storySlides } from "@/lib/learning/intro-story-content"
+import { StoryBodyParagraphs, StoryTitle } from "./StorySlideShells"
 
 const pieceVariants = {
   hidden: { opacity: 0, scale: 0, rotate: -45 },
@@ -71,22 +72,8 @@ export default function PurposeSlide() {
         })}
       </motion.div>
 
-      <motion.h1
-        className="text-4xl md:text-5xl font-bold text-white"
-        variants={childVariants}
-      >
-        {slide.title}
-      </motion.h1>
-
-      {slide.body.map((line) => (
-        <motion.p
-          key={line}
-          className="text-xl md:text-2xl text-gray-300 leading-relaxed"
-          variants={childVariants}
-        >
-          {line}
-        </motion.p>
-      ))}
+      <StoryTitle title={slide.title} />
+      <StoryBodyParagraphs body={slide.body} keyPrefix="purpose" />
     </StorySlide>
   )
 }

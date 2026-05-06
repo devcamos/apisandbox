@@ -2,6 +2,8 @@ import Link from "next/link"
 import { Compass, ArrowLeft, BookOpen, CheckCircle2 } from "lucide-react"
 import { SubscriptionGate } from "@/components/SubscriptionGate"
 import PhaseLayout from "@/components/PhaseLayout"
+import Phase5NotFound from "@/components/phase-5/Phase5NotFound"
+import BulletListCard from "@/components/phase-5/BulletListCard"
 import {
   dsaFoundationsByPattern,
   getPatternFundamentals,
@@ -18,16 +20,7 @@ export default async function PatternFundamentalsPage({
   const fundamentals = getPatternFundamentals(patternId)
 
   if (!pattern || !fundamentals) {
-    return (
-      <SubscriptionGate phaseNumber={5} lockedContentName="Phase 5: API Algorithms">
-        <div className="min-h-screen bg-slate-900 text-white p-8">
-          <p className="mb-4">Fundamentals page not found.</p>
-          <Link href="/phase-5" className="text-cyan-300 underline">
-            Back to Phase 5
-          </Link>
-        </div>
-      </SubscriptionGate>
-    )
+    return <Phase5NotFound message="Fundamentals page not found." />
   }
 
   const dsa = dsaFoundationsByPattern[pattern.id] || "Core data structures"
@@ -95,67 +88,32 @@ export default async function PatternFundamentalsPage({
             <p className="text-gray-300 leading-7">{fundamentals.whyItMatters}</p>
           </article>
 
-          <article className="rounded-2xl border border-slate-700 bg-slate-800/50 p-6">
-            <h3 className="text-xl font-bold text-white mb-3">Read This Pattern In Real Systems</h3>
-            <ul className="space-y-3 text-gray-300">
-              {pattern.readFirstExamples.map((example) => (
-                <li key={example} className="flex items-start gap-3">
-                  <span className="mt-2 h-2 w-2 rounded-full bg-emerald-300" />
-                  <span>{example}</span>
-                </li>
-              ))}
-            </ul>
-          </article>
+          <BulletListCard
+            heading="Read This Pattern In Real Systems"
+            items={pattern.readFirstExamples}
+            dotClass="mt-2 h-2 w-2 rounded-full bg-emerald-300"
+          />
         </section>
 
         <section className="grid gap-6 lg:grid-cols-3 mb-8">
-          <article className="rounded-2xl border border-slate-700 bg-slate-800/50 p-6">
-            <h3 className="text-xl font-bold text-white mb-3">Mental Model</h3>
-            <ul className="space-y-3 text-gray-300">
-              {fundamentals.mentalModel.map((item) => (
-                <li key={item} className="flex items-start gap-3">
-                  <span className="mt-2 h-2 w-2 rounded-full bg-cyan-300" />
-                  <span>{item}</span>
-                </li>
-              ))}
-            </ul>
-          </article>
+          <BulletListCard heading="Mental Model" items={fundamentals.mentalModel} />
 
-          <article className="rounded-2xl border border-slate-700 bg-slate-800/50 p-6">
-            <h3 className="text-xl font-bold text-white mb-3">How To Study It</h3>
-            <ol className="space-y-3 text-gray-300 list-decimal list-inside">
-              {fundamentals.workflow.map((item) => (
-                <li key={item} className="leading-7">
-                  {item}
-                </li>
-              ))}
-            </ol>
-          </article>
+          <BulletListCard heading="How To Study It" items={fundamentals.workflow} ordered />
 
-          <article className="rounded-2xl border border-slate-700 bg-slate-800/50 p-6">
-            <h3 className="text-xl font-bold text-white mb-3">Common Pitfalls</h3>
-            <ul className="space-y-3 text-gray-300">
-              {fundamentals.commonPitfalls.map((item) => (
-                <li key={item} className="flex items-start gap-3">
-                  <span className="mt-2 h-2 w-2 rounded-full bg-rose-300" />
-                  <span>{item}</span>
-                </li>
-              ))}
-            </ul>
-          </article>
+          <BulletListCard
+            heading="Common Pitfalls"
+            items={fundamentals.commonPitfalls}
+            dotClass="mt-2 h-2 w-2 rounded-full bg-rose-300"
+          />
         </section>
 
-        <section className="rounded-2xl border border-emerald-500/30 bg-emerald-500/10 p-6">
-          <h3 className="text-xl font-bold text-white mb-3">Ready Check</h3>
-          <ul className="space-y-3 text-emerald-50">
-            {fundamentals.studyChecklist.map((item) => (
-              <li key={item} className="flex items-start gap-3">
-                <span className="mt-2 h-2 w-2 rounded-full bg-emerald-300" />
-                <span>{item}</span>
-              </li>
-            ))}
-          </ul>
-        </section>
+        <BulletListCard
+          heading="Ready Check"
+          items={fundamentals.studyChecklist}
+          containerClass="rounded-2xl border border-emerald-500/30 bg-emerald-500/10 p-6"
+          listClass="space-y-3 text-emerald-50"
+          dotClass="mt-2 h-2 w-2 rounded-full bg-emerald-300"
+        />
       </PhaseLayout>
     </SubscriptionGate>
   )

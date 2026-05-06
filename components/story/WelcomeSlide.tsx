@@ -4,6 +4,7 @@ import { motion } from "framer-motion"
 import { Home } from "lucide-react"
 import StorySlide, { childVariants } from "./StorySlide"
 import { storySlides } from "@/lib/learning/intro-story-content"
+import { StoryBodyParagraphs, StoryTitle } from "./StorySlideShells"
 
 function FloatingParticle({ delay, x, y, size }: Readonly<{ delay: number; x: string; y: string; size: number }>) {
   return (
@@ -63,22 +64,8 @@ export default function WelcomeSlide() {
         </motion.div>
       </motion.div>
 
-      <motion.h1
-        className="text-4xl md:text-5xl font-bold text-white"
-        variants={childVariants}
-      >
-        {slide.title}
-      </motion.h1>
-
-      {slide.body.map((line) => (
-        <motion.p
-          key={line}
-          className="text-xl md:text-2xl text-gray-300 leading-relaxed"
-          variants={childVariants}
-        >
-          {line}
-        </motion.p>
-      ))}
+      <StoryTitle title={slide.title} />
+      <StoryBodyParagraphs body={slide.body} keyPrefix="welcome" />
     </StorySlide>
   )
 }

@@ -4,6 +4,7 @@ import { motion } from "framer-motion"
 import { TrendingUp } from "lucide-react"
 import StorySlide, { childVariants } from "./StorySlide"
 import { storySlides } from "@/lib/learning/intro-story-content"
+import { StoryBodyParagraphs, StoryHeroIcon, StoryTitle } from "./StorySlideShells"
 
 function GrowthCurve() {
   return (
@@ -77,42 +78,24 @@ export default function CompoundSlide() {
 
   return (
     <StorySlide bg={slide.theme.bg}>
-      <motion.div variants={childVariants}>
-        <motion.div
-          className="w-20 h-20 rounded-full bg-violet-500/15 border border-violet-500/25 flex items-center justify-center"
-          animate={{
-            boxShadow: [
-              "0 0 20px rgba(139, 92, 246, 0.1)",
-              "0 0 40px rgba(139, 92, 246, 0.2)",
-              "0 0 20px rgba(139, 92, 246, 0.1)",
-            ],
-          }}
-          transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-        >
-          <TrendingUp className="w-10 h-10 text-violet-400" />
-        </motion.div>
-      </motion.div>
+      <StoryHeroIcon
+        Icon={TrendingUp}
+        containerClass="w-20 h-20 rounded-full bg-violet-500/15 border border-violet-500/25 flex items-center justify-center"
+        iconClass="w-10 h-10 text-violet-400"
+        glow={[
+          "0 0 20px rgba(139, 92, 246, 0.1)",
+          "0 0 40px rgba(139, 92, 246, 0.2)",
+          "0 0 20px rgba(139, 92, 246, 0.1)",
+        ]}
+      />
 
-      <motion.h1
-        className="text-4xl md:text-5xl font-bold text-white"
-        variants={childVariants}
-      >
-        {slide.title}
-      </motion.h1>
+      <StoryTitle title={slide.title} />
 
       <motion.div variants={childVariants}>
         <GrowthCurve />
       </motion.div>
 
-      {slide.body.map((line, i) => (
-        <motion.p
-          key={i}
-          className="text-xl md:text-2xl text-gray-300 leading-relaxed"
-          variants={childVariants}
-        >
-          {line}
-        </motion.p>
-      ))}
+      <StoryBodyParagraphs body={slide.body} keyPrefix="compound" />
     </StorySlide>
   )
 }

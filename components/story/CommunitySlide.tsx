@@ -4,6 +4,7 @@ import { motion } from "framer-motion"
 import { Users } from "lucide-react"
 import StorySlide, { childVariants } from "./StorySlide"
 import { storySlides } from "@/lib/learning/intro-story-content"
+import { StoryBodyParagraphs, StoryHeroIcon, StoryTitle } from "./StorySlideShells"
 
 const colorMap: Record<string, { bg: string; border: string; text: string; dot: string }> = {
   blue: {
@@ -37,38 +38,19 @@ export default function CommunitySlide() {
 
   return (
     <StorySlide bg={slide.theme.bg}>
-      <motion.div variants={childVariants}>
-        <motion.div
-          className="w-20 h-20 rounded-full bg-purple-500/15 border border-purple-500/25 flex items-center justify-center"
-          animate={{
-            boxShadow: [
-              "0 0 20px rgba(168, 85, 247, 0.1)",
-              "0 0 40px rgba(168, 85, 247, 0.2)",
-              "0 0 20px rgba(168, 85, 247, 0.1)",
-            ],
-          }}
-          transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-        >
-          <Users className="w-10 h-10 text-purple-400" />
-        </motion.div>
-      </motion.div>
+      <StoryHeroIcon
+        Icon={Users}
+        containerClass="w-20 h-20 rounded-full bg-purple-500/15 border border-purple-500/25 flex items-center justify-center"
+        iconClass="w-10 h-10 text-purple-400"
+        glow={[
+          "0 0 20px rgba(168, 85, 247, 0.1)",
+          "0 0 40px rgba(168, 85, 247, 0.2)",
+          "0 0 20px rgba(168, 85, 247, 0.1)",
+        ]}
+      />
 
-      <motion.h1
-        className="text-4xl md:text-5xl font-bold text-white"
-        variants={childVariants}
-      >
-        {slide.title}
-      </motion.h1>
-
-      {slide.body.map((line) => (
-        <motion.p
-          key={`${slide.title}-${line}`}
-          className="text-xl md:text-2xl text-gray-300 leading-relaxed"
-          variants={childVariants}
-        >
-          {line}
-        </motion.p>
-      ))}
+      <StoryTitle title={slide.title} />
+      <StoryBodyParagraphs body={slide.body} keyPrefix={slide.title} />
 
       <motion.div
         className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full mt-2"

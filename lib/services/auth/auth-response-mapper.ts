@@ -1,5 +1,6 @@
 import type { AuthResponse, AuthUser } from "@/lib/auth/types"
 import { issueJwtToken } from "@/lib/services/auth/token-service"
+import { splitFullName } from "@/lib/user-name"
 
 interface UserWithProfile {
   id: string
@@ -15,18 +16,8 @@ interface UserWithProfile {
   } | null
 }
 
-function splitName(name: string | null) {
-  if (!name) return { firstName: null, lastName: null }
-  const parts = name.trim().split(/\s+/)
-  if (parts.length === 0) return { firstName: null, lastName: null }
-  return {
-    firstName: parts[0] || null,
-    lastName: parts.length > 1 ? parts.slice(1).join(" ") : null,
-  }
-}
-
 export function mapUserToAuthUser(user: UserWithProfile): AuthUser {
-  const fallback = splitName(user.name)
+  const fallback = splitFullName(user.name)
   return {
     id: user.id,
     email: user.email,

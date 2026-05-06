@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { useEffect, useMemo, useState } from "react"
+import { useMemo, useState } from "react"
 import { useRouter } from "next/navigation"
 import { motion } from "framer-motion"
 import {
@@ -9,12 +9,11 @@ import {
   patternLevelMeta,
   getPatternNode,
   dsaFoundationsByPattern,
-  PATTERN_PROGRESS_STORAGE_KEY,
   emptyNodeProgress,
-  type PatternProgressState,
   type PatternDifficulty,
   type PatternNode,
 } from "@/lib/learning/leetcode-pattern-graph"
+import { usePatternProgress } from "@/hooks/usePatternProgress"
 
 function difficultyClasses(difficulty: PatternDifficulty) {
   if (difficulty === "Easy") return "border-emerald-400/50 bg-emerald-500/10 text-emerald-200"
@@ -59,31 +58,14 @@ function patternNodeStatusLabel(completed: boolean, unlocked: boolean) {
 export default function LeetCodePatternGraph() {
   const router = useRouter()
   const [selectedId, setSelectedId] = useState("arrays-strings")
-  const [progress, setProgress] = useState<PatternProgressState>({})
+  const { progress } = usePatternProgress()
 
   const selected = getPatternNode(selectedId) || leetcodePatternNodes[0]
   const related = useMemo(() => collectNeighbors(selected), [selected])
 
-  useEffect(() => {
-    if (globalThis.window === undefined) return
-    try {
-      const raw = localStorage.getItem(PATTERN_PROGRESS_STORAGE_KEY)
-      if (!raw) return
-      const parsed = JSON.parse(raw) as PatternProgressState
-      setProgress(parsed || {})
-    } catch {
-      setProgress({})
-    }
-  }, [])
-
-  useEffect(() => {
-    if (globalThis.window === undefined) return
-    localStorage.setItem(PATTERN_PROGRESS_STORAGE_KEY, JSON.stringify(progress))
-  }, [progress])
-
   const getNodeProgress = (id: string) => ({
     ...emptyNodeProgress(),
-    ...(progress[id] || {}),
+    ...(progress[id] ?? {}),
   })
 
   const isAvailable = (node: PatternNode) =>

@@ -1,26 +1,14 @@
 import { NextRequest } from "next/server"
 import { getAuthenticatedUserFromToken } from "@/lib/services/auth/auth-service"
-import { errorResponse, handleRouteError, okResponse } from "@/lib/http/responses"
+import { errorResponse, okResponse } from "@/lib/http/responses"
+import { readAuthToken, withRouteErrorHandling } from "@/lib/http/auth-route-helpers"
 
-function tokenFromRequest(request: NextRequest) {
-  const authHeader = request.headers.get("authorization")
-  if (authHeader?.startsWith("Bearer ")) {
-    return authHeader.slice(7)
+export const GET = withRouteErrorHandling(async (request: NextRequest) => {
+  const token = readAuthToken(request)
+  if (!token) {
+    return errorResponse(401, "auth_failure", "Unauthorized")
   }
-  return request.cookies.get("auth_token")?.value ?? null
-}
 
-export async function GET(request: NextRequest) {
-  try {
-    const token = tokenFromRequest(request)
-    if (!token) {
-      return errorResponse(401, "auth_failure", "Unauthorized")
-    }
-
-    const user = await getAuthenticatedUserFromToken(token)
-    return okResponse({ user })
-  } catch (error) {
-    return handleRouteError(error)
-  }
-}
-
+  const user = await getAuthenticatedUserFromToken(token)
+  return okResponse({ user })
+})

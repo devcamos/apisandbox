@@ -1,7 +1,12 @@
 import { NextRequest } from "next/server"
 import { z } from "zod"
 import { registerWithPassword } from "@/lib/services/auth/auth-service"
-import { handleRouteError, okResponse, errorResponse } from "@/lib/http/responses"
+import {
+  authSessionResponse,
+  parseJsonBody,
+  withRouteErrorHandling,
+} from "@/lib/http/auth-route-helpers"
+import { splitFullName } from "@/lib/user-name"
 
 const schema = z.object({
   email: z.string().email(),
@@ -12,36 +17,19 @@ const schema = z.object({
   __testForceBootstrapFail: z.boolean().optional(),
 })
 
-export async function POST(request: NextRequest) {
-  try {
-    const body = await request.json()
-    const parsed = schema.safeParse(body)
-    if (!parsed.success) {
-      return errorResponse(400, "validation_error", "Invalid register payload", parsed.error.issues)
-    }
+export const POST = withRouteErrorHandling(async (request: NextRequest) => {
+  const parsed = await parseJsonBody(request, schema, "Invalid register payload")
+  if (!parsed.ok) return parsed.response
 
-    const fallbackNameParts = (parsed.data.name || "").trim().split(/\s+/).filter(Boolean)
-    const response = await registerWithPassword({
-      email: parsed.data.email,
-      password: parsed.data.password,
-      firstName: parsed.data.firstName ?? fallbackNameParts[0] ?? undefined,
-      lastName:
-        parsed.data.lastName ??
-        (fallbackNameParts.length > 1 ? fallbackNameParts.slice(1).join(" ") : undefined),
-      forceBootstrapFailure:
-        process.env.NODE_ENV !== "production" ? parsed.data.__testForceBootstrapFail : false,
-    })
+  const fallback = splitFullName(parsed.data.name)
+  const response = await registerWithPassword({
+    email: parsed.data.email,
+    password: parsed.data.password,
+    firstName: parsed.data.firstName ?? fallback.firstName ?? undefined,
+    lastName: parsed.data.lastName ?? fallback.lastName ?? undefined,
+    forceBootstrapFailure:
+      process.env.NODE_ENV !== "production" ? parsed.data.__testForceBootstrapFail : false,
+  })
 
-    const res = okResponse(response, 201)
-    res.cookies.set("auth_token", response.token, {
-      httpOnly: true,
-      sameSite: "lax",
-      secure: process.env.NODE_ENV === "production",
-      path: "/",
-      maxAge: response.expiresIn,
-    })
-    return res
-  } catch (error) {
-    return handleRouteError(error)
-  }
-}
+  return authSessionResponse(response, 201)
+})

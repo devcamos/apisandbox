@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server"
 import { z } from "zod"
 import { registerWithPassword } from "@/lib/services/auth/auth-service"
 import { AppError } from "@/lib/http/errors"
+import { setAuthCookie } from "@/lib/http/auth-route-helpers"
+import { splitFullName } from "@/lib/user-name"
 
 const schema = z.object({
   email: z.string().email(),
@@ -21,12 +23,12 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const parts = (parsed.data.name || "").trim().split(/\s+/).filter(Boolean)
+    const { firstName, lastName } = splitFullName(parsed.data.name)
     const authResponse = await registerWithPassword({
       email: parsed.data.email,
       password: parsed.data.password,
-      firstName: parts[0],
-      lastName: parts.length > 1 ? parts.slice(1).join(" ") : undefined,
+      firstName: firstName ?? undefined,
+      lastName: lastName ?? undefined,
       forceBootstrapFailure:
         process.env.NODE_ENV !== "production" ? parsed.data.__testForceBootstrapFail : false,
     })
@@ -40,14 +42,10 @@ export async function POST(request: NextRequest) {
       },
       { status: 201 }
     )
-    response.cookies.set("auth_token", authResponse.token, {
-      httpOnly: true,
-      sameSite: "lax",
-      secure: process.env.NODE_ENV === "production",
-      path: "/",
+    return setAuthCookie(response, {
+      token: authResponse.token,
       maxAge: authResponse.expiresIn,
     })
-    return response
   } catch (error) {
     if (error instanceof AppError) {
       const payload: { error: string; details?: unknown } = { error: error.message }

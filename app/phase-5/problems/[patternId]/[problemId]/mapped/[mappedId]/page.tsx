@@ -5,6 +5,10 @@ import { useParams } from "next/navigation"
 import { ArrowLeft, CheckCircle2 } from "lucide-react"
 import { SubscriptionGate } from "@/components/SubscriptionGate"
 import PhaseLayout from "@/components/PhaseLayout"
+import Phase5NotFound from "@/components/phase-5/Phase5NotFound"
+import LearningStructureCard from "@/components/phase-5/LearningStructureCard"
+import LinkedStrategyList from "@/components/phase-5/LinkedStrategyList"
+import { CompactBulletListCard } from "@/components/phase-5/BulletListCard"
 import {
   getPatternNode,
   getPatternPracticeProblem,
@@ -24,16 +28,7 @@ export default function MappedProblemPage() {
   const mappedProblem = patternId && problemId && mappedId ? getMappedPracticeProblem(patternId, problemId, mappedId) : null
 
   if (!pattern || !parentProblem || !mappedProblem) {
-    return (
-      <SubscriptionGate phaseNumber={5} lockedContentName="Phase 5: API Algorithms">
-        <div className="min-h-screen bg-slate-900 text-white p-8">
-          <p className="mb-4">Mapped problem not found.</p>
-          <Link href="/phase-5" className="text-cyan-300 underline">
-            Back to Phase 5
-          </Link>
-        </div>
-      </SubscriptionGate>
-    )
+    return <Phase5NotFound message="Mapped problem not found." />
   }
 
   const dsa = dsaFoundationsByPattern[pattern.id] || "Core data structures"
@@ -59,18 +54,13 @@ export default function MappedProblemPage() {
             Back to {parentProblem.title}
           </Link>
 
-          <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-4">
-            <div className="text-xs text-gray-400 mb-1">Learning structure</div>
-            <div className="text-sm text-cyan-100 mb-1">
-              <span className="font-semibold">DSA:</span> {dsa}
-            </div>
-            <div className="text-sm text-cyan-100 mb-1">
-              <span className="font-semibold">Algo pattern:</span> {pattern.label}
-            </div>
-            <div className="text-sm text-cyan-100">
-              <span className="font-semibold">Mapped from:</span> {parentProblem.title}
-            </div>
-          </div>
+          <LearningStructureCard
+            items={[
+              { label: "DSA", value: dsa },
+              { label: "Algo pattern", value: pattern.label },
+              { label: "Mapped from", value: parentProblem.title },
+            ]}
+          />
         </section>
 
         <section className="mb-8">
@@ -89,47 +79,31 @@ export default function MappedProblemPage() {
 
         {linkedStrategies.length > 0 && (
           <section className="mb-8">
-            <div className="bg-cyan-500/10 border border-cyan-500/30 rounded-xl p-4">
-              <div className="text-xs text-cyan-300 mb-2">Method design</div>
-              <div className="space-y-2">
-                {linkedStrategies.map((strategy) => (
-                  <Link
-                    key={strategy.id}
-                    href={`/phase-5/strategies/${strategy.id}`}
-                    className="block rounded border border-slate-700 bg-slate-900/60 p-3 transition-colors hover:border-cyan-400/60"
-                  >
-                    <div className="text-sm font-semibold text-cyan-200 underline">{strategy.title}</div>
-                    <div className="text-xs text-cyan-100 mt-1">{strategy.summary}</div>
-                  </Link>
-                ))}
-              </div>
-            </div>
+            <LinkedStrategyList
+              strategies={linkedStrategies}
+              containerClass="bg-cyan-500/10 border border-cyan-500/30 rounded-xl p-4"
+              headingClass="text-xs text-cyan-300 mb-2"
+            />
           </section>
         )}
 
         <section className="grid lg:grid-cols-2 gap-4">
-          <div className="bg-emerald-500/10 border border-emerald-500/30 rounded-xl p-4">
-            <div className="text-xs text-emerald-300 mb-2">What to learn</div>
-            <ul className="space-y-1.5 text-sm text-emerald-100">
-              {mappedProblem.learn.map((item) => (
-                <li key={item} className="flex items-start gap-2">
-                  <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-emerald-300" />
-                  <span>{item}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-          <div className="bg-cyan-500/10 border border-cyan-500/30 rounded-xl p-4">
-            <div className="text-xs text-cyan-300 mb-2">What to do</div>
-            <ul className="space-y-1.5 text-sm text-cyan-100">
-              {mappedProblem.do.map((item) => (
-                <li key={item} className="flex items-start gap-2">
-                  <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-cyan-300" />
-                  <span>{item}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
+          <CompactBulletListCard
+            heading="What to learn"
+            items={mappedProblem.learn}
+            containerClass="bg-emerald-500/10 border border-emerald-500/30 rounded-xl p-4"
+            headingClass="text-xs text-emerald-300 mb-2"
+            listClass="space-y-1.5 text-sm text-emerald-100"
+            dotClass="mt-1.5 h-1.5 w-1.5 rounded-full bg-emerald-300"
+          />
+          <CompactBulletListCard
+            heading="What to do"
+            items={mappedProblem.do}
+            containerClass="bg-cyan-500/10 border border-cyan-500/30 rounded-xl p-4"
+            headingClass="text-xs text-cyan-300 mb-2"
+            listClass="space-y-1.5 text-sm text-cyan-100"
+            dotClass="mt-1.5 h-1.5 w-1.5 rounded-full bg-cyan-300"
+          />
         </section>
       </PhaseLayout>
     </SubscriptionGate>
