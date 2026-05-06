@@ -170,19 +170,33 @@ export default function GsapDemo({ algorithm = "binary" }: { algorithm?: SearchA
 
         const isJumpBoundary = algorithm === "jump" && jumpBlockSize > 0 && i % jumpBlockSize === 0 && i <= state.high
 
+        let borderColor = "#1e293b"
+        if (isMid) {
+          borderColor = state.phase === "found" ? "#34d399" : "#fbbf24"
+        } else if (isJumpBoundary && isInRange) {
+          borderColor = "#a78bfa"
+        } else if (isInRange) {
+          borderColor = algorithm !== "linear" ? "#4ade80" : "#475569"
+        }
+
+        let backgroundColor = "rgba(15, 23, 42, 0.3)"
+        if (isMid) {
+          backgroundColor =
+            state.phase === "found" ? "rgba(52, 211, 153, 0.25)" : "rgba(251, 191, 36, 0.2)"
+        } else if (isJumpBoundary && isInRange) {
+          backgroundColor = "rgba(167, 139, 250, 0.1)"
+        } else if (isInRange) {
+          backgroundColor =
+            algorithm !== "linear" ? "rgba(34, 197, 94, 0.1)" : "rgba(51, 65, 85, 1)"
+        }
+
         gsap.to(cell, {
           scale: isMid ? 1.15 : isInRange ? 1 : 0.85,
           opacity: isPast ? 0.3 : isInRange ? 1 : 0.3,
           duration: 0.35,
           ease: "back.out(1.4)",
-          borderColor: isMid
-            ? state.phase === "found" ? "#34d399" : "#fbbf24"
-            : isJumpBoundary && isInRange ? "#a78bfa"
-            : isInRange ? (algorithm !== "linear" ? "#4ade80" : "#475569") : "#1e293b",
-          backgroundColor: isMid
-            ? state.phase === "found" ? "rgba(52, 211, 153, 0.25)" : "rgba(251, 191, 36, 0.2)"
-            : isJumpBoundary && isInRange ? "rgba(167, 139, 250, 0.1)"
-            : isInRange ? (algorithm !== "linear" ? "rgba(34, 197, 94, 0.1)" : "rgba(51, 65, 85, 1)") : "rgba(15, 23, 42, 0.3)",
+          borderColor,
+          backgroundColor,
         })
       })
       if (state.mid >= 0) animatePointer(state.mid)
@@ -305,7 +319,16 @@ export default function GsapDemo({ algorithm = "binary" }: { algorithm?: SearchA
       <div className="flex items-center justify-center gap-2 pt-2">
         <button onClick={reset} className="px-3 py-1.5 text-xs font-medium bg-slate-700 border border-slate-600 rounded-lg text-gray-300 hover:bg-slate-600 transition-colors">Reset</button>
         <button onClick={() => applyStep(stepIdx + 1)} disabled={isPlaying || current?.phase === "found" || current?.phase === "not-found"} className="px-3 py-1.5 text-xs font-medium bg-green-500/20 border border-green-500/30 rounded-lg text-green-300 hover:bg-green-500/30 transition-colors disabled:opacity-40">Step</button>
-        <button onClick={() => { if (stepIdx < 0) applyStep(0); setIsPlaying(!isPlaying) }} disabled={current?.phase === "found" || current?.phase === "not-found"} className="px-4 py-1.5 text-xs font-medium bg-green-500/20 border border-green-500/30 rounded-lg text-green-300 hover:bg-green-500/30 transition-colors disabled:opacity-40">
+        <button
+          onClick={() => {
+            if (stepIdx < 0) {
+              applyStep(0)
+            }
+            setIsPlaying(!isPlaying)
+          }}
+          disabled={current?.phase === "found" || current?.phase === "not-found"}
+          className="px-4 py-1.5 text-xs font-medium bg-green-500/20 border border-green-500/30 rounded-lg text-green-300 hover:bg-green-500/30 transition-colors disabled:opacity-40"
+        >
           {isPlaying ? "Pause" : "Play"}
         </button>
       </div>

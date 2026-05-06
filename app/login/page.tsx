@@ -337,14 +337,18 @@ function LoginForm() {
   useEffect(() => {
     if (!googleClientId || !googleButtonRef.current) return
     const init = () => {
-      if (typeof window !== "undefined" && window.google?.accounts?.id && googleButtonRef.current) {
-        window.google.accounts.id.initialize({
+      if (
+        typeof globalThis.window !== "undefined" &&
+        globalThis.window.google?.accounts?.id &&
+        googleButtonRef.current
+      ) {
+        globalThis.window.google.accounts.id.initialize({
           client_id: googleClientId,
           callback: (response: { credential: string }) => {
             if (response.credential) handleGoogleCredential(response.credential)
           },
         })
-        window.google.accounts.id.renderButton(googleButtonRef.current, {
+        globalThis.window.google.accounts.id.renderButton(googleButtonRef.current, {
           type: "standard",
           theme: "outline",
           size: "large",
@@ -353,11 +357,11 @@ function LoginForm() {
         })
       }
     }
-    if (window.google?.accounts?.id) {
+    if (globalThis.window.google?.accounts?.id) {
       init()
     } else {
       const t = setInterval(() => {
-        if (window.google?.accounts?.id) {
+        if (globalThis.window.google?.accounts?.id) {
           clearInterval(t)
           init()
         }

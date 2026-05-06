@@ -24,7 +24,7 @@ export async function requireAuthenticatedUser(request: NextRequest) {
     select: { id: true, email: true, isActive: true },
   })
 
-  if (!user || !user.isActive) {
+  if (!user?.isActive) {
     throw new AppError("User is not active", 401, "auth_failure")
   }
 

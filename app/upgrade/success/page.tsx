@@ -12,7 +12,7 @@ export default function UpgradeSuccessPage() {
       setCountdown((c) => {
         if (c <= 1) {
           clearInterval(timer)
-          window.location.href = "/phase-2"
+          globalThis.window.location.href = "/phase-2"
         }
         return c - 1
       })

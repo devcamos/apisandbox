@@ -56,6 +56,6 @@ export function CookieConsent() {
 }
 
 export function hasAnalyticsConsent(): boolean {
-  if (typeof window === "undefined") return false
+  if (typeof globalThis.window === "undefined") return false
   return localStorage.getItem(CONSENT_KEY) === "accepted"
 }

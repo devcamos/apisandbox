@@ -32,6 +32,30 @@ function collectNeighbors(node: PatternNode) {
   return new Set([node.id, ...node.prerequisites, ...node.unlocks])
 }
 
+function patternNodeCardClass(
+  isSelected: boolean,
+  isRelated: boolean,
+  unlocked: boolean,
+  difficulty: PatternDifficulty,
+) {
+  if (isSelected) {
+    return "border-cyan-400 bg-cyan-500/15 text-cyan-100 shadow-[0_0_0_1px_rgba(34,211,238,0.25)]"
+  }
+  if (isRelated) {
+    return "border-cyan-500/40 bg-cyan-500/10 text-cyan-100"
+  }
+  if (!unlocked) {
+    return "border-yellow-500/50 bg-yellow-500/10 text-yellow-100"
+  }
+  return difficultyClasses(difficulty)
+}
+
+function patternNodeStatusLabel(completed: boolean, unlocked: boolean) {
+  if (completed) return "Completed"
+  if (unlocked) return "Unlocked"
+  return "Locked"
+}
+
 export default function LeetCodePatternGraph() {
   const router = useRouter()
   const [selectedId, setSelectedId] = useState("arrays-strings")
@@ -41,7 +65,7 @@ export default function LeetCodePatternGraph() {
   const related = useMemo(() => collectNeighbors(selected), [selected])
 
   useEffect(() => {
-    if (typeof window === "undefined") return
+    if (typeof globalThis.window === "undefined") return
     try {
       const raw = localStorage.getItem(PATTERN_PROGRESS_STORAGE_KEY)
       if (!raw) return
@@ -53,7 +77,7 @@ export default function LeetCodePatternGraph() {
   }, [])
 
   useEffect(() => {
-    if (typeof window === "undefined") return
+    if (typeof globalThis.window === "undefined") return
     localStorage.setItem(PATTERN_PROGRESS_STORAGE_KEY, JSON.stringify(progress))
   }, [progress])
 
@@ -124,15 +148,12 @@ export default function LeetCodePatternGraph() {
                         onClick={() => handleNodeSelect(node.id)}
                         whileHover={{ y: -1.5 }}
                         whileTap={{ scale: 0.985 }}
-                        className={`text-left rounded-lg border px-3 py-2 transition-all ${
-                          isSelected
-                            ? "border-cyan-400 bg-cyan-500/15 text-cyan-100 shadow-[0_0_0_1px_rgba(34,211,238,0.25)]"
-                            : isRelated
-                              ? "border-cyan-500/40 bg-cyan-500/10 text-cyan-100"
-                              : !unlocked
-                                ? "border-yellow-500/50 bg-yellow-500/10 text-yellow-100"
-                                : difficultyClasses(node.difficulty)
-                        }`}
+                        className={`text-left rounded-lg border px-3 py-2 transition-all ${patternNodeCardClass(
+                          isSelected,
+                          isRelated,
+                          unlocked,
+                          node.difficulty,
+                        )}`}
                       >
                         <div className="flex items-center justify-between gap-2">
                           <span className="text-sm font-semibold">{node.label}</span>
@@ -144,7 +165,7 @@ export default function LeetCodePatternGraph() {
                           prereq: {node.prerequisites.length} · unlocks: {node.unlocks.length}
                         </div>
                         <div className="text-[11px] mt-1 text-gray-300">
-                          {nodeProgress.completed ? "Completed" : unlocked ? "Unlocked" : "Locked"}
+                          {patternNodeStatusLabel(nodeProgress.completed, unlocked)}
                         </div>
                       </motion.button>
                     )

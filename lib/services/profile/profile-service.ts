@@ -39,19 +39,19 @@ export async function updateProfileByUserId(userId: string, updates: UpdateProfi
     prisma.userProfile.update({
       where: { userId },
       data: {
-        ...(updates.firstName !== undefined ? { firstName: updates.firstName } : {}),
-        ...(updates.lastName !== undefined ? { lastName: updates.lastName } : {}),
-        ...(updates.avatarUrl !== undefined ? { avatarUrl: updates.avatarUrl } : {}),
-        ...(updates.roleLabel !== undefined ? { roleLabel: updates.roleLabel } : {}),
-        ...(updates.identityStatement !== undefined
-          ? { identityStatement: updates.identityStatement }
-          : {}),
+        ...(updates.firstName === undefined ? {} : { firstName: updates.firstName }),
+        ...(updates.lastName === undefined ? {} : { lastName: updates.lastName }),
+        ...(updates.avatarUrl === undefined ? {} : { avatarUrl: updates.avatarUrl }),
+        ...(updates.roleLabel === undefined ? {} : { roleLabel: updates.roleLabel }),
+        ...(updates.identityStatement === undefined
+          ? {}
+          : { identityStatement: updates.identityStatement }),
       },
     }),
     prisma.user.update({
       where: { id: userId },
       data: {
-        ...(updates.avatarUrl !== undefined ? { image: updates.avatarUrl } : {}),
+        ...(updates.avatarUrl === undefined ? {} : { image: updates.avatarUrl }),
         name: normalizeDisplayName(nextFirstName ?? null, nextLastName ?? null),
       },
     }),

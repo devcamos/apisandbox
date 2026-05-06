@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 const fs = require("fs");
-const path = require("path");
+const path = require("node:path");
 const crypto = require("crypto");
 const { execFileSync } = require("child_process");
 const dotenv = require("dotenv");

@@ -8,7 +8,7 @@ interface MermaidDiagramProps {
 }
 
 export default function MermaidDiagram({ chart }: MermaidDiagramProps) {
-  const elementId = useId().replace(/[:]/g, "-");
+  const elementId = useId().replaceAll(":", "-");
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [error, setError] = useState<string | null>(null);
 

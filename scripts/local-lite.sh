@@ -8,17 +8,18 @@ YELLOW='\033[1;33m'
 RED='\033[0;31m'
 NC='\033[0m'
 
-log_info()    { echo -e "${BLUE}[INFO]${NC} $1"; }
-log_success() { echo -e "${GREEN}[OK]${NC} $1"; }
-log_warning() { echo -e "${YELLOW}[WARN]${NC} $1"; }
-log_error()   { echo -e "${RED}[ERROR]${NC} $1"; }
+log_info()    { local msg="$1"; echo -e "${BLUE}[INFO]${NC} ${msg}"; }
+log_success() { local msg="$1"; echo -e "${GREEN}[OK]${NC} ${msg}"; }
+log_warning() { local msg="$1"; echo -e "${YELLOW}[WARN]${NC} ${msg}"; }
+log_error()   { local msg="$1"; echo -e "${RED}[ERROR]${NC} ${msg}"; }
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 cd "$PROJECT_ROOT"
 
 is_port_in_use() {
-  lsof -nP -iTCP:"$1" -sTCP:LISTEN >/dev/null 2>&1
+  local port="$1"
+  lsof -nP -iTCP:"$port" -sTCP:LISTEN >/dev/null 2>&1
 }
 
 wait_for_db() {

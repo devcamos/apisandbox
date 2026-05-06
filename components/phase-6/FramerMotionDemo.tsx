@@ -334,7 +334,12 @@ export default function FramerMotionDemo({ algorithm = "bubble" }: { algorithm?:
           Step
         </button>
         <button
-          onClick={() => { if (stepIndex < 0) applyStep(0); setIsPlaying(!isPlaying) }}
+          onClick={() => {
+            if (stepIndex < 0) {
+              applyStep(0)
+            }
+            setIsPlaying(!isPlaying)
+          }}
           disabled={isDone}
           className="px-4 py-1.5 text-xs font-medium bg-violet-500/20 border border-violet-500/30 rounded-lg text-violet-300 hover:bg-violet-500/30 transition-colors disabled:opacity-40"
         >

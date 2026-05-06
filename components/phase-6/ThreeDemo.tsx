@@ -163,7 +163,13 @@ function TreeEdges({ tree }: { tree: TreeNode[] }) {
   )
 }
 
-function Scene({ tree, nodeStatuses, onHover }: { tree: TreeNode[]; nodeStatuses: Map<number, "idle" | "visiting" | "visited" | "queued">; onHover: (id: number | null) => void }) {
+type SceneProps = Readonly<{
+  tree: TreeNode[]
+  nodeStatuses: Map<number, "idle" | "visiting" | "visited" | "queued">
+  onHover: (id: number | null) => void
+}>
+
+function Scene({ tree, nodeStatuses, onHover }: SceneProps) {
   return (
     <>
       <ambientLight intensity={0.4} />

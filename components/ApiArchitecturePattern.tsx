@@ -8,7 +8,13 @@ interface ApiArchitecturePatternProps {
   accentColor: string;
 }
 
-function LayerRow({ layer, isLast, accentColor }: { layer: ArchitectureLayer; isLast: boolean; accentColor: string }) {
+type LayerRowProps = Readonly<{
+  layer: ArchitectureLayer
+  isLast: boolean
+  accentColor: string
+}>
+
+function LayerRow({ layer, isLast, accentColor }: LayerRowProps) {
   const [open, setOpen] = useState(false);
 
   return (
@@ -67,7 +73,10 @@ function LayerDiagram({ pattern, accentColor }: { pattern: FrameworkPattern; acc
   );
 }
 
-export default function ApiArchitecturePattern({ categoryId, accentColor }: ApiArchitecturePatternProps) {
+export default function ApiArchitecturePattern({
+  categoryId,
+  accentColor,
+}: Readonly<ApiArchitecturePatternProps>) {
   const patterns = getPatternsByCategory(categoryId);
   const [activeFramework, setActiveFramework] = useState(0);
 

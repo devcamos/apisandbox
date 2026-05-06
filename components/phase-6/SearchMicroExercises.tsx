@@ -127,6 +127,75 @@ const exercises: Exercise[] = [
 const typeLabels = { identify: "Scenario", predict: "Predict", estimate: "Estimate" }
 const typeColors = { identify: "text-violet-400", predict: "text-amber-400", estimate: "text-cyan-400" }
 
+function microExerciseCompletionBlurb(pct: number): string {
+  if (pct >= 88) return "Legendary — you think in constraints, not algorithms."
+  if (pct >= 75) return "Heroic — strong pattern recognition."
+  if (pct >= 50) return "Normal — review the constraints you missed."
+  return "Easy — revisit the decision checklist and try again."
+}
+
+function microExerciseTrophyClass(pct: number): string {
+  if (pct >= 75) return "text-amber-400"
+  if (pct >= 50) return "text-gray-300"
+  return "text-gray-600"
+}
+
+function microExerciseOptionClasses(
+  showResult: boolean,
+  selected: string | null,
+  optValue: string,
+  correctAnswer: string,
+): { border: string; bg: string; text: string } {
+  if (showResult && optValue === correctAnswer) {
+    return { border: "border-emerald-500/50", bg: "bg-emerald-500/10", text: "text-emerald-300" }
+  }
+  if (showResult && optValue === selected) {
+    return { border: "border-rose-500/50", bg: "bg-rose-500/10", text: "text-rose-300" }
+  }
+  if (!showResult && selected === optValue) {
+    return { border: "border-green-500/50", bg: "bg-green-500/10", text: "text-green-300" }
+  }
+  return { border: "border-slate-700", bg: "bg-slate-900/40", text: "text-gray-300" }
+}
+
+type MicroExerciseOptionButtonProps = Readonly<{
+  opt: { label: string; value: string }
+  showResult: boolean
+  selected: string | null
+  correctAnswer: string
+  onSelect: (value: string) => void
+}>
+
+function MicroExerciseOptionButton({
+  opt,
+  showResult,
+  selected,
+  correctAnswer,
+  onSelect,
+}: MicroExerciseOptionButtonProps) {
+  const { border: borderClass, bg: bgClass, text: textClass } = microExerciseOptionClasses(
+    showResult,
+    selected,
+    opt.value,
+    correctAnswer,
+  )
+  return (
+    <button
+      type="button"
+      onClick={() => {
+        if (showResult) {
+          return
+        }
+        onSelect(opt.value)
+      }}
+      disabled={showResult}
+      className={`w-full text-left px-3 py-2.5 rounded-lg border-2 transition-all text-xs ${borderClass} ${bgClass} ${textClass} ${showResult ? "" : "hover:border-slate-600"}`}
+    >
+      {opt.label}
+    </button>
+  )
+}
+
 export default function SearchMicroExercises() {
   const [currentIdx, setCurrentIdx] = useState(0)
   const [selected, setSelected] = useState<string | null>(null)
@@ -163,15 +232,10 @@ export default function SearchMicroExercises() {
     const pct = Math.round((score.correct / score.total) * 100)
     return (
       <div className="text-center py-8 space-y-4">
-        <Trophy className={`w-10 h-10 mx-auto ${pct >= 75 ? "text-amber-400" : pct >= 50 ? "text-gray-300" : "text-gray-600"}`} />
+        <Trophy className={`w-10 h-10 mx-auto ${microExerciseTrophyClass(pct)}`} />
         <div>
           <p className="text-lg font-bold text-white">{score.correct}/{score.total} Correct</p>
-          <p className="text-xs text-gray-400 mt-1">
-            {pct >= 88 ? "Legendary — you think in constraints, not algorithms." :
-             pct >= 75 ? "Heroic — strong pattern recognition." :
-             pct >= 50 ? "Normal — review the constraints you missed." :
-             "Easy — revisit the decision checklist and try again."}
-          </p>
+          <p className="text-xs text-gray-400 mt-1">{microExerciseCompletionBlurb(pct)}</p>
         </div>
         <button onClick={resetAll} className="inline-flex items-center gap-2 px-4 py-2 text-xs font-medium bg-green-500/20 border border-green-500/30 rounded-lg text-green-300 hover:bg-green-500/30 transition-colors">
           <RotateCcw className="w-3 h-3" />
@@ -221,38 +285,16 @@ export default function SearchMicroExercises() {
           )}
 
           <div className="space-y-2">
-            {exercise.options.map((opt) => {
-              let borderClass = "border-slate-700"
-              let bgClass = "bg-slate-900/40"
-              let textClass = "text-gray-300"
-
-              if (showResult) {
-                if (opt.value === exercise.correctAnswer) {
-                  borderClass = "border-emerald-500/50"
-                  bgClass = "bg-emerald-500/10"
-                  textClass = "text-emerald-300"
-                } else if (opt.value === selected) {
-                  borderClass = "border-rose-500/50"
-                  bgClass = "bg-rose-500/10"
-                  textClass = "text-rose-300"
-                }
-              } else if (selected === opt.value) {
-                borderClass = "border-green-500/50"
-                bgClass = "bg-green-500/10"
-                textClass = "text-green-300"
-              }
-
-              return (
-                <button
-                  key={opt.value}
-                  onClick={() => !showResult && setSelected(opt.value)}
-                  disabled={showResult}
-                  className={`w-full text-left px-3 py-2.5 rounded-lg border-2 transition-all text-xs ${borderClass} ${bgClass} ${textClass} ${!showResult ? "hover:border-slate-600" : ""}`}
-                >
-                  {opt.label}
-                </button>
-              )
-            })}
+            {exercise.options.map((opt) => (
+              <MicroExerciseOptionButton
+                key={opt.value}
+                opt={opt}
+                showResult={showResult}
+                selected={selected}
+                correctAnswer={exercise.correctAnswer}
+                onSelect={setSelected}
+              />
+            ))}
           </div>
 
           <AnimatePresence>
@@ -276,20 +318,22 @@ export default function SearchMicroExercises() {
           </AnimatePresence>
 
           <div className="flex items-center justify-end gap-2 pt-1">
-            {!showResult ? (
+            {showResult ? (
               <button
+                type="button"
+                onClick={nextExercise}
+                className="flex items-center gap-1 px-3 py-1.5 text-xs font-medium bg-green-500/20 border border-green-500/30 rounded-lg text-green-300 hover:bg-green-500/30 transition-colors"
+              >
+                Next <ArrowRight className="w-3 h-3" />
+              </button>
+            ) : (
+              <button
+                type="button"
                 onClick={submitAnswer}
                 disabled={!selected}
                 className="flex items-center gap-1 px-3 py-1.5 text-xs font-medium bg-green-500/20 border border-green-500/30 rounded-lg text-green-300 hover:bg-green-500/30 transition-colors disabled:opacity-40"
               >
                 Check Answer
-              </button>
-            ) : (
-              <button
-                onClick={nextExercise}
-                className="flex items-center gap-1 px-3 py-1.5 text-xs font-medium bg-green-500/20 border border-green-500/30 rounded-lg text-green-300 hover:bg-green-500/30 transition-colors"
-              >
-                Next <ArrowRight className="w-3 h-3" />
               </button>
             )}
           </div>

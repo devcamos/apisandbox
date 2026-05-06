@@ -8,13 +8,13 @@ const DEFAULT_EXPIRY_SECONDS = 60 * 60 * 24 * 7 // 7 days
 function base64UrlEncode(value: string | Buffer) {
   return Buffer.from(value)
     .toString("base64")
-    .replace(/=/g, "")
-    .replace(/\+/g, "-")
-    .replace(/\//g, "_")
+    .replaceAll("=", "")
+    .replaceAll("+", "-")
+    .replaceAll("/", "_")
 }
 
 function base64UrlDecode(value: string) {
-  const normalized = value.replace(/-/g, "+").replace(/_/g, "/")
+  const normalized = value.replaceAll("-", "+").replaceAll("_", "/")
   const pad = normalized.length % 4 === 0 ? "" : "=".repeat(4 - (normalized.length % 4))
   return Buffer.from(normalized + pad, "base64").toString("utf8")
 }

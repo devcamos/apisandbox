@@ -318,7 +318,19 @@ export function LessonTracker({ phase }: LessonTrackerProps) {
 
       {isOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={() => setIsOpen(false)} />
+          <div
+            className="absolute inset-0 bg-black/80 backdrop-blur-sm"
+            role="button"
+            tabIndex={0}
+            aria-label="Close lesson dialog"
+            onClick={() => setIsOpen(false)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault()
+                setIsOpen(false)
+              }
+            }}
+          />
 
           <div className="relative bg-slate-900 rounded-2xl border border-slate-700 max-w-6xl w-full max-h-[90vh] overflow-hidden shadow-2xl animate-slideDown">
             <div className="bg-gradient-to-r from-green-500 to-emerald-500 p-6 relative">
@@ -539,7 +551,7 @@ export function LessonTracker({ phase }: LessonTrackerProps) {
                                 ) : (
                                   <div className="ml-8 space-y-2">
                                     <div className="flex items-center justify-between">
-                                      <label className="text-xs text-gray-400">Your answer</label>
+                                      <label htmlFor={`lt-answer-${module.id}-${checkpoint.id}`} className="text-xs text-gray-400">Your answer</label>
                                       <button
                                         type="button"
                                         onClick={() => patchState(module.id, checkpoint.id, { answer: checkpointTemplate(checkpoint) })}
@@ -549,6 +561,7 @@ export function LessonTracker({ phase }: LessonTrackerProps) {
                                       </button>
                                     </div>
                                     <textarea
+                                      id={`lt-answer-${module.id}-${checkpoint.id}`}
                                       value={state.answer}
                                       onChange={(e) => patchState(module.id, checkpoint.id, { answer: e.target.value })}
                                       className="w-full mt-1 p-2 rounded-md bg-slate-900 border border-slate-700 text-sm text-gray-100"
@@ -557,8 +570,9 @@ export function LessonTracker({ phase }: LessonTrackerProps) {
                                     />
 
                                     <div>
-                                      <label className="text-xs text-gray-400">Project evidence</label>
+                                      <label htmlFor={`lt-evidence-${module.id}-${checkpoint.id}`} className="text-xs text-gray-400">Project evidence</label>
                                       <input
+                                        id={`lt-evidence-${module.id}-${checkpoint.id}`}
                                         value={state.evidence}
                                         onChange={(e) => patchState(module.id, checkpoint.id, { evidence: e.target.value })}
                                         className="w-full mt-1 p-2 rounded-md bg-slate-900 border border-slate-700 text-sm text-gray-100"
@@ -568,8 +582,9 @@ export function LessonTracker({ phase }: LessonTrackerProps) {
 
                                     <div className="grid md:grid-cols-2 gap-2">
                                       <div>
-                                        <label className="text-xs text-gray-400">Service name</label>
+                                        <label htmlFor={`lt-service-${module.id}-${checkpoint.id}`} className="text-xs text-gray-400">Service name</label>
                                         <input
+                                          id={`lt-service-${module.id}-${checkpoint.id}`}
                                           value={state.serviceName}
                                           onChange={(e) => patchState(module.id, checkpoint.id, { serviceName: e.target.value })}
                                           className="w-full mt-1 p-2 rounded-md bg-slate-900 border border-slate-700 text-sm text-gray-100"
@@ -577,8 +592,9 @@ export function LessonTracker({ phase }: LessonTrackerProps) {
                                         />
                                       </div>
                                       <div>
-                                        <label className="text-xs text-gray-400">Endpoint / handler</label>
+                                        <label htmlFor={`lt-endpoint-${module.id}-${checkpoint.id}`} className="text-xs text-gray-400">Endpoint / handler</label>
                                         <input
+                                          id={`lt-endpoint-${module.id}-${checkpoint.id}`}
                                           value={state.endpointName}
                                           onChange={(e) => patchState(module.id, checkpoint.id, { endpointName: e.target.value })}
                                           className="w-full mt-1 p-2 rounded-md bg-slate-900 border border-slate-700 text-sm text-gray-100"
@@ -586,8 +602,9 @@ export function LessonTracker({ phase }: LessonTrackerProps) {
                                         />
                                       </div>
                                       <div>
-                                        <label className="text-xs text-gray-400">Critical path step</label>
+                                        <label htmlFor={`lt-critical-${module.id}-${checkpoint.id}`} className="text-xs text-gray-400">Critical path step</label>
                                         <input
+                                          id={`lt-critical-${module.id}-${checkpoint.id}`}
                                           value={state.criticalPathStep}
                                           onChange={(e) => patchState(module.id, checkpoint.id, { criticalPathStep: e.target.value })}
                                           className="w-full mt-1 p-2 rounded-md bg-slate-900 border border-slate-700 text-sm text-gray-100"
@@ -595,8 +612,9 @@ export function LessonTracker({ phase }: LessonTrackerProps) {
                                         />
                                       </div>
                                       <div>
-                                        <label className="text-xs text-gray-400">Audit evidence (PR / runbook / test / dashboard)</label>
+                                        <label htmlFor={`lt-audit-${module.id}-${checkpoint.id}`} className="text-xs text-gray-400">Audit evidence (PR / runbook / test / dashboard)</label>
                                         <input
+                                          id={`lt-audit-${module.id}-${checkpoint.id}`}
                                           value={state.auditEvidence}
                                           onChange={(e) => patchState(module.id, checkpoint.id, { auditEvidence: e.target.value })}
                                           className="w-full mt-1 p-2 rounded-md bg-slate-900 border border-slate-700 text-sm text-gray-100"

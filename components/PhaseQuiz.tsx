@@ -32,6 +32,13 @@ interface ProgressPayload {
   attempts: number
 }
 
+function quizOptionRowClass(showCorrect: boolean, showIncorrectSelection: boolean, isSelected: boolean) {
+  if (showCorrect) return "border-green-500/50 bg-green-500/10"
+  if (showIncorrectSelection) return "border-red-500/50 bg-red-500/10"
+  if (isSelected) return "border-cyan-500/50 bg-cyan-500/10"
+  return "border-slate-700 bg-slate-800/50 hover:border-slate-600"
+}
+
 interface SubmissionResult {
   correctAnswers: number
   totalQuestions: number
@@ -224,15 +231,11 @@ export default function PhaseQuiz({ phaseNumber, accentClass }: PhaseQuizProps) 
                   return (
                     <label
                       key={option}
-                      className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-all ${
-                        showCorrect
-                          ? "border-green-500/50 bg-green-500/10"
-                          : showIncorrectSelection
-                            ? "border-red-500/50 bg-red-500/10"
-                            : isSelected
-                              ? "border-cyan-500/50 bg-cyan-500/10"
-                              : "border-slate-700 bg-slate-800/50 hover:border-slate-600"
-                      }`}
+                      className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-all ${quizOptionRowClass(
+                        showCorrect,
+                        showIncorrectSelection,
+                        isSelected,
+                      )}`}
                     >
                       <input
                         type="radio"
