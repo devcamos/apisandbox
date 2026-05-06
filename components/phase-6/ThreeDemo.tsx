@@ -7,6 +7,8 @@ import * as THREE from "three"
 
 export type TraversalAlgorithm = "bfs" | "dfs-preorder" | "dfs-inorder" | "dfs-postorder"
 
+type NodeTraversalStatus = "idle" | "visiting" | "visited" | "queued"
+
 interface TreeNode {
   id: number
   value: number
@@ -112,7 +114,7 @@ const traversalMeta: Record<TraversalAlgorithm, { label: string; description: st
   "dfs-postorder": { label: "DFS Post-Order", description: "Post-order visits left subtree, right subtree, then the node. Used for deletion and expression trees." },
 }
 
-function NodeSphere({ node, status, onHover }: { node: TreeNode; status: "idle" | "visiting" | "visited" | "queued"; onHover: (id: number | null) => void }) {
+function NodeSphere({ node, status, onHover }: { node: TreeNode; status: NodeTraversalStatus; onHover: (id: number | null) => void }) {
   const meshRef = useRef<THREE.Mesh>(null)
   const baseColor = useMemo(() => {
     switch (status) {
@@ -132,7 +134,7 @@ function NodeSphere({ node, status, onHover }: { node: TreeNode; status: "idle" 
   return (
     <group position={[node.x, node.y, node.z]}>
       <mesh ref={meshRef} onPointerOver={() => onHover(node.id)} onPointerOut={() => onHover(null)}>
-        <sphereGeometry args={[0.3, 16, 16]} />
+        <primitive object={new THREE.SphereGeometry(0.3, 16, 16)} attach="geometry" />
         <meshStandardMaterial color={baseColor} roughness={0.3} metalness={0.6} />
       </mesh>
       <Text position={[0, 0, 0.35]} fontSize={0.2} color="white" anchorX="center" anchorY="middle" font={undefined}>
@@ -165,7 +167,7 @@ function TreeEdges({ tree }: { tree: TreeNode[] }) {
 
 type SceneProps = Readonly<{
   tree: TreeNode[]
-  nodeStatuses: Map<number, "idle" | "visiting" | "visited" | "queued">
+  nodeStatuses: Map<number, NodeTraversalStatus>
   onHover: (id: number | null) => void
 }>
 
@@ -200,7 +202,7 @@ export default function ThreeDemo({ algorithm = "bfs" }: { algorithm?: Traversal
   }, [algorithm])
 
   const nodeStatuses = useMemo(() => {
-    const map = new Map<number, "idle" | "visiting" | "visited" | "queued">()
+    const map = new Map<number, NodeTraversalStatus>()
     tree.forEach((n) => map.set(n.id, "idle"))
     if (visitIndex >= 0) {
       for (let i = 0; i <= visitIndex && i < order.length; i++) {

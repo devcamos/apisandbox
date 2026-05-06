@@ -10,9 +10,9 @@ import {
 
 export default async function PatternFundamentalsPage({
   params,
-}: {
+}: Readonly<{
   params: Promise<{ patternId: string }>
-}) {
+}>) {
   const { patternId } = await params
   const pattern = getPatternNode(patternId)
   const fundamentals = getPatternFundamentals(patternId)

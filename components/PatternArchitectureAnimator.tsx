@@ -48,7 +48,7 @@ function paletteForLesson(lessonId: string) {
   }
 }
 
-export default function PatternArchitectureAnimator({ lessonId, title }: PatternArchitectureAnimatorProps) {
+export default function PatternArchitectureAnimator({ lessonId, title }: Readonly<PatternArchitectureAnimatorProps>) {
   const palette = paletteForLesson(lessonId)
   const delayBase = (lessonId.length % 5) * 0.2
 

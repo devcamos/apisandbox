@@ -7,6 +7,12 @@ import { Menu, X, LogOut, User, ChevronDown, BookOpen, Cloud, Brain, Compass, Se
 import { useState, useRef, useEffect } from "react";
 import { PageSearch } from "./PageSearch";
 
+function mobileExploreBadgeClass(badge: string | undefined) {
+  if (badge === "Free") return "bg-green-500/20 text-green-400";
+  if (badge === "Docs") return "bg-slate-500/30 text-slate-300";
+  return "bg-purple-500/20 text-purple-400";
+}
+
 export default function Navigation() {
   const pathname = usePathname();
   const { data: session, status } = useSession();
@@ -394,13 +400,7 @@ export default function Navigation() {
                           >
                             <div className="flex items-center justify-between gap-2">
                               <span className="text-sm">{item.name}</span>
-                              <span className={`shrink-0 text-xs px-2 py-0.5 rounded ${
-                                item.badge === "Free"
-                                  ? "bg-green-500/20 text-green-400"
-                                  : item.badge === "Docs"
-                                    ? "bg-slate-500/30 text-slate-300"
-                                    : "bg-purple-500/20 text-purple-400"
-                              }`}>
+                              <span className={`shrink-0 text-xs px-2 py-0.5 rounded ${mobileExploreBadgeClass(item.badge)}`}>
                                 {item.badge}
                               </span>
                             </div>

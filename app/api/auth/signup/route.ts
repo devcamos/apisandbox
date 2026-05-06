@@ -51,13 +51,11 @@ export async function POST(request: NextRequest) {
     return response
   } catch (error) {
     if (error instanceof AppError) {
-      return NextResponse.json(
-        {
-          error: error.message,
-          ...(error.details !== undefined ? { details: error.details } : {}),
-        },
-        { status: error.status }
-      )
+      const payload: { error: string; details?: unknown } = { error: error.message }
+      if (error.details !== undefined) {
+        payload.details = error.details
+      }
+      return NextResponse.json(payload, { status: error.status })
     }
     return NextResponse.json(
       { error: "Failed to create account. Please try again." },

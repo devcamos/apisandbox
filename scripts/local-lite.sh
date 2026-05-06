@@ -8,10 +8,22 @@ YELLOW='\033[1;33m'
 RED='\033[0;31m'
 NC='\033[0m'
 
-log_info()    { local msg="$1"; echo -e "${BLUE}[INFO]${NC} ${msg}"; }
-log_success() { local msg="$1"; echo -e "${GREEN}[OK]${NC} ${msg}"; }
-log_warning() { local msg="$1"; echo -e "${YELLOW}[WARN]${NC} ${msg}"; }
-log_error()   { local msg="$1"; echo -e "${RED}[ERROR]${NC} ${msg}"; }
+log_info() {
+  local msg="${1:-}"
+  echo -e "${BLUE}[INFO]${NC} ${msg}"
+}
+log_success() {
+  local msg="${1:-}"
+  echo -e "${GREEN}[OK]${NC} ${msg}"
+}
+log_warning() {
+  local msg="${1:-}"
+  echo -e "${YELLOW}[WARN]${NC} ${msg}"
+}
+log_error() {
+  local msg="${1:-}"
+  echo -e "${RED}[ERROR]${NC} ${msg}" >&2
+}
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"

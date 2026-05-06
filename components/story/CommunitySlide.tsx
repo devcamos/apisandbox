@@ -60,9 +60,9 @@ export default function CommunitySlide() {
         {slide.title}
       </motion.h1>
 
-      {slide.body.map((line, i) => (
+      {slide.body.map((line) => (
         <motion.p
-          key={i}
+          key={`${slide.title}-${line}`}
           className="text-xl md:text-2xl text-gray-300 leading-relaxed"
           variants={childVariants}
         >

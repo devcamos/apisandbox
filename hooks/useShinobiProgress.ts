@@ -7,7 +7,6 @@ import {
   loadShinobiProgress,
   saveShinobiProgress,
   tryAwardSectionExploration,
-  type ShinobiAttributeId,
   type ShinobiProgressState,
 } from "@/lib/learning/shinobi-progress"
 import { XP_PER_CORRECT_QUIZ } from "@/lib/learning/shinobi-quiz"
@@ -69,4 +68,4 @@ export function useShinobiProgress() {
 }
 
 export type ShinobiProgressApi = ReturnType<typeof useShinobiProgress>
-export type { ShinobiAttributeId, ShinobiProgressState }
+export type { ShinobiAttributeId, ShinobiProgressState } from "@/lib/learning/shinobi-progress"

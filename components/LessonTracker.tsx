@@ -569,8 +569,8 @@ export function LessonTracker({ phase }: LessonTrackerProps) {
                                       placeholder={`${answerGuide}\n\n${checkpointTemplate(checkpoint)}`}
                                     />
 
-                                    <div>
-                                      <label htmlFor={`lt-evidence-${module.id}-${checkpoint.id}`} className="text-xs text-gray-400">Project evidence</label>
+                                    <label className="block text-xs text-gray-400">
+                                      Project evidence
                                       <input
                                         id={`lt-evidence-${module.id}-${checkpoint.id}`}
                                         value={state.evidence}
@@ -578,7 +578,7 @@ export function LessonTracker({ phase }: LessonTrackerProps) {
                                         className="w-full mt-1 p-2 rounded-md bg-slate-900 border border-slate-700 text-sm text-gray-100"
                                         placeholder="What exactly did you build/test/change?"
                                       />
-                                    </div>
+                                    </label>
 
                                     <div className="grid md:grid-cols-2 gap-2">
                                       <div>

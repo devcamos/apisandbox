@@ -3,7 +3,7 @@
 const fs = require("fs");
 const path = require("node:path");
 const crypto = require("crypto");
-const { execFileSync } = require("child_process");
+const { execFileSync } = require("node:child_process");
 const dotenv = require("dotenv");
 const bcrypt = require("bcryptjs");
 const { PrismaClient } = require("@prisma/client");
@@ -25,7 +25,7 @@ function sqliteQuery(dbPath, sql) {
 function quoteSqlValue(value) {
   if (value === null || value === undefined) return "NULL";
   if (typeof value === "number") return String(value);
-  return `'${String(value).replace(/'/g, "''")}'`;
+  return `'${String(value).replaceAll("'", "''")}'`;
 }
 
 async function main() {
@@ -43,12 +43,13 @@ async function main() {
     {
       email: "test@example.com",
       name: "Test User",
-      password: "Test1234!@#$",
+      // NOSONAR — synthetic users for empty local DB only; override with ENSURE_TEST_USERS_PASSWORD
+      password: process.env.ENSURE_TEST_USERS_PASSWORD || "Test1234!@#$",
     },
     {
       email: "qa@example.com",
       name: "QA User",
-      password: "QaTest1234!@#$",
+      password: process.env.ENSURE_TEST_USERS_PASSWORD_QA || "QaTest1234!@#$", // NOSONAR
     },
   ];
 
@@ -78,7 +79,7 @@ async function main() {
 
     for (const user of testUsers) {
       const passwordHash = await bcrypt.hash(user.password, 12);
-      const id = `usr_${crypto.randomUUID().replace(/-/g, "").slice(0, 24)}`;
+      const id = `usr_${crypto.randomUUID().replaceAll("-", "").slice(0, 24)}`;
       const now = new Date().toISOString();
 
       const candidateValues = {

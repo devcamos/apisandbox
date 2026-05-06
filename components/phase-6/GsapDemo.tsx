@@ -24,8 +24,10 @@ function generateBinarySearchSteps(arr: number[], target: number): SearchState[]
 
   while (low <= high) {
     const mid = Math.floor((low + high) / 2)
-    states.push({ low, high, mid, phase: "narrowing", explanation: `Search window: indices ${low}–${high}. Middle = ⌊(${low}+${high})/2⌋ = ${mid}` })
-    states.push({ low, high, mid, phase: "checking", explanation: `Compare arr[${mid}] = ${arr[mid]} with target ${target}` })
+    states.push(
+      { low, high, mid, phase: "narrowing", explanation: `Search window: indices ${low}–${high}. Middle = ⌊(${low}+${high})/2⌋ = ${mid}` },
+      { low, high, mid, phase: "checking", explanation: `Compare arr[${mid}] = ${arr[mid]} with target ${target}` }
+    )
 
     if (arr[mid] === target) {
       states.push({ low, high, mid, phase: "found", explanation: `${arr[mid]} === ${target} — found at index ${mid}!` })
@@ -94,6 +96,60 @@ function generateSteps(algo: SearchAlgorithm, arr: number[], target: number): Se
   if (algo === "binary") return generateBinarySearchSteps(arr, target)
   if (algo === "jump") return generateJumpSearchSteps(arr, target)
   return generateLinearSearchSteps(arr, target)
+}
+
+function usesWindowHighlight(algorithm: SearchAlgorithm): boolean {
+  return algorithm === "binary" || algorithm === "jump"
+}
+
+function computeCellBorderColor(
+  algorithm: SearchAlgorithm,
+  state: SearchState,
+  isInRange: boolean,
+  isMid: boolean,
+  isJumpBoundary: boolean
+): string {
+  if (isMid) {
+    return state.phase === "found" ? "#34d399" : "#fbbf24"
+  }
+  if (isJumpBoundary && isInRange) {
+    return "#a78bfa"
+  }
+  if (isInRange) {
+    return usesWindowHighlight(algorithm) ? "#4ade80" : "#475569"
+  }
+  return "#1e293b"
+}
+
+function computeCellBackgroundColor(
+  algorithm: SearchAlgorithm,
+  state: SearchState,
+  isInRange: boolean,
+  isMid: boolean,
+  isJumpBoundary: boolean
+): string {
+  if (isMid) {
+    return state.phase === "found" ? "rgba(52, 211, 153, 0.25)" : "rgba(251, 191, 36, 0.2)"
+  }
+  if (isJumpBoundary && isInRange) {
+    return "rgba(167, 139, 250, 0.1)"
+  }
+  if (isInRange) {
+    return usesWindowHighlight(algorithm) ? "rgba(34, 197, 94, 0.1)" : "rgba(51, 65, 85, 1)"
+  }
+  return "rgba(15, 23, 42, 0.3)"
+}
+
+function computeCellScale(isMid: boolean, isInRange: boolean): number {
+  if (isMid) return 1.15
+  if (isInRange) return 1
+  return 0.85
+}
+
+function computeCellOpacity(isPast: boolean, isInRange: boolean): number {
+  if (isPast) return 0.3
+  if (isInRange) return 1
+  return 0.3
 }
 
 const algorithmMeta: Record<SearchAlgorithm, { label: string; complexity: string; description: string; array: number[] }> = {
@@ -170,29 +226,14 @@ export default function GsapDemo({ algorithm = "binary" }: { algorithm?: SearchA
 
         const isJumpBoundary = algorithm === "jump" && jumpBlockSize > 0 && i % jumpBlockSize === 0 && i <= state.high
 
-        let borderColor = "#1e293b"
-        if (isMid) {
-          borderColor = state.phase === "found" ? "#34d399" : "#fbbf24"
-        } else if (isJumpBoundary && isInRange) {
-          borderColor = "#a78bfa"
-        } else if (isInRange) {
-          borderColor = algorithm !== "linear" ? "#4ade80" : "#475569"
-        }
-
-        let backgroundColor = "rgba(15, 23, 42, 0.3)"
-        if (isMid) {
-          backgroundColor =
-            state.phase === "found" ? "rgba(52, 211, 153, 0.25)" : "rgba(251, 191, 36, 0.2)"
-        } else if (isJumpBoundary && isInRange) {
-          backgroundColor = "rgba(167, 139, 250, 0.1)"
-        } else if (isInRange) {
-          backgroundColor =
-            algorithm !== "linear" ? "rgba(34, 197, 94, 0.1)" : "rgba(51, 65, 85, 1)"
-        }
+        const borderColor = computeCellBorderColor(algorithm, state, isInRange, isMid, isJumpBoundary)
+        const backgroundColor = computeCellBackgroundColor(algorithm, state, isInRange, isMid, isJumpBoundary)
+        const scale = computeCellScale(isMid, isInRange)
+        const opacity = computeCellOpacity(isPast, isInRange)
 
         gsap.to(cell, {
-          scale: isMid ? 1.15 : isInRange ? 1 : 0.85,
-          opacity: isPast ? 0.3 : isInRange ? 1 : 0.3,
+          scale,
+          opacity,
           duration: 0.35,
           ease: "back.out(1.4)",
           borderColor,
@@ -275,7 +316,7 @@ export default function GsapDemo({ algorithm = "binary" }: { algorithm?: SearchA
             </>
           )}
           {algorithm === "linear" && (
-            <span className="text-amber-400">scanning: [{current.mid >= 0 ? current.mid : 0}]</span>
+            <span className="text-amber-400">scanning: [{Math.max(current.mid, 0)}]</span>
           )}
           <span className="text-gray-500">|</span>
           <span className="text-cyan-400">comparisons: {comparisonCount}</span>

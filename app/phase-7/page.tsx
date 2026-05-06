@@ -5,7 +5,7 @@ import PhaseLayout from "@/components/PhaseLayout";
 import { DollarSign, ArrowRight, Clock, Flame, TrendingUp, ChevronDown } from "lucide-react";
 import { monetisationPaths, type MonetisationPath } from "@/lib/learning/monetisation-paths";
 
-function EffortBadge({ level }: { level: MonetisationPath["effortLevel"] }) {
+function EffortBadge({ level }: Readonly<{ level: MonetisationPath["effortLevel"] }>) {
   const styles = {
     Low: "bg-emerald-500/20 text-emerald-300 border-emerald-500/30",
     Medium: "bg-amber-500/20 text-amber-300 border-amber-500/30",

@@ -6,7 +6,7 @@ import { useState } from "react";
 
 function base64UrlDecode(str: string): string {
   try {
-    const base64 = str.replace(/-/g, "+").replace(/_/g, "/");
+    const base64 = str.replaceAll("-", "+").replaceAll("_", "/");
     const padded = base64.padEnd(base64.length + (4 - base64.length % 4) % 4, "=");
     return decodeURIComponent(
       atob(padded)
@@ -22,7 +22,7 @@ function base64UrlDecode(str: string): string {
 function base64UrlEncode(obj: object): string {
   const json = JSON.stringify(obj);
   const b64 = btoa(unescape(encodeURIComponent(json)));
-  return b64.replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+  return b64.replaceAll("+", "-").replaceAll("/", "_").replace(/=+$/, "");
 }
 
 export default function JwtDemo() {
