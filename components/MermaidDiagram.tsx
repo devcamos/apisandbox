@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useId, useRef, useState } from "react";
-import { sanitizeMermaidSvg } from "@/lib/sanitize-mermaid-svg";
+import { mountSanitizedMermaidSvg } from "@/lib/sanitize-mermaid-svg";
 
 interface MermaidDiagramProps {
   chart: string;
@@ -43,7 +43,7 @@ export default function MermaidDiagram({ chart }: MermaidDiagramProps) {
 
         const { svg } = await mermaid.render(`mermaid-${elementId}`, chart);
         if (!cancelled && containerRef.current) {
-          containerRef.current.innerHTML = sanitizeMermaidSvg(svg);
+          mountSanitizedMermaidSvg(containerRef.current, svg);
         }
       } catch (renderError) {
         if (!cancelled) {

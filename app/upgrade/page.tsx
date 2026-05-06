@@ -1,5 +1,6 @@
 "use client"
 
+import { isAllowedStripeCheckoutRedirectUrl } from "@/lib/safe-redirect"
 import { useSession } from "@/components/providers/SessionProvider"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
@@ -26,7 +27,7 @@ export default function UpgradePage() {
 
       if (response.ok) {
         const { url } = await response.json()
-        if (url) {
+        if (typeof url === "string" && isAllowedStripeCheckoutRedirectUrl(url)) {
           window.location.href = url
           return
         }

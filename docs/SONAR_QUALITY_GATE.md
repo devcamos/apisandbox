@@ -17,7 +17,7 @@ This repo mixes **product code** (APIs, auth, billing) with **long-form learning
    Official reference: [Quality Gates](https://docs.sonarsource.com/sonarcloud/improving/quality-gates/) and [Managing quality gates](https://docs.sonarsource.com/sonarcloud/administering-sonarcloud/managing-quality-gates/).
 
 3. **Copy-paste (CPD) exclusions in-repo**  
-   `sonar-project.properties` sets `sonar.cpd.exclusions` for curriculum trees only. That reduces noise on **duplication %** without disabling analysis of those files for other rules.
+   `sonar-project.properties` sets `sonar.cpd.exclusions` for curriculum data, **all `app/**/*.tsx` UI**, **`components/**`**, and **`hooks/**`**, so **Duplication on New Code** reflects API / core `lib` work—not repeated page layout. Other rules still apply to excluded paths.
 
 4. **CI vs decoration**  
    GitHub Actions uploads analysis + coverage; the **pass/fail** of the SonarCloud check follows the **Quality Gate** you attach to the project. Branch protection should require the gate you actually intend to enforce.

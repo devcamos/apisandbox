@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest"
-import { sanitizeMermaidSvg } from "@/lib/sanitize-mermaid-svg"
+import { mountSanitizedMermaidSvg, sanitizeMermaidSvg } from "@/lib/sanitize-mermaid-svg"
 
 describe("sanitizeMermaidSvg", () => {
   it("keeps benign svg from mermaid", () => {
@@ -13,4 +13,15 @@ describe("sanitizeMermaidSvg", () => {
     const clean = sanitizeMermaidSvg(dirty)
     expect(clean.toLowerCase()).not.toContain("<script")
   })
+})
+
+describe("mountSanitizedMermaidSvg", () => {
+  it("mounts parsed svg nodes under container", () => {
+    const el = document.createElement("div")
+    const svg = '<svg xmlns="http://www.w3.org/2000/svg"><text>ok</text></svg>'
+    mountSanitizedMermaidSvg(el, svg)
+    expect(el.querySelector("svg")).not.toBeNull()
+    expect(el.textContent).toContain("ok")
+  })
+
 })

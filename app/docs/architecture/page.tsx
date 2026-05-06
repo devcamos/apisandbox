@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { sanitizeMermaidSvg } from "@/lib/sanitize-mermaid-svg";
+import { mountSanitizedMermaidSvg } from "@/lib/sanitize-mermaid-svg";
 
 export default function ArchitecturePage() {
   const [mounted, setMounted] = useState(false);
@@ -37,7 +37,7 @@ export default function ArchitecturePage() {
               ref.setAttribute("data-rendered", "true");
               try {
                 const { svg } = await mermaid.default.render(`mermaid-${index}`, diagram);
-                ref.innerHTML = sanitizeMermaidSvg(svg);
+                mountSanitizedMermaidSvg(ref, svg);
               } catch (error) {
                 console.error(`Error rendering diagram ${index}:`, error);
                 ref.replaceChildren();

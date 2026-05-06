@@ -1,6 +1,7 @@
 "use client"
 
 import { ReactNode, createContext, useContext, useEffect, useState } from "react"
+import { getSafeClientRelativeRedirect } from "@/lib/safe-redirect"
 
 type SessionStatus = "loading" | "authenticated" | "unauthenticated"
 
@@ -137,7 +138,7 @@ export function useSession() {
 }
 
 export async function signOut(options?: { callbackUrl?: string }) {
-  const callback = options?.callbackUrl || "/"
+  const callback = getSafeClientRelativeRedirect(options?.callbackUrl, "/")
   if (typeof window !== "undefined") {
     localStorage.removeItem(STORAGE_KEY)
     try {

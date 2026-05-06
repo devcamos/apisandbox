@@ -16,6 +16,7 @@ export default defineConfig({
       // thousands of 0%-covered lines in lcov.info; SonarCloud then fails Coverage on New Code.
       include: [
         "lib/sanitize-mermaid-svg.ts",
+        "lib/safe-redirect.ts",
         "lib/stripe-client.ts",
         "config/featureFlags.ts",
       ],
