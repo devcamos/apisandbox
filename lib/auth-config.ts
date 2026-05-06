@@ -21,8 +21,7 @@ import NextAuth, { type NextAuthConfig } from "next-auth"
 import CredentialsProvider from "next-auth/providers/credentials"
 import GoogleProvider from "next-auth/providers/google"
 import { OAuth2Client } from "google-auth-library"
-import { prisma } from "@/lib/prisma"
-import { verifyPassword } from "@/lib/auth"
+import { authorizeWithEmailPassword, authorizeWithGoogleIdToken } from "@/lib/auth-authorize-helpers"
 
 // MENTOR NOTE: Environment variables for OAuth
 // In production, set these in your hosting platform:
@@ -72,138 +71,21 @@ export const authConfig: NextAuthConfig = {
         googleIdToken: { label: "Google ID Token", type: "text" },
       },
       async authorize(credentials) {
-        // Google Sign-In (life-world-os style: verify id_token, find or create user)
         const googleIdToken = credentials?.googleIdToken as string | undefined
         if (googleIdToken && googleOAuth2Client && GOOGLE_CLIENT_ID) {
           try {
-            const ticket = await googleOAuth2Client.verifyIdToken({
-              idToken: googleIdToken,
-              audience: GOOGLE_CLIENT_ID,
-            })
-            const payload = ticket.getPayload()
-            if (!payload?.email) {
-              throw new Error("Google did not provide an email")
-            }
-            const email = payload.email
-            const name = payload.name ?? undefined
-            const image = payload.picture ?? undefined
-
-            let user = await prisma.user.findUnique({ where: { email } })
-            if (!user) {
-              user = await prisma.user.create({
-                data: {
-                  email,
-                  name: name ?? email.split("@")[0],
-                  image,
-                  passwordHash: null,
-                },
-              })
-            } else if (!user.image && image) {
-              user = await prisma.user.update({
-                where: { id: user.id },
-                data: { image, ...(name && !user.name ? { name } : {}) },
-              })
-            }
-            return {
-              id: user.id,
-              email: user.email,
-              name: user.name,
-              image: user.image,
-            }
+            return await authorizeWithGoogleIdToken(googleIdToken, googleOAuth2Client, GOOGLE_CLIENT_ID)
           } catch (err) {
             console.error("Google id_token verification failed", err)
-            throw new Error(
-              err instanceof Error ? err.message : "Google sign-in failed"
-            )
+            throw new Error(err instanceof Error ? err.message : "Google sign-in failed")
           }
         }
 
-        // Email/password flow
         if (!credentials?.email || !credentials?.password) {
           throw new Error("Email and password are required")
         }
 
-        const email = credentials.email as string
-        const password = credentials.password as string
-
-        // Find user in database
-        const user = await prisma.user.findUnique({
-          where: { email }
-        })
-
-        if (!user) {
-          // MENTOR NOTE: Security Best Practice
-          // Don't reveal if email exists (prevents user enumeration)
-          // However, we can provide helpful guidance without revealing specifics
-          throw new Error("CREDENTIALS_INVALID")
-        }
-
-        // Check if account is locked
-        if (user.lockedUntil && user.lockedUntil > new Date()) {
-          const minutesRemaining = Math.ceil((user.lockedUntil.getTime() - Date.now()) / (1000 * 60))
-          throw new Error(`ACCOUNT_LOCKED:${minutesRemaining}`)
-        }
-
-        // Check if account is active
-        if (!user.isActive) {
-          throw new Error("Account is deactivated. Please contact support.")
-        }
-
-        // Verify password
-        if (!user.passwordHash) {
-          // User signed up with OAuth, no password set
-          throw new Error("This account was created with OAuth. Please sign in with your OAuth provider (Google).")
-        }
-
-        const isValidPassword = await verifyPassword(
-          password,
-          user.passwordHash
-        )
-
-        if (!isValidPassword) {
-          // MENTOR NOTE: Account Lockout
-          // Increment failed login attempts
-          const newAttempts = (user.loginAttempts || 0) + 1
-          let lockedUntil = null
-
-          // Lock after 5 failed attempts for 30 minutes
-          if (newAttempts >= 5) {
-            lockedUntil = new Date(Date.now() + 30 * 60 * 1000)
-          }
-
-          await prisma.user.update({
-            where: { id: user.id },
-            data: {
-              loginAttempts: newAttempts,
-              lockedUntil,
-            }
-          })
-
-          // Provide helpful error message based on attempts
-          if (newAttempts >= 5) {
-            throw new Error("ACCOUNT_LOCKED")
-          } else {
-            const attemptsRemaining = 5 - newAttempts
-            throw new Error(`PASSWORD_INCORRECT:${attemptsRemaining}`)
-          }
-        }
-
-        // Reset login attempts on successful login
-        await prisma.user.update({
-          where: { id: user.id },
-          data: {
-            loginAttempts: 0,
-            lockedUntil: null,
-          }
-        })
-
-        // Return user object (password NOT included)
-        return {
-          id: user.id,
-          email: user.email,
-          name: user.name,
-          image: user.image,
-        }
+        return authorizeWithEmailPassword(credentials.email as string, credentials.password as string)
       }
     }),
 

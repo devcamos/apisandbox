@@ -68,8 +68,11 @@ function generateJumpSearchSteps(arr: number[], target: number): SearchState[] {
   states.push({ low: 0, high: n - 1, mid: -1, phase: "narrowing", explanation: `Jump size = ⌊√${n}⌋ = ${step}. Start scanning in blocks.` })
 
   while (curr < n && arr[Math.min(curr, n - 1)] < target) {
-    states.push({ low: prev, high: Math.min(curr, n - 1), mid: Math.min(curr, n - 1), phase: "checking", explanation: `Jump to index ${Math.min(curr, n - 1)}: arr[${Math.min(curr, n - 1)}] = ${arr[Math.min(curr, n - 1)]}` })
-    states.push({ low: prev, high: Math.min(curr, n - 1), mid: Math.min(curr, n - 1), phase: "narrowing", explanation: `${arr[Math.min(curr, n - 1)]} < ${target} — jump forward another ${step}` })
+    const hi = Math.min(curr, n - 1)
+    states.push(
+      { low: prev, high: hi, mid: hi, phase: "checking", explanation: `Jump to index ${hi}: arr[${hi}] = ${arr[hi]}` },
+      { low: prev, high: hi, mid: hi, phase: "narrowing", explanation: `${arr[hi]} < ${target} — jump forward another ${step}` }
+    )
     prev = curr
     curr += step
   }
@@ -110,13 +113,15 @@ function computeCellBorderColor(
   isJumpBoundary: boolean
 ): string {
   if (isMid) {
-    return state.phase === "found" ? "#34d399" : "#fbbf24"
+    if (state.phase === "found") return "#34d399"
+    return "#fbbf24"
   }
   if (isJumpBoundary && isInRange) {
     return "#a78bfa"
   }
   if (isInRange) {
-    return usesWindowHighlight(algorithm) ? "#4ade80" : "#475569"
+    if (usesWindowHighlight(algorithm)) return "#4ade80"
+    return "#475569"
   }
   return "#1e293b"
 }
@@ -129,13 +134,15 @@ function computeCellBackgroundColor(
   isJumpBoundary: boolean
 ): string {
   if (isMid) {
-    return state.phase === "found" ? "rgba(52, 211, 153, 0.25)" : "rgba(251, 191, 36, 0.2)"
+    if (state.phase === "found") return "rgba(52, 211, 153, 0.25)"
+    return "rgba(251, 191, 36, 0.2)"
   }
   if (isJumpBoundary && isInRange) {
     return "rgba(167, 139, 250, 0.1)"
   }
   if (isInRange) {
-    return usesWindowHighlight(algorithm) ? "rgba(34, 197, 94, 0.1)" : "rgba(51, 65, 85, 1)"
+    if (usesWindowHighlight(algorithm)) return "rgba(34, 197, 94, 0.1)"
+    return "rgba(51, 65, 85, 1)"
   }
   return "rgba(15, 23, 42, 0.3)"
 }
@@ -150,6 +157,51 @@ function computeCellOpacity(isPast: boolean, isInRange: boolean): number {
   if (isPast) return 0.3
   if (isInRange) return 1
   return 0.3
+}
+
+function visualizerSubtitle(algorithm: SearchAlgorithm): string {
+  if (algorithm === "binary") return "narrowing search window"
+  if (algorithm === "jump") return "block jumps and linear scan"
+  return "sequential scan"
+}
+
+function runSearchStepCellAnimations(
+  cells: (HTMLDivElement | null)[],
+  algorithm: SearchAlgorithm,
+  arrLength: number,
+  state: SearchState,
+  animatePointer: (midIndex: number) => void
+): void {
+  const jumpBlockSize = algorithm === "jump" ? Math.floor(Math.sqrt(arrLength)) : 0
+
+  cells.forEach((cell, i) => {
+    if (!cell) return
+    const isInRange = i >= state.low && i <= state.high
+    const isMid = i === state.mid
+
+    let isPast = false
+    if (algorithm === "linear") isPast = i < state.mid
+    if (algorithm === "jump" && state.phase === "narrowing" && state.mid >= 0) {
+      isPast = i < state.low
+    }
+
+    const isJumpBoundary = algorithm === "jump" && jumpBlockSize > 0 && i % jumpBlockSize === 0 && i <= state.high
+
+    const borderColor = computeCellBorderColor(algorithm, state, isInRange, isMid, isJumpBoundary)
+    const backgroundColor = computeCellBackgroundColor(algorithm, state, isInRange, isMid, isJumpBoundary)
+    const scale = computeCellScale(isMid, isInRange)
+    const opacity = computeCellOpacity(isPast, isInRange)
+
+    gsap.to(cell, {
+      scale,
+      opacity,
+      duration: 0.35,
+      ease: "back.out(1.4)",
+      borderColor,
+      backgroundColor,
+    })
+  })
+  if (state.mid >= 0) animatePointer(state.mid)
 }
 
 const algorithmMeta: Record<SearchAlgorithm, { label: string; complexity: string; description: string; array: number[] }> = {
@@ -173,7 +225,7 @@ const algorithmMeta: Record<SearchAlgorithm, { label: string; complexity: string
   },
 }
 
-export default function GsapDemo({ algorithm = "binary" }: { algorithm?: SearchAlgorithm }) {
+export default function GsapDemo({ algorithm = "binary" }: Readonly<{ algorithm?: SearchAlgorithm }>) {
   const meta = algorithmMeta[algorithm]
   const arr = meta.array
   const [target, setTarget] = useState(DEFAULT_TARGET)
@@ -211,36 +263,7 @@ export default function GsapDemo({ algorithm = "binary" }: { algorithm?: SearchA
 
   const animateCells = useCallback(
     (state: SearchState) => {
-      const jumpBlockSize = algorithm === "jump" ? Math.floor(Math.sqrt(arr.length)) : 0
-
-      cellRefs.current.forEach((cell, i) => {
-        if (!cell) return
-        const isInRange = i >= state.low && i <= state.high
-        const isMid = i === state.mid
-
-        let isPast = false
-        if (algorithm === "linear") isPast = i < state.mid
-        if (algorithm === "jump" && state.phase === "narrowing" && state.mid >= 0) {
-          isPast = i < state.low
-        }
-
-        const isJumpBoundary = algorithm === "jump" && jumpBlockSize > 0 && i % jumpBlockSize === 0 && i <= state.high
-
-        const borderColor = computeCellBorderColor(algorithm, state, isInRange, isMid, isJumpBoundary)
-        const backgroundColor = computeCellBackgroundColor(algorithm, state, isInRange, isMid, isJumpBoundary)
-        const scale = computeCellScale(isMid, isInRange)
-        const opacity = computeCellOpacity(isPast, isInRange)
-
-        gsap.to(cell, {
-          scale,
-          opacity,
-          duration: 0.35,
-          ease: "back.out(1.4)",
-          borderColor,
-          backgroundColor,
-        })
-      })
-      if (state.mid >= 0) animatePointer(state.mid)
+      runSearchStepCellAnimations(cellRefs.current, algorithm, arr.length, state, animatePointer)
     },
     [animatePointer, algorithm, arr.length]
   )
@@ -283,7 +306,7 @@ export default function GsapDemo({ algorithm = "binary" }: { algorithm?: SearchA
         <div>
           <h3 className="text-lg font-semibold text-white">{meta.label} Visualizer</h3>
           <p className="text-xs text-green-300/70 mt-0.5">
-            The visualizer shows the {algorithm === "binary" ? "narrowing search window" : algorithm === "jump" ? "block jumps and linear scan" : "sequential scan"} step by step
+            The visualizer shows the {visualizerSubtitle(algorithm)} step by step
           </p>
         </div>
         <div className="flex items-center gap-3">

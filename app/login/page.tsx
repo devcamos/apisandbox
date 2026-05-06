@@ -19,6 +19,7 @@ import { useRouter, useSearchParams } from "next/navigation"
 import Link from "next/link"
 import { ArrowRight, Mail, Lock, AlertCircle, CheckCircle, XCircle, Loader2 } from "lucide-react"
 import { useAuthSessionWriter } from "@/components/providers/SessionProvider"
+import { parseLoginErrorMessage, type LoginErrorInfo } from "@/lib/login-error-parser"
 
 declare global {
   interface Window {
@@ -33,23 +34,13 @@ declare global {
   }
 }
 
-// Error types for better categorization
-type ErrorType = "validation" | "authentication" | "network" | "account" | "unknown"
-
-interface ErrorInfo {
-  message: string
-  type: ErrorType
-  recoverable: boolean
-  suggestion?: string
-}
-
 function LoginForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const { setSessionFromAuthResponse } = useAuthSessionWriter()
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
-  const [error, setError] = useState<ErrorInfo | null>(null)
+  const [error, setError] = useState<LoginErrorInfo | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [emailError, setEmailError] = useState("")
   const [passwordError, setPasswordError] = useState("")
@@ -125,123 +116,6 @@ function LoginForm() {
     }
   }
 
-  // Parse error message and categorize it
-  const parseError = useCallback((errorMessage: string): ErrorInfo => {
-    // Account locked errors (with time remaining)
-    if (errorMessage.startsWith("ACCOUNT_LOCKED")) {
-      const minutesMatch = errorMessage.match(/:(\d+)/)
-      const minutes = minutesMatch ? minutesMatch[1] : "30"
-      return {
-        message: "Account temporarily locked",
-        type: "account",
-        recoverable: true,
-        suggestion: `Your account has been temporarily locked due to multiple failed login attempts. Please wait ${minutes} minute${minutes !== "1" ? "s" : ""} before trying again, or contact support if you need immediate access.`
-      }
-    }
-
-    // Password incorrect (user exists, but password wrong)
-    if (errorMessage.startsWith("PASSWORD_INCORRECT")) {
-      const attemptsMatch = errorMessage.match(/:(\d+)/)
-      const attemptsRemaining = attemptsMatch ? attemptsMatch[1] : "0"
-      return {
-        message: "Incorrect password",
-        type: "authentication",
-        recoverable: true,
-        suggestion: `The password you entered is incorrect. ${attemptsRemaining !== "0" ? `You have ${attemptsRemaining} attempt${attemptsRemaining !== "1" ? "s" : ""} remaining before your account is locked. ` : ""}Please check your password or use "Forgot password" to reset it.`
-      }
-    }
-
-    // Credentials invalid (could be email not found OR password wrong - we don't reveal which)
-    if (errorMessage === "CREDENTIALS_INVALID") {
-      return {
-        message: "Invalid login credentials",
-        type: "authentication",
-        recoverable: true,
-        suggestion: "The email address or password you entered is incorrect. Please check both and try again. If you've forgotten your password, use the 'Forgot password' link below. If you don't have an account, please sign up."
-      }
-    }
-
-    // Account deactivated
-    if (errorMessage.includes("deactivated")) {
-      return {
-        message: "Account deactivated",
-        type: "account",
-        recoverable: false,
-        suggestion: "Your account has been deactivated. Please contact support to reactivate your account."
-      }
-    }
-
-    // OAuth account error
-    if (errorMessage.includes("OAuth") || errorMessage.includes("Google")) {
-      return {
-        message: "Account created with Google",
-        type: "authentication",
-        recoverable: true,
-        suggestion: "This account was created using Google sign-in. Please use the 'Sign in with Google' button below instead of email and password."
-      }
-    }
-
-    // Legacy error format support (for backward compatibility)
-    if (errorMessage.includes("Invalid email or password") || errorMessage.includes("invalid")) {
-      const attemptsMatch = errorMessage.match(/(\d+)\s*attempt/i)
-      if (attemptsMatch) {
-        const attempts = attemptsMatch[1]
-        return {
-          message: "Invalid login credentials",
-          type: "authentication",
-          recoverable: true,
-          suggestion: `${attempts} attempt${attempts !== "1" ? "s" : ""} remaining. The email address or password may be incorrect. Please check both, or use "Forgot password" to reset.`
-        }
-      }
-      return {
-        message: "Invalid login credentials",
-        type: "authentication",
-        recoverable: true,
-        suggestion: "The email address or password you entered may be incorrect. Please check both and try again, or use 'Forgot password' to reset your password."
-      }
-    }
-
-    // Legacy locked error format
-    if (errorMessage.includes("locked") || errorMessage.includes("lockout")) {
-      const minutesMatch = errorMessage.match(/(\d+)\s*minute/i)
-      const minutes = minutesMatch ? minutesMatch[1] : "30"
-      return {
-        message: "Account temporarily locked",
-        type: "account",
-        recoverable: true,
-        suggestion: `Your account is temporarily locked. Please wait ${minutes} minutes or contact support if you need immediate access.`
-      }
-    }
-
-    // Required fields
-    if (errorMessage.includes("required")) {
-      return {
-        message: errorMessage,
-        type: "validation",
-        recoverable: true,
-        suggestion: "Please fill in all required fields."
-      }
-    }
-
-    // Network errors
-    if (errorMessage.includes("network") || errorMessage.includes("fetch") || errorMessage.includes("timeout")) {
-      return {
-        message: "Network error. Please check your connection.",
-        type: "network",
-        recoverable: true,
-        suggestion: "Check your internet connection and try again. If the problem persists, please try again in a few moments."
-      }
-    }
-
-    // Unknown errors
-    return {
-      message: errorMessage || "An unexpected error occurred",
-      type: "unknown",
-      recoverable: true,
-      suggestion: "Please try again. If the problem continues, contact support."
-    }
-  }, [])
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError(null)
@@ -274,7 +148,7 @@ function LoginForm() {
       })
       const payload = await response.json()
       if (!response.ok) {
-        const errorInfo = parseError(payload?.error?.message || "Login failed")
+        const errorInfo = parseLoginErrorMessage(payload?.error?.message ?? "Login failed")
         setError(errorInfo)
         setIsLoading(false)
         return
@@ -297,7 +171,7 @@ function LoginForm() {
         }
       }
 
-      const errorInfo = parseError(errorMessage)
+      const errorInfo = parseLoginErrorMessage(errorMessage)
       setError(errorInfo)
       setIsLoading(false)
     }
@@ -315,7 +189,7 @@ function LoginForm() {
         })
         const payload = await response.json()
         if (!response.ok) {
-          const errorInfo = parseError(payload?.error?.message || "Google sign-in failed")
+          const errorInfo = parseLoginErrorMessage(payload?.error?.message ?? "Google sign-in failed")
           setError(errorInfo)
           setIsLoading(false)
           return
@@ -324,44 +198,41 @@ function LoginForm() {
         router.push(callbackUrl)
         router.refresh()
       } catch (err) {
-        const errorInfo = parseError(
+        const errorInfo = parseLoginErrorMessage(
           err instanceof Error ? err.message : "Failed to sign in with Google. Please try again."
         )
         setError(errorInfo)
         setIsLoading(false)
       }
     },
-    [callbackUrl, parseError, router, setSessionFromAuthResponse]
+    [callbackUrl, router, setSessionFromAuthResponse]
   )
 
   useEffect(() => {
     if (!googleClientId || !googleButtonRef.current) return
     const init = () => {
-      if (
-        typeof globalThis.window !== "undefined" &&
-        globalThis.window.google?.accounts?.id &&
-        googleButtonRef.current
-      ) {
-        globalThis.window.google.accounts.id.initialize({
-          client_id: googleClientId,
-          callback: (response: { credential: string }) => {
-            if (response.credential) handleGoogleCredential(response.credential)
-          },
-        })
-        globalThis.window.google.accounts.id.renderButton(googleButtonRef.current, {
-          type: "standard",
-          theme: "outline",
-          size: "large",
-          text: "signin_with",
-          width: "100%",
-        })
-      }
+      const gsi = globalThis.window?.google?.accounts?.id
+      const el = googleButtonRef.current
+      if (!gsi || !el) return
+      gsi.initialize({
+        client_id: googleClientId,
+        callback: (response: { credential: string }) => {
+          if (response.credential) void handleGoogleCredential(response.credential)
+        },
+      })
+      gsi.renderButton(el, {
+        type: "standard",
+        theme: "outline",
+        size: "large",
+        text: "signin_with",
+        width: "100%",
+      })
     }
-    if (globalThis.window.google?.accounts?.id) {
+    if (globalThis.window?.google?.accounts?.id) {
       init()
     } else {
       const t = setInterval(() => {
-        if (globalThis.window.google?.accounts?.id) {
+        if (globalThis.window?.google?.accounts?.id) {
           clearInterval(t)
           init()
         }

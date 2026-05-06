@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { useEffect, useMemo, useState } from "react"
+import { useCallback, useEffect, useMemo, useState } from "react"
 import { Trophy, CheckCircle2, AlertCircle, Lock } from "lucide-react"
 import { useSession } from "@/components/providers/SessionProvider"
 
@@ -37,6 +37,89 @@ function quizOptionRowClass(showCorrect: boolean, showIncorrectSelection: boolea
   if (showIncorrectSelection) return "border-red-500/50 bg-red-500/10"
   if (isSelected) return "border-cyan-500/50 bg-cyan-500/10"
   return "border-slate-700 bg-slate-800/50 hover:border-slate-600"
+}
+
+function QuizOptionRow(props: Readonly<{
+  option: string
+  optionIndex: number
+  questionId: string
+  isSelected: boolean
+  showCorrect: boolean
+  showIncorrectSelection: boolean
+  onSelect: (questionId: string, optionIndex: number) => void
+}>) {
+  const { option, optionIndex, questionId, isSelected, showCorrect, showIncorrectSelection, onSelect } = props
+  return (
+    <label
+      className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-all ${quizOptionRowClass(
+        showCorrect,
+        showIncorrectSelection,
+        isSelected,
+      )}`}
+    >
+      <input
+        type="radio"
+        name={questionId}
+        checked={isSelected}
+        onChange={() => onSelect(questionId, optionIndex)}
+        className="w-4 h-4"
+      />
+      <span className="text-gray-200">{option}</span>
+    </label>
+  )
+}
+
+function QuizQuestionBlock(props: Readonly<{
+  question: QuizQuestion
+  index: number
+  answers: Record<string, number>
+  result: SubmissionResult | null
+  onSelectOption: (questionId: string, optionIndex: number) => void
+}>) {
+  const { question, index, answers, result, onSelectOption } = props
+  const questionResult = result?.details.find((item) => item.questionId === question.id)
+
+  return (
+    <div className="bg-slate-900/50 border border-slate-700 rounded-xl p-6">
+      <h3 className="text-lg font-semibold text-white mb-4">
+        {index + 1}. {question.prompt}
+      </h3>
+      <div className="space-y-3">
+        {question.options.map((option, optionIndex) => {
+          const isSelected = answers[question.id] === optionIndex
+          const isCorrect = questionResult?.correctIndex === optionIndex
+          const showCorrect = Boolean(questionResult) && isCorrect
+          const showIncorrectSelection = Boolean(questionResult) && isSelected && !isCorrect
+
+          return (
+            <QuizOptionRow
+              key={option}
+              option={option}
+              optionIndex={optionIndex}
+              questionId={question.id}
+              isSelected={isSelected}
+              showCorrect={showCorrect}
+              showIncorrectSelection={showIncorrectSelection}
+              onSelect={onSelectOption}
+            />
+          )
+        })}
+      </div>
+      {result && questionResult && (
+        <div className={`mt-4 rounded-lg border p-4 ${questionResult.isCorrect ? "border-green-500/30 bg-green-500/5" : "border-amber-500/30 bg-amber-500/5"}`}>
+          <div className="flex items-center gap-2 mb-2 text-sm font-semibold text-white">
+            {questionResult.isCorrect ? (
+              <CheckCircle2 className="w-4 h-4 text-green-400" />
+            ) : (
+              <AlertCircle className="w-4 h-4 text-amber-400" />
+            )}
+            Explanation
+          </div>
+          <p className="text-sm text-gray-300">{questionResult.explanation}</p>
+        </div>
+      )}
+    </div>
+  )
 }
 
 interface SubmissionResult {
@@ -113,6 +196,10 @@ export default function PhaseQuiz({ phaseNumber, accentClass }: PhaseQuizProps) 
   }, [phaseNumber, status])
 
   const answeredCount = useMemo(() => Object.keys(answers).length, [answers])
+
+  const selectQuizOption = useCallback((questionId: string, optionIndex: number) => {
+    setAnswers((prev) => ({ ...prev, [questionId]: optionIndex }))
+  }, [])
 
   async function submitQuiz() {
     const token = localStorage.getItem(AUTH_STORAGE_KEY)
@@ -216,55 +303,14 @@ export default function PhaseQuiz({ phaseNumber, accentClass }: PhaseQuizProps) 
 
         <div className="space-y-6">
           {quiz.questions.map((question, index) => (
-            <div key={question.id} className="bg-slate-900/50 border border-slate-700 rounded-xl p-6">
-              <h3 className="text-lg font-semibold text-white mb-4">
-                {index + 1}. {question.prompt}
-              </h3>
-              <div className="space-y-3">
-                {question.options.map((option, optionIndex) => {
-                  const questionResult = result?.details.find((item) => item.questionId === question.id)
-                  const isSelected = answers[question.id] === optionIndex
-                  const isCorrect = questionResult?.correctIndex === optionIndex
-                  const showCorrect = Boolean(questionResult) && isCorrect
-                  const showIncorrectSelection = Boolean(questionResult) && isSelected && !isCorrect
-
-                  return (
-                    <label
-                      key={option}
-                      className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-all ${quizOptionRowClass(
-                        showCorrect,
-                        showIncorrectSelection,
-                        isSelected,
-                      )}`}
-                    >
-                      <input
-                        type="radio"
-                        name={question.id}
-                        checked={isSelected}
-                        onChange={() => setAnswers((prev) => ({ ...prev, [question.id]: optionIndex }))}
-                        className="w-4 h-4"
-                      />
-                      <span className="text-gray-200">{option}</span>
-                    </label>
-                  )
-                })}
-              </div>
-              {result && (
-                <div className={`mt-4 rounded-lg border p-4 ${result.details.find((item) => item.questionId === question.id)?.isCorrect ? "border-green-500/30 bg-green-500/5" : "border-amber-500/30 bg-amber-500/5"}`}>
-                  <div className="flex items-center gap-2 mb-2 text-sm font-semibold text-white">
-                    {result.details.find((item) => item.questionId === question.id)?.isCorrect ? (
-                      <CheckCircle2 className="w-4 h-4 text-green-400" />
-                    ) : (
-                      <AlertCircle className="w-4 h-4 text-amber-400" />
-                    )}
-                    Explanation
-                  </div>
-                  <p className="text-sm text-gray-300">
-                    {result.details.find((item) => item.questionId === question.id)?.explanation}
-                  </p>
-                </div>
-              )}
-            </div>
+            <QuizQuestionBlock
+              key={question.id}
+              question={question}
+              index={index}
+              answers={answers}
+              result={result}
+              onSelectOption={selectQuizOption}
+            />
           ))}
         </div>
 
