@@ -11,7 +11,6 @@ export interface FrameworkPattern {
   language: string
   icon: string
   layers: ArchitectureLayer[]
-  codeSketch: string
   bestPractices: string[]
 }
 
@@ -123,61 +122,6 @@ public class User {
     }
 }` },
         ],
-        codeSketch: `// UserController.java
-@RestController
-@RequestMapping("/api/users")
-@RequiredArgsConstructor
-public class UserController {
-
-    private final UserService userService;
-
-    @GetMapping("/{id}")
-    public ResponseEntity<UserResponse> getUser(
-            @PathVariable Long id) {
-        return ResponseEntity.ok(userService.findById(id));
-    }
-
-    @PostMapping
-    public ResponseEntity<UserResponse> createUser(
-            @Valid @RequestBody CreateUserRequest request) {
-        UserResponse created = userService.create(request);
-        URI location = URI.create("/api/users/" + created.id());
-        return ResponseEntity.created(location).body(created);
-    }
-}
-
-// CreateUserRequest.java (DTO)
-public record CreateUserRequest(
-    @NotBlank String name,
-    @Email String email
-) {}
-
-// UserService.java
-@Service
-@Transactional(readOnly = true)
-@RequiredArgsConstructor
-public class UserService {
-
-    private final UserRepository repo;
-
-    public UserResponse findById(Long id) {
-        User user = repo.findById(id)
-            .orElseThrow(() -> new ResourceNotFoundException("User", id));
-        return UserResponse.from(user);
-    }
-
-    @Transactional
-    public UserResponse create(CreateUserRequest req) {
-        User user = new User(req.name(), req.email());
-        return UserResponse.from(repo.save(user));
-    }
-}
-
-// UserRepository.java
-@Repository
-public interface UserRepository extends JpaRepository<User, Long> {
-    Optional<User> findByEmail(String email);
-}`,
         bestPractices: [
           "DTOs decouple your API contract from the database schema — never expose @Entity directly",
           "@Transactional(readOnly = true) on the service class, override with @Transactional on writes",
@@ -253,49 +197,6 @@ export const remove = async (id: string) => {
   updatedAt DateTime @updatedAt
 }` },
         ],
-        codeSketch: `// user.routes.ts
-import { Router } from "express";
-import { validate } from "../middleware/validate";
-import { createUserSchema } from "./user.schema";
-import * as ctrl from "./user.controller";
-
-const router = Router();
-router.get("/:id", ctrl.getUser);
-router.post("/", validate(createUserSchema), ctrl.createUser);
-export default router;
-
-// user.schema.ts (DTO)
-import { z } from "zod";
-export const createUserSchema = z.object({
-  name: z.string().min(1),
-  email: z.string().email(),
-});
-export type CreateUserInput = z.infer<typeof createUserSchema>;
-
-// user.controller.ts
-export const getUser: RequestHandler = async (req, res) => {
-  const user = await userService.findById(req.params.id);
-  res.json(user);
-};
-
-export const createUser: RequestHandler = async (req, res) => {
-  const user = await userService.create(req.body);
-  res.status(201).json(user);
-};
-
-// user.service.ts
-import { prisma } from "../lib/prisma";
-
-export const findById = async (id: string) => {
-  const user = await prisma.user.findUniqueOrThrow({
-    where: { id },
-  });
-  return user;
-};
-
-export const create = async (data: CreateUserInput) => {
-  return prisma.user.create({ data });
-};`,
         bestPractices: [
           "Validate with Zod at the router layer — never trust raw req.body",
           "Controllers only handle HTTP concerns (status codes, headers)",
@@ -387,54 +288,6 @@ class User(Base):
     email      = Column(String, unique=True, nullable=False)
     created_at = Column(DateTime, server_default=func.now())` },
         ],
-        codeSketch: `# user_router.py
-from fastapi import APIRouter, Depends, status
-from .user_schema import CreateUserRequest, UserResponse
-from .user_service import UserService
-
-router = APIRouter(prefix="/api/users", tags=["users"])
-
-@router.get("/{user_id}", response_model=UserResponse)
-async def get_user(
-    user_id: int,
-    service: UserService = Depends(),
-):
-    return service.find_by_id(user_id)
-
-@router.post("/", response_model=UserResponse,
-             status_code=status.HTTP_201_CREATED)
-async def create_user(
-    body: CreateUserRequest,
-    service: UserService = Depends(),
-):
-    return service.create(body)
-
-# user_schema.py (DTO)
-from pydantic import BaseModel, EmailStr
-
-class CreateUserRequest(BaseModel):
-    name: str
-    email: EmailStr
-
-class UserResponse(BaseModel):
-    id: int
-    name: str
-    email: str
-    model_config = {"from_attributes": True}
-
-# user_service.py
-class UserService:
-    def __init__(self, repo: UserRepository = Depends()):
-        self.repo = repo
-
-    def find_by_id(self, user_id: int) -> User:
-        user = self.repo.get(user_id)
-        if not user:
-            raise HTTPException(status_code=404)
-        return user
-
-    def create(self, data: CreateUserRequest) -> User:
-        return self.repo.save(User(**data.model_dump()))`,
         bestPractices: [
           "Pydantic schemas are your DTOs — separate request and response models",
           "Use Depends() for dependency injection (mirrors Spring @Autowired)",
@@ -528,48 +381,6 @@ type User {
     posts: [Post!]!
 }` },
         ],
-        codeSketch: `# schema.graphqls
-type Query {
-    user(id: ID!): User
-    users: [User!]!
-}
-type Mutation {
-    createUser(input: CreateUserInput!): User!
-}
-input CreateUserInput {
-    name: String!
-    email: String!
-}
-type User {
-    id: ID!
-    name: String!
-    email: String!
-    posts: [Post!]!
-}
-
-// UserGraphQlController.java
-@Controller
-@RequiredArgsConstructor
-public class UserGraphQlController {
-
-    private final UserService userService;
-
-    @QueryMapping
-    public User user(@Argument Long id) {
-        return userService.findById(id);
-    }
-
-    @MutationMapping
-    public User createUser(
-            @Argument CreateUserInput input) {
-        return userService.create(input);
-    }
-
-    @SchemaMapping(typeName = "User")
-    public List<Post> posts(User user) {
-        return postService.findByUserId(user.getId());
-    }
-}`,
         bestPractices: [
           "Spring for GraphQL uses @QueryMapping / @MutationMapping — not REST annotations",
           "@SchemaMapping resolves nested fields lazily (avoids N+1 with @BatchMapping)",
@@ -665,43 +476,6 @@ model Post {
   user   User   @relation(fields: [userId], references: [id])
 }` },
         ],
-        codeSketch: `// schema.graphql
-type Query {
-  user(id: ID!): User
-  users: [User!]!
-}
-type Mutation {
-  createUser(input: CreateUserInput!): User!
-}
-
-// user.resolver.ts (Apollo Server)
-export const resolvers = {
-  Query: {
-    user: (_, { id }, ctx) =>
-      ctx.services.user.findById(id),
-    users: (_, __, ctx) =>
-      ctx.services.user.findAll(),
-  },
-  Mutation: {
-    createUser: (_, { input }, ctx) =>
-      ctx.services.user.create(input),
-  },
-  User: {
-    posts: (parent, _, ctx) =>
-      ctx.loaders.postsByUser.load(parent.id),
-  },
-};
-
-// user.loader.ts (DataLoader)
-export const createPostsByUserLoader = () =>
-  new DataLoader<string, Post[]>(async (userIds) => {
-    const posts = await prisma.post.findMany({
-      where: { userId: { in: [...userIds] } },
-    });
-    return userIds.map((id) =>
-      posts.filter((p) => p.userId === id)
-    );
-  });`,
         bestPractices: [
           "Use DataLoader to batch nested field resolution and prevent N+1 queries",
           "Resolvers are thin — delegate to service layer for business logic",
@@ -780,42 +554,6 @@ class User(Base):
     name  = Column(String, nullable=False)
     email = Column(String, unique=True, nullable=False)` },
         ],
-        codeSketch: `# types.py (Strawberry)
-import strawberry
-
-@strawberry.type
-class User:
-    id: strawberry.ID
-    name: str
-    email: str
-
-    @strawberry.field
-    async def posts(self, info) -> list["Post"]:
-        return await info.context.loaders.posts.load(self.id)
-
-@strawberry.input
-class CreateUserInput:
-    name: str
-    email: str
-
-# resolvers.py
-@strawberry.type
-class Query:
-    @strawberry.field
-    async def user(self, id: strawberry.ID) -> User:
-        return await user_service.find_by_id(id)
-
-@strawberry.type
-class Mutation:
-    @strawberry.mutation
-    async def create_user(self, input: CreateUserInput) -> User:
-        return await user_service.create(input)
-
-schema = strawberry.Schema(query=Query, mutation=Mutation)
-
-# main.py
-from strawberry.fastapi import GraphQLRouter
-app.include_router(GraphQLRouter(schema), prefix="/graphql")`,
         bestPractices: [
           "Strawberry uses Python type hints as the schema — no separate SDL file needed",
           "Use info.context for dependency injection of services and data loaders",
@@ -918,50 +656,6 @@ protobuf {
     plugins { grpc { artifact = "io.grpc:protoc-gen-grpc-java:1.68.0" } }
 }` },
         ],
-        codeSketch: `// user_service.proto
-syntax = "proto3";
-option java_package = "com.example.grpc";
-
-service UserService {
-  rpc GetUser(GetUserRequest) returns (UserResponse);
-  rpc CreateUser(CreateUserRequest) returns (UserResponse);
-  rpc ListUsers(Empty) returns (stream UserResponse);
-}
-message GetUserRequest { int64 id = 1; }
-message CreateUserRequest {
-  string name = 1;
-  string email = 2;
-}
-message UserResponse {
-  int64 id = 1;
-  string name = 2;
-  string email = 3;
-}
-
-// UserGrpcService.java
-@GrpcService
-@RequiredArgsConstructor
-public class UserGrpcService
-        extends UserServiceGrpc.UserServiceImplBase {
-
-    private final UserService userService;
-
-    @Override
-    public void getUser(GetUserRequest req,
-            StreamObserver<UserResponse> observer) {
-        User user = userService.findById(req.getId());
-        observer.onNext(toProto(user));
-        observer.onCompleted();
-    }
-
-    @Override
-    public void listUsers(Empty req,
-            StreamObserver<UserResponse> observer) {
-        userService.findAll().forEach(u ->
-            observer.onNext(toProto(u)));
-        observer.onCompleted();
-    }
-}`,
         bestPractices: [
           "Proto file is the contract — generate Java stubs with protobuf-maven-plugin",
           "@GrpcService (from grpc-spring-boot-starter) auto-registers on the gRPC port",
@@ -1052,37 +746,6 @@ server.bindAsync(
   }
 );` },
         ],
-        codeSketch: `// user.handler.ts
-import { UserServiceServer } from "./generated/user_service";
-
-export const userHandlers: UserServiceServer = {
-  getUser(call, callback) {
-    const user = await userService.findById(call.request.id);
-    callback(null, toProto(user));
-  },
-
-  createUser(call, callback) {
-    const user = await userService.create(call.request);
-    callback(null, toProto(user));
-  },
-
-  listUsers(call) {
-    const users = await userService.findAll();
-    users.forEach((u) => call.write(toProto(u)));
-    call.end();
-  },
-};
-
-// server.ts
-import { Server, ServerCredentials } from "@grpc/grpc-js";
-
-const server = new Server();
-server.addService(UserServiceService, userHandlers);
-server.bindAsync(
-  "0.0.0.0:50051",
-  ServerCredentials.createInsecure(),
-  () => server.start()
-);`,
         bestPractices: [
           "Use ts-proto or grpc_tools_node_protoc_ts for TypeScript code generation",
           "Handler functions follow the callback pattern — call callback(null, response)",
@@ -1205,49 +868,6 @@ client.publish({
   body: JSON.stringify({ roomId: "general", text: "Hello!" }),
 });` },
         ],
-        codeSketch: `// WebSocketConfig.java
-@Configuration
-@EnableWebSocketMessageBroker
-public class WebSocketConfig
-        implements WebSocketMessageBrokerConfigurer {
-
-    @Override
-    public void configureMessageBroker(
-            MessageBrokerRegistry registry) {
-        registry.enableSimpleBroker("/topic");
-        registry.setApplicationDestinationPrefixes("/app");
-    }
-
-    @Override
-    public void registerStompEndpoints(
-            StompEndpointRegistry registry) {
-        registry.addEndpoint("/ws")
-                .setAllowedOrigins("*")
-                .withSockJS();
-    }
-}
-
-// ChatController.java
-@Controller
-@RequiredArgsConstructor
-public class ChatController {
-
-    private final SimpMessagingTemplate messaging;
-
-    @MessageMapping("/chat.send")
-    public void sendMessage(ChatMessage message) {
-        messaging.convertAndSend(
-            "/topic/room." + message.getRoomId(),
-            message);
-    }
-
-    @MessageMapping("/chat.join")
-    public void joinRoom(JoinRequest req) {
-        messaging.convertAndSend(
-            "/topic/room." + req.getRoomId(),
-            new SystemMessage(req.getUser() + " joined"));
-    }
-}`,
         bestPractices: [
           "Use STOMP over WebSocket — Spring's built-in message broker handles pub/sub",
           "@MessageMapping routes inbound STOMP messages (like @PostMapping for HTTP)",
@@ -1354,38 +974,6 @@ export function useSocket(room: string, onMessage: (msg) => void) {
   return { send };
 }` },
         ],
-        codeSketch: `// socket.ts
-import { Server } from "socket.io";
-
-export function initSocket(httpServer: HttpServer) {
-  const io = new Server(httpServer, {
-    cors: { origin: "*" },
-  });
-
-  io.use(authMiddleware);
-  io.on("connection", (socket) =>
-    chatHandler(io, socket));
-
-  return io;
-}
-
-// chat.handler.ts
-export function chatHandler(io: Server, socket: Socket) {
-  socket.on("chat:join", (roomId: string) => {
-    socket.join(roomId);
-    io.to(roomId).emit("chat:system",
-      \`\${socket.data.user} joined\`);
-  });
-
-  socket.on("chat:message", async (data) => {
-    const message = await chatService.save(data);
-    io.to(data.roomId).emit("chat:message", message);
-  });
-
-  socket.on("disconnect", () => {
-    // cleanup
-  });
-}`,
         bestPractices: [
           "Socket.IO adds rooms, namespaces, and auto-reconnect on top of raw WebSocket",
           "Use io.use() middleware to authenticate sockets before any events fire",
@@ -1489,51 +1077,6 @@ public class KafkaConfig {
     }
 }` },
         ],
-        codeSketch: `// OrderPlacedEvent.java (Event DTO)
-public record OrderPlacedEvent(
-    String orderId,
-    String userId,
-    BigDecimal amount,
-    Instant timestamp
-) {}
-
-// OrderEventProducer.java
-@Component
-@RequiredArgsConstructor
-public class OrderEventProducer {
-
-    private final KafkaTemplate<String, Object> kafka;
-
-    public void publishOrderPlaced(Order order) {
-        var event = new OrderPlacedEvent(
-            order.getId(), order.getUserId(),
-            order.getTotal(), Instant.now());
-        kafka.send("order.placed", order.getId(), event);
-    }
-}
-
-// OrderEventConsumer.java
-@Component
-@RequiredArgsConstructor
-public class OrderEventConsumer {
-
-    private final InventoryService inventoryService;
-    private final NotificationService notificationService;
-
-    @KafkaListener(
-        topics = "order.placed",
-        groupId = "inventory-service")
-    public void handleOrderPlaced(OrderPlacedEvent event) {
-        inventoryService.reserve(event);
-    }
-
-    @KafkaListener(
-        topics = "order.placed",
-        groupId = "notification-service")
-    public void sendConfirmation(OrderPlacedEvent event) {
-        notificationService.sendOrderEmail(event);
-    }
-}`,
         bestPractices: [
           "Use record types for events — immutable, serialisable, self-documenting",
           "Key messages by entity ID (orderId) so related events land on the same partition",
@@ -1622,46 +1165,6 @@ export const kafka = new Kafka({
   },
 });` },
         ],
-        codeSketch: `// events.ts
-export interface OrderPlacedEvent {
-  orderId: string;
-  userId: string;
-  amount: number;
-  timestamp: string;
-}
-
-// order.producer.ts
-import { kafka } from "./kafka";
-const producer = kafka.producer();
-
-export async function publishOrderPlaced(order: Order) {
-  await producer.send({
-    topic: "order.placed",
-    messages: [{
-      key: order.id,
-      value: JSON.stringify({
-        orderId: order.id,
-        userId: order.userId,
-        amount: order.total,
-        timestamp: new Date().toISOString(),
-      }),
-    }],
-  });
-}
-
-// order.consumer.ts
-const consumer = kafka.consumer({
-  groupId: "inventory-service",
-});
-
-await consumer.subscribe({ topic: "order.placed" });
-await consumer.run({
-  eachMessage: async ({ message }) => {
-    const event: OrderPlacedEvent =
-      JSON.parse(message.value!.toString());
-    await inventoryHandler.reserve(event);
-  },
-});`,
         bestPractices: [
           "KafkaJS is the standard Node.js Kafka client — lightweight and Promise-based",
           "Key messages by entity ID so partition ordering is preserved per entity",
