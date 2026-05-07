@@ -19,17 +19,40 @@ export interface CategoryArchitecture {
   patterns: FrameworkPattern[]
 }
 
+function layer(
+  name: string,
+  file: string,
+  responsibility: string,
+  code: string,
+  annotation?: string,
+): ArchitectureLayer {
+  return { name, annotation, file, responsibility, code }
+}
+
+function pattern(
+  framework: string,
+  language: string,
+  icon: string,
+  layers: ArchitectureLayer[],
+  bestPractices: string[],
+): FrameworkPattern {
+  return { framework, language, icon, layers, bestPractices }
+}
+
 export const apiArchitecturePatterns: CategoryArchitecture[] = [
   {
     categoryId: "rest",
     patterns: [
-      {
-        framework: "Spring Boot",
-        language: "Java",
-        icon: "☕",
-        layers: [
-          { name: "Controller", annotation: "@RestController", file: "UserController.java", responsibility: "Route HTTP requests, validate input, return ResponseEntity",
-            code: `@RestController
+      pattern(
+        "Spring Boot",
+        "Java",
+        "☕",
+        [
+          layer(
+            "Controller",
+            "UserController.java",
+            "Route HTTP requests, validate input, return ResponseEntity",
+            `@RestController
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
 public class UserController {
@@ -49,9 +72,14 @@ public class UserController {
         URI location = URI.create("/api/users/" + created.id());
         return ResponseEntity.created(location).body(created);
     }
-}` },
-          { name: "DTO", annotation: "@Valid", file: "CreateUserRequest.java", responsibility: "Shape the API contract — decouple wire format from domain model",
-            code: `public record CreateUserRequest(
+}`,
+            "@RestController",
+          ),
+          layer(
+            "DTO",
+            "CreateUserRequest.java",
+            "Shape the API contract — decouple wire format from domain model",
+            `public record CreateUserRequest(
     @NotBlank String name,
     @Email   String email
 ) {}
@@ -66,9 +94,14 @@ public record UserResponse(
         return new UserResponse(
             user.getId(), user.getName(), user.getEmail());
     }
-}` },
-          { name: "Service", annotation: "@Service", file: "UserService.java", responsibility: "Business logic, orchestrate domain rules, transaction boundaries",
-            code: `@Service
+}`,
+            "@Valid",
+          ),
+          layer(
+            "Service",
+            "UserService.java",
+            "Business logic, orchestrate domain rules, transaction boundaries",
+            `@Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class UserService {
@@ -87,9 +120,14 @@ public class UserService {
         User user = new User(req.name(), req.email());
         return UserResponse.from(repo.save(user));
     }
-}` },
-          { name: "Repository", annotation: "@Repository", file: "UserRepository.java", responsibility: "Data access via JPA/Hibernate — translate domain to SQL",
-            code: `@Repository
+}`,
+            "@Service",
+          ),
+          layer(
+            "Repository",
+            "UserRepository.java",
+            "Data access via JPA/Hibernate — translate domain to SQL",
+            `@Repository
 public interface UserRepository
         extends JpaRepository<User, Long> {
 
@@ -97,9 +135,14 @@ public interface UserRepository
 
     @Query("SELECT u FROM User u WHERE u.name LIKE %:q%")
     List<User> search(@Param("q") String query);
-}` },
-          { name: "Entity", annotation: "@Entity", file: "User.java", responsibility: "Database table mapping — JPA manages lifecycle and persistence",
-            code: `@Entity
+}`,
+            "@Repository",
+          ),
+          layer(
+            "Entity",
+            "User.java",
+            "Database table mapping — JPA manages lifecycle and persistence",
+            `@Entity
 @Table(name = "users")
 @Getter @Setter @NoArgsConstructor
 public class User {
@@ -120,23 +163,28 @@ public class User {
         this.name = name;
         this.email = email;
     }
-}` },
+}`,
+            "@Entity",
+          ),
         ],
-        bestPractices: [
+        [
           "DTOs decouple your API contract from the database schema — never expose @Entity directly",
           "@Transactional(readOnly = true) on the service class, override with @Transactional on writes",
           "Return ResponseEntity with proper status codes (201 Created, 204 No Content)",
           "Use Bean Validation (@Valid, @NotBlank, @Email) at the controller layer",
           "Repository extends JpaRepository for CRUD — add custom queries via method naming",
         ],
-      },
-      {
-        framework: "Express",
-        language: "TypeScript",
-        icon: "🟢",
-        layers: [
-          { name: "Router", annotation: "express.Router()", file: "user.routes.ts", responsibility: "Define route paths, attach middleware, delegate to controller",
-            code: `import { Router } from "express";
+      ),
+      pattern(
+        "Express",
+        "TypeScript",
+        "🟢",
+        [
+          layer(
+            "Router",
+            "user.routes.ts",
+            "Define route paths, attach middleware, delegate to controller",
+            `import { Router } from "express";
 import { validate } from "../middleware/validate";
 import { createUserSchema } from "./user.schema";
 import * as ctrl from "./user.controller";
@@ -146,9 +194,14 @@ router.get("/:id", ctrl.getUser);
 router.post("/", validate(createUserSchema), ctrl.createUser);
 router.put("/:id", validate(updateUserSchema), ctrl.updateUser);
 router.delete("/:id", ctrl.deleteUser);
-export default router;` },
-          { name: "Controller", annotation: "RequestHandler", file: "user.controller.ts", responsibility: "Parse req/res, call service, send HTTP response",
-            code: `import { RequestHandler } from "express";
+export default router;`,
+            "express.Router()",
+          ),
+          layer(
+            "Controller",
+            "user.controller.ts",
+            "Parse req/res, call service, send HTTP response",
+            `import { RequestHandler } from "express";
 import * as userService from "./user.service";
 
 export const getUser: RequestHandler = async (req, res) => {
@@ -159,9 +212,14 @@ export const getUser: RequestHandler = async (req, res) => {
 export const createUser: RequestHandler = async (req, res) => {
   const user = await userService.create(req.body);
   res.status(201).json(user);
-};` },
-          { name: "DTO / Schema", annotation: "zod.object()", file: "user.schema.ts", responsibility: "Validate and type request payloads at runtime",
-            code: `import { z } from "zod";
+};`,
+            "RequestHandler",
+          ),
+          layer(
+            "DTO / Schema",
+            "user.schema.ts",
+            "Validate and type request payloads at runtime",
+            `import { z } from "zod";
 
 export const createUserSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -171,9 +229,14 @@ export const createUserSchema = z.object({
 export type CreateUserInput = z.infer<typeof createUserSchema>;
 
 export const updateUserSchema = createUserSchema.partial();
-export type UpdateUserInput = z.infer<typeof updateUserSchema>;` },
-          { name: "Service", annotation: "class", file: "user.service.ts", responsibility: "Business logic, orchestrate data access",
-            code: `import { prisma } from "../lib/prisma";
+export type UpdateUserInput = z.infer<typeof updateUserSchema>;`,
+            "zod.object()",
+          ),
+          layer(
+            "Service",
+            "user.service.ts",
+            "Business logic, orchestrate data access",
+            `import { prisma } from "../lib/prisma";
 import type { CreateUserInput } from "./user.schema";
 
 export const findById = async (id: string) => {
@@ -186,25 +249,32 @@ export const create = async (data: CreateUserInput) => {
 
 export const remove = async (id: string) => {
   return prisma.user.delete({ where: { id } });
-};` },
-          { name: "Model", annotation: "Prisma model", file: "schema.prisma", responsibility: "Database schema and generated type-safe client",
-            code: `model User {
+};`,
+            "class",
+          ),
+          layer(
+            "Model",
+            "schema.prisma",
+            "Database schema and generated type-safe client",
+            `model User {
   id        String   @id @default(cuid())
   name      String
   email     String   @unique
   posts     Post[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-}` },
+}`,
+            "Prisma model",
+          ),
         ],
-        bestPractices: [
+        [
           "Validate with Zod at the router layer — never trust raw req.body",
           "Controllers only handle HTTP concerns (status codes, headers)",
           "Services contain business logic and are framework-agnostic",
           "Use Prisma (or Drizzle) for type-safe database access",
           "Centralise error handling in an Express error middleware",
         ],
-      },
+      ),
       {
         framework: "FastAPI",
         language: "Python",
