@@ -23,7 +23,10 @@ function base64UrlEncode(obj: object): string {
   const json = JSON.stringify(obj);
   const bytes = new TextEncoder().encode(json);
   const b64 = btoa(String.fromCharCode(...bytes));
-  return b64.replaceAll("+", "-").replaceAll("/", "_").replace(/=+$/, "");
+  // Avoid regex here to keep the demo obviously safe from ReDoS concerns.
+  let safe = b64.replaceAll("+", "-").replaceAll("/", "_");
+  while (safe.endsWith("=")) safe = safe.slice(0, -1);
+  return safe;
 }
 
 export default function JwtDemo() {

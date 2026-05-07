@@ -5,6 +5,7 @@
  */
 
 import { test, expect } from '@playwright/test';
+import { randomUUID } from 'node:crypto';
 
 test.describe('Upgrade Page', () => {
   test('should display upgrade page', async ({ page }) => {
@@ -51,7 +52,7 @@ test.describe('Upgrade Page', () => {
   });
 
   test('should allow authenticated users to upgrade', async ({ page, request }) => {
-    const uniqueEmail = `test-${Date.now()}-${Math.random().toString(36).substring(7)}@example.com`;
+    const uniqueEmail = `test-${Date.now()}-${randomUUID()}@example.com`;
     await request.post('/api/auth/signup', {
       data: {
         email: uniqueEmail,
@@ -89,4 +90,3 @@ test.describe('Upgrade Page', () => {
     await expect(backLink).toHaveAttribute('href', '/dashboard');
   });
 });
-

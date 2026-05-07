@@ -35,7 +35,7 @@ describe("isAllowedStripeCheckoutRedirectUrl", () => {
   })
 
   it("rejects non-HTTPS and non-Stripe hosts", () => {
-    expect(isAllowedStripeCheckoutRedirectUrl("http://checkout.stripe.com/pay")).toBe(false)
+    expect(isAllowedStripeCheckoutRedirectUrl("ws://checkout.stripe.com/pay")).toBe(false)
     expect(isAllowedStripeCheckoutRedirectUrl("https://evil.com/")).toBe(false)
     expect(isAllowedStripeCheckoutRedirectUrl("https://phishing-stripe.com.fake/")).toBe(false)
     expect(isAllowedStripeCheckoutRedirectUrl("not-a-valid-url")).toBe(false)

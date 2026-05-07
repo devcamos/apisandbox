@@ -1,14 +1,21 @@
 import { Resend } from "resend"
 
-if (!process.env.RESEND_API_KEY && process.env.NODE_ENV === "production") {
-  throw new Error("RESEND_API_KEY is required in production")
-}
-
-const resend = new Resend(process.env.RESEND_API_KEY ?? "")
-
 const FROM_ADDRESS = process.env.EMAIL_FROM ?? "API Sandbox <noreply@apisandbox.dev>"
 
+function getResendClient() {
+  const apiKey = process.env.RESEND_API_KEY?.trim()
+  if (apiKey) {
+    return new Resend(apiKey)
+  }
+  if (process.env.NODE_ENV === "production") {
+    throw new Error("RESEND_API_KEY is required in production")
+  }
+  return null
+}
+
 export async function sendWelcomeEmail(to: string, name?: string) {
+  const resend = getResendClient()
+  if (!resend) return null
   return resend.emails.send({
     from: FROM_ADDRESS,
     to,
@@ -23,6 +30,8 @@ export async function sendWelcomeEmail(to: string, name?: string) {
 }
 
 export async function sendVerificationEmail(to: string, token: string) {
+  const resend = getResendClient()
+  if (!resend) return null
   const verifyUrl = `${process.env.NEXT_PUBLIC_APP_URL}/api/auth/verify?token=${token}`
   return resend.emails.send({
     from: FROM_ADDRESS,
@@ -38,6 +47,8 @@ export async function sendVerificationEmail(to: string, token: string) {
 }
 
 export async function sendSubscriptionConfirmation(to: string) {
+  const resend = getResendClient()
+  if (!resend) return null
   return resend.emails.send({
     from: FROM_ADDRESS,
     to,
@@ -52,6 +63,8 @@ export async function sendSubscriptionConfirmation(to: string) {
 }
 
 export async function sendSubscriptionCancelled(to: string, endsAt: Date) {
+  const resend = getResendClient()
+  if (!resend) return null
   return resend.emails.send({
     from: FROM_ADDRESS,
     to,

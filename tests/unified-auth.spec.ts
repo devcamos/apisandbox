@@ -1,7 +1,8 @@
 import { test, expect } from "@playwright/test"
+import { randomUUID } from "node:crypto"
 
 function randomEmail(prefix: string) {
-  return `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2)}@example.com`
+  return `${prefix}-${Date.now()}-${randomUUID()}@example.com`
 }
 
 function makeTestGoogleToken(payload: {
@@ -136,4 +137,3 @@ test.describe("Unified Auth", () => {
     expect(loginRes.status()).toBe(401)
   })
 })
-

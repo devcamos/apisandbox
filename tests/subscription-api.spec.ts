@@ -5,11 +5,12 @@
  */
 
 import { test, expect } from '@playwright/test';
+import { randomUUID } from 'node:crypto';
 
 test.describe('Subscription API', () => {
   test('should return subscription status for authenticated user', async ({ request }) => {
     // Create user
-    const uniqueEmail = `test-${Date.now()}-${Math.random().toString(36).substring(7)}@example.com`;
+    const uniqueEmail = `test-${Date.now()}-${randomUUID()}@example.com`;
     await request.post('/api/auth/signup', {
       data: {
         email: uniqueEmail,
@@ -46,7 +47,7 @@ test.describe('Subscription API', () => {
 
   test('should upgrade user to premium', async ({ request }) => {
     // Create user
-    const uniqueEmail = `test-${Date.now()}-${Math.random().toString(36).substring(7)}@example.com`;
+    const uniqueEmail = `test-${Date.now()}-${randomUUID()}@example.com`;
     await request.post('/api/auth/signup', {
       data: {
         email: uniqueEmail,
@@ -81,5 +82,4 @@ test.describe('Subscription API', () => {
     expect(statuses.some(s => s === 401)).toBeTruthy();
   });
 });
-
 

@@ -13,7 +13,18 @@ RUN npm ci --ignore-scripts
 FROM node:20-alpine AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
-COPY . .
+# Copy only what build needs to reduce the chance of accidentally shipping local secrets.
+COPY app ./app
+COPY components ./components
+COPY config ./config
+COPY hooks ./hooks
+COPY lib ./lib
+COPY prisma ./prisma
+COPY public ./public
+COPY scripts ./scripts
+COPY tests ./tests
+COPY middleware.ts ./
+COPY next.config.mjs package.json tsconfig.json postcss.config.* tailwind.config.* eslint.config.mjs playwright.config.ts vitest.config.ts ./
 RUN mkdir -p public
 ENV NEXT_TELEMETRY_DISABLED=1
 RUN npx prisma generate
@@ -27,14 +38,20 @@ ENV NEXT_TELEMETRY_DISABLED=1
 RUN apk upgrade --no-cache \
   && addgroup --system --gid 1001 nodejs \
   && adduser --system --uid 1001 nextjs
-COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
-COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
-COPY --from=builder /app/public ./public
-COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
-COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
-COPY --from=builder /app/node_modules/prisma ./node_modules/prisma
-COPY --from=builder /app/prisma ./prisma
-COPY --from=builder /app/package.json ./
+COPY --from=builder --chown=nextjs:nodejs --chmod=0555 /app/.next/standalone ./
+COPY --from=builder --chown=nextjs:nodejs --chmod=0555 /app/.next/static ./.next/static
+COPY --from=builder --chmod=0555 /app/public ./public
+COPY --from=builder --chmod=0555 /app/node_modules/.prisma ./node_modules/.prisma
+COPY --from=builder --chmod=0555 /app/node_modules/@prisma ./node_modules/@prisma
+COPY --from=builder --chmod=0555 /app/node_modules/prisma ./node_modules/prisma
+COPY --from=builder --chmod=0555 /app/prisma ./prisma
+COPY --from=builder --chmod=0444 /app/package.json ./
+# Harden runtime filesystem: make shipped app code non-writable.
+RUN chown -R nextjs:nodejs /app \
+  && chmod -R a-w /app \
+  && mkdir -p /app/.next/cache \
+  && chown -R nextjs:nodejs /app/.next/cache \
+  && chmod -R u+w /app/.next/cache
 USER nextjs
 EXPOSE 4000
 ENV PORT=4000

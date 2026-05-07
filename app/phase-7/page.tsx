@@ -2,8 +2,11 @@
 
 import { useState } from "react";
 import PhaseLayout from "@/components/PhaseLayout";
-import { DollarSign, ArrowRight, Clock, Flame, TrendingUp, ChevronDown } from "lucide-react";
+import { DollarSign, ArrowRight, Clock, Flame, TrendingUp } from "lucide-react";
 import { monetisationPaths, type MonetisationPath } from "@/lib/learning/monetisation-paths";
+import SelectableLearningCard from "@/components/learning/SelectableLearningCard";
+import DetailTabsShell from "@/components/learning/DetailTabsShell";
+import ParetoInsightCard from "@/components/learning/ParetoInsightCard";
 
 function EffortBadge({ level }: Readonly<{ level: MonetisationPath["effortLevel"] }>) {
   const styles = {
@@ -20,25 +23,13 @@ function EffortBadge({ level }: Readonly<{ level: MonetisationPath["effortLevel"
 
 function PathCard({ path, isSelected, onSelect }: Readonly<{ path: MonetisationPath; isSelected: boolean; onSelect: () => void }>) {
   return (
-    <button
-      onClick={onSelect}
-      className={`w-full text-left rounded-xl border p-5 transition-all ${
-        isSelected
-          ? "bg-slate-800/80 border-slate-500 ring-1 ring-slate-500/50"
-          : "bg-slate-800/40 border-slate-700 hover:border-slate-600 hover:bg-slate-800/60"
-      }`}
+    <SelectableLearningCard
+      icon={path.icon}
+      title={path.name}
+      tagline={path.tagline}
+      isSelected={isSelected}
+      onSelect={onSelect}
     >
-      <div className="flex items-start justify-between gap-3 mb-3">
-        <div className="flex items-center gap-3">
-          <span className="text-2xl">{path.icon}</span>
-          <div>
-            <h3 className="text-lg font-bold text-white">{path.name}</h3>
-            <p className="text-xs text-gray-400">{path.tagline}</p>
-          </div>
-        </div>
-        <ChevronDown className={`w-5 h-5 text-gray-500 transition-transform shrink-0 mt-1 ${isSelected ? "rotate-180" : ""}`} />
-      </div>
-
       <div className="flex items-center gap-3 flex-wrap">
         <EffortBadge level={path.effortLevel} />
         <span className="text-xs text-gray-400 flex items-center gap-1">
@@ -48,7 +39,7 @@ function PathCard({ path, isSelected, onSelect }: Readonly<{ path: MonetisationP
           <TrendingUp className="w-3 h-3" /> {path.monthlyRevenueRange}
         </span>
       </div>
-    </button>
+    </SelectableLearningCard>
   );
 }
 
@@ -63,47 +54,18 @@ function PathDetail({ path }: Readonly<{ path: MonetisationPath }>) {
   ];
 
   return (
-    <div className="bg-slate-800/50 border border-slate-700 rounded-xl overflow-hidden animate-slideDown">
-      <div className={`bg-gradient-to-r ${path.color} px-6 py-4`}>
-        <div className="flex items-center gap-3">
-          <span className="text-3xl">{path.icon}</span>
-          <div>
-            <h3 className="text-xl font-bold text-white">{path.name}</h3>
-            <p className="text-white/80 text-sm">{path.tagline}</p>
-          </div>
-        </div>
-      </div>
-
-      <div className="border-b border-slate-700 px-4">
-        <div className="flex gap-1 overflow-x-auto">
-          {tabs.map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={`px-4 py-2.5 text-sm font-medium transition-all border-b-2 shrink-0 ${
-                activeTab === tab.id
-                  ? "border-white text-white"
-                  : "border-transparent text-gray-400 hover:text-gray-200"
-              }`}
-            >
-              {tab.label}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      <div className="p-6">
+    <DetailTabsShell
+      color={path.color}
+      icon={path.icon}
+      title={path.name}
+      tagline={path.tagline}
+      tabs={tabs}
+      activeTab={activeTab}
+      onTabChange={(tabId) => setActiveTab(tabId as typeof activeTab)}
+    >
         {activeTab === "overview" && (
           <div className="space-y-5">
-            <div className="bg-gradient-to-r from-amber-500/10 to-orange-500/10 border border-amber-500/20 rounded-lg p-4">
-              <div className="flex items-start gap-2">
-                <Flame className="w-4 h-4 text-amber-400 mt-0.5 shrink-0" />
-                <div>
-                  <h4 className="text-sm font-bold text-amber-300 mb-1">Pareto Insight (80/20)</h4>
-                  <p className="text-sm text-gray-300">{path.paretoInsight}</p>
-                </div>
-              </div>
-            </div>
+            <ParetoInsightCard insight={path.paretoInsight} />
 
             <div>
               <h4 className="text-sm font-bold text-white mb-2">What is it?</h4>
@@ -212,8 +174,7 @@ function PathDetail({ path }: Readonly<{ path: MonetisationPath }>) {
             ))}
           </div>
         )}
-      </div>
-    </div>
+    </DetailTabsShell>
   );
 }
 

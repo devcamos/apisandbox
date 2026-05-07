@@ -12,14 +12,41 @@ export interface LoginErrorInfo {
   suggestion?: string
 }
 
-const COLON_DIGITS = /:(\d+)/
-const ATTEMPTS_IN_MESSAGE = /(\d+)\s*attempt/i
-const MINUTES_IN_MESSAGE = /(\d+)\s*minute/i
+function extractIntegerAfterColon(message: string): string | null {
+  const colonIndex = message.indexOf(":")
+  if (colonIndex < 0) return null
+  let i = colonIndex + 1
+  while (i < message.length && message.charCodeAt(i) === 32) i += 1
+  let start = i
+  while (i < message.length) {
+    const code = message.charCodeAt(i)
+    if (code < 48 || code > 57) break
+    i += 1
+  }
+  if (i === start) return null
+  return message.slice(start, i)
+}
+
+function extractIntegerBeforeWord(message: string, wordLower: string): string | null {
+  const lower = message.toLowerCase()
+  const wordIndex = lower.indexOf(wordLower)
+  if (wordIndex < 0) return null
+  let i = wordIndex - 1
+  while (i >= 0 && lower.charCodeAt(i) === 32) i -= 1
+  let end = i + 1
+  while (i >= 0) {
+    const code = lower.charCodeAt(i)
+    if (code < 48 || code > 57) break
+    i -= 1
+  }
+  const start = i + 1
+  if (start >= end) return null
+  return message.slice(start, end)
+}
 
 function parseAccountLockedPrefix(message: string): LoginErrorInfo | null {
   if (message.startsWith("ACCOUNT_LOCKED")) {
-    const m = COLON_DIGITS.exec(message)
-    const minutes = m ? m[1] : "30"
+    const minutes = extractIntegerAfterColon(message) ?? "30"
     const minuteWord = minutes === "1" ? "minute" : "minutes"
     return {
       message: "Account temporarily locked",
@@ -39,8 +66,7 @@ function passwordIncorrectAttemptsHint(attemptsRemaining: string): string {
 
 function parsePasswordIncorrectPrefix(message: string): LoginErrorInfo | null {
   if (message.startsWith("PASSWORD_INCORRECT")) {
-    const m = COLON_DIGITS.exec(message)
-    const attemptsRemaining = m ? m[1] : "0"
+    const attemptsRemaining = extractIntegerAfterColon(message) ?? "0"
     const hint = passwordIncorrectAttemptsHint(attemptsRemaining)
     return {
       message: "Incorrect password",
@@ -91,9 +117,8 @@ function parseOAuthHint(message: string): LoginErrorInfo | null {
 
 function parseLegacyInvalidCredentials(message: string): LoginErrorInfo | null {
   if (message.includes("Invalid email or password") || message.includes("invalid")) {
-    const attemptsMatch = ATTEMPTS_IN_MESSAGE.exec(message)
-    if (attemptsMatch) {
-      const attempts = attemptsMatch[1]
+    const attempts = extractIntegerBeforeWord(message, "attempt")
+    if (attempts) {
       const plural = attempts === "1" ? "" : "s"
       return {
         message: "Invalid login credentials",
@@ -115,8 +140,7 @@ function parseLegacyInvalidCredentials(message: string): LoginErrorInfo | null {
 
 function parseLegacyLockout(message: string): LoginErrorInfo | null {
   if (message.includes("locked") || message.includes("lockout")) {
-    const minutesMatch = MINUTES_IN_MESSAGE.exec(message)
-    const minutes = minutesMatch ? minutesMatch[1] : "30"
+    const minutes = extractIntegerBeforeWord(message, "minute") ?? "30"
     return {
       message: "Account temporarily locked",
       type: "account",

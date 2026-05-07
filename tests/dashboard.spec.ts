@@ -5,6 +5,7 @@
  */
 
 import { test, expect } from '@playwright/test';
+import { randomUUID } from 'node:crypto';
 
 test.describe('Dashboard', () => {
   test('should redirect to login when not authenticated', async ({ page }) => {
@@ -14,7 +15,7 @@ test.describe('Dashboard', () => {
 
   test('should display dashboard for authenticated users', async ({ page, request }) => {
     // Create and login user
-    const uniqueEmail = `test-${Date.now()}-${Math.random().toString(36).substring(7)}@example.com`;
+    const uniqueEmail = `test-${Date.now()}-${randomUUID()}@example.com`;
     await request.post('/api/auth/signup', {
       data: {
         email: uniqueEmail,
@@ -34,7 +35,7 @@ test.describe('Dashboard', () => {
   });
 
   test('should show subscription tier badge', async ({ page, request }) => {
-    const uniqueEmail = `test-${Date.now()}-${Math.random().toString(36).substring(7)}@example.com`;
+    const uniqueEmail = `test-${Date.now()}-${randomUUID()}@example.com`;
     await request.post('/api/auth/signup', {
       data: {
         email: uniqueEmail,
@@ -53,7 +54,7 @@ test.describe('Dashboard', () => {
   });
 
   test('should show premium badge for premium users', async ({ page, request }) => {
-    const uniqueEmail = `test-${Date.now()}-${Math.random().toString(36).substring(7)}@example.com`;
+    const uniqueEmail = `test-${Date.now()}-${randomUUID()}@example.com`;
     const signupResponse = await request.post('/api/auth/signup', {
       data: {
         email: uniqueEmail,
@@ -75,7 +76,7 @@ test.describe('Dashboard', () => {
   });
 
   test('should show lock icons on premium phases for free users', async ({ page, request }) => {
-    const uniqueEmail = `test-${Date.now()}-${Math.random().toString(36).substring(7)}@example.com`;
+    const uniqueEmail = `test-${Date.now()}-${randomUUID()}@example.com`;
     await request.post('/api/auth/signup', {
       data: {
         email: uniqueEmail,
@@ -95,7 +96,7 @@ test.describe('Dashboard', () => {
   });
 
   test('should display all 5 learning phases', async ({ page, request }) => {
-    const uniqueEmail = `test-${Date.now()}-${Math.random().toString(36).substring(7)}@example.com`;
+    const uniqueEmail = `test-${Date.now()}-${randomUUID()}@example.com`;
     await request.post('/api/auth/signup', {
       data: {
         email: uniqueEmail,
@@ -117,7 +118,7 @@ test.describe('Dashboard', () => {
   });
 
   test('should have links to all phases', async ({ page, request }) => {
-    const uniqueEmail = `test-${Date.now()}-${Math.random().toString(36).substring(7)}@example.com`;
+    const uniqueEmail = `test-${Date.now()}-${randomUUID()}@example.com`;
     await request.post('/api/auth/signup', {
       data: {
         email: uniqueEmail,
@@ -137,4 +138,3 @@ test.describe('Dashboard', () => {
     await expect(phase1Link).toHaveAttribute('href', '/phase-1');
   });
 });
-

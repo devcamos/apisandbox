@@ -5,11 +5,12 @@
  */
 
 import { test, expect } from '@playwright/test';
+import { randomUUID } from "node:crypto";
 
 test.describe('Subscription Gate', () => {
   test('should show upgrade prompt for free users on Phase 2', async ({ page, request }) => {
     // Create a free user and login
-    const uniqueEmail = `test-${Date.now()}-${Math.random().toString(36).substring(7)}@example.com`;
+    const uniqueEmail = `test-${Date.now()}-${randomUUID()}@example.com`;
     await request.post('/api/auth/signup', {
       data: {
         email: uniqueEmail,
@@ -33,7 +34,7 @@ test.describe('Subscription Gate', () => {
   });
 
   test('should show upgrade prompt for free users on Phase 3', async ({ page, request }) => {
-    const uniqueEmail = `test-${Date.now()}-${Math.random().toString(36).substring(7)}@example.com`;
+    const uniqueEmail = `test-${Date.now()}-${randomUUID()}@example.com`;
     await request.post('/api/auth/signup', {
       data: {
         email: uniqueEmail,
@@ -52,7 +53,7 @@ test.describe('Subscription Gate', () => {
   });
 
   test('should show upgrade prompt for free users on Phase 4', async ({ page, request }) => {
-    const uniqueEmail = `test-${Date.now()}-${Math.random().toString(36).substring(7)}@example.com`;
+    const uniqueEmail = `test-${Date.now()}-${randomUUID()}@example.com`;
     await request.post('/api/auth/signup', {
       data: {
         email: uniqueEmail,
@@ -71,7 +72,7 @@ test.describe('Subscription Gate', () => {
   });
 
   test('should show upgrade prompt for free users on Phase 5', async ({ page, request }) => {
-    const uniqueEmail = `test-${Date.now()}-${Math.random().toString(36).substring(7)}@example.com`;
+    const uniqueEmail = `test-${Date.now()}-${randomUUID()}@example.com`;
     await request.post('/api/auth/signup', {
       data: {
         email: uniqueEmail,
@@ -90,7 +91,7 @@ test.describe('Subscription Gate', () => {
   });
 
   test('should show upgrade prompt for free users on Cloud section', async ({ page, request }) => {
-    const uniqueEmail = `test-${Date.now()}-${Math.random().toString(36).substring(7)}@example.com`;
+    const uniqueEmail = `test-${Date.now()}-${randomUUID()}@example.com`;
     await request.post('/api/auth/signup', {
       data: {
         email: uniqueEmail,
@@ -109,7 +110,7 @@ test.describe('Subscription Gate', () => {
   });
 
   test('should allow free users to access Phase 1', async ({ page, request }) => {
-    const uniqueEmail = `test-${Date.now()}-${Math.random().toString(36).substring(7)}@example.com`;
+    const uniqueEmail = `test-${Date.now()}-${randomUUID()}@example.com`;
     await request.post('/api/auth/signup', {
       data: {
         email: uniqueEmail,
@@ -131,7 +132,7 @@ test.describe('Subscription Gate', () => {
 
   test('should allow premium users to access all phases', async ({ page, request }) => {
     // Create user
-    const uniqueEmail = `test-${Date.now()}-${Math.random().toString(36).substring(7)}@example.com`;
+    const uniqueEmail = `test-${Date.now()}-${randomUUID()}@example.com`;
     const signupResponse = await request.post('/api/auth/signup', {
       data: {
         email: uniqueEmail,
@@ -169,4 +170,3 @@ test.describe('Subscription Gate', () => {
     await expect(page.getByText(/api algorithms/i)).toBeVisible();
   });
 });
-

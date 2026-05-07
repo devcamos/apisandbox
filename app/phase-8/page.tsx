@@ -2,30 +2,21 @@
 
 import { useState } from "react";
 import PhaseLayout from "@/components/PhaseLayout";
-import { Database, ArrowRight, Flame, ChevronDown, ExternalLink, AlertTriangle } from "lucide-react";
+import { Database, ArrowRight, Flame, ExternalLink, AlertTriangle } from "lucide-react";
 import { dsCategories, type DSCategory } from "@/lib/learning/data-science-production";
+import SelectableLearningCard from "@/components/learning/SelectableLearningCard";
+import DetailTabsShell from "@/components/learning/DetailTabsShell";
+import ParetoInsightCard from "@/components/learning/ParetoInsightCard";
 
 function CategoryCard({ cat, isSelected, onSelect }: Readonly<{ cat: DSCategory; isSelected: boolean; onSelect: () => void }>) {
   return (
-    <button
-      onClick={onSelect}
-      className={`w-full text-left rounded-xl border p-5 transition-all ${
-        isSelected
-          ? "bg-slate-800/80 border-slate-500 ring-1 ring-slate-500/50"
-          : "bg-slate-800/40 border-slate-700 hover:border-slate-600 hover:bg-slate-800/60"
-      }`}
-    >
-      <div className="flex items-start justify-between gap-3 mb-2">
-        <div className="flex items-center gap-3">
-          <span className="text-2xl">{cat.icon}</span>
-          <div>
-            <h3 className="text-lg font-bold text-white">{cat.name}</h3>
-            <p className="text-xs text-gray-400">{cat.tagline}</p>
-          </div>
-        </div>
-        <ChevronDown className={`w-5 h-5 text-gray-500 transition-transform shrink-0 mt-1 ${isSelected ? "rotate-180" : ""}`} />
-      </div>
-    </button>
+    <SelectableLearningCard
+      icon={cat.icon}
+      title={cat.name}
+      tagline={cat.tagline}
+      isSelected={isSelected}
+      onSelect={onSelect}
+    />
   );
 }
 
@@ -40,47 +31,18 @@ function CategoryDetail({ cat }: Readonly<{ cat: DSCategory }>) {
   ];
 
   return (
-    <div className="bg-slate-800/50 border border-slate-700 rounded-xl overflow-hidden animate-slideDown">
-      <div className={`bg-gradient-to-r ${cat.color} px-6 py-4`}>
-        <div className="flex items-center gap-3">
-          <span className="text-3xl">{cat.icon}</span>
-          <div>
-            <h3 className="text-xl font-bold text-white">{cat.name}</h3>
-            <p className="text-white/80 text-sm">{cat.tagline}</p>
-          </div>
-        </div>
-      </div>
-
-      <div className="border-b border-slate-700 px-4">
-        <div className="flex gap-1 overflow-x-auto">
-          {tabs.map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={`px-4 py-2.5 text-sm font-medium transition-all border-b-2 shrink-0 ${
-                activeTab === tab.id
-                  ? "border-white text-white"
-                  : "border-transparent text-gray-400 hover:text-gray-200"
-              }`}
-            >
-              {tab.label}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      <div className="p-6">
+    <DetailTabsShell
+      color={cat.color}
+      icon={cat.icon}
+      title={cat.name}
+      tagline={cat.tagline}
+      tabs={tabs}
+      activeTab={activeTab}
+      onTabChange={(tabId) => setActiveTab(tabId as typeof activeTab)}
+    >
         {activeTab === "overview" && (
           <div className="space-y-5">
-            <div className="bg-gradient-to-r from-amber-500/10 to-orange-500/10 border border-amber-500/20 rounded-lg p-4">
-              <div className="flex items-start gap-2">
-                <Flame className="w-4 h-4 text-amber-400 mt-0.5 shrink-0" />
-                <div>
-                  <h4 className="text-sm font-bold text-amber-300 mb-1">Pareto Insight (80/20)</h4>
-                  <p className="text-sm text-gray-300">{cat.paretoInsight}</p>
-                </div>
-              </div>
-            </div>
+            <ParetoInsightCard insight={cat.paretoInsight} />
 
             <div>
               <h4 className="text-sm font-bold text-white mb-2">Why it matters</h4>
@@ -189,8 +151,7 @@ function CategoryDetail({ cat }: Readonly<{ cat: DSCategory }>) {
             ))}
           </div>
         )}
-      </div>
-    </div>
+    </DetailTabsShell>
   );
 }
 

@@ -8,6 +8,21 @@ const dotenv = require("dotenv");
 const bcrypt = require("bcryptjs");
 const { PrismaClient } = require("@prisma/client");
 
+function findSqlite3Binary() {
+  if (process.env.SQLITE3_BIN) return process.env.SQLITE3_BIN;
+  try {
+    const candidate = execFileSync("which", ["sqlite3"], {
+      encoding: "utf8",
+      env: { PATH: "/usr/bin:/bin:/usr/sbin:/sbin" },
+    })
+      .trim()
+      .split("\n")[0];
+    return candidate || "sqlite3";
+  } catch {
+    return "sqlite3";
+  }
+}
+
 function loadEnv() {
   const candidates = [".env.local", ".env"];
   for (const filename of candidates) {
@@ -19,7 +34,11 @@ function loadEnv() {
 }
 
 function sqliteQuery(dbPath, sql) {
-  return execFileSync("sqlite3", [dbPath, sql], { encoding: "utf8" }).trim();
+  const sqlite3 = findSqlite3Binary();
+  return execFileSync(sqlite3, [dbPath, sql], {
+    encoding: "utf8",
+    env: { PATH: "/usr/bin:/bin:/usr/sbin:/sbin" },
+  }).trim();
 }
 
 function quoteSqlValue(value) {
