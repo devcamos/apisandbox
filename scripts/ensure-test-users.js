@@ -10,17 +10,11 @@ const { PrismaClient } = require("@prisma/client");
 
 function findSqlite3Binary() {
   if (process.env.SQLITE3_BIN) return process.env.SQLITE3_BIN;
-  try {
-    const candidate = execFileSync("which", ["sqlite3"], {
-      encoding: "utf8",
-      env: { PATH: "/usr/bin:/bin:/usr/sbin:/sbin" },
-    })
-      .trim()
-      .split("\n")[0];
-    return candidate || "sqlite3";
-  } catch {
-    return "sqlite3";
+  const candidates = ["/usr/bin/sqlite3", "/bin/sqlite3", "/usr/local/bin/sqlite3"];
+  for (const candidate of candidates) {
+    if (fs.existsSync(candidate)) return candidate;
   }
+  return "sqlite3";
 }
 
 function loadEnv() {
