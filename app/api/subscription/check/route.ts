@@ -8,20 +8,13 @@
  */
 
 import { NextRequest, NextResponse } from "next/server"
-import { auth } from "@/app/api/auth/[...nextauth]/route"
+import { requireAuthenticatedUser } from "@/lib/auth/jwt-auth-middleware"
 import { checkPhaseAccess } from "@/lib/subscription"
+import { handleRouteError } from "@/lib/http/responses"
 
 export async function GET(request: NextRequest) {
   try {
-    // MENTOR NOTE: Get session using NextAuth v5 auth helper
-    const session = await auth()
-
-    if (!session?.user?.id) {
-      return NextResponse.json(
-        { error: "Unauthorized" },
-        { status: 401 }
-      )
-    }
+    const user = await requireAuthenticatedUser(request)
 
     const phaseParam = request.nextUrl.searchParams.get("phase")
     
@@ -46,15 +39,10 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    const accessCheck = await checkPhaseAccess(session.user.id, phaseNumber)
+    const accessCheck = await checkPhaseAccess(user.id, phaseNumber)
 
     return NextResponse.json(accessCheck)
   } catch (error) {
-    console.error("Subscription check error:", error)
-    return NextResponse.json(
-      { error: "Failed to check subscription" },
-      { status: 500 }
-    )
+    return handleRouteError(error)
   }
 }
-

@@ -1,0 +1,72 @@
+# Staging override: run apisandbox app + postgres as Docker containers
+# Usage: docker-compose -f docker-compose.yml -f docker-compose.staging.yml up -d
+#
+# Security: set AUTH_SECRET (and optionally NEXTAUTH_SECRET) in a `.env` file next to this compose
+# file, or export them — weak defaults are not allowed. Postgres is bound to 127.0.0.1 only.
+
+services:
+  postgres-staging:
+    image: postgres:15-alpine
+    container_name: apisandbox-postgres-staging
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: apisandbox_staging
+    ports:
+      - "127.0.0.1:5434:5432"
+    volumes:
+      - postgres_staging_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - apisandbox-network
+    restart: unless-stopped
+
+  app-staging:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: apisandbox-app-staging
+    environment:
+      NODE_ENV: staging
+      DATABASE_URL: postgresql://postgres:postgres@postgres-staging:5432/apisandbox_staging
+      AUTH_SECRET: ${AUTH_SECRET:?Set AUTH_SECRET in .env (min 32 chars) — see docs/GITFLOW.md}
+      NEXTAUTH_SECRET: ${NEXTAUTH_SECRET:-${AUTH_SECRET}}
+      # NextAuth v5: base URL must match how you open the app (e.g. http://0.0.0.0:4000 or http://localhost:4000)
+      AUTH_URL: ${AUTH_URL:-http://0.0.0.0:4000}
+      NEXTAUTH_URL: ${NEXTAUTH_URL:-http://0.0.0.0:4000}
+      NEXT_PUBLIC_APP_URL: ${NEXT_PUBLIC_APP_URL:-http://0.0.0.0:4000}
+      PORT: 4000
+      # Google OAuth – set in .env; client ID needed on client for Sign-in button (life-world-os style)
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-}
+      NEXT_PUBLIC_GOOGLE_CLIENT_ID: ${NEXT_PUBLIC_GOOGLE_CLIENT_ID:-${GOOGLE_CLIENT_ID:-}}
+    ports:
+      - "127.0.0.1:4000:4000"
+    security_opt:
+      - no-new-privileges:true
+    depends_on:
+      postgres-staging:
+        condition: service_healthy
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "fetch('http://127.0.0.1:4000/').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    networks:
+      - apisandbox-network
+    restart: unless-stopped
+
+volumes:
+  postgres_staging_data:
+    driver: local

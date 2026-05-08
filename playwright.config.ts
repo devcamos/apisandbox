@@ -1,5 +1,9 @@
 import { defineConfig, devices } from '@playwright/test';
 
+const baseURL =
+  process.env.PLAYWRIGHT_BASE_URL ??
+  (process.env.CI ? "http://127.0.0.1:4000" : "http://localhost:4000");
+
 /**
  * @see https://playwright.dev/docs/test-configuration
  */
@@ -24,12 +28,12 @@ export default defineConfig({
   /* Coverage threshold - fail if below 80% */
   expect: {
     /* Maximum time expect() should wait for the condition to be met. */
-    timeout: 5000,
+    timeout: process.env.CI ? 15_000 : 5000,
   },
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     /* Base URL to use in actions like `await page.goto('/')`. */
-    baseURL: 'http://localhost:4000',
+    baseURL,
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'on-first-retry',
@@ -77,16 +81,33 @@ export default defineConfig({
     //   name: 'Google Chrome',
     //   use: { ...devices['Desktop Chrome'], channel: 'chrome' },
     // },
+
+    /* Staging: run against already-running staging (e.g. Docker). Add with: STAGING_TEST=1 npm run test:staging */
+    ...(process.env.STAGING_TEST
+      ? [
+          {
+            name: 'staging',
+            use: {
+              baseURL: process.env.STAGING_URL || 'http://localhost:4000',
+            },
+          },
+        ]
+      : []),
   ],
 
-  /* Run your local dev server before starting the tests */
-  webServer: {
-    command: 'npm run dev',
-    url: 'http://localhost:4000',
-    reuseExistingServer: !process.env.CI,
-    timeout: 120 * 1000,
-    env: {
-      NODE_ENV: 'test',
-    },
-  },
+  /* Run your local dev server before starting the tests (skip when running staging tests) */
+  webServer: process.env.STAGING_TEST
+    ? undefined
+    : {
+        // GitHub runners: bind explicitly to IPv4 (avoids localhost / ::1 mismatches with the health-check URL).
+        command: process.env.CI
+          ? "npx next dev -H 127.0.0.1 -p 4000 --webpack"
+          : "npm run dev",
+        url: baseURL,
+        reuseExistingServer: !process.env.CI,
+        timeout: process.env.CI ? 180 * 1000 : 120 * 1000,
+        env: {
+          NODE_ENV: "test",
+        },
+      },
 });

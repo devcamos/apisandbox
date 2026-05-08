@@ -5,7 +5,7 @@
  * 
  * Subscription Tiers:
  * - FREE: Access to Phase 1 only
- * - PREMIUM: Access to all phases (1-4) + Cloud section
+ * - PREMIUM: Access to all phases (1-5) + Cloud section
  * 
  * Access Control Strategy:
  * 1. Check user's subscription tier
@@ -35,11 +35,11 @@ export interface AccessCheck {
  * 
  * MENTOR NOTE: Access Control Logic
  * - FREE tier: Only Phase 1
- * - PREMIUM tier: All phases (1-4) + Cloud + AI
+ * - PREMIUM tier: All phases (1-5) + Cloud + AI
  * - Expired subscriptions: Treated as FREE
  * 
  * @param userId - User ID
- * @param phaseNumber - Phase number (1, 2, 3, 4), "cloud", or "ai"
+ * @param phaseNumber - Phase number (1, 2, 3, 4, 5), "cloud", or "ai"
  * @returns Access check result
  */
 export async function checkPhaseAccess(
@@ -75,15 +75,13 @@ export async function checkPhaseAccess(
   let hasAccess = false
   let upgradeRequired = false
 
-  if (phaseNumber === 0 || phaseNumber === 1) {
-    // Phase 0 (Fundamentals) and Phase 1 are free for everyone
+  if (phaseNumber === 0 || phaseNumber === 1 || phaseNumber === 7 || phaseNumber === 8) {
     hasAccess = true
-  } else if (phaseNumber === "cloud" || phaseNumber === "ai") {
-    // Cloud and AI sections require premium
-    hasAccess = effectiveTier === "PREMIUM"
-    upgradeRequired = !hasAccess
-  } else if (phaseNumber >= 2 && phaseNumber <= 4) {
-    // Phases 2-4 require premium
+  } else if (
+    phaseNumber === "cloud" ||
+    phaseNumber === "ai" ||
+    (typeof phaseNumber === "number" && phaseNumber >= 2 && phaseNumber <= 5)
+  ) {
     hasAccess = effectiveTier === "PREMIUM"
     upgradeRequired = !hasAccess
   }
@@ -151,7 +149,7 @@ export async function upgradeToPremium(
 export function getTierFeatures(tier: SubscriptionTier) {
   if (tier === "PREMIUM") {
     return {
-      phases: [0, 1, 2, 3, 4],
+      phases: [0, 1, 2, 3, 4, 5],
       cloud: true,
       ai: true,
       observability: true,
@@ -167,4 +165,3 @@ export function getTierFeatures(tier: SubscriptionTier) {
     demos: false,
   }
 }
-

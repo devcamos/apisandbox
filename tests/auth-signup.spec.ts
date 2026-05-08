@@ -6,6 +6,7 @@
  */
 
 import { test, expect } from '@playwright/test';
+import { randomUUID } from 'node:crypto';
 
 test.describe('Auth Signup', () => {
   test.beforeEach(async ({ page }) => {
@@ -88,7 +89,7 @@ test.describe('Auth Signup', () => {
   });
 
   test('should successfully sign up with valid credentials', async ({ request, page }) => {
-    const uniqueEmail = `test-${Date.now()}-${Math.random().toString(36).substring(7)}@example.com`;
+    const uniqueEmail = `test-${Date.now()}-${randomUUID()}@example.com`;
     
     await page.getByLabel(/email address/i).fill(uniqueEmail);
     await page.getByLabel(/^password$/i).fill('Test1234!@#$');
@@ -103,7 +104,7 @@ test.describe('Auth Signup', () => {
   });
 
   test('should successfully create account via API', async ({ request }) => {
-    const uniqueEmail = `test-${Date.now()}-${Math.random().toString(36).substring(7)}@example.com`;
+    const uniqueEmail = `test-${Date.now()}-${randomUUID()}@example.com`;
     
     const response = await request.post('/api/auth/signup', {
       data: {
@@ -124,7 +125,7 @@ test.describe('Auth Signup', () => {
   });
 
   test('should reject duplicate email', async ({ request }) => {
-    const uniqueEmail = `test-${Date.now()}-${Math.random().toString(36).substring(7)}@example.com`;
+    const uniqueEmail = `test-${Date.now()}-${randomUUID()}@example.com`;
     
     // First signup should succeed
     const firstResponse = await request.post('/api/auth/signup', {
@@ -148,7 +149,7 @@ test.describe('Auth Signup', () => {
   });
 
   test('should reject weak passwords via API', async ({ request }) => {
-    const uniqueEmail = `test-${Date.now()}-${Math.random().toString(36).substring(7)}@example.com`;
+    const uniqueEmail = `test-${Date.now()}-${randomUUID()}@example.com`;
     
     const response = await request.post('/api/auth/signup', {
       data: {
@@ -203,25 +204,26 @@ test.describe('Auth Signup', () => {
     }
   });
 
-  test('should show error messages on failed signup', async ({ page }) => {
+  test("should show error messages on failed signup", async ({ page }) => {
     // Try to sign up with existing email (if we can create one first)
-    const emailInput = page.getByLabel(/email address/i);
-    const passwordInput = page.getByLabel(/^password$/i);
-    const confirmPasswordInput = page.getByLabel(/confirm password/i);
-    const submitButton = page.getByRole('button', { name: /create account/i });
+    const emailInput = page.getByLabel(/email address/i)
+    const passwordInput = page.getByLabel(/^password$/i)
+    const confirmPasswordInput = page.getByLabel(/confirm password/i)
+    const submitButton = page.getByRole("button", { name: /create account/i })
     
     // Fill form with potentially duplicate email
-    await emailInput.fill('test@example.com');
-    await passwordInput.fill('Test1234!@#$');
-    await confirmPasswordInput.fill('Test1234!@#$');
+    await emailInput.fill("test@example.com")
+    await passwordInput.fill("Test1234!@#$")
+    await confirmPasswordInput.fill("Test1234!@#$")
     
-    await submitButton.click();
+    await submitButton.click()
     
     // Should show error message (either duplicate or success)
     // We can't guarantee duplicate, so just check error handling works
-    const errorContainer = page.locator('.bg-red-500\\/10');
-    // Error might appear or might succeed - both are valid
-  });
+    const errorContainer = page.locator(".bg-red-500\\/10")
+    // Error might appear or might succeed - both are valid, but we must assert on an outcome.
+    await expect(errorContainer.or(page.getByText(/registered|welcome|sign in/i))).toBeVisible()
+  })
 
   test('should disable submit button when password is weak', async ({ page }) => {
     const passwordInput = page.getByLabel(/^password$/i);
@@ -239,7 +241,7 @@ test.describe('Auth Signup', () => {
   });
 
   test('should show loading state during signup', async ({ page }) => {
-    const uniqueEmail = `test-${Date.now()}-${Math.random().toString(36).substring(7)}@example.com`;
+    const uniqueEmail = `test-${Date.now()}-${randomUUID()}@example.com`;
     
     await page.getByLabel(/email address/i).fill(uniqueEmail);
     await page.getByLabel(/^password$/i).fill('Test1234!@#$');
@@ -277,5 +279,3 @@ test.describe('Auth Signup', () => {
     await expect(page.getByText(/unexpected error|network error/i)).toBeVisible();
   });
 });
-
-

@@ -1,0 +1,201 @@
+# Continuous integration: lint, production build, unit tests, SonarCloud, Playwright smoke.
+# Continuous delivery: handled by Vercel when the GitHub repo is connected
+# (see docs/CI_CD_GITHUB_VERCEL.md).
+
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+      - master
+      - develop
+      - dev
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  NODE_OPTIONS: --max-old-space-size=6144
+  NEXT_TELEMETRY_DISABLED: "1"
+  # Build-time placeholders (no database connection required for `next build`).
+  AUTH_SECRET: github-actions-ci-placeholder-secret-min-32-chars
+  NEXTAUTH_SECRET: github-actions-ci-placeholder-secret-min-32-chars
+  DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/_build_placeholder
+  NEXT_PUBLIC_APP_URL: http://localhost:4000
+  # `next build` runs with NODE_ENV=production; lib/email.ts validates this at import time.
+  RESEND_API_KEY: github-actions-ci-resend-placeholder
+
+jobs:
+  lint-and-build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Build
+        run: npm run build
+
+  unit-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Unit tests with coverage
+        run: npm run test:unit -- --coverage
+
+      - name: Upload coverage artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage
+          path: coverage/
+          if-no-files-found: warn
+
+  sonarcloud:
+    name: SonarQube Cloud
+    runs-on: ubuntu-latest
+    needs: [lint-and-build, unit-tests]
+    # Blocks merge when SONAR_TOKEN is set and SonarCloud Quality Gate fails (sonar.qualitygate.wait=true).
+    if: github.event.repository.fork == false
+    permissions:
+      contents: read
+      pull-requests: write
+    env:
+      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Download coverage
+        uses: actions/download-artifact@v4
+        with:
+          name: coverage
+          path: coverage
+
+      - name: Cache SonarQube scanner artifacts
+        uses: actions/cache@v4
+        with:
+          path: ~/.sonar/cache
+          key: ${{ runner.os }}-sonar-${{ hashFiles('**/sonar-project.properties', '**/package-lock.json') }}
+          restore-keys: ${{ runner.os }}-sonar-
+
+      - name: SonarCloud Scan
+        if: env.SONAR_TOKEN != ''
+        uses: SonarSource/sonarqube-scan-action@59db25f34e16620e48ab4bb9e4a5dce155cb5432
+        with:
+          # Hosted runners occasionally fail GPG keyserver fetch for scanner signature verify.
+          skipSignatureVerification: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  docker-compose-validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate staging compose (secrets + interpolation)
+        env:
+          AUTH_SECRET: github-actions-ci-placeholder-secret-min-32-chars
+        run: bash scripts/validate-compose.sh
+
+  e2e-smoke:
+    needs: [lint-and-build, unit-tests]
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: apisandbox_ci
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d apisandbox_ci"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      CI: true
+      AUTH_SECRET: github-actions-ci-placeholder-secret-min-32-chars
+      NEXTAUTH_SECRET: github-actions-ci-placeholder-secret-min-32-chars
+      DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/apisandbox_ci
+      NEXT_PUBLIC_APP_URL: http://127.0.0.1:4000
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      # Migrations in prisma/migrations are SQLite-era; fresh Postgres in CI is
+      # synced from schema with db push. Use `prisma migrate deploy` in hosted
+      # environments only after a Postgres-native migration baseline exists.
+      - name: Sync Prisma schema to Postgres (CI)
+        run: npx prisma db push --accept-data-loss
+
+      - name: Install Playwright Chromium
+        run: npx playwright install chromium --with-deps
+
+      - name: Run E2E smoke (Chromium)
+        run: npm run test:ci:smoke
+
+      - name: Upload Playwright report
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report/
+          if-no-files-found: ignore
+
+  dependency-review:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # Report vulnerabilities/licenses without blocking merges (npm audit still tracked locally).
+      - name: Dependency review
+        uses: actions/dependency-review-action@v4
+        with:
+          warn-only: true
+          fail-on-severity: critical

@@ -66,15 +66,53 @@ model User {
   loginAttempts Int       @default(0)
   lockedUntil   DateTime?
   isActive      Boolean   @default(true)
+  // Stripe billing
+  stripeCustomerId     String?   @unique
+  stripeSubscriptionId String?
   // Subscription fields
   subscriptionTier SubscriptionTier @default(FREE)
-  subscriptionExpiresAt DateTime?    // For trial periods or expiring subscriptions
+  subscriptionExpiresAt DateTime?
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
   accounts Account[]
   sessions Session[]
   verificationToken VerificationToken[]
+  profile UserProfile?
+  phaseProgress UserPhaseProgress[]
+}
+
+model UserPhaseProgress {
+  id             String   @id @default(cuid())
+  userId         String
+  phaseNumber    Int
+  xpEarned       Int      @default(0)
+  totalQuestions Int      @default(0)
+  correctAnswers Int      @default(0)
+  attempts       Int      @default(0)
+  completedAt    DateTime?
+  lastAttemptAt  DateTime?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, phaseNumber])
+  @@index([userId])
+}
+
+model UserProfile {
+  id                String   @id @default(cuid())
+  userId             String   @unique
+  firstName          String?
+  lastName           String?
+  avatarUrl          String?
+  roleLabel          String?
+  identityStatement  String?
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model VerificationToken {

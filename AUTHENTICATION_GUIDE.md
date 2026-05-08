@@ -196,6 +196,8 @@ GOOGLE_CLIENT_ID="your-google-client-id"
 GOOGLE_CLIENT_SECRET="your-google-client-secret"
 ```
 
+For step-by-step Google OAuth (redirect URIs, Cloud Console), see **[docs/GOOGLE_OAUTH_SETUP.md](docs/GOOGLE_OAUTH_SETUP.md)**.
+
 ## Production Checklist
 
 - [ ] Change `AUTH_SECRET` to a secure random value

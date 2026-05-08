@@ -12,13 +12,19 @@
 
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect, useRef, useCallback } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { ArrowRight, Mail, Lock, User, AlertCircle, CheckCircle } from "lucide-react"
+import { useAuthSessionWriter } from "@/components/providers/SessionProvider"
+import AuthPageShell from "@/components/auth/AuthPageShell"
+import AuthSocialSection from "@/components/auth/AuthSocialSection"
 
 export default function SignupPage() {
   const router = useRouter()
+  const { setSessionFromAuthResponse } = useAuthSessionWriter()
+  const googleButtonRef = useRef<HTMLDivElement>(null)
+  const googleClientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ?? ""
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -66,7 +72,7 @@ export default function SignupPage() {
     setIsLoading(true)
 
     try {
-      const response = await fetch("/api/auth/signup", {
+      const response = await fetch("/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -79,34 +85,86 @@ export default function SignupPage() {
       const data = await response.json()
 
       if (!response.ok) {
-        setErrors(Array.isArray(data.details) ? data.details : [data.error || "Signup failed"])
+        const details = data?.error?.details
+        const message = data?.error?.message || "Signup failed"
+        setErrors(Array.isArray(details) ? details : [message])
         setIsLoading(false)
         return
       }
 
-      // Success - redirect to login
-      router.push("/login?registered=true")
+      setSessionFromAuthResponse(data.data)
+      router.push("/dashboard")
+      router.refresh()
     } catch (err) {
       setErrors(["An unexpected error occurred. Please try again."])
       setIsLoading(false)
     }
   }
 
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center px-6 py-12">
-      <div className="w-full max-w-md">
-        {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-blue-400 to-cyan-400 text-transparent bg-clip-text">
-            Create Account
-          </h1>
-          <p className="text-gray-400">
-            Start your API integration learning journey
-          </p>
-        </div>
+  const handleGoogleCredential = useCallback(
+    async (credential: string) => {
+      setErrors([])
+      setIsLoading(true)
+      try {
+        const response = await fetch("/api/auth/google", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ idToken: credential }),
+        })
+        const data = await response.json()
+        if (!response.ok) {
+          setErrors([data?.error?.message || "Google signup failed"])
+          setIsLoading(false)
+          return
+        }
+        setSessionFromAuthResponse(data.data)
+        router.push("/dashboard")
+        router.refresh()
+      } catch {
+        setErrors(["Failed to sign up with Google. Please try again."])
+        setIsLoading(false)
+      }
+    },
+    [router, setSessionFromAuthResponse]
+  )
 
-        {/* Signup Form */}
-        <div className="bg-slate-800/50 backdrop-blur-sm rounded-2xl p-8 border border-slate-700">
+  useEffect(() => {
+    if (!googleClientId || !googleButtonRef.current) return
+    const init = () => {
+      if (globalThis.window !== undefined && window.google?.accounts?.id && googleButtonRef.current) {
+        window.google.accounts.id.initialize({
+          client_id: googleClientId,
+          callback: (response: { credential: string }) => {
+            if (response.credential) handleGoogleCredential(response.credential)
+          },
+        })
+        window.google.accounts.id.renderButton(googleButtonRef.current, {
+          type: "standard",
+          theme: "outline",
+          size: "large",
+          text: "signup_with",
+          width: "100%",
+        })
+      }
+    }
+    if (globalThis.window !== undefined && window.google?.accounts?.id) {
+      init()
+    } else {
+      const t = setInterval(() => {
+        if (globalThis.window !== undefined && window.google?.accounts?.id) {
+          clearInterval(t)
+          init()
+        }
+      }, 100)
+      setTimeout(() => clearInterval(t), 10000)
+    }
+  }, [googleClientId, handleGoogleCredential])
+
+  return (
+    <AuthPageShell
+      title="Create Account"
+      subtitle="Start your API integration learning journey"
+    >
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Name Field */}
             <div>
@@ -248,27 +306,12 @@ export default function SignupPage() {
             </button>
           </form>
 
-          {/* Divider */}
-          <div className="relative my-6">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-slate-700"></div>
-            </div>
-            <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-slate-800/50 text-gray-400">Or sign up with</span>
-            </div>
-          </div>
-
-          {/* OAuth Buttons */}
-          <button
-            onClick={() => {
-              // OAuth signup will be handled by NextAuth
-              window.location.href = "/api/auth/signin?callbackUrl=/dashboard"
-            }}
-            disabled={isLoading}
-            className="w-full py-3 bg-slate-900/50 border border-slate-700 text-white rounded-lg font-semibold hover:bg-slate-800 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+          <AuthSocialSection
+            googleClientId={googleClientId}
+            googleButtonRef={googleButtonRef}
+            fallbackLabel="Sign up with Google"
+            dividerLabel="Or sign up with"
           >
-            Sign up with Google
-          </button>
 
           {/* Login Link */}
           <div className="mt-6 text-center text-sm text-gray-400">
@@ -277,10 +320,8 @@ export default function SignupPage() {
               Sign in
             </Link>
           </div>
-        </div>
-      </div>
-    </div>
+          </AuthSocialSection>
+    </AuthPageShell>
   )
 }
-
 

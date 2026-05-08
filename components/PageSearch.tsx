@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { Search, ArrowRight, BookOpen, Cloud, Brain, Database, Zap, Code, Shield, CreditCard, Mail, Folder } from 'lucide-react';
 
@@ -88,6 +88,14 @@ const searchData: SearchResult[] = [
     category: "Phase 2",
     icon: Zap,
     keywords: ["oauth", "oauth2", "authentication", "flow", "demo"]
+  },
+  {
+    title: "Phase 2: JWT",
+    description: "Decode and explore JSON Web Tokens",
+    href: "/phase-2/demos/jwt",
+    category: "Phase 2",
+    icon: Zap,
+    keywords: ["jwt", "token", "json web token", "authentication", "bearer", "demo"]
   },
   {
     title: "Phase 2: Retry Logic",
@@ -192,6 +200,14 @@ const searchData: SearchResult[] = [
     category: "Phase 4",
     icon: Brain,
     keywords: ["phase 4", "architecture", "patterns", "anti-patterns", "principal", "advanced"]
+  },
+  {
+    title: "Phase 5: API Algorithms",
+    description: "LeetCode concepts mapped to production API system design",
+    href: "/phase-5",
+    category: "Phase 5",
+    icon: Brain,
+    keywords: ["phase 5", "api algorithms", "leetcode", "theory", "caching", "rate limiter", "idempotency", "queue", "trade-offs"]
   },
 
   // Cloud Section
@@ -305,6 +321,15 @@ export function PageSearch() {
   const router = useRouter();
   const searchRef = useRef<HTMLDivElement>(null);
 
+  const handleSelect = useCallback(
+    (result: SearchResult) => {
+      setQuery('');
+      setIsOpen(false);
+      router.push(result.href);
+    },
+    [router],
+  );
+
   // Filter results based on query
   useEffect(() => {
     if (!query.trim()) {
@@ -353,7 +378,7 @@ export function PageSearch() {
 
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen, results, selectedIndex]);
+  }, [handleSelect, isOpen, results, selectedIndex]);
 
   // Close when clicking outside
   useEffect(() => {
@@ -367,12 +392,6 @@ export function PageSearch() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const handleSelect = (result: SearchResult) => {
-    setQuery('');
-    setIsOpen(false);
-    router.push(result.href);
-  };
-
   const getCategoryColor = (category: string) => {
     const colors: Record<string, string> = {
       'Main': 'bg-blue-100 text-blue-800',
@@ -381,6 +400,7 @@ export function PageSearch() {
       'Phase 2': 'bg-yellow-100 text-yellow-800',
       'Phase 3': 'bg-red-100 text-red-800',
       'Phase 4': 'bg-indigo-100 text-indigo-800',
+      'Phase 5': 'bg-sky-100 text-sky-800',
       'Cloud': 'bg-cyan-100 text-cyan-800',
       'AI': 'bg-pink-100 text-pink-800',
       'Databases': 'bg-orange-100 text-orange-800',

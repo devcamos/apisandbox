@@ -42,6 +42,7 @@ export interface ErrorMetric {
 class MetricsCollector {
   private metrics: Metric[] = [];
   private listeners: ((metrics: Metric[]) => void)[] = [];
+  private metricCounter = 0;
 
   constructor() {
     // Add some sample metrics to demonstrate the dashboard
@@ -118,8 +119,13 @@ class MetricsCollector {
 
   // Add a new metric
   addMetric(type: Metric['type'], data: any) {
+    const metricId =
+      typeof crypto !== "undefined" && "randomUUID" in crypto
+        ? crypto.randomUUID()
+        : `${Date.now()}-${this.metricCounter++}`;
+
     const metric: Metric = {
-      id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      id: metricId,
       timestamp: Date.now(),
       type,
       data

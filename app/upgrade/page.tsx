@@ -1,57 +1,49 @@
-/**
- * Upgrade/Pricing Page
- * 
- * MENTOR NOTE: Pricing Page Best Practices
- * 
- * 1. Clear value proposition
- * 2. Feature comparison (Free vs Premium)
- * 3. Social proof (testimonials, user count)
- * 4. Clear pricing
- * 5. Easy upgrade flow
- * 
- * This page allows users to upgrade from FREE to PREMIUM
- */
-
 "use client"
 
-import { useSession } from "next-auth/react"
+import { isAllowedStripeCheckoutRedirectUrl } from "@/lib/safe-redirect"
+import { useSession } from "@/components/providers/SessionProvider"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
 import Link from "next/link"
-import { Check, Sparkles, Lock, ArrowRight, Star } from "lucide-react"
+import { Check, Sparkles, Lock, ArrowRight, Zap, Brain, BarChart3 } from "lucide-react"
 
 export default function UpgradePage() {
   const { data: session } = useSession()
   const router = useRouter()
   const [isUpgrading, setIsUpgrading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   const handleUpgrade = async () => {
     if (!session?.user?.id) {
-      router.push("/login")
+      router.push("/login?callbackUrl=/upgrade")
       return
     }
 
     setIsUpgrading(true)
+    setError(null)
 
     try {
-      // MENTOR NOTE: In production, this would:
-      // 1. Create Stripe checkout session
-      // 2. Redirect to payment
-      // 3. Webhook updates subscription on success
-      
-      // For now, simulate upgrade (demo mode)
-      const response = await fetch("/api/subscription/upgrade", {
-        method: "POST",
-      })
+      const response = await fetch("/api/checkout", { method: "POST" })
 
       if (response.ok) {
-        router.push("/dashboard")
+        const { url } = await response.json()
+        if (typeof url === "string" && isAllowedStripeCheckoutRedirectUrl(url)) {
+          if (globalThis.window !== undefined) {
+            window.location.href = url
+          }
+          return
+        }
+      }
+
+      const fallback = await fetch("/api/subscription/upgrade", { method: "POST" })
+      if (fallback.ok) {
+        router.push("/phase-2")
         router.refresh()
       } else {
-        alert("Upgrade failed. Please try again.")
+        setError("Upgrade failed. Please try again.")
       }
-    } catch (error) {
-      alert("An error occurred. Please try again.")
+    } catch {
+      setError("An error occurred. Please try again.")
     } finally {
       setIsUpgrading(false)
     }
@@ -60,206 +52,187 @@ export default function UpgradePage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
       <div className="container mx-auto px-6 py-16">
-        {/* Header */}
         <div className="text-center mb-12">
-          <h1 className="text-5xl font-bold mb-4 bg-gradient-to-r from-purple-400 via-pink-400 to-orange-400 text-transparent bg-clip-text">
-            Upgrade to Premium
+          <h1 className="text-5xl font-bold mb-4 bg-gradient-to-r from-violet-400 via-fuchsia-400 to-pink-400 text-transparent bg-clip-text">
+            Unlock Full Access
           </h1>
           <p className="text-xl text-gray-300 max-w-2xl mx-auto">
-            Unlock all learning phases, cloud guides, and advanced features
+            Master APIs, algorithms, and architecture with interactive tools and guided practice
           </p>
         </div>
 
-        {/* Pricing Comparison */}
-        <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto mb-12">
+        <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto mb-16">
           {/* Free Tier */}
           <div className="bg-slate-800/50 backdrop-blur-sm rounded-2xl p-8 border border-slate-700">
             <div className="text-center mb-6">
               <h3 className="text-2xl font-bold text-white mb-2">Free</h3>
-              <div className="text-4xl font-bold text-white mb-1">$0</div>
-              <p className="text-gray-400">Forever free</p>
+              <div className="text-4xl font-bold text-white mb-1">£0</div>
+              <p className="text-gray-400">No account required</p>
             </div>
             <ul className="space-y-3 mb-6">
               <li className="flex items-center gap-2 text-gray-300">
-                <Check className="w-5 h-5 text-green-400" />
+                <Check className="w-5 h-5 text-green-400 shrink-0" />
+                Phase 0: How the Internet Works
+              </li>
+              <li className="flex items-center gap-2 text-gray-300">
+                <Check className="w-5 h-5 text-green-400 shrink-0" />
                 Phase 1: Integration Mindset
               </li>
               <li className="flex items-center gap-2 text-gray-300">
-                <Check className="w-5 h-5 text-green-400" />
-                Basic API concepts
+                <Check className="w-5 h-5 text-green-400 shrink-0" />
+                Phase 7: Monetisation Paths
+              </li>
+              <li className="flex items-center gap-2 text-gray-300">
+                <Check className="w-5 h-5 text-green-400 shrink-0" />
+                Phase 8: Data Science in Production
               </li>
               <li className="flex items-center gap-2 text-gray-500">
-                <Lock className="w-5 h-5" />
-                <span className="line-through">Phases 2-4</span>
+                <Lock className="w-5 h-5 shrink-0" />
+                <span className="line-through">Interactive visualisers</span>
               </li>
               <li className="flex items-center gap-2 text-gray-500">
-                <Lock className="w-5 h-5" />
-                <span className="line-through">Cloud Migration</span>
-              </li>
-              <li className="flex items-center gap-2 text-gray-500">
-                <Lock className="w-5 h-5" />
-                <span className="line-through">Advanced Demos</span>
+                <Lock className="w-5 h-5 shrink-0" />
+                <span className="line-through">Exercises & progress tracking</span>
               </li>
             </ul>
             <Link
-              href="/dashboard"
+              href="/phase-0"
               className="block w-full py-3 bg-slate-700 text-white rounded-lg font-semibold text-center hover:bg-slate-600 transition-all"
             >
-              Continue with Free
+              Start Free
             </Link>
           </div>
 
           {/* Premium Tier */}
-          <div className="bg-gradient-to-br from-purple-500/20 via-pink-500/20 to-orange-500/20 backdrop-blur-sm rounded-2xl p-8 border-2 border-purple-500/50 relative">
-            <div className="absolute top-4 right-4 bg-purple-500 text-white text-xs font-semibold px-3 py-1 rounded-full">
-              RECOMMENDED
+          <div className="bg-gradient-to-br from-violet-500/20 via-fuchsia-500/20 to-pink-500/20 backdrop-blur-sm rounded-2xl p-8 border-2 border-violet-500/50 relative">
+            <div className="absolute top-4 right-4 bg-violet-600 text-white text-xs font-semibold px-3 py-1 rounded-full">
+              FULL ACCESS
             </div>
             <div className="text-center mb-6">
               <h3 className="text-2xl font-bold text-white mb-2">Premium</h3>
-              <div className="text-4xl font-bold text-white mb-1">$29</div>
-              <p className="text-gray-400">per month</p>
+              <div className="text-4xl font-bold text-white mb-1">£5</div>
+              <p className="text-gray-400">per month · cancel anytime</p>
             </div>
             <ul className="space-y-3 mb-6">
               <li className="flex items-center gap-2 text-white">
-                <Check className="w-5 h-5 text-green-400" />
-                <strong>All 4 Learning Phases</strong>
+                <Check className="w-5 h-5 text-green-400 shrink-0" />
+                <strong>All 9 learning phases</strong>
               </li>
               <li className="flex items-center gap-2 text-white">
-                <Check className="w-5 h-5 text-green-400" />
-                AWS Cloud Migration Guides
+                <Check className="w-5 h-5 text-green-400 shrink-0" />
+                Interactive algorithm visualisers
               </li>
               <li className="flex items-center gap-2 text-white">
-                <Check className="w-5 h-5 text-green-400" />
-                Advanced Observability Dashboard
+                <Check className="w-5 h-5 text-green-400 shrink-0" />
+                Shinobi progress board & XP
               </li>
               <li className="flex items-center gap-2 text-white">
-                <Check className="w-5 h-5 text-green-400" />
-                Interactive Demos & Examples
+                <Check className="w-5 h-5 text-green-400 shrink-0" />
+                Guided exercises per algorithm
               </li>
               <li className="flex items-center gap-2 text-white">
-                <Check className="w-5 h-5 text-green-400" />
-                Java + React Integration Examples
+                <Check className="w-5 h-5 text-green-400 shrink-0" />
+                Architecture pattern library
               </li>
               <li className="flex items-center gap-2 text-white">
-                <Check className="w-5 h-5 text-green-400" />
-                Priority Support
-              </li>
-              <li className="flex items-center gap-2 text-white">
-                <Check className="w-5 h-5 text-green-400" />
-                Certificate of Completion
+                <Check className="w-5 h-5 text-green-400 shrink-0" />
+                Concept side quests
               </li>
             </ul>
             <button
               onClick={handleUpgrade}
-              disabled={isUpgrading || !session}
-              className="w-full py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg font-semibold hover:shadow-lg hover:scale-105 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              disabled={isUpgrading}
+              className="w-full py-3 bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white rounded-lg font-semibold hover:shadow-lg hover:shadow-violet-500/25 hover:scale-[1.02] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             >
               {!session ? (
                 <>
                   <Lock className="w-5 h-5" />
-                  Sign In to Upgrade
+                  Sign in to upgrade
                 </>
               ) : isUpgrading ? (
-                "Upgrading..."
+                "Redirecting to checkout..."
               ) : (
                 <>
                   <Sparkles className="w-5 h-5" />
-                  Upgrade Now
+                  Upgrade — £5/month
                   <ArrowRight className="w-4 h-4" />
                 </>
               )}
             </button>
             {!session && (
-              <p className="text-center text-sm text-gray-400 mt-2">
-                <Link href="/login" className="text-purple-400 hover:text-purple-300">
+              <p className="text-center text-sm text-gray-400 mt-3">
+                <Link href="/login?callbackUrl=/upgrade" className="text-violet-400 hover:text-violet-300">
                   Sign in
                 </Link>{" "}
                 or{" "}
-                <Link href="/signup" className="text-purple-400 hover:text-purple-300">
+                <Link href="/signup" className="text-violet-400 hover:text-violet-300">
                   create an account
                 </Link>{" "}
                 to upgrade
               </p>
             )}
+            {error && (
+              <p className="text-center text-sm text-rose-400 mt-3">{error}</p>
+            )}
           </div>
         </div>
 
-        {/* Feature Details */}
+        {/* What's included */}
         <div className="max-w-4xl mx-auto">
           <h2 className="text-3xl font-bold text-white mb-8 text-center">
-            What You Get with Premium
+            What Premium Unlocks
           </h2>
-          
-          <div className="grid md:grid-cols-2 gap-6">
-            <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border border-slate-700">
-              <div className="flex items-center gap-3 mb-3">
-                <div className="p-2 bg-blue-500/20 rounded-lg">
-                  <Star className="w-6 h-6 text-blue-400" />
-                </div>
-                <h3 className="text-xl font-bold text-white">All Learning Phases</h3>
+
+          <div className="grid md:grid-cols-3 gap-6">
+            <div className="bg-slate-800/50 rounded-xl p-6 border border-slate-700">
+              <div className="p-2 bg-violet-500/20 rounded-lg w-fit mb-3">
+                <Brain className="w-6 h-6 text-violet-400" />
               </div>
+              <h3 className="text-lg font-bold text-white mb-2">Deep Learning Phases</h3>
               <p className="text-gray-400 text-sm">
-                Access to Phases 2, 3, and 4 covering OAuth2, microservices, 
-                distributed systems, and principal-level architecture.
+                OAuth2, microservices, distributed systems, principal-level architecture,
+                and algorithm mastery.
               </p>
             </div>
 
-            <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border border-slate-700">
-              <div className="flex items-center gap-3 mb-3">
-                <div className="p-2 bg-orange-500/20 rounded-lg">
-                  <Sparkles className="w-6 h-6 text-orange-400" />
-                </div>
-                <h3 className="text-xl font-bold text-white">Cloud Migration</h3>
+            <div className="bg-slate-800/50 rounded-xl p-6 border border-slate-700">
+              <div className="p-2 bg-fuchsia-500/20 rounded-lg w-fit mb-3">
+                <Zap className="w-6 h-6 text-fuchsia-400" />
               </div>
+              <h3 className="text-lg font-bold text-white mb-2">Interactive Visualisers</h3>
               <p className="text-gray-400 text-sm">
-                Complete AWS migration guides, cost calculators, and 
-                architecture templates for enterprise deployments.
+                Watch sorting, searching, and graph algorithms run step-by-step
+                with Framer Motion, GSAP, and Three.js animations.
               </p>
             </div>
 
-            <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border border-slate-700">
-              <div className="flex items-center gap-3 mb-3">
-                <div className="p-2 bg-green-500/20 rounded-lg">
-                  <Check className="w-6 h-6 text-green-400" />
-                </div>
-                <h3 className="text-xl font-bold text-white">Java + React Examples</h3>
+            <div className="bg-slate-800/50 rounded-xl p-6 border border-slate-700">
+              <div className="p-2 bg-emerald-500/20 rounded-lg w-fit mb-3">
+                <BarChart3 className="w-6 h-6 text-emerald-400" />
               </div>
+              <h3 className="text-lg font-bold text-white mb-2">Progress Tracking</h3>
               <p className="text-gray-400 text-sm">
-                Real-world code examples showing how Java backends and 
-                React frontends communicate through APIs.
-              </p>
-            </div>
-
-            <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border border-slate-700">
-              <div className="flex items-center gap-3 mb-3">
-                <div className="p-2 bg-purple-500/20 rounded-lg">
-                  <Star className="w-6 h-6 text-purple-400" />
-                </div>
-                <h3 className="text-xl font-bold text-white">Priority Support</h3>
-              </div>
-              <p className="text-gray-400 text-sm">
-                Get help when you need it with priority email support 
-                and access to exclusive community forums.
+                Earn XP, track difficulty tiers, and see your growth
+                on the Shinobi learning board.
               </p>
             </div>
           </div>
         </div>
 
-        {/* Trust Indicators */}
+        {/* Trust */}
         <div className="mt-12 text-center">
           <p className="text-gray-400 mb-4">
-            <strong className="text-white">30-day money-back guarantee</strong> • Cancel anytime • No credit card required for free tier
+            <strong className="text-white">7-day refund guarantee</strong> · Cancel anytime · Secure payment via Stripe
           </p>
-          <Link
-            href="/dashboard"
-            className="text-purple-400 hover:text-purple-300 font-semibold"
-          >
-            ← Back to Dashboard
-          </Link>
+          <div className="flex items-center justify-center gap-6 text-sm text-gray-500">
+            <Link href="/terms" className="hover:text-gray-300 transition-colors">Terms</Link>
+            <Link href="/privacy" className="hover:text-gray-300 transition-colors">Privacy</Link>
+            <Link href="/phase-0" className="text-violet-400 hover:text-violet-300 transition-colors">
+              ← Explore free content
+            </Link>
+          </div>
         </div>
       </div>
     </div>
   )
 }
-
-

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { mountSanitizedMermaidSvg } from "@/lib/sanitize-mermaid-svg";
 
 export default function ArchitecturePage() {
   const [mounted, setMounted] = useState(false);
@@ -36,10 +37,16 @@ export default function ArchitecturePage() {
               ref.setAttribute("data-rendered", "true");
               try {
                 const { svg } = await mermaid.default.render(`mermaid-${index}`, diagram);
-                ref.innerHTML = svg;
+                mountSanitizedMermaidSvg(ref, svg);
               } catch (error) {
                 console.error(`Error rendering diagram ${index}:`, error);
-                ref.innerHTML = `<div class="text-red-400">Error rendering diagram: ${error instanceof Error ? error.message : 'Unknown error'}</div>`;
+                ref.replaceChildren();
+                const errEl = document.createElement("div");
+                errEl.className = "text-red-400";
+                errEl.textContent = `Error rendering diagram: ${
+                  error instanceof Error ? error.message : "Unknown error"
+                }`;
+                ref.appendChild(errEl);
               }
             }
           }

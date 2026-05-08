@@ -1,10 +1,15 @@
 "use client";
 
+import Link from "next/link";
 import PhaseLayout from "@/components/PhaseLayout";
 import ConceptCard from "@/components/ConceptCard";
+import ConceptVisuals from "@/components/ConceptVisuals";
+import PhaseQuiz from "@/components/PhaseQuiz";
 import ProjectCard from "@/components/ProjectCard";
 import { SubscriptionGate } from "@/components/SubscriptionGate";
-import { Compass, AlertTriangle, Shield, GitMerge, Clock, Archive } from "lucide-react";
+import { LessonTracker } from "@/components/LessonTracker";
+import SystemDesignTracker from "@/components/SystemDesignTracker";
+import { Compass, AlertTriangle, Shield, GitMerge, Clock, Archive, Target, Workflow, Gauge, Siren, Scale, BrainCircuit, ArrowRight } from "lucide-react";
 
 export default function Phase4() {
   return (
@@ -24,6 +29,35 @@ export default function Phase4() {
           and robust patterns for versioning, testing, and legacy system integration.
         </p>
       </div>
+
+      <LessonTracker phase={4} />
+
+      <section className="mb-12">
+        <div className="bg-gradient-to-br from-cyan-500/10 via-emerald-500/10 to-blue-500/10 border border-cyan-500/30 rounded-2xl p-6">
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+            <div>
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-300 text-sm font-semibold mb-3">
+                <BrainCircuit className="w-4 h-4" />
+                API Algorithms
+              </div>
+              <h2 className="text-2xl font-bold text-white mb-2">Master theory, then prove it in project systems</h2>
+              <p className="text-gray-300 max-w-3xl">
+                Continue into Phase 5 for API Algorithms: a dedicated theory track that connects LeetCode-style thinking to
+                caching, queueing, rate limiting, idempotency, and operations decisions.
+              </p>
+            </div>
+            <Link
+              href="/phase-5"
+              className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-gradient-to-r from-cyan-500 to-emerald-500 text-white font-semibold hover:opacity-95 transition-opacity"
+            >
+              Open Phase 5
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      <ConceptVisuals conceptId="caching" />
 
       {/* Pareto Principle Summary */}
       <div className="bg-gradient-to-br from-yellow-500/10 to-orange-500/10 border-2 border-yellow-500/30 rounded-xl p-6 mb-12">
@@ -73,6 +107,135 @@ export default function Phase4() {
           </div>
         </div>
       </div>
+
+      {/* Constraint-Driven Thinking */}
+      <section className="mb-12">
+        <div className="bg-gradient-to-br from-emerald-500/10 via-cyan-500/10 to-blue-500/10 border-2 border-emerald-500/30 rounded-2xl p-8">
+          <div className="flex items-start gap-4 mb-6">
+            <div className="p-3 bg-emerald-500/20 rounded-lg">
+              <Target className="w-8 h-8 text-emerald-300" />
+            </div>
+            <div>
+              <h2 className="text-3xl font-bold text-white mb-2">Constraint-Driven System Design Thinking</h2>
+              <p className="text-gray-300 max-w-4xl">
+                This fits at the start of system design, before caching, load balancing, queues, rate limiting, or replication.
+                Those systems are implementation choices. This framework determines whether they should exist at all, what
+                problem they are solving, and what trade-offs you are accepting.
+              </p>
+            </div>
+          </div>
+
+          <div className="bg-slate-900/40 border border-slate-700 rounded-xl p-5 mb-6">
+            <h3 className="text-lg font-bold text-emerald-300 mb-3">Recommended order for the tracker</h3>
+            <p className="text-gray-300 mb-3">
+              Put this before the concrete systems as the reasoning layer that drives the rest of the sequence.
+            </p>
+            <div className="grid md:grid-cols-2 gap-3 text-sm text-gray-300">
+              <div className="bg-slate-800/60 rounded-lg p-3 border border-slate-700">0. Constraint-Driven System Design Thinking</div>
+              <div className="bg-slate-800/60 rounded-lg p-3 border border-slate-700">1. Caching Layer</div>
+              <div className="bg-slate-800/60 rounded-lg p-3 border border-slate-700">2. Load Balancer</div>
+              <div className="bg-slate-800/60 rounded-lg p-3 border border-slate-700">3. Queue / Async Processing</div>
+              <div className="bg-slate-800/60 rounded-lg p-3 border border-slate-700">4. Rate Limiter</div>
+              <div className="bg-slate-800/60 rounded-lg p-3 border border-slate-700">5. Database Replication</div>
+              <div className="bg-slate-800/60 rounded-lg p-3 border border-slate-700">6. Notification System</div>
+              <div className="bg-slate-800/60 rounded-lg p-3 border border-slate-700">7. URL Shortener</div>
+            </div>
+          </div>
+
+          <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-6">
+            <ConceptCard
+              icon={Target}
+              title="1. Existence"
+              description="Prove the system deserves to exist before discussing implementation."
+              items={[
+                "What real-world failure happens if this system does not exist?",
+                "Who is hurt first when it fails or is missing?",
+                "What resource is being protected or optimised?",
+                "What constraint forced this system into existence?",
+                "What happens if we remove it tomorrow?"
+              ]}
+              color="from-emerald-500 to-teal-500"
+            />
+            <ConceptCard
+              icon={Workflow}
+              title="2. Mechanics"
+              description="Trace the exact implementation path. No vague architecture talk."
+              items={[
+                "Where does state live, and why there?",
+                "What is the exact request flow from start to finish?",
+                "What algorithm or pattern is used, and why this one?",
+                "What are the core components and interactions?",
+                "What assumptions exist around consistency, ordering, or timing?"
+              ]}
+              color="from-cyan-500 to-blue-500"
+            />
+            <ConceptCard
+              icon={Gauge}
+              title="3. Stress"
+              description="Model the first cracks instead of assuming the system scales."
+              items={[
+                "What happens at 10x traffic?",
+                "What becomes the first bottleneck?",
+                "Where does latency increase, and why?",
+                "Which component becomes a hotspot?",
+                "How does the system behave under bursts or uneven traffic?"
+              ]}
+              color="from-blue-500 to-indigo-500"
+            />
+            <ConceptCard
+              icon={Siren}
+              title="4. Failure"
+              description="Understand breakdown modes, especially partial failure and dependency loss."
+              items={[
+                "What happens if the core dependency disappears?",
+                "What happens under partial failure, not total outage?",
+                "How does the system behave during network partitions?",
+                "Can this create a cascade failure?",
+                "What is the fallback behaviour, and is it acceptable?"
+              ]}
+              color="from-amber-500 to-red-500"
+            />
+            <ConceptCard
+              icon={Scale}
+              title="5. Trade-offs"
+              description="Defend the design against the best alternatives and changing constraints."
+              items={[
+                "Why this design over the top two alternatives?",
+                "What did you optimise for?",
+                "What did you sacrifice?",
+                "When would this design become the wrong choice?",
+                "How does the design change under 100x traffic, 90% lower budget, or tighter latency?"
+              ]}
+              color="from-fuchsia-500 to-pink-500"
+            />
+            <div className="bg-slate-900/40 border border-slate-700 rounded-xl p-6">
+              <h3 className="text-xl font-bold text-white mb-3">How to use it</h3>
+              <ul className="space-y-3 text-sm text-gray-300">
+                <li className="flex items-start gap-2">
+                  <span className="text-emerald-400 font-bold">1.</span>
+                  <span>Start every system design by answering Existence before you name technologies.</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-cyan-400 font-bold">2.</span>
+                  <span>Move to Mechanics only after the system&apos;s reason for existing is concrete.</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-blue-400 font-bold">3.</span>
+                  <span>Use Stress and Failure to expose weak assumptions early.</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-pink-400 font-bold">4.</span>
+                  <span>Close with Trade-offs so the design is argued, not guessed.</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="system-design-tracker" className="mb-12">
+        <SystemDesignTracker />
+      </section>
 
       {/* Anti-Patterns */}
       <section className="mb-12">
@@ -479,6 +642,8 @@ class LegacyUserAdapter {
         </div>
       </section>
 
+      <PhaseQuiz phaseNumber={4} accentClass="from-green-500 to-emerald-500" />
+
       {/* Architecture Design */}
       <section>
         <h2 className="text-3xl font-bold text-white mb-6">🧩 Phase Project</h2>
@@ -502,4 +667,3 @@ class LegacyUserAdapter {
     </SubscriptionGate>
   );
 }
-

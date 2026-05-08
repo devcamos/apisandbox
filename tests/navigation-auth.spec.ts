@@ -5,6 +5,7 @@
  */
 
 import { test, expect } from '@playwright/test';
+import { randomUUID } from 'node:crypto';
 
 test.describe('Navigation with Authentication', () => {
   test('should show login/signup buttons when not authenticated', async ({ page }) => {
@@ -16,7 +17,7 @@ test.describe('Navigation with Authentication', () => {
   });
 
   test('should show user info and sign out when authenticated', async ({ page, request }) => {
-    const uniqueEmail = `test-${Date.now()}-${Math.random().toString(36).substring(7)}@example.com`;
+    const uniqueEmail = `test-${Date.now()}-${randomUUID()}@example.com`;
     await request.post('/api/auth/signup', {
       data: {
         email: uniqueEmail,
@@ -36,7 +37,7 @@ test.describe('Navigation with Authentication', () => {
   });
 
   test('should show protected navigation items when authenticated', async ({ page, request }) => {
-    const uniqueEmail = `test-${Date.now()}-${Math.random().toString(36).substring(7)}@example.com`;
+    const uniqueEmail = `test-${Date.now()}-${randomUUID()}@example.com`;
     await request.post('/api/auth/signup', {
       data: {
         email: uniqueEmail,
@@ -62,7 +63,7 @@ test.describe('Navigation with Authentication', () => {
   });
 
   test('should sign out and redirect to home', async ({ page, request }) => {
-    const uniqueEmail = `test-${Date.now()}-${Math.random().toString(36).substring(7)}@example.com`;
+    const uniqueEmail = `test-${Date.now()}-${randomUUID()}@example.com`;
     await request.post('/api/auth/signup', {
       data: {
         email: uniqueEmail,
@@ -83,5 +84,3 @@ test.describe('Navigation with Authentication', () => {
     await expect(page).toHaveURL('/');
   });
 });
-
-

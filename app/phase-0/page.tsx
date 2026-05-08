@@ -2,9 +2,54 @@
 
 import PhaseLayout from "@/components/PhaseLayout";
 import ConceptCard from "@/components/ConceptCard";
-import { BookOpen, Code, Server, Database, GitBranch, Zap, RefreshCw, Lock } from "lucide-react";
+import PhaseQuiz from "@/components/PhaseQuiz";
+import { LessonTracker } from "@/components/LessonTracker";
+import { BookOpen, Code, Server, Database, GitBranch, Zap, RefreshCw, type LucideIcon } from "lucide-react";
+import { useState } from "react";
+
+const springTabs: { id: string; label: string; icon: LucideIcon; items: { term: string; desc: string }[] }[] = [
+  { id: "async", label: "Async", icon: RefreshCw, items: [
+    { term: "@Async", desc: "Marks a method to run on a separate thread pool, returning CompletableFuture<T>" },
+    { term: "WebClient", desc: "Spring WebFlux\u2019s non-blocking HTTP client — the reactive equivalent of fetch/promises" },
+    { term: "@EventListener", desc: "Decoupled event callbacks within the application context (pub/sub in one JVM)" },
+    { term: "@Scheduled", desc: "Cron and fixed-rate callbacks Spring invokes on a timer (analogous to setInterval)" },
+  ]},
+  { id: "data", label: "Data", icon: Database, items: [
+    { term: "JPA Entities", desc: "POJOs with @Entity annotations; Jackson serialises them to/from JSON automatically" },
+    { term: "ResponseEntity<T>", desc: "Wraps response body, headers, and status code into one object" },
+    { term: "Stream API", desc: ".filter(), .map(), .collect() are Java\u2019s equivalent of array methods" },
+    { term: "ConcurrentHashMap", desc: "Used everywhere for caches, config lookups, and in-memory state" },
+  ]},
+  { id: "http", label: "HTTP", icon: Zap, items: [
+    { term: "@RestController", desc: "Marks a class as an HTTP endpoint; every method returns a response body" },
+    { term: "@GetMapping / @PostMapping", desc: "Maps HTTP methods to Java methods (GET, POST, PUT, DELETE)" },
+    { term: "@RequestBody / @PathVariable", desc: "Binds JSON body or URL parameters to method arguments" },
+    { term: "HttpStatus", desc: "Enum with all status codes (OK, CREATED, BAD_REQUEST, NOT_FOUND)" },
+  ]},
+  { id: "cloud", label: "Cloud", icon: Server, items: [
+    { term: "Embedded Tomcat", desc: "Spring Boot packages its own server inside the JAR; java -jar app.jar runs anywhere" },
+    { term: "Docker + Spring", desc: "Multi-stage Dockerfile builds a slim JRE image; deploys to EC2, ECS, or Kubernetes" },
+    { term: "Spring Profiles", desc: "application-dev.yml vs application-prod.yml swaps config per environment" },
+    { term: "Actuator", desc: "/actuator/health endpoint for load balancer health checks on VMs and containers" },
+  ]},
+  { id: "algo", label: "Algorithms", icon: Code, items: [
+    { term: "Collections.sort()", desc: "TimSort under the hood; pass a Comparator for custom ordering" },
+    { term: "Stream pipeline", desc: "Declarative .filter().map().collect() that mirrors JS array methods" },
+    { term: "HashMap O(1)", desc: "Spring\u2019s bean registry, @Cacheable, and config resolution all rely on hash maps" },
+    { term: "Sort.by()", desc: "Translates to SQL ORDER BY, letting the database\u2019s own sort algorithm handle it" },
+  ]},
+  { id: "devops", label: "DevOps", icon: GitBranch, items: [
+    { term: "Maven / Gradle", desc: "Spring Boot plugin builds a fat JAR; ./gradlew bootJar or mvn package" },
+    { term: "GitHub Actions", desc: "CI pipeline: checkout \u2192 setup-java \u2192 gradle build \u2192 docker push \u2192 deploy" },
+    { term: "Spring Cloud Config", desc: "Externalised configuration backed by a Git repository (config-as-code)" },
+    { term: "Feature flags", desc: "Combine Spring Profiles + Git branches for feature toggles across environments" },
+  ]},
+];
 
 export default function Phase0() {
+  const [activeSpringTab, setActiveSpringTab] = useState("async");
+  const activePanel = springTabs.find((t) => t.id === activeSpringTab)!;
+
   return (
     <PhaseLayout
       phaseNumber={0}
@@ -21,6 +66,8 @@ export default function Phase0() {
           These are the building blocks you'll use in every phase.
         </p>
       </div>
+
+      <LessonTracker phase={0} />
 
       {/* Pareto Principle Summary */}
       <div className="bg-gradient-to-br from-yellow-500/10 to-orange-500/10 border-2 border-yellow-500/30 rounded-xl p-6 mb-12">
@@ -646,6 +693,50 @@ export default function Phase0() {
         </div>
       </section>
 
+      {/* Spring Framework Perspective — tabbed */}
+      <section className="mb-12">
+        <div className="bg-gradient-to-br from-green-900/30 to-emerald-900/20 border-2 border-green-500/30 rounded-xl overflow-hidden">
+          <div className="flex items-center gap-3 px-6 pt-5 pb-3">
+            <span className="text-2xl">☕</span>
+            <h2 className="text-xl font-bold text-white">Spring Framework Perspective</h2>
+          </div>
+
+          <div className="flex items-center gap-1 px-5 pb-3 overflow-x-auto">
+            {springTabs.map((tab) => {
+              const Icon = tab.icon;
+              const isActive = activeSpringTab === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveSpringTab(tab.id)}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all shrink-0 ${
+                    isActive
+                      ? "bg-green-500/20 text-green-300 border border-green-500/40"
+                      : "text-gray-400 hover:text-gray-200 border border-transparent hover:bg-slate-800/60"
+                  }`}
+                >
+                  <Icon className="w-3.5 h-3.5" />
+                  {tab.label}
+                </button>
+              );
+            })}
+          </div>
+
+          <div className="px-6 pb-5">
+            <div className="bg-slate-800/60 rounded-lg border border-slate-700 divide-y divide-slate-700/60">
+              {activePanel.items.map((item) => (
+                <div key={item.term} className="flex items-start gap-3 px-4 py-3">
+                  <code className="text-green-300 text-xs font-bold bg-green-500/10 px-2 py-0.5 rounded shrink-0 mt-0.5">{item.term}</code>
+                  <span className="text-sm text-gray-300">{item.desc}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <PhaseQuiz phaseNumber={0} accentClass="from-green-500 to-emerald-500" />
+
       {/* Next Steps */}
       <section className="mb-12">
         <div className="bg-gradient-to-r from-green-500/20 to-emerald-500/20 rounded-xl p-6 border border-green-500/30">
@@ -671,4 +762,3 @@ export default function Phase0() {
     </PhaseLayout>
   );
 }
-

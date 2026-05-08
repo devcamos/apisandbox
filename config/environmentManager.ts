@@ -148,9 +148,10 @@ export function getEnvironment(): Environment {
     return 'prod'
   }
   
-  // Local development - use NODE_ENV
-  const nodeEnv = process.env.NODE_ENV || 'development'
+  // Local development - use NODE_ENV (staging = dev branch / staging containers)
+  const nodeEnv = (process.env.NODE_ENV || 'development') as string
   if (nodeEnv === 'production') return 'prod'
+  if (nodeEnv === 'staging') return 'staging'
   if (nodeEnv === 'development') return 'local'
   
   // Default to local

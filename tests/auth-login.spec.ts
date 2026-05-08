@@ -5,6 +5,7 @@
  */
 
 import { test, expect } from '@playwright/test';
+import { randomUUID } from 'node:crypto';
 
 test.describe('Auth Login', () => {
   test.beforeEach(async ({ page }) => {
@@ -45,7 +46,7 @@ test.describe('Auth Login', () => {
 
   test('should redirect to dashboard on successful login', async ({ page, request }) => {
     // First create a test user
-    const uniqueEmail = `test-${Date.now()}-${Math.random().toString(36).substring(7)}@example.com`;
+    const uniqueEmail = `test-${Date.now()}-${randomUUID()}@example.com`;
     await request.post('/api/auth/signup', {
       data: {
         email: uniqueEmail,
@@ -62,5 +63,4 @@ test.describe('Auth Login', () => {
     await expect(page).toHaveURL(/\/dashboard/);
   });
 });
-
 

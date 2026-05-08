@@ -16,10 +16,10 @@
 
 "use client"
 
-import { useSession } from "next-auth/react"
+import { useSession } from "@/components/providers/SessionProvider"
 import { useEffect, useState } from "react"
 import { UpgradePrompt } from "./UpgradePrompt"
-import { useRouter } from "next/navigation"
+import { signupRequiredForPremium } from "@/config/featureFlags"
 
 interface SubscriptionGateProps {
   children: React.ReactNode
@@ -33,7 +33,6 @@ export function SubscriptionGate({
   lockedContentName 
 }: SubscriptionGateProps) {
   const { data: session, status } = useSession()
-  const router = useRouter()
   const [accessCheck, setAccessCheck] = useState<{
     hasAccess: boolean
     tier: "FREE" | "PREMIUM"
@@ -43,12 +42,26 @@ export function SubscriptionGate({
 
   useEffect(() => {
     if (status === "loading") return
+
+    // No session: when signup not required, unlock all for navigation; else free-only
     if (!session?.user?.id) {
-      router.push("/login")
+      const isFreePhase = phaseNumber === 0 || phaseNumber === 1
+      const unlockAll = !signupRequiredForPremium
+      setAccessCheck({
+        hasAccess: unlockAll || isFreePhase,
+        tier: "FREE",
+        upgradeRequired: !unlockAll && !isFreePhase,
+      })
+      setIsLoading(false)
       return
     }
 
-    // Check access
+    // Signed-in: when signup not required, unlock all; else use API
+    if (!signupRequiredForPremium) {
+      setAccessCheck({ hasAccess: true, tier: "FREE", upgradeRequired: false })
+      setIsLoading(false)
+      return
+    }
     fetch(`/api/subscription/check?phase=${phaseNumber}`)
       .then(res => res.json())
       .then(data => {
@@ -58,7 +71,7 @@ export function SubscriptionGate({
       .catch(() => {
         setIsLoading(false)
       })
-  }, [session, status, phaseNumber, router])
+  }, [session, status, phaseNumber])
 
   if (status === "loading" || isLoading) {
     return (
@@ -94,4 +107,3 @@ export function SubscriptionGate({
   // User has access, render content
   return <>{children}</>
 }
-

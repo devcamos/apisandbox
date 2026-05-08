@@ -26,7 +26,7 @@ import { prisma } from "@/lib/prisma"
 // Combine config with adapter
 const { handlers, auth } = NextAuth({
   ...authConfig,
-  adapter: PrismaAdapter(prisma) as any,
+  adapter: PrismaAdapter(prisma),
 })
 
 // MENTOR NOTE: Export auth function for server-side use

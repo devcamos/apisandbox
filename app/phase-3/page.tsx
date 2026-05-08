@@ -2,8 +2,10 @@
 
 import PhaseLayout from "@/components/PhaseLayout";
 import ConceptCard from "@/components/ConceptCard";
+import PhaseQuiz from "@/components/PhaseQuiz";
 import ProjectCard from "@/components/ProjectCard";
 import { SubscriptionGate } from "@/components/SubscriptionGate";
+import { LessonTracker } from "@/components/LessonTracker";
 import { Network, Zap, MessageSquare, GitBranch, Activity, Eye } from "lucide-react";
 
 export default function Phase3() {
@@ -24,6 +26,8 @@ export default function Phase3() {
           and distributed system observability for building scalable microservices.
         </p>
       </div>
+
+      <LessonTracker phase={3} />
 
       {/* Pareto Principle Summary */}
       <div className="bg-gradient-to-br from-yellow-500/10 to-orange-500/10 border-2 border-yellow-500/30 rounded-xl p-6 mb-12">
@@ -803,6 +807,8 @@ async function processOrder(orderId: string) {
         </div>
       </section>
 
+      <PhaseQuiz phaseNumber={3} accentClass="from-orange-500 to-red-500" />
+
       {/* Project */}
       <section>
         <h2 className="text-3xl font-bold text-white mb-6">🧩 Phase Project</h2>
@@ -826,4 +832,3 @@ async function processOrder(orderId: string) {
     </SubscriptionGate>
   );
 }
-

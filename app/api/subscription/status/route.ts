@@ -4,22 +4,15 @@
  * Returns user's current subscription tier and status
  */
 
-import { NextResponse } from "next/server"
-import { auth } from "@/app/api/auth/[...nextauth]/route"
+import { NextRequest, NextResponse } from "next/server"
+import { requireAuthenticatedUser } from "@/lib/auth/jwt-auth-middleware"
 import { getUserSubscription } from "@/lib/subscription"
+import { handleRouteError } from "@/lib/http/responses"
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
-    const session = await auth()
-
-    if (!session?.user?.id) {
-      return NextResponse.json(
-        { error: "Unauthorized" },
-        { status: 401 }
-      )
-    }
-
-    const subscription = await getUserSubscription(session.user.id)
+    const user = await requireAuthenticatedUser(request)
+    const subscription = await getUserSubscription(user.id)
 
     if (!subscription) {
       return NextResponse.json({
@@ -34,11 +27,6 @@ export async function GET() {
       expiresAt: subscription.expiresAt,
     })
   } catch (error) {
-    console.error("Subscription status error:", error)
-    return NextResponse.json(
-      { error: "Failed to get subscription status" },
-      { status: 500 }
-    )
+    return handleRouteError(error)
   }
 }
-

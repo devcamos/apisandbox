@@ -8,6 +8,8 @@
 
 # testing
 /coverage
+/test-results
+/playwright-report
 
 # next.js
 /.next/
@@ -31,6 +33,9 @@ yarn-error.log*
 .env.*
 !.env.example
 !config/environments/*.env.example
+
+# SonarCloud: optional local overrides (see sonar-project.local.properties.example)
+sonar-project.local.properties
 
 # database files
 *.db

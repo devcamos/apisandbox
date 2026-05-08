@@ -13,37 +13,60 @@
 
 "use client"
 
-import { useState, useEffect, Suspense } from "react"
-import { signIn } from "next-auth/react"
+import { useState, useEffect, useRef, useCallback, Suspense } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import Link from "next/link"
 import { ArrowRight, Mail, Lock, AlertCircle, CheckCircle, XCircle, Loader2 } from "lucide-react"
+import { useAuthSessionWriter } from "@/components/providers/SessionProvider"
+import { parseLoginErrorMessage, type LoginErrorInfo } from "@/lib/login-error-parser"
+import AuthPageShell from "@/components/auth/AuthPageShell"
+import AuthSocialSection from "@/components/auth/AuthSocialSection"
 
-// Error types for better categorization
-type ErrorType = "validation" | "authentication" | "network" | "account" | "unknown"
-
-interface ErrorInfo {
-  message: string
-  type: ErrorType
-  recoverable: boolean
-  suggestion?: string
+declare global {
+  interface Window {
+    google?: {
+      accounts: {
+        id: {
+          initialize: (config: { client_id: string; callback: (res: { credential: string }) => void }) => void
+          renderButton: (el: HTMLElement, options: { type?: string; theme?: string; size?: string; text?: string; width?: string }) => void
+        }
+      }
+    }
+  }
 }
 
 function LoginForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
+  const { setSessionFromAuthResponse } = useAuthSessionWriter()
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
-  const [error, setError] = useState<ErrorInfo | null>(null)
+  const [error, setError] = useState<LoginErrorInfo | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [emailError, setEmailError] = useState("")
   const [passwordError, setPasswordError] = useState("")
   const [emailTouched, setEmailTouched] = useState(false)
   const [passwordTouched, setPasswordTouched] = useState(false)
-  
+  const googleButtonRef = useRef<HTMLDivElement>(null)
+  const googleClientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ?? ""
+
   // MENTOR NOTE: Get callbackUrl from query params
   // This is set by middleware when user tries to access protected route
   const callbackUrl = searchParams.get("callbackUrl") || "/dashboard"
+
+  // Show friendly message when NextAuth returns error=Configuration (e.g. AUTH_URL mismatch)
+  useEffect(() => {
+    const err = searchParams.get("error")
+    if (err === "Configuration") {
+      setError({
+        message: "Auth configuration error",
+        type: "unknown",
+        recoverable: true,
+        suggestion:
+          "If you're on staging, open the app using the same URL as AUTH_URL (e.g. http://localhost:4000 or http://0.0.0.0:4000). Set AUTH_URL and NEXTAUTH_URL in your .env to match.",
+      })
+    }
+  }, [searchParams])
 
   // Client-side email validation
   const validateEmail = (emailValue: string): string => {
@@ -94,123 +117,6 @@ function LoginForm() {
     }
   }
 
-  // Parse error message and categorize it
-  const parseError = (errorMessage: string): ErrorInfo => {
-    // Account locked errors (with time remaining)
-    if (errorMessage.startsWith("ACCOUNT_LOCKED")) {
-      const minutesMatch = errorMessage.match(/:(\d+)/)
-      const minutes = minutesMatch ? minutesMatch[1] : "30"
-      return {
-        message: "Account temporarily locked",
-        type: "account",
-        recoverable: true,
-        suggestion: `Your account has been temporarily locked due to multiple failed login attempts. Please wait ${minutes} minute${minutes !== "1" ? "s" : ""} before trying again, or contact support if you need immediate access.`
-      }
-    }
-
-    // Password incorrect (user exists, but password wrong)
-    if (errorMessage.startsWith("PASSWORD_INCORRECT")) {
-      const attemptsMatch = errorMessage.match(/:(\d+)/)
-      const attemptsRemaining = attemptsMatch ? attemptsMatch[1] : "0"
-      return {
-        message: "Incorrect password",
-        type: "authentication",
-        recoverable: true,
-        suggestion: `The password you entered is incorrect. ${attemptsRemaining !== "0" ? `You have ${attemptsRemaining} attempt${attemptsRemaining !== "1" ? "s" : ""} remaining before your account is locked. ` : ""}Please check your password or use "Forgot password" to reset it.`
-      }
-    }
-
-    // Credentials invalid (could be email not found OR password wrong - we don't reveal which)
-    if (errorMessage === "CREDENTIALS_INVALID") {
-      return {
-        message: "Invalid login credentials",
-        type: "authentication",
-        recoverable: true,
-        suggestion: "The email address or password you entered is incorrect. Please check both and try again. If you've forgotten your password, use the 'Forgot password' link below. If you don't have an account, please sign up."
-      }
-    }
-
-    // Account deactivated
-    if (errorMessage.includes("deactivated")) {
-      return {
-        message: "Account deactivated",
-        type: "account",
-        recoverable: false,
-        suggestion: "Your account has been deactivated. Please contact support to reactivate your account."
-      }
-    }
-
-    // OAuth account error
-    if (errorMessage.includes("OAuth") || errorMessage.includes("Google")) {
-      return {
-        message: "Account created with Google",
-        type: "authentication",
-        recoverable: true,
-        suggestion: "This account was created using Google sign-in. Please use the 'Sign in with Google' button below instead of email and password."
-      }
-    }
-
-    // Legacy error format support (for backward compatibility)
-    if (errorMessage.includes("Invalid email or password") || errorMessage.includes("invalid")) {
-      const attemptsMatch = errorMessage.match(/(\d+)\s*attempt/i)
-      if (attemptsMatch) {
-        const attempts = attemptsMatch[1]
-        return {
-          message: "Invalid login credentials",
-          type: "authentication",
-          recoverable: true,
-          suggestion: `${attempts} attempt${attempts !== "1" ? "s" : ""} remaining. The email address or password may be incorrect. Please check both, or use "Forgot password" to reset.`
-        }
-      }
-      return {
-        message: "Invalid login credentials",
-        type: "authentication",
-        recoverable: true,
-        suggestion: "The email address or password you entered may be incorrect. Please check both and try again, or use 'Forgot password' to reset your password."
-      }
-    }
-
-    // Legacy locked error format
-    if (errorMessage.includes("locked") || errorMessage.includes("lockout")) {
-      const minutesMatch = errorMessage.match(/(\d+)\s*minute/i)
-      const minutes = minutesMatch ? minutesMatch[1] : "30"
-      return {
-        message: "Account temporarily locked",
-        type: "account",
-        recoverable: true,
-        suggestion: `Your account is temporarily locked. Please wait ${minutes} minutes or contact support if you need immediate access.`
-      }
-    }
-
-    // Required fields
-    if (errorMessage.includes("required")) {
-      return {
-        message: errorMessage,
-        type: "validation",
-        recoverable: true,
-        suggestion: "Please fill in all required fields."
-      }
-    }
-
-    // Network errors
-    if (errorMessage.includes("network") || errorMessage.includes("fetch") || errorMessage.includes("timeout")) {
-      return {
-        message: "Network error. Please check your connection.",
-        type: "network",
-        recoverable: true,
-        suggestion: "Check your internet connection and try again. If the problem persists, please try again in a few moments."
-      }
-    }
-
-    // Unknown errors
-    return {
-      message: errorMessage || "An unexpected error occurred",
-      type: "unknown",
-      recoverable: true,
-      suggestion: "Please try again. If the problem continues, contact support."
-    }
-  }
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError(null)
@@ -233,30 +139,25 @@ function LoginForm() {
     setIsLoading(true)
 
     try {
-      // Add timeout for the request
-      const timeoutPromise = new Promise((_, reject) => {
-        setTimeout(() => reject(new Error("Request timeout. Please try again.")), 30000) // 30 second timeout
+      const response = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: email.trim().toLowerCase(),
+          password,
+        }),
       })
-
-      const signInPromise = signIn("credentials", {
-        email: email.trim().toLowerCase(),
-        password,
-        redirect: false,
-      })
-
-      const result = await Promise.race([signInPromise, timeoutPromise]) as any
-
-      if (result?.error) {
-        const errorInfo = parseError(result.error)
+      const payload = await response.json()
+      if (!response.ok) {
+        const errorInfo = parseLoginErrorMessage(payload?.error?.message ?? "Login failed")
         setError(errorInfo)
         setIsLoading(false)
         return
       }
+      setSessionFromAuthResponse(payload.data)
 
-      // Success - redirect to callbackUrl (defaults to dashboard)
-      // MENTOR NOTE: Using window.location.href ensures a full page reload
-      // which allows the middleware to see the new session cookie immediately
-      window.location.href = callbackUrl
+      router.push(callbackUrl)
+      router.refresh()
     } catch (err) {
       // Handle timeout and network errors
       let errorMessage = "An unexpected error occurred. Please try again."
@@ -271,42 +172,84 @@ function LoginForm() {
         }
       }
 
-      const errorInfo = parseError(errorMessage)
+      const errorInfo = parseLoginErrorMessage(errorMessage)
       setError(errorInfo)
       setIsLoading(false)
     }
   }
 
-  const handleGoogleSignIn = async () => {
-    setError(null)
-    setIsLoading(true)
-    try {
-      // MENTOR NOTE: Use callbackUrl from query params or default to dashboard
-      await signIn("google", { callbackUrl })
-    } catch (err) {
-      const errorInfo = parseError(
-        err instanceof Error ? err.message : "Failed to sign in with Google. Please try again."
-      )
-      setError(errorInfo)
-      setIsLoading(false)
+  const handleGoogleCredential = useCallback(
+    async (credential: string) => {
+      setError(null)
+      setIsLoading(true)
+      try {
+        const response = await fetch("/api/auth/google", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ idToken: credential }),
+        })
+        const payload = await response.json()
+        if (!response.ok) {
+          const errorInfo = parseLoginErrorMessage(payload?.error?.message ?? "Google sign-in failed")
+          setError(errorInfo)
+          setIsLoading(false)
+          return
+        }
+        setSessionFromAuthResponse(payload.data)
+        router.push(callbackUrl)
+        router.refresh()
+      } catch (err) {
+        const errorInfo = parseLoginErrorMessage(
+          err instanceof Error ? err.message : "Failed to sign in with Google. Please try again."
+        )
+        setError(errorInfo)
+        setIsLoading(false)
+      }
+    },
+    [callbackUrl, router, setSessionFromAuthResponse]
+  )
+
+  useEffect(() => {
+    if (!googleClientId || !googleButtonRef.current) return
+    const init = () => {
+      const gsi = globalThis.window?.google?.accounts?.id
+      const el = googleButtonRef.current
+      if (!gsi || !el) return
+      gsi.initialize({
+        client_id: googleClientId,
+        callback: (response: { credential: string }) => {
+          const cred = response.credential
+          if (cred) {
+            handleGoogleCredential(cred).catch(() => {})
+          }
+        },
+      })
+      gsi.renderButton(el, {
+        type: "standard",
+        theme: "outline",
+        size: "large",
+        text: "signin_with",
+        width: "100%",
+      })
     }
-  }
+    if (globalThis.window?.google?.accounts?.id) {
+      init()
+    } else {
+      const t = setInterval(() => {
+        if (globalThis.window?.google?.accounts?.id) {
+          clearInterval(t)
+          init()
+        }
+      }, 100)
+      setTimeout(() => clearInterval(t), 10000)
+    }
+  }, [googleClientId, handleGoogleCredential])
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center px-6 py-12">
-      <div className="w-full max-w-md">
-        {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-blue-400 to-cyan-400 text-transparent bg-clip-text">
-            Welcome Back
-          </h1>
-          <p className="text-gray-400">
-            Sign in to continue your API integration journey
-          </p>
-        </div>
-
-        {/* Login Form */}
-        <div className="bg-slate-800/50 backdrop-blur-sm rounded-2xl p-8 border border-slate-700">
+    <AuthPageShell
+      title="Welcome Back"
+      subtitle="Sign in to continue your API integration journey"
+    >
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Email Field */}
             <div>
@@ -467,24 +410,12 @@ function LoginForm() {
             </button>
           </form>
 
-          {/* Divider */}
-          <div className="relative my-6">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-slate-700"></div>
-            </div>
-            <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-slate-800/50 text-gray-400">Or continue with</span>
-            </div>
-          </div>
-
-          {/* OAuth Buttons */}
-          <button
-            onClick={handleGoogleSignIn}
-            disabled={isLoading}
-            className="w-full py-3 bg-slate-900/50 border border-slate-700 text-white rounded-lg font-semibold hover:bg-slate-800 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+          <AuthSocialSection
+            googleClientId={googleClientId}
+            googleButtonRef={googleButtonRef}
+            fallbackLabel="Sign in with Google"
+            dividerLabel="Or continue with"
           >
-            Sign in with Google
-          </button>
 
           {/* Sign Up Link */}
           <div className="mt-6 text-center text-sm text-gray-400">
@@ -493,9 +424,8 @@ function LoginForm() {
               Sign up
             </Link>
           </div>
-        </div>
-      </div>
-    </div>
+          </AuthSocialSection>
+    </AuthPageShell>
   )
 }
 
@@ -510,4 +440,3 @@ export default function LoginPage() {
     </Suspense>
   )
 }
-

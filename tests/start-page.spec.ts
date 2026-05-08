@@ -24,17 +24,18 @@ test.describe('Start Page', () => {
     await expect(page.getByRole('heading', { name: 'Choose Your Learning Path' })).toBeVisible();
     
     // Check that we explain what phases are
-    await expect(page.getByText('4 progressive phases')).toBeVisible();
-    await expect(page.getByText('from API basics to advanced architecture patterns')).toBeVisible();
+    await expect(page.getByText('5 progressive phases')).toBeVisible();
+    await expect(page.getByText('from API basics to architecture-level theory mastery')).toBeVisible();
     
     // Check skill level indicators
     await expect(page.getByText('Phase 1 • Beginner')).toBeVisible();
     await expect(page.getByText('Phase 2 • Intermediate')).toBeVisible();
     await expect(page.getByText('Phase 3 • Advanced')).toBeVisible();
     await expect(page.getByText('Phase 4 • Expert')).toBeVisible();
+    await expect(page.getByText('Phase 5 • Architect')).toBeVisible();
   });
 
-  test('should display all 4 phase cards', async ({ page }) => {
+  test('should display all 5 phase cards', async ({ page }) => {
     await expect(page.getByRole('heading', { name: 'Choose Your Learning Path' })).toBeVisible();
     
     // Check all phase cards are present
@@ -42,12 +43,14 @@ test.describe('Start Page', () => {
     await expect(page.getByText('Phase 2')).toBeVisible();
     await expect(page.getByText('Phase 3')).toBeVisible();
     await expect(page.getByText('Phase 4')).toBeVisible();
+    await expect(page.getByText('Phase 5')).toBeVisible();
     
     // Check phase titles
     await expect(page.getByText('Integration Mindset')).toBeVisible();
     await expect(page.getByText('Third-Party Integrations')).toBeVisible();
     await expect(page.getByText('Inter-Service Communication')).toBeVisible();
     await expect(page.getByText('Principal-Level Architecture')).toBeVisible();
+    await expect(page.getByText('API Algorithms')).toBeVisible();
   });
 
   test('should have working phase links', async ({ page }) => {

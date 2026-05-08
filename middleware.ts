@@ -1,73 +1,55 @@
-/**
- * Next.js Middleware - Route Protection
- * 
- * MENTOR NOTE: Middleware Best Practices
- * 
- * This middleware:
- * 1. Protects routes that require authentication
- * 2. Redirects unauthenticated users to login
- * 3. Handles session validation
- * 4. Preserves intended destination (redirect after login)
- * 
- * Protected Routes:
- * - /dashboard - Main learning dashboard
- * - /phase-* - All learning phases
- * - /observability - Progress dashboard
- * 
- * Public Routes:
- * - / - Landing page
- * - /login - Login page
- * - /signup - Signup page
- * - /api/auth/* - NextAuth endpoints
- */
-
 import { NextResponse } from "next/server"
 import type { NextRequest } from "next/server"
+import { isSafeRelativeCallbackPath } from "@/lib/safe-redirect"
+
+const PREMIUM_PHASE_PATTERN = /^\/phase-([2-6])(\/|$)/
+const PROTECTED_API_PATTERN = /^\/api\/(subscription|profile|phase-progress)/
+
+function getSessionToken(request: NextRequest): string | null {
+  return (
+    request.cookies.get("next-auth.session-token")?.value ??
+    request.cookies.get("__Secure-next-auth.session-token")?.value ??
+    null
+  )
+}
 
 export function middleware(request: NextRequest) {
-  // MENTOR NOTE: Simple session check using cookies
-  // In NextAuth v5 beta, session token cookie names:
-  // - Development: authjs.session-token
-  // - Production: __Secure-authjs.session-token
-  const sessionToken = request.cookies.get("authjs.session-token") || 
-                       request.cookies.get("__Secure-authjs.session-token") ||
-                       request.cookies.get("next-auth.session-token") || 
-                       request.cookies.get("__Secure-next-auth.session-token")
+  const { pathname } = request.nextUrl
+  const paywallEnabled =
+    process.env.NEXT_PUBLIC_FF_PREMIUM_PAYWALL === "true"
 
-  const pathname = request.nextUrl.pathname
-
-  // Redirect authenticated users away from landing page to dashboard
-  if (pathname === "/" && sessionToken) {
-    const url = request.nextUrl.clone()
-    url.pathname = "/dashboard"
-    return NextResponse.redirect(url)
+  if (!paywallEnabled) {
+    return NextResponse.next()
   }
 
-  // If accessing protected route without session, redirect to login
-  if (!sessionToken) {
-    const url = request.nextUrl.clone()
-    url.pathname = "/login"
-    url.searchParams.set("callbackUrl", request.nextUrl.pathname)
-    return NextResponse.redirect(url)
+  const token = getSessionToken(request)
+
+  if (PROTECTED_API_PATTERN.test(pathname) && !token) {
+    return NextResponse.json(
+      { error: "Authentication required" },
+      { status: 401 }
+    )
   }
 
-  return NextResponse.next()
+  if (PREMIUM_PHASE_PATTERN.test(pathname) && !token) {
+    const loginUrl = new URL("/login", request.url)
+    if (isSafeRelativeCallbackPath(pathname)) {
+      loginUrl.searchParams.set("callbackUrl", pathname)
+    }
+    return NextResponse.redirect(loginUrl)
+  }
+
+  const response = NextResponse.next()
+
+  response.headers.set("X-Content-Type-Options", "nosniff")
+  response.headers.set("X-Frame-Options", "DENY")
+  response.headers.set("Referrer-Policy", "strict-origin-when-cross-origin")
+
+  return response
 }
 
-// MENTOR NOTE: Matcher Configuration
-// Define which routes require authentication or need special handling
 export const config = {
   matcher: [
-    "/", // Home page - redirect authenticated users to dashboard
-    "/dashboard/:path*",
-    "/phase-0/:path*", // Phase 0 is free but requires auth
-    "/phase-1/:path*",
-    "/phase-2/:path*",
-    "/phase-3/:path*",
-    "/phase-4/:path*",
-    "/observability/:path*",
-    "/cloud/:path*", // Protect cloud section
-    "/ai/:path*", // Protect AI section
+    "/((?!_next/static|_next/image|favicon.ico|api/auth|api/webhooks).*)",
   ],
 }
-
