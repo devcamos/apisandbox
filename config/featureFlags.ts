@@ -39,7 +39,7 @@ const flags: Record<FeatureFlag, FlagConfig> = {
   DEMO_LOGIN: {
     enabled: process.env.NEXT_PUBLIC_FF_DEMO_LOGIN === "true",
     description:
-      "Show Try demo entry points and POST /api/auth/demo. Server needs DEMO_USER_EMAIL + DEMO_USER_PASSWORD and a PREMIUM demo user (scripts/ensure-demo-user.js).",
+      "Show Try demo entry points and POST /api/auth/demo. Server needs DEMO_USER_EMAIL + DEMO_USER_PASSWORD and a PREMIUM demo user (scripts/ensure-demo-user.js). Banner email comes from DEMO_USER_EMAIL.",
   },
 }
 

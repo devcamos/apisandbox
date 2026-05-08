@@ -20,14 +20,27 @@ export function isDemoLoginRouteEnabled(): boolean {
 }
 
 /**
- * Client: same email as server (public); used only to show “demo session” banner.
- * Set NEXT_PUBLIC_DEMO_USER_EMAIL to match DEMO_USER_EMAIL in each environment.
+ * Legacy / optional: only used when `isDemoSessionEmail` is called without a canonical email.
+ * Prefer passing `getDemoUserEmail()` from the server (e.g. root layout → `DemoSessionBanner`)
+ * so the banner always matches `DEMO_USER_EMAIL` without a second public env var.
  */
 export function getPublicDemoUserEmail(): string {
   return (process.env.NEXT_PUBLIC_DEMO_USER_EMAIL || DEFAULT_DEMO_EMAIL).trim().toLowerCase()
 }
 
-export function isDemoSessionEmail(email: string | undefined | null): boolean {
+/** Normalize for comparison (login and DB store lowercased emails). */
+export function normalizeDemoEmail(email: string): string {
+  return email.trim().toLowerCase()
+}
+
+/**
+ * @param canonicalDemoEmail — from server `getDemoUserEmail()` when available; otherwise falls back to `getPublicDemoUserEmail()`.
+ */
+export function isDemoSessionEmail(
+  email: string | undefined | null,
+  canonicalDemoEmail?: string,
+): boolean {
   if (!email) return false
-  return email.trim().toLowerCase() === getPublicDemoUserEmail()
+  const expected = normalizeDemoEmail(canonicalDemoEmail ?? getPublicDemoUserEmail())
+  return normalizeDemoEmail(email) === expected
 }

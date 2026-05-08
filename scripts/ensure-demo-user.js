@@ -94,7 +94,7 @@ async function main() {
     });
 
     console.log(`Demo user ready: ${email} (PREMIUM). Password from DEMO_USER_PASSWORD.`);
-    console.log("Set NEXT_PUBLIC_FF_DEMO_LOGIN=true and matching NEXT_PUBLIC_DEMO_USER_EMAIL in Vercel.");
+    console.log("Set NEXT_PUBLIC_FF_DEMO_LOGIN=true in Vercel (and DEMO_USER_EMAIL / DEMO_USER_PASSWORD to match this seed).");
   } finally {
     await prisma.$disconnect();
   }
