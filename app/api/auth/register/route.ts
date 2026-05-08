@@ -28,7 +28,7 @@ export const POST = withRouteErrorHandling(async (request: NextRequest) => {
     firstName: parsed.data.firstName ?? fallback.firstName ?? undefined,
     lastName: parsed.data.lastName ?? fallback.lastName ?? undefined,
     forceBootstrapFailure:
-      process.env.NODE_ENV !== "production" ? parsed.data.__testForceBootstrapFail : false,
+      process.env.NODE_ENV !== "production" && parsed.data.__testForceBootstrapFail === true,
   })
 
   return authSessionResponse(response, 201)

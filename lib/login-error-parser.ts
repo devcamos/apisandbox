@@ -16,10 +16,10 @@ function extractIntegerAfterColon(message: string): string | null {
   const colonIndex = message.indexOf(":")
   if (colonIndex < 0) return null
   let i = colonIndex + 1
-  while (i < message.length && message.charCodeAt(i) === 32) i += 1
+  while (i < message.length && (message.codePointAt(i) ?? -1) === 32) i += 1
   let start = i
   while (i < message.length) {
-    const code = message.charCodeAt(i)
+    const code = message.codePointAt(i) ?? -1
     if (code < 48 || code > 57) break
     i += 1
   }
@@ -32,10 +32,10 @@ function extractIntegerBeforeWord(message: string, wordLower: string): string | 
   const wordIndex = lower.indexOf(wordLower)
   if (wordIndex < 0) return null
   let i = wordIndex - 1
-  while (i >= 0 && lower.charCodeAt(i) === 32) i -= 1
+  while (i >= 0 && (lower.codePointAt(i) ?? -1) === 32) i -= 1
   let end = i + 1
   while (i >= 0) {
-    const code = lower.charCodeAt(i)
+    const code = lower.codePointAt(i) ?? -1
     if (code < 48 || code > 57) break
     i -= 1
   }

@@ -106,7 +106,7 @@ export async function getAuthenticatedUserFromToken(token: string) {
     where: { id: payload.sub },
     include: { profile: true },
   })
-  if (!user || !user.isActive) {
+  if (!user?.isActive) {
     throw new AppError("Unauthorized", 401, "auth_failure")
   }
   return mapUserToAuthUser(user)

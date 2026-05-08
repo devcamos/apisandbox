@@ -23,7 +23,7 @@ export function errorResponse(
       error: {
         category,
         message,
-        ...(details !== undefined ? { details } : {}),
+        ...(details ? { details } : {}),
       },
     },
     { status }
@@ -37,4 +37,3 @@ export function handleRouteError(error: unknown) {
 
   return errorResponse(500, "unknown_error", "Unexpected server error")
 }
-

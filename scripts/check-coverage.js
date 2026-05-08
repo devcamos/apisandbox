@@ -1,5 +1,5 @@
-const fs = require('fs');
-const path = require('path');
+const fs = require("node:fs")
+const path = require("node:path")
 
 // Calculate test coverage based on test files vs source files
 const testDir = path.join(__dirname, '../tests');
@@ -38,5 +38,4 @@ if (coverage >= 80) {
   console.log(`❌ Coverage is ${coverage}%, needs to be at least 80%`);
   process.exit(1);
 }
-
 

@@ -1,4 +1,4 @@
-import fs from "fs/promises"
+import fs from "node:fs/promises"
 import path from "node:path"
 import { prisma } from "@/lib/prisma"
 import { AppError } from "@/lib/http/errors"
@@ -29,8 +29,8 @@ export async function getProfileByUserId(userId: string) {
 
 export async function updateProfileByUserId(userId: string, updates: UpdateProfileInput) {
   const existing = await getProfileByUserId(userId)
-  const nextFirstName = updates.firstName !== undefined ? updates.firstName : existing.firstName
-  const nextLastName = updates.lastName !== undefined ? updates.lastName : existing.lastName
+  const nextFirstName = updates.firstName ?? existing.firstName
+  const nextLastName = updates.lastName ?? existing.lastName
 
   const [profile] = await prisma.$transaction([
     prisma.userProfile.update({
@@ -40,9 +40,7 @@ export async function updateProfileByUserId(userId: string, updates: UpdateProfi
         ...(updates.lastName === undefined ? {} : { lastName: updates.lastName }),
         ...(updates.avatarUrl === undefined ? {} : { avatarUrl: updates.avatarUrl }),
         ...(updates.roleLabel === undefined ? {} : { roleLabel: updates.roleLabel }),
-        ...(updates.identityStatement === undefined
-          ? {}
-          : { identityStatement: updates.identityStatement }),
+        ...(updates.identityStatement === undefined ? {} : { identityStatement: updates.identityStatement }),
       },
     }),
     prisma.user.update({
@@ -75,4 +73,3 @@ export async function uploadAvatarForUser(userId: string, file: File) {
   await updateProfileByUserId(userId, { avatarUrl })
   return avatarUrl
 }
-

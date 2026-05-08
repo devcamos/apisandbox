@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
       firstName: firstName ?? undefined,
       lastName: lastName ?? undefined,
       forceBootstrapFailure:
-        process.env.NODE_ENV !== "production" ? parsed.data.__testForceBootstrapFail : false,
+        process.env.NODE_ENV !== "production" && parsed.data.__testForceBootstrapFail === true,
     })
 
     const response = NextResponse.json(
