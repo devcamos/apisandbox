@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import Navigation from "@/components/Navigation";
+import { DemoSessionBanner } from "@/components/DemoSessionBanner";
 import { SessionProvider } from "@/components/providers/SessionProvider";
 import { CookieConsent } from "@/components/CookieConsent";
 import { AnalyticsProvider } from "@/components/AnalyticsProvider";
@@ -30,6 +31,7 @@ export default function RootLayout({
       <body className={`${inter.className} bg-slate-900 text-white`}>
         <SessionProvider>
           <Navigation />
+          <DemoSessionBanner />
           <main className="min-h-screen">
             {children}
           </main>

@@ -30,6 +30,7 @@ export const authLimiter = createLimiter(5, "15 m", "auth")
 export const signupLimiter = createLimiter(3, "1 h", "signup")
 export const apiLimiter = createLimiter(100, "15 m", "api")
 export const webhookLimiter = createLimiter(50, "1 m", "webhook")
+export const demoLoginLimiter = createLimiter(20, "1 h", "demo-login")
 
 export interface RateLimitResult {
   allowed: boolean

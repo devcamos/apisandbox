@@ -4,6 +4,7 @@ type FeatureFlag =
   | "EMAIL_VERIFICATION"
   | "RATE_LIMITING"
   | "ANALYTICS"
+  | "DEMO_LOGIN"
 
 interface FlagConfig {
   enabled: boolean
@@ -34,6 +35,11 @@ const flags: Record<FeatureFlag, FlagConfig> = {
   ANALYTICS: {
     enabled: process.env.NEXT_PUBLIC_FF_ANALYTICS === "true",
     description: "Enable Vercel Analytics and event tracking.",
+  },
+  DEMO_LOGIN: {
+    enabled: process.env.NEXT_PUBLIC_FF_DEMO_LOGIN === "true",
+    description:
+      "Show Try demo entry points and POST /api/auth/demo. Server needs DEMO_USER_EMAIL + DEMO_USER_PASSWORD and a PREMIUM demo user (scripts/ensure-demo-user.js).",
   },
 }
 

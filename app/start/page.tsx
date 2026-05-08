@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Play } from "lucide-react";
 import QuickStartGuide from "@/components/home/QuickStartGuide";
 import CloudSectionCard from "@/components/home/CloudSectionCard";
+import { TryDemoButton } from "@/components/auth/TryDemoButton";
 import { getLearningPhases } from "@/lib/learning/dashboard-phase-catalog";
 
 export default function StartPage() {
@@ -22,16 +23,22 @@ export default function StartPage() {
             <p className="text-xl text-gray-300 mb-8">
               Master the art of API integrations from fundamentals to principal-level architecture
             </p>
-            <div className="flex justify-center gap-4">
+            <div className="flex flex-col sm:flex-row justify-center items-stretch sm:items-center gap-4 max-w-xl mx-auto">
               <Link 
                 href="#phases"
-                className="px-12 py-4 bg-gradient-to-r from-blue-500 to-cyan-500 text-white rounded-xl font-bold text-lg hover:shadow-lg hover:scale-102 transition-all duration-200"
+                className="px-12 py-4 bg-gradient-to-r from-blue-500 to-cyan-500 text-white rounded-xl font-bold text-lg hover:shadow-lg hover:scale-102 transition-all duration-200 text-center"
               >
                 Start Learning
               </Link>
+              <TryDemoButton
+                nextPath="/dashboard"
+                className="px-8 py-4 rounded-xl font-semibold border border-amber-500/50 bg-amber-950/40 text-amber-100 hover:bg-amber-900/50 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+              >
+                Try live demo (full app)
+              </TryDemoButton>
               <Link 
                 href="/observability"
-                className="px-8 py-4 border border-gray-600 text-gray-300 rounded-xl font-semibold hover:bg-gray-800 transition-all flex items-center gap-2"
+                className="px-8 py-4 border border-gray-600 text-gray-300 rounded-xl font-semibold hover:bg-gray-800 transition-all flex items-center justify-center gap-2"
               >
                 <Play className="w-4 h-4" />
                 View Dashboard

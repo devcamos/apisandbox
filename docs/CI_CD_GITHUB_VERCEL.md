@@ -36,11 +36,34 @@ A one-off **`vercel deploy`** from a laptop uploads **whatever is on that machin
 
 | Trigger | GitHub Actions | Vercel |
 |--------|----------------|--------|
-| Open / update **PR** | `CI` workflow: lint, build, **Playwright smoke** (Chromium + Postgres), dependency review | **Preview deployment** for the PR (unique URL) |
-| Push to **`main`** (or your production branch) | Same `CI` workflow | **Production deployment** to your production domain / alias |
-| Push to **`develop`** or **`dev`** | `CI` workflow | **Preview** deployments for that branch (not production unless you set one of them as the production branch) |
+| Open / update **PR** → `main` | `CI`: lint, build, unit tests, E2E smoke, then **`Preview approved (Vercel)`** (waits for [GitHub Environment](https://docs.github.com/en/actions/deployment/targeting-different-environments/using-environments-for-deployment) approval) | **Preview deployment** (Vercel builds from the PR commit; check the Vercel bot comment for the URL) |
+| Push / merge to **`main`** | `CI` on the merged commit | **Production deployment** (Vercel production branch) |
+| Push to **`develop`** / **`dev`** | `CI` workflow | **Preview** for that branch (not production unless you set one of those as the production branch) |
 
-Vercel does **not** need a deploy secret in GitHub for the default flow: it builds from the webhook when you connect the repository.
+### Manual approval before merging to `main`
+
+This repo gates PRs with a GitHub Actions **environment** named `preview`:
+
+1. **Vercel** (Git connected): every PR still gets an automatic **Preview** deployment and URL.
+2. **GitHub Actions** (`preview-deploy-gate` in `.github/workflows/ci.yml`): after **lint, unit tests, E2E smoke, and compose validation** succeed, the workflow waits on the **`preview`** environment.
+3. **You** (or designated reviewers): in the PR’s **Checks** tab, open the waiting **Preview approved (Vercel)** job and approve the deployment for the `preview` environment *after* reviewing the Vercel Preview in the browser.
+4. **Branch protection**: on `main`, require the status check **`Preview approved (Vercel)`** (and your existing CI jobs, e.g. `lint-and-build`, `e2e-smoke`) so merges are blocked until both CI and the preview gate pass.
+
+**One-time GitHub setup**
+
+1. Repository **Settings → Environments → New environment** → name: **`preview`**.
+2. Under **Deployment protection rules**, enable **Required reviewers** and add the people or teams allowed to sign off on previews.
+3. **Settings → Rules → Rulesets** (or **Branches → Branch protection rules**) for `main`:
+   - Require status checks: enable **`Preview approved (Vercel)`** plus **`lint-and-build`**, **`unit-tests`**, **`e2e-smoke`** (and any others you rely on).
+   - Optionally require pull request reviews in addition to the preview gate.
+
+**Draft PRs:** `preview-deploy-gate` is skipped for draft PRs. If your branch rules still require that check, enable the option to **not require status checks on draft pull requests** (Rulesets: configure required workflows / exemptions), or mark the PR ready for review when you want the gate to run.
+
+**Forks:** Contributors from forks may not be able to use protected environments the same way; adjust protection rules or use a fork-specific policy if you accept external PRs.
+
+### Optional: Vercel-side preview protection
+
+In Vercel → Project → **Settings → Deployment Protection**, you can add an extra approval step for **Preview** deployments. That is independent of GitHub; use either or both, depending on how strict you want the process to be.
 
 ## One-time Vercel setup (CD)
 
@@ -56,6 +79,8 @@ After this:
 - Every **pull request** gets a **Preview** build and URL (Vercel comments on the PR when enabled in team settings).
 - Every merge to **`main`** triggers a **Production** deployment.
 
+Vercel does **not** need a deploy secret in GitHub for the default flow: it builds from the webhook when you connect the repository.
+
 ### Aligning “releases” with production
 
 **Recommended (simple):** treat **merge to `main`** as the release gate. Production deploys automatically. Create a **GitHub Release** / tag afterward for changelog and versioning; the live site is already updated.
@@ -68,10 +93,11 @@ No secrets are required for the default **`.github/workflows/ci.yml`** (lint, bu
 
 Enable **Actions** on the repository (Settings → Actions → General).
 
-Optional hardening (same ideas as other templates):
+Optional hardening:
 
-- Branch protection on `main`: require **status checks** `lint-and-build` and `e2e-smoke` (and `dependency-review` for PRs).
-- Require PR reviews before merge.
+- Branch protection on `main`: require **status checks** `lint-and-build`, `unit-tests`, `e2e-smoke`, **`Preview approved (Vercel)`** (and `dependency-review` / Sonar if you use them).
+- Create GitHub **Environment** `preview` with **Required reviewers** (see [Manual approval before merging to `main`](#manual-approval-before-merging-to-main)).
+- Require PR code reviews before merge (in addition to the preview gate, if you want both).
 
 ## Optional: deploy production from GitHub Actions
 
@@ -92,7 +118,7 @@ If you need it:
 
 ### Prisma migrations vs CI
 
-Historical migration SQL targets SQLite (`migration_lock.toml`). CI applies the current **Postgres** schema with `prisma db push` on an empty database so smoke tests can run. For production, continue using your existing migration / deploy process until you add a Postgres-native migration baseline (then you can switch CI to `prisma migrate deploy`).
+CI uses **`prisma db push`** on an ephemeral Postgres database so smoke tests match the current `schema.prisma`. Hosted environments should use **`prisma migrate deploy`** against your real Postgres once migrations are aligned.
 
 ## Related docs
 
