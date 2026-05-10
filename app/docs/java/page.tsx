@@ -131,12 +131,14 @@ export default function JavaTrackPage() {
                         Show backend code samples (how wrappers look in Spring)
                       </summary>
                       <div className="px-4 pb-4">
-                        <div className="mt-3 text-xs font-semibold tracking-wide text-slate-300/90">
-                          Routing + validation (controller + DTO)
-                        </div>
-                        <HighlightedCodeBlock
-                          language="java"
-                          code={`import jakarta.validation.constraints.Email;
+                        <details className="mt-3 rounded-xl border border-slate-800 bg-slate-950/60">
+                          <summary className="cursor-pointer select-none px-4 py-3 text-xs font-semibold text-slate-200 hover:text-white">
+                            Routing + validation (controller + DTO)
+                          </summary>
+                          <div className="px-4 pb-4">
+                            <HighlightedCodeBlock
+                              language="java"
+                              code={`import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -156,14 +158,18 @@ final class AuthController {
 
 record LoginRequest(@Email String email, @NotBlank String password) {}
 record AuthSession(String token, int expiresIn) {}`}
-                        />
+                            />
+                          </div>
+                        </details>
 
-                        <div className="mt-5 text-xs font-semibold tracking-wide text-slate-300/90">
-                          Filters/interceptors (auth + correlation IDs)
-                        </div>
-                        <HighlightedCodeBlock
-                          language="java"
-                          code={`import jakarta.servlet.FilterChain;
+                        <details className="mt-3 rounded-xl border border-slate-800 bg-slate-950/60">
+                          <summary className="cursor-pointer select-none px-4 py-3 text-xs font-semibold text-slate-200 hover:text-white">
+                            Filters/interceptors (auth + correlation IDs)
+                          </summary>
+                          <div className="px-4 pb-4">
+                            <HighlightedCodeBlock
+                              language="java"
+                              code={`import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.MDC;
@@ -185,14 +191,18 @@ final class CorrelationAndAuthFilter extends OncePerRequestFilter {
     try { chain.doFilter(req, res); } finally { MDC.remove("request_id"); }
   }
 }`}
-                        />
+                            />
+                          </div>
+                        </details>
 
-                        <div className="mt-5 text-xs font-semibold tracking-wide text-slate-300/90">
-                          Uniform error responses (ControllerAdvice)
-                        </div>
-                        <HighlightedCodeBlock
-                          language="java"
-                          code={`import org.springframework.http.HttpStatus;
+                        <details className="mt-3 rounded-xl border border-slate-800 bg-slate-950/60">
+                          <summary className="cursor-pointer select-none px-4 py-3 text-xs font-semibold text-slate-200 hover:text-white">
+                            Uniform error responses (ControllerAdvice)
+                          </summary>
+                          <div className="px-4 pb-4">
+                            <HighlightedCodeBlock
+                              language="java"
+                              code={`import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
@@ -206,14 +216,18 @@ final class ApiErrors {
 }
 
 record ErrorEnvelope(String category, String message) {}`}
-                        />
+                            />
+                          </div>
+                        </details>
 
-                        <div className="mt-5 text-xs font-semibold tracking-wide text-slate-300/90">
-                          Transactions (service layer boundary)
-                        </div>
-                        <HighlightedCodeBlock
-                          language="java"
-                          code={`import org.springframework.stereotype.Service;
+                        <details className="mt-3 rounded-xl border border-slate-800 bg-slate-950/60">
+                          <summary className="cursor-pointer select-none px-4 py-3 text-xs font-semibold text-slate-200 hover:text-white">
+                            Transactions (service layer boundary)
+                          </summary>
+                          <div className="px-4 pb-4">
+                            <HighlightedCodeBlock
+                              language="java"
+                              code={`import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
@@ -228,14 +242,18 @@ final class ProfileService {
     users.save(user);
   }
 }`}
-                        />
+                            />
+                          </div>
+                        </details>
 
-                        <div className="mt-5 text-xs font-semibold tracking-wide text-slate-300/90">
-                          Webhook verification (signature check sketch)
-                        </div>
-                        <HighlightedCodeBlock
-                          language="java"
-                          code={`// Webhooks must verify the signature over the *raw* request body.
+                        <details className="mt-3 rounded-xl border border-slate-800 bg-slate-950/60">
+                          <summary className="cursor-pointer select-none px-4 py-3 text-xs font-semibold text-slate-200 hover:text-white">
+                            Webhook verification (signature check sketch)
+                          </summary>
+                          <div className="px-4 pb-4">
+                            <HighlightedCodeBlock
+                              language="java"
+                              code={`// Webhooks must verify the signature over the *raw* request body.
 // Exact libs vary, but the pattern is consistent: compute HMAC, constant-time compare.
 final class WebhookVerifier {
   static boolean verify(String rawBody, String signatureHeader, String secret) {
@@ -243,19 +261,25 @@ final class WebhookVerifier {
     return constantTimeEquals(expected, signatureHeader);
   }
 }`}
-                        />
+                            />
+                          </div>
+                        </details>
 
-                        <div className="mt-5 text-xs font-semibold tracking-wide text-slate-300/90">
-                          HTTP server tuning (config is also a “wrapper”)
-                        </div>
-                        <pre className="mt-2 bg-slate-950/70 border border-slate-800 rounded-xl p-3 overflow-x-auto text-xs text-slate-200 font-mono leading-relaxed whitespace-pre">
+                        <details className="mt-3 rounded-xl border border-slate-800 bg-slate-950/60">
+                          <summary className="cursor-pointer select-none px-4 py-3 text-xs font-semibold text-slate-200 hover:text-white">
+                            HTTP server tuning (config is also a “wrapper”)
+                          </summary>
+                          <div className="px-4 pb-4">
+                            <pre className="mt-2 bg-slate-950/70 border border-slate-800 rounded-xl p-3 overflow-x-auto text-xs text-slate-200 font-mono leading-relaxed whitespace-pre">
 {`# application.yml (example)
 server:
   tomcat:
     threads:
       max: 200
     accept-count: 100`}
-                        </pre>
+                            </pre>
+                          </div>
+                        </details>
                       </div>
                     </details>
                   </div>
