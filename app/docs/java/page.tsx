@@ -595,12 +595,72 @@ server:
             <div className="rounded-2xl border border-slate-700 bg-slate-800/40 p-6">
               <h2 className="text-xl font-bold text-white">What to Master (Java)</h2>
               <ul className="mt-3 space-y-2 text-sm text-slate-300 list-disc pl-5">
-                <li>HTTP semantics: status codes, headers, content types, idempotency.</li>
-                <li>Resilience: timeouts, retries with backoff, circuit breakers.</li>
-                <li>Auth: cookies vs tokens, session renewal, safe redirects.</li>
-                <li>Persistence: Postgres + migrations + transactional boundaries.</li>
-                <li>Observability: structured logs, correlation IDs, metrics.</li>
-                <li>Testing: unit + integration (Testcontainers) + contract tests.</li>
+                <li>
+                  HTTP semantics: status codes, headers, content types, idempotency.{" "}
+                  <a
+                    className="text-sky-300 hover:text-sky-200 underline underline-offset-2"
+                    href="https://www.rfc-editor.org/rfc/rfc9110"
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    Read: RFC 9110 (HTTP Semantics)
+                  </a>
+                </li>
+                <li>
+                  Resilience: timeouts, retries with backoff, circuit breakers.{" "}
+                  <a
+                    className="text-sky-300 hover:text-sky-200 underline underline-offset-2"
+                    href="https://resilience4j.readme.io/"
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    Read: Resilience4j docs
+                  </a>
+                </li>
+                <li>
+                  Auth: cookies vs tokens, session renewal, safe redirects.{" "}
+                  <a
+                    className="text-sky-300 hover:text-sky-200 underline underline-offset-2"
+                    href="https://cheatsheetseries.owasp.org/cheatsheets/Authentication_Cheat_Sheet.html"
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    Read: OWASP Authentication Cheat Sheet
+                  </a>
+                </li>
+                <li>
+                  Persistence: Postgres + migrations + transactional boundaries.{" "}
+                  <a
+                    className="text-sky-300 hover:text-sky-200 underline underline-offset-2"
+                    href="https://www.postgresql.org/docs/current/tutorial-transactions.html"
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    Read: PostgreSQL transactions
+                  </a>
+                </li>
+                <li>
+                  Observability: structured logs, correlation IDs, metrics.{" "}
+                  <a
+                    className="text-sky-300 hover:text-sky-200 underline underline-offset-2"
+                    href="https://opentelemetry.io/docs/concepts/observability-primer/"
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    Read: OpenTelemetry observability primer
+                  </a>
+                </li>
+                <li>
+                  Testing: unit + integration (Testcontainers) + contract tests.{" "}
+                  <a
+                    className="text-sky-300 hover:text-sky-200 underline underline-offset-2"
+                    href="https://www.testcontainers.org/"
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    Read: Testcontainers
+                  </a>
+                </li>
               </ul>
             </div>
 
