@@ -639,6 +639,87 @@ server:
                         Spring Web (MVC)
                       </a>{" "}
                       (<span className="font-mono text-slate-200">org.springframework:spring-web</span>)
+
+                      <details className="mt-2 rounded-xl border border-slate-700 bg-slate-950/40">
+                        <summary className="cursor-pointer select-none px-3 py-2 text-[11px] font-semibold text-slate-200 hover:text-white">
+                          Pareto: Spring MVC classes + annotations you’ll actually use
+                        </summary>
+                        <div className="px-3 pb-3">
+                          <div className="mt-2 text-xs text-slate-300">
+                            These cover the majority of everyday API work: routing, binding, validation, and
+                            consistent errors.
+                          </div>
+                          <div className="mt-3 overflow-x-auto">
+                            <table className="min-w-full text-xs text-slate-300">
+                              <thead>
+                                <tr className="text-left text-slate-300">
+                                  <th className="py-2 pr-6 font-semibold">Thing</th>
+                                  <th className="py-2 pr-2 font-semibold">Why it matters</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                <tr className="border-t border-slate-800">
+                                  <td className="py-2 pr-6 font-mono text-[11px] text-slate-200">@RestController</td>
+                                  <td className="py-2 pr-2">Declares HTTP handlers; returns JSON bodies by default.</td>
+                                </tr>
+                                <tr className="border-t border-slate-800">
+                                  <td className="py-2 pr-6 font-mono text-[11px] text-slate-200">@RequestMapping / @GetMapping / @PostMapping</td>
+                                  <td className="py-2 pr-2">Routes method + path to a Java method.</td>
+                                </tr>
+                                <tr className="border-t border-slate-800">
+                                  <td className="py-2 pr-6 font-mono text-[11px] text-slate-200">@RequestBody</td>
+                                  <td className="py-2 pr-2">Binds JSON body to a DTO using message converters (Jackson).</td>
+                                </tr>
+                                <tr className="border-t border-slate-800">
+                                  <td className="py-2 pr-6 font-mono text-[11px] text-slate-200">@RequestParam / @PathVariable</td>
+                                  <td className="py-2 pr-2">Binds query params and path params into typed arguments.</td>
+                                </tr>
+                                <tr className="border-t border-slate-800">
+                                  <td className="py-2 pr-6 font-mono text-[11px] text-slate-200">@Validated / @Valid</td>
+                                  <td className="py-2 pr-2">Turns constraints into consistent 400s instead of downstream errors.</td>
+                                </tr>
+                                <tr className="border-t border-slate-800">
+                                  <td className="py-2 pr-6 font-mono text-[11px] text-slate-200">@ControllerAdvice / @RestControllerAdvice</td>
+                                  <td className="py-2 pr-2">Global “policy” wrapper for uniform error envelopes.</td>
+                                </tr>
+                                <tr className="border-t border-slate-800">
+                                  <td className="py-2 pr-6 font-mono text-[11px] text-slate-200">@ExceptionHandler</td>
+                                  <td className="py-2 pr-2">Routes exceptions into handlers (exception routing).</td>
+                                </tr>
+                                <tr className="border-t border-slate-800">
+                                  <td className="py-2 pr-6 font-mono text-[11px] text-slate-200">ResponseEntity&lt;T&gt;</td>
+                                  <td className="py-2 pr-2">Explicit status + headers + body when you need control.</td>
+                                </tr>
+                              </tbody>
+                            </table>
+                          </div>
+
+                          <details className="mt-3 rounded-xl border border-slate-700 bg-slate-950/60">
+                            <summary className="cursor-pointer select-none px-3 py-2 text-[11px] font-semibold text-slate-200 hover:text-white">
+                              Breakdown (how these map to the wrapper stack)
+                            </summary>
+                            <div className="px-3 pb-3">
+                              <ul className="mt-2 space-y-1 text-xs text-slate-300 list-disc pl-5">
+                                <li>
+                                  <span className="font-mono text-slate-200">@*Mapping</span> is the routing wrapper.
+                                </li>
+                                <li>
+                                  <span className="font-mono text-slate-200">@RequestBody</span> + message converters
+                                  is the JSON bind wrapper.
+                                </li>
+                                <li>
+                                  <span className="font-mono text-slate-200">@Valid</span> is the validation wrapper.
+                                </li>
+                                <li>
+                                  <span className="font-mono text-slate-200">@ControllerAdvice</span> +{" "}
+                                  <span className="font-mono text-slate-200">@ExceptionHandler</span> is the uniform
+                                  error wrapper.
+                                </li>
+                              </ul>
+                            </div>
+                          </details>
+                        </div>
+                      </details>
                     </li>
                     <li>
                       <span className="mr-2 inline-flex items-center rounded-full border border-slate-600/60 bg-slate-900/40 px-2 py-0.5 text-[11px] font-semibold text-slate-200">
