@@ -1,5 +1,6 @@
 import Link from "next/link"
 import { HighlightedCodeBlock } from "@/components/HighlightedCodeBlock"
+import { FrameworkOntologyExplorer } from "@/components/java/FrameworkOntologyExplorer"
 
 export default function JavaTrackPage() {
   return (
@@ -477,6 +478,10 @@ server:
                   </tbody>
                 </table>
               </div>
+            </div>
+
+            <div className="mt-5">
+              <FrameworkOntologyExplorer />
             </div>
           </div>
 
