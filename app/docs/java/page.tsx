@@ -520,6 +520,24 @@ server:
                   <div className="text-sm font-semibold text-white">Core Dependencies (linked)</div>
                   <ul className="mt-2 space-y-2 list-disc pl-5">
                     <li>
+                      <span className="mr-2 inline-flex items-center rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2 py-0.5 text-[11px] font-semibold text-emerald-200">
+                        Spring
+                      </span>
+                      Web framework:{" "}
+                      <a
+                        className="text-sky-300 hover:text-sky-200 underline underline-offset-2"
+                        href="https://docs.spring.io/spring-framework/reference/web/webmvc.html"
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        Spring Web (MVC)
+                      </a>{" "}
+                      (<span className="font-mono text-slate-200">org.springframework:spring-web</span>)
+                    </li>
+                    <li>
+                      <span className="mr-2 inline-flex items-center rounded-full border border-slate-600/60 bg-slate-900/40 px-2 py-0.5 text-[11px] font-semibold text-slate-200">
+                        Third-party
+                      </span>
                       JSON:{" "}
                       <a
                         className="text-sky-300 hover:text-sky-200 underline underline-offset-2"
@@ -532,6 +550,9 @@ server:
                       (<span className="font-mono text-slate-200">com.fasterxml.jackson.core:jackson-databind</span>)
                     </li>
                     <li>
+                      <span className="mr-2 inline-flex items-center rounded-full border border-slate-600/60 bg-slate-900/40 px-2 py-0.5 text-[11px] font-semibold text-slate-200">
+                        Third-party
+                      </span>
                       HTTP (optional):{" "}
                       <a
                         className="text-sky-300 hover:text-sky-200 underline underline-offset-2"
@@ -544,6 +565,9 @@ server:
                       (<span className="font-mono text-slate-200">com.squareup.okhttp3:okhttp</span>)
                     </li>
                     <li>
+                      <span className="mr-2 inline-flex items-center rounded-full border border-slate-600/60 bg-slate-900/40 px-2 py-0.5 text-[11px] font-semibold text-slate-200">
+                        Third-party
+                      </span>
                       Resilience:{" "}
                       <a
                         className="text-sky-300 hover:text-sky-200 underline underline-offset-2"
@@ -556,6 +580,9 @@ server:
                       (timeouts, retries, circuit breakers)
                     </li>
                     <li>
+                      <span className="mr-2 inline-flex items-center rounded-full border border-slate-600/60 bg-slate-900/40 px-2 py-0.5 text-[11px] font-semibold text-slate-200">
+                        Third-party
+                      </span>
                       Tests:{" "}
                       <a
                         className="text-sky-300 hover:text-sky-200 underline underline-offset-2"
