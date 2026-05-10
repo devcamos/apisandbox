@@ -217,6 +217,138 @@ final class ApiErrors {
 
 record ErrorEnvelope(String category, String message) {}`}
                             />
+
+                            <details className="mt-3 rounded-xl border border-slate-800 bg-slate-950/40">
+                              <summary className="cursor-pointer select-none px-4 py-3 text-[11px] font-semibold text-slate-200 hover:text-white">
+                                Component ontology (what each part is “doing”)
+                              </summary>
+                              <div className="px-4 pb-4">
+                                <div className="mt-2 overflow-x-auto">
+                                  <table className="min-w-full text-xs text-slate-300">
+                                    <thead>
+                                      <tr className="text-left text-slate-300">
+                                        <th className="py-2 pr-6 font-semibold">Component</th>
+                                        <th className="py-2 pr-6 font-semibold">Code element</th>
+                                        <th className="py-2 pr-2 font-semibold">Purpose</th>
+                                      </tr>
+                                    </thead>
+                                    <tbody>
+                                      <tr className="border-t border-slate-800">
+                                        <td className="py-2 pr-6">Import layer</td>
+                                        <td className="py-2 pr-6 font-mono text-[11px] text-slate-200">
+                                          HttpStatus, MethodArgumentNotValidException, web.bind.*
+                                        </td>
+                                        <td className="py-2 pr-2">
+                                          Pulls in Spring’s HTTP status constants, the validation exception type,
+                                          and annotation APIs used to attach behavior to your code.
+                                        </td>
+                                      </tr>
+                                      <tr className="border-t border-slate-800">
+                                        <td className="py-2 pr-6">Cross-cutting wrapper</td>
+                                        <td className="py-2 pr-6 font-mono text-[11px] text-slate-200">
+                                          @RestControllerAdvice
+                                        </td>
+                                        <td className="py-2 pr-2">
+                                          Registers this class as a global error-mapping wrapper for controllers:
+                                          it intercepts exceptions and produces uniform HTTP responses.
+                                        </td>
+                                      </tr>
+                                      <tr className="border-t border-slate-800">
+                                        <td className="py-2 pr-6">Component class</td>
+                                        <td className="py-2 pr-6 font-mono text-[11px] text-slate-200">
+                                          final class ApiErrors
+                                        </td>
+                                        <td className="py-2 pr-2">
+                                          A singleton “policy object” that defines how errors should look across
+                                          your API.
+                                        </td>
+                                      </tr>
+                                      <tr className="border-t border-slate-800">
+                                        <td className="py-2 pr-6">Exception routing</td>
+                                        <td className="py-2 pr-6 font-mono text-[11px] text-slate-200">
+                                          @ExceptionHandler(MethodArgumentNotValidException.class)
+                                        </td>
+                                        <td className="py-2 pr-2">
+                                          Routes a specific failure type into this handler method (a routing rule,
+                                          like “if path matches…” but for exceptions).
+                                        </td>
+                                      </tr>
+                                      <tr className="border-t border-slate-800">
+                                        <td className="py-2 pr-6">HTTP contract</td>
+                                        <td className="py-2 pr-6 font-mono text-[11px] text-slate-200">
+                                          @ResponseStatus(HttpStatus.BAD_REQUEST)
+                                        </td>
+                                        <td className="py-2 pr-2">
+                                          Forces the HTTP status to 400 so the client can reliably interpret the
+                                          failure as a validation problem.
+                                        </td>
+                                      </tr>
+                                      <tr className="border-t border-slate-800">
+                                        <td className="py-2 pr-6">Handler method</td>
+                                        <td className="py-2 pr-6 font-mono text-[11px] text-slate-200">
+                                          ErrorEnvelope validation(... ex)
+                                        </td>
+                                        <td className="py-2 pr-2">
+                                          Converts a thrown exception into a stable JSON error body (your API’s
+                                          error envelope).
+                                        </td>
+                                      </tr>
+                                      <tr className="border-t border-slate-800">
+                                        <td className="py-2 pr-6">DTO / envelope</td>
+                                        <td className="py-2 pr-6 font-mono text-[11px] text-slate-200">
+                                          record ErrorEnvelope(String category, String message)
+                                        </td>
+                                        <td className="py-2 pr-2">
+                                          A typed shape that Jackson serializes to JSON. This is your “API error
+                                          schema” contract.
+                                        </td>
+                                      </tr>
+                                    </tbody>
+                                  </table>
+                                </div>
+
+                                <details className="mt-3 rounded-xl border border-slate-800 bg-slate-950/60">
+                                  <summary className="cursor-pointer select-none px-4 py-3 text-[11px] font-semibold text-slate-200 hover:text-white">
+                                    Child: record ErrorEnvelope(String category, String message)
+                                  </summary>
+                                  <div className="px-4 pb-4">
+                                    <HighlightedCodeBlock
+                                      language="java"
+                                      code={`record ErrorEnvelope(String category, String message) {}`}
+                                    />
+                                    <div className="mt-2 overflow-x-auto">
+                                      <table className="min-w-full text-xs text-slate-300">
+                                        <thead>
+                                          <tr className="text-left text-slate-300">
+                                            <th className="py-2 pr-6 font-semibold">Field</th>
+                                            <th className="py-2 pr-2 font-semibold">Meaning in an API</th>
+                                          </tr>
+                                        </thead>
+                                        <tbody>
+                                          <tr className="border-t border-slate-800">
+                                            <td className="py-2 pr-6 font-mono text-[11px] text-slate-200">
+                                              category
+                                            </td>
+                                            <td className="py-2 pr-2">
+                                              Machine-friendly error code bucket (used for client branching,
+                                              dashboards, alerts).
+                                            </td>
+                                          </tr>
+                                          <tr className="border-t border-slate-800">
+                                            <td className="py-2 pr-6 font-mono text-[11px] text-slate-200">
+                                              message
+                                            </td>
+                                            <td className="py-2 pr-2">
+                                              Human-friendly message safe to surface in UI logs (avoid secrets).
+                                            </td>
+                                          </tr>
+                                        </tbody>
+                                      </table>
+                                    </div>
+                                  </div>
+                                </details>
+                              </div>
+                            </details>
                           </div>
                         </details>
 
