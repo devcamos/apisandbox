@@ -170,6 +170,13 @@ record AuthSession(String token, int expiresIn) {}`}
                                 <OntologyBreakdownTable
                                   rows={[
                                     {
+                                      component: "Foundation annotations",
+                                      codeElement: "@Email / @NotBlank (on record components)",
+                                      why: "Field-level constraints declare input rules at the schema boundary; validation wrappers then enforce them automatically.",
+                                      tags: ["validation", "contracts"],
+                                      kind: "annotation",
+                                    },
+                                    {
                                       component: "Routing wrapper",
                                       codeElement: "@RestController",
                                       why: "Declares “HTTP handlers live here” and defaults responses to JSON bodies.",
@@ -223,6 +230,13 @@ record AuthSession(String token, int expiresIn) {}`}
                                       codeElement: "record LoginRequest(...)",
                                       why: "A stable request schema (and validation target) that prevents “loose maps” from spreading through code.",
                                       tags: ["contracts", "validation"],
+                                      kind: "type",
+                                    },
+                                    {
+                                      component: "Java foundation",
+                                      codeElement: "record (data carrier type)",
+                                      why: "Records give you a compact, immutable-by-default DTO shape that JSON mappers can serialize/deserialize cleanly.",
+                                      tags: ["contracts", "serialization"],
                                       kind: "type",
                                     },
                                     {
