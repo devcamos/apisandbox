@@ -137,13 +137,13 @@ export default function JavaTrackPage() {
                           <summary className="cursor-pointer select-none px-4 py-3 text-xs font-semibold text-slate-200 hover:text-white">
                             Routing + validation (controller + DTO)
                           </summary>
-                          <div className="px-4 pb-4">
-                            <HighlightedCodeBlock
-                              language="java"
-                              code={`import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+	                          <div className="px-4 pb-4">
+	                            <HighlightedCodeBlock
+	                              language="java"
+	                              code={`import jakarta.validation.constraints.Email;
+	import jakarta.validation.constraints.NotBlank;
+	import org.springframework.validation.annotation.Validated;
+	import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -158,15 +158,82 @@ final class AuthController {
   }
 }
 
+	record LoginRequest(@Email String email, @NotBlank String password) {}
+	record AuthSession(String token, int expiresIn) {}`}
+	                            />
+
+	                            <div className="mt-4 rounded-xl border border-slate-800 bg-slate-950/60 p-4">
+	                              <div className="text-xs font-semibold tracking-wide text-slate-200">
+	                                Key terms
+	                              </div>
+
+	                              <div className="mt-3 text-sm text-slate-300">
+	                                <div className="text-[11px] font-semibold text-slate-200">
+	                                  @RequestMapping / @PostMapping
+	                                </div>
+	                                <div className="mt-1">
+	                                  Routes HTTP method + path to a handler method (routing wrapper).
+	                                </div>
+	                                <div className="mt-2">
+	                                  <HighlightedCodeBlock
+	                                    language="java"
+	                                    code={`import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequestMapping("/api/auth")
+final class AuthController {
+  @PostMapping("/login")
+  AuthSession login(@RequestBody LoginRequest req) {
+    // handler runs after Spring matches method+path and binds JSON -> DTO
+    return new AuthSession("token", 3600);
+  }
+}
+
+record LoginRequest(String email, String password) {}
+record AuthSession(String token, int expiresIn) {}`}
+	                                  />
+	                                </div>
+	                              </div>
+
+	                              <div className="mt-4 text-sm text-slate-300">
+	                                <div className="text-[11px] font-semibold text-slate-200">
+	                                  @Valid / @Validated
+	                                </div>
+	                                <div className="mt-1">
+	                                  Triggers bean validation for request bodies/parameters, returning structured
+	                                  400 errors when invalid.
+	                                </div>
+	                                <div className="mt-2">
+	                                  <HighlightedCodeBlock
+	                                    language="java"
+	                                    code={`import jakarta.validation.Valid;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequestMapping("/api/auth")
+@Validated // enables method/parameter validation for this controller
+final class AuthController {
+  @PostMapping("/login")
+  AuthSession login(@RequestBody @Valid LoginRequest req) {
+    return new AuthSession("token", 3600);
+  }
+}
+
 record LoginRequest(@Email String email, @NotBlank String password) {}
 record AuthSession(String token, int expiresIn) {}`}
-                            />
+	                                  />
+	                                </div>
+	                              </div>
+	                            </div>
 
-                            <details className="mt-3 rounded-xl border border-slate-800 bg-slate-950/40">
-                              <summary className="cursor-pointer select-none px-4 py-3 text-[11px] font-semibold text-slate-200 hover:text-white">
-                                Component breakdown (ontology)
-                              </summary>
-                              <div className="px-4 pb-4">
+	                            <details className="mt-3 rounded-xl border border-slate-800 bg-slate-950/40">
+	                              <summary className="cursor-pointer select-none px-4 py-3 text-[11px] font-semibold text-slate-200 hover:text-white">
+	                                Component breakdown (ontology)
+	                              </summary>
+	                              <div className="px-4 pb-4">
                                 <OntologyBreakdownTable
                                   rows={[
                                     {
