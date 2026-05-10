@@ -95,8 +95,14 @@ export function FrameworkOntologyExplorer() {
         description:
           "Annotation-driven wrappers over a servlet engine (Tomcat/Jetty/Netty via adapters), with global exception mapping via ControllerAdvice.",
         officialDocs: [
-          { label: "@RestControllerAdvice", url: "https://docs.spring.io/spring-framework/reference/web/webmvc/mvc-controller/ann-advice.html" },
-          { label: "Controller Advice docs", url: "https://docs.spring.io/spring-framework/reference/web/webmvc/mvc-controller/ann-advice.html" },
+          {
+            label: "@RestControllerAdvice (Javadoc)",
+            url: "https://docs.spring.io/spring-framework/docs/6.2.6/javadoc-api/org/springframework/web/bind/annotation/RestControllerAdvice.html",
+          },
+          {
+            label: "Controller Advice (reference)",
+            url: "https://docs.spring.io/spring-framework/reference/web/webmvc/mvc-controller/ann-advice.html",
+          },
         ],
         dependencies: [
           {
@@ -450,4 +456,3 @@ record ErrorEnvelope(String category, String message) {}`,
     </div>
   )
 }
-
