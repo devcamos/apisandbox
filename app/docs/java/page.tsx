@@ -221,7 +221,10 @@ record AuthSession(String token, int expiresIn) {}`}
                                           @RequestBody LoginRequest
                                         </td>
                                         <td className="py-2 pr-2">
-                                          Tells Spring to parse JSON into a typed DTO (Jackson under the hood).
+                                          Tells Spring “this parameter comes from the HTTP request body”. For JSON
+                                          requests, Spring uses its message converters (usually Jackson) to deserialize
+                                          bytes into the DTO. Without it, Spring may treat the parameter as coming from
+                                          query/form params instead of JSON, and validation won’t behave as intended.
                                         </td>
                                       </tr>
                                       <tr className="border-t border-slate-800">
