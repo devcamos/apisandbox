@@ -1,6 +1,7 @@
 import Link from "next/link"
 import { HighlightedCodeBlock } from "@/components/HighlightedCodeBlock"
 import { FrameworkOntologyExplorer } from "@/components/java/FrameworkOntologyExplorer"
+import { OntologyBreakdownTable } from "@/components/java/OntologyBreakdownTable"
 
 export default function JavaTrackPage() {
   return (
@@ -166,109 +167,64 @@ record AuthSession(String token, int expiresIn) {}`}
                                 Component breakdown (ontology)
                               </summary>
                               <div className="px-4 pb-4">
-                                <div className="mt-2 overflow-x-auto">
-                                  <table className="min-w-full text-xs text-slate-300">
-                                    <thead>
-                                      <tr className="text-left text-slate-300">
-                                        <th className="py-2 pr-6 font-semibold">Component</th>
-                                        <th className="py-2 pr-6 font-semibold">Code element</th>
-                                        <th className="py-2 pr-2 font-semibold">Why it exists</th>
-                                      </tr>
-                                    </thead>
-                                    <tbody>
-                                      <tr className="border-t border-slate-800">
-                                        <td className="py-2 pr-6">Routing wrapper</td>
-                                        <td className="py-2 pr-6 font-mono text-[11px] text-slate-200">
-                                          @RestController
-                                        </td>
-                                        <td className="py-2 pr-2">
-                                          Declares “HTTP handlers live here” and defaults responses to JSON bodies.
-                                        </td>
-                                      </tr>
-                                      <tr className="border-t border-slate-800">
-                                        <td className="py-2 pr-6">Path namespace</td>
-                                        <td className="py-2 pr-6 font-mono text-[11px] text-slate-200">
-                                          @RequestMapping("/api/auth")
-                                        </td>
-                                        <td className="py-2 pr-2">
-                                          Binds a base path once so all methods inherit it (prevents duplication and
-                                          drift).
-                                        </td>
-                                      </tr>
-                                      <tr className="border-t border-slate-800">
-                                        <td className="py-2 pr-6">Validation wrapper</td>
-                                        <td className="py-2 pr-6 font-mono text-[11px] text-slate-200">
-                                          @Validated (class + request body)
-                                        </td>
-                                        <td className="py-2 pr-2">
-                                          Activates bean validation so invalid input becomes a consistent 400 response
-                                          instead of leaking deeper errors.
-                                        </td>
-                                      </tr>
-                                      <tr className="border-t border-slate-800">
-                                        <td className="py-2 pr-6">Endpoint route</td>
-                                        <td className="py-2 pr-6 font-mono text-[11px] text-slate-200">
-                                          @PostMapping("/login")
-                                        </td>
-                                        <td className="py-2 pr-2">
-                                          Maps HTTP method + path to this function. This is “routing” in its simplest
-                                          form.
-                                        </td>
-                                      </tr>
-                                      <tr className="border-t border-slate-800">
-                                        <td className="py-2 pr-6">Body binding</td>
-                                        <td className="py-2 pr-6 font-mono text-[11px] text-slate-200">
-                                          @RequestBody LoginRequest
-                                        </td>
-                                        <td className="py-2 pr-2">
-                                          Tells Spring “this parameter comes from the HTTP request body”. For JSON
-                                          requests, Spring uses its message converters (usually Jackson) to deserialize
-                                          bytes into the DTO. Without it, Spring may treat the parameter as coming from
-                                          query/form params instead of JSON, and validation won’t behave as intended.
-                                        </td>
-                                      </tr>
-                                      <tr className="border-t border-slate-800">
-                                        <td className="py-2 pr-6">Controller class</td>
-                                        <td className="py-2 pr-6 font-mono text-[11px] text-slate-200">
-                                          final class AuthController
-                                        </td>
-                                        <td className="py-2 pr-2">
-                                          A thin wrapper that owns HTTP concerns and delegates business logic to a
-                                          service.
-                                        </td>
-                                      </tr>
-                                      <tr className="border-t border-slate-800">
-                                        <td className="py-2 pr-6">Business boundary</td>
-                                        <td className="py-2 pr-6 font-mono text-[11px] text-slate-200">
-                                          AuthService
-                                        </td>
-                                        <td className="py-2 pr-2">
-                                          Keeps auth logic testable and reusable; the controller stays glue code.
-                                        </td>
-                                      </tr>
-                                      <tr className="border-t border-slate-800">
-                                        <td className="py-2 pr-6">Input contract</td>
-                                        <td className="py-2 pr-6 font-mono text-[11px] text-slate-200">
-                                          record LoginRequest(...)
-                                        </td>
-                                        <td className="py-2 pr-2">
-                                          A stable request schema (and validation target) that prevents “loose maps”
-                                          from spreading through code.
-                                        </td>
-                                      </tr>
-                                      <tr className="border-t border-slate-800">
-                                        <td className="py-2 pr-6">Output contract</td>
-                                        <td className="py-2 pr-6 font-mono text-[11px] text-slate-200">
-                                          record AuthSession(token, expiresIn)
-                                        </td>
-                                        <td className="py-2 pr-2">
-                                          Returns a typed session payload (token + lifetime) so the client and server
-                                          share a clear auth contract.
-                                        </td>
-                                      </tr>
-                                    </tbody>
-                                  </table>
-                                </div>
+                                <OntologyBreakdownTable
+                                  rows={[
+                                    {
+                                      component: "Routing wrapper",
+                                      codeElement: "@RestController",
+                                      why: "Declares “HTTP handlers live here” and defaults responses to JSON bodies.",
+                                      tags: ["routing"],
+                                    },
+                                    {
+                                      component: "Path namespace",
+                                      codeElement: '@RequestMapping("/api/auth")',
+                                      why: "Binds a base path once so all methods inherit it (prevents duplication and drift).",
+                                      tags: ["routing"],
+                                    },
+                                    {
+                                      component: "Validation wrapper",
+                                      codeElement: "@Validated (class + request body)",
+                                      why: "Activates bean validation so invalid input becomes a consistent 400 response instead of leaking deeper errors.",
+                                      tags: ["validation"],
+                                    },
+                                    {
+                                      component: "Endpoint route",
+                                      codeElement: '@PostMapping("/login")',
+                                      why: "Maps HTTP method + path to this function. This is “routing” in its simplest form.",
+                                      tags: ["routing"],
+                                    },
+                                    {
+                                      component: "Body binding",
+                                      codeElement: "@RequestBody LoginRequest",
+                                      why: "Tells Spring “this parameter comes from the HTTP request body”. For JSON requests, Spring uses its message converters (usually Jackson) to deserialize bytes into the DTO. Without it, Spring may treat the parameter as coming from query/form params instead of JSON, and validation won’t behave as intended.",
+                                      tags: ["binding", "serialization", "validation"],
+                                    },
+                                    {
+                                      component: "Controller class",
+                                      codeElement: "final class AuthController",
+                                      why: "A thin wrapper that owns HTTP concerns and delegates business logic to a service.",
+                                      tags: ["routing"],
+                                    },
+                                    {
+                                      component: "Business boundary",
+                                      codeElement: "AuthService",
+                                      why: "Keeps auth logic testable and reusable; the controller stays glue code.",
+                                      tags: ["di"],
+                                    },
+                                    {
+                                      component: "Input contract",
+                                      codeElement: "record LoginRequest(...)",
+                                      why: "A stable request schema (and validation target) that prevents “loose maps” from spreading through code.",
+                                      tags: ["contracts", "validation"],
+                                    },
+                                    {
+                                      component: "Output contract",
+                                      codeElement: "record AuthSession(token, expiresIn)",
+                                      why: "Returns a typed session payload (token + lifetime) so the client and server share a clear auth contract.",
+                                      tags: ["contracts", "auth"],
+                                    },
+                                  ]}
+                                />
 
                                 <div className="mt-3 rounded-xl border border-slate-800 bg-slate-950/60 p-4 text-sm text-slate-300">
                                   <div className="text-xs font-semibold tracking-wide text-slate-300/90">
@@ -356,89 +312,56 @@ record ErrorEnvelope(String category, String message) {}`}
                                 Component ontology (what each part is “doing”)
                               </summary>
                               <div className="px-4 pb-4">
-                                <div className="mt-2 overflow-x-auto">
-                                  <table className="min-w-full text-xs text-slate-300">
-                                    <thead>
-                                      <tr className="text-left text-slate-300">
-                                        <th className="py-2 pr-6 font-semibold">Component</th>
-                                        <th className="py-2 pr-6 font-semibold">Code element</th>
-                                        <th className="py-2 pr-2 font-semibold">Purpose</th>
-                                      </tr>
-                                    </thead>
-                                    <tbody>
-                                      <tr className="border-t border-slate-800">
-                                        <td className="py-2 pr-6">Import layer</td>
-                                        <td className="py-2 pr-6 font-mono text-[11px] text-slate-200">
-                                          HttpStatus, MethodArgumentNotValidException, web.bind.*
-                                        </td>
-                                        <td className="py-2 pr-2">
-                                          Pulls in Spring’s HTTP status constants, the validation exception type,
-                                          and annotation APIs used to attach behavior to your code.
-                                        </td>
-                                      </tr>
-                                      <tr className="border-t border-slate-800">
-                                        <td className="py-2 pr-6">Cross-cutting wrapper</td>
-                                        <td className="py-2 pr-6 font-mono text-[11px] text-slate-200">
-                                          @RestControllerAdvice
-                                        </td>
-                                        <td className="py-2 pr-2">
-                                          Registers this class as a global error-mapping wrapper for controllers:
-                                          it intercepts exceptions and produces uniform HTTP responses.
-                                        </td>
-                                      </tr>
-                                      <tr className="border-t border-slate-800">
-                                        <td className="py-2 pr-6">Component class</td>
-                                        <td className="py-2 pr-6 font-mono text-[11px] text-slate-200">
-                                          final class ApiErrors
-                                        </td>
-                                        <td className="py-2 pr-2">
-                                          A singleton “policy object” that defines how errors should look across
-                                          your API.
-                                        </td>
-                                      </tr>
-                                      <tr className="border-t border-slate-800">
-                                        <td className="py-2 pr-6">Exception routing</td>
-                                        <td className="py-2 pr-6 font-mono text-[11px] text-slate-200">
-                                          @ExceptionHandler(MethodArgumentNotValidException.class)
-                                        </td>
-                                        <td className="py-2 pr-2">
-                                          Routes a specific failure type into this handler method (a routing rule,
-                                          like “if path matches…” but for exceptions).
-                                        </td>
-                                      </tr>
-                                      <tr className="border-t border-slate-800">
-                                        <td className="py-2 pr-6">HTTP contract</td>
-                                        <td className="py-2 pr-6 font-mono text-[11px] text-slate-200">
-                                          @ResponseStatus(HttpStatus.BAD_REQUEST)
-                                        </td>
-                                        <td className="py-2 pr-2">
-                                          Forces the HTTP status to 400 so the client can reliably interpret the
-                                          failure as a validation problem.
-                                        </td>
-                                      </tr>
-                                      <tr className="border-t border-slate-800">
-                                        <td className="py-2 pr-6">Handler method</td>
-                                        <td className="py-2 pr-6 font-mono text-[11px] text-slate-200">
-                                          ErrorEnvelope validation(... ex)
-                                        </td>
-                                        <td className="py-2 pr-2">
-                                          Converts a thrown exception into a stable JSON error body (your API’s
-                                          error envelope).
-                                        </td>
-                                      </tr>
-                                      <tr className="border-t border-slate-800">
-                                        <td className="py-2 pr-6">DTO / envelope</td>
-                                        <td className="py-2 pr-6 font-mono text-[11px] text-slate-200">
-                                          record ErrorEnvelope(String category, String message)
-                                        </td>
-                                        <td className="py-2 pr-2">
-                                          A typed shape that Jackson serializes to JSON. This is your “API error
-                                          schema” contract.
-                                        </td>
-                                      </tr>
-                                    </tbody>
-                                  </table>
-                                </div>
+                                <OntologyBreakdownTable
+                                  rows={[
+                                    {
+                                      component: "Import layer",
+                                      codeElement:
+                                        "HttpStatus, MethodArgumentNotValidException, web.bind.*",
+                                      why: "Pulls in Spring’s HTTP status constants, the validation exception type, and annotation APIs used to attach behavior to your code.",
+                                      tags: ["errors"],
+                                    },
+                                    {
+                                      component: "Cross-cutting wrapper",
+                                      codeElement: "@RestControllerAdvice",
+                                      why: "Registers this class as a global error-mapping wrapper for controllers: it intercepts exceptions and produces uniform HTTP responses.",
+                                      tags: ["errors", "routing"],
+                                    },
+                                    {
+                                      component: "Component class",
+                                      codeElement: "final class ApiErrors",
+                                      why: "A singleton “policy object” that defines how errors should look across your API.",
+                                      tags: ["errors"],
+                                    },
+                                    {
+                                      component: "Exception routing",
+                                      codeElement:
+                                        "@ExceptionHandler(MethodArgumentNotValidException.class)",
+                                      why: "Routes a specific failure type into this handler method (a routing rule, like “if path matches…” but for exceptions).",
+                                      tags: ["errors"],
+                                    },
+                                    {
+                                      component: "HTTP contract",
+                                      codeElement: "@ResponseStatus(HttpStatus.BAD_REQUEST)",
+                                      why: "Forces the HTTP status to 400 so the client can reliably interpret the failure as a validation problem.",
+                                      tags: ["errors", "validation"],
+                                    },
+                                    {
+                                      component: "Handler method",
+                                      codeElement: "ErrorEnvelope validation(... ex)",
+                                      why: "Converts a thrown exception into a stable JSON error body (your API’s error envelope).",
+                                      tags: ["errors", "serialization"],
+                                    },
+                                    {
+                                      component: "DTO / envelope",
+                                      codeElement:
+                                        "record ErrorEnvelope(String category, String message)",
+                                      why: "A typed shape that Jackson serializes to JSON. This is your “API error schema” contract.",
+                                      tags: ["contracts", "errors", "serialization"],
+                                    },
+                                  ]}
+                                  defaultTags={["errors"]}
+                                />
 
                                 <details className="mt-3 rounded-xl border border-slate-800 bg-slate-950/60">
                                   <summary className="cursor-pointer select-none px-4 py-3 text-[11px] font-semibold text-slate-200 hover:text-white">
