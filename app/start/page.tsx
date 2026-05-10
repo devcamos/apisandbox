@@ -132,6 +132,49 @@ export default function StartPage() {
                 );
               })}
             </div>
+
+        {/* Language Tracks */}
+        <div className="mt-10">
+          <div className="text-center mb-6">
+            <h3 className="text-2xl font-bold text-white">Language Tracks</h3>
+            <p className="text-gray-400 mt-1">
+              Prefer learning APIs through a specific programming language? Start here.
+            </p>
+          </div>
+          <div className="grid md:grid-cols-2 gap-6 max-w-5xl mx-auto">
+            <Link href="/docs/java">
+              <div className="group bg-slate-800/50 backdrop-blur-sm rounded-2xl p-6 border border-slate-700 hover:border-emerald-500/40 transition-all hover:shadow-2xl hover:scale-[1.02] cursor-pointer relative overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                <div className="relative z-10">
+                  <div className="flex items-start justify-between gap-4">
+                    <div>
+                      <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-200 text-xs font-semibold">
+                        Java Track
+                        <span className="text-emerald-300/80">Docs</span>
+                      </div>
+                      <h4 className="mt-3 text-xl font-bold text-white">Master APIs with Java</h4>
+                      <p className="mt-2 text-sm text-gray-400">
+                        Use Java 21 to build a typed client and re-implement key endpoints (auth, validation,
+                        persistence, webhooks, tests).
+                      </p>
+                    </div>
+                    <div className="text-emerald-300 font-semibold group-hover:translate-x-0.5 transition-transform">
+                      →
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </Link>
+
+            <div className="bg-slate-800/30 rounded-2xl p-6 border border-slate-700/60">
+              <div className="text-sm font-semibold text-white">Want another language?</div>
+              <p className="mt-2 text-sm text-gray-400">
+                Tell me which one (Python, Go, C#, Rust), and we can add a similar track page plus starter
+                repo structure.
+              </p>
+            </div>
+          </div>
+        </div>
       </section>
 
       <CloudSectionCard href="/cloud" ctaText="Explore Cloud" />

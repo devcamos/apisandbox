@@ -106,6 +106,7 @@ export default function Navigation() {
         { name: "AI Learning", href: "/ai", badge: "Premium" },
         { name: "Security", href: "/cloud/security", badge: "Premium" },
         { name: "Architecture", href: "/docs/architecture", badge: "Docs" },
+        { name: "Java Track", href: "/docs/java", badge: "Docs" },
       ],
     },
   ];
