@@ -97,6 +97,34 @@ export default function JavaTrackPage() {
   -> JSON bind (Jackson)
   -> Your controller/service code`}
                     </pre>
+                    <div className="mt-3 grid gap-2 text-sm text-slate-300">
+                      <div>
+                        <span className="font-semibold text-slate-200">TCP + TLS termination:</span>{" "}
+                        accept connections, negotiate encryption, and turn raw bytes into secure streams.
+                      </div>
+                      <div>
+                        <span className="font-semibold text-slate-200">HTTP server:</span> parse HTTP
+                        (headers, body), manage keep-alive, request threads/event loop, and backpressure.
+                      </div>
+                      <div>
+                        <span className="font-semibold text-slate-200">Framework routing:</span> match
+                        method/path, bind parameters, and choose the right controller handler.
+                      </div>
+                      <div>
+                        <span className="font-semibold text-slate-200">Filters/interceptors:</span>{" "}
+                        cross-cutting wrappers for auth, correlation IDs, logging, rate limits, and
+                        uniform error mapping.
+                      </div>
+                      <div>
+                        <span className="font-semibold text-slate-200">JSON bind:</span> map bytes to
+                        typed DTOs (and back), validate shapes, and surface parse errors consistently.
+                      </div>
+                      <div>
+                        <span className="font-semibold text-slate-200">Controller/service code:</span>{" "}
+                        your business logic boundary, transactions, idempotency, and side effects (email,
+                        webhooks, queues).
+                      </div>
+                    </div>
                   </div>
                   <div>
                     <div className="text-xs font-semibold text-slate-200">Framework “magic” is mostly</div>
