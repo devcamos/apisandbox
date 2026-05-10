@@ -36,6 +36,133 @@ export default function JavaTrackPage() {
             </div>
           </div>
 
+          <div className="mt-8 rounded-2xl border border-slate-700 bg-slate-800/40 p-6">
+            <h2 className="text-xl font-bold text-white">Client vs Backend: The Wrapper Stack</h2>
+            <p className="mt-2 text-sm text-slate-300">
+              The “quantum leap” is realizing frameworks don’t replace HTTP. They wrap it. They give you
+              safer defaults and consistent patterns for the same low-level primitives: sockets, TLS,
+              headers, cookies, JSON bytes, and timeouts.
+            </p>
+
+            <div className="mt-5 grid md:grid-cols-2 gap-4">
+              <div className="rounded-2xl border border-slate-700/70 bg-slate-900/30 p-5">
+                <div className="text-sm font-semibold text-white">Client (you consume APIs)</div>
+                <div className="mt-3 grid gap-3">
+                  <div>
+                    <div className="text-xs font-semibold text-slate-200">What you write</div>
+                    <div className="mt-1 text-sm text-slate-300">
+                      DTOs, request builders, auth (cookie/bearer), retries, backoff, parsing errors into
+                      typed results.
+                    </div>
+                  </div>
+                  <div>
+                    <div className="text-xs font-semibold text-slate-200">Wrapper layers</div>
+                    <pre className="mt-2 bg-slate-950/70 border border-slate-800 rounded-xl p-3 overflow-x-auto text-xs text-slate-200 font-mono leading-relaxed whitespace-pre">
+{`Your code
+  -> (JSON serialize / validate)
+  -> HttpClient (or OkHttp)
+  -> Connection pool + DNS
+  -> TLS
+  -> TCP sockets
+  -> Remote server`}
+                    </pre>
+                  </div>
+                  <div>
+                    <div className="text-xs font-semibold text-slate-200">Framework “magic” is mostly</div>
+                    <div className="mt-1 text-sm text-slate-300">
+                      interceptors/middleware, JSON mappers, retry policies, and consistent error handling.
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="rounded-2xl border border-slate-700/70 bg-slate-900/30 p-5">
+                <div className="text-sm font-semibold text-white">Backend (you expose APIs)</div>
+                <div className="mt-3 grid gap-3">
+                  <div>
+                    <div className="text-xs font-semibold text-slate-200">What you write</div>
+                    <div className="mt-1 text-sm text-slate-300">
+                      controllers/handlers, validation, auth filters, service layer, DB transactions,
+                      webhook verification, and observability.
+                    </div>
+                  </div>
+                  <div>
+                    <div className="text-xs font-semibold text-slate-200">Wrapper layers</div>
+                    <pre className="mt-2 bg-slate-950/70 border border-slate-800 rounded-xl p-3 overflow-x-auto text-xs text-slate-200 font-mono leading-relaxed whitespace-pre">
+{`Internet
+  -> TCP + TLS termination
+  -> HTTP server (Tomcat/Jetty/Netty)
+  -> Framework routing (Spring MVC)
+  -> Filters/interceptors (auth, logs)
+  -> JSON bind (Jackson)
+  -> Your controller/service code`}
+                    </pre>
+                  </div>
+                  <div>
+                    <div className="text-xs font-semibold text-slate-200">Framework “magic” is mostly</div>
+                    <div className="mt-1 text-sm text-slate-300">
+                      routing + lifecycle, validation, dependency injection, and uniform error responses.
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-5 rounded-2xl border border-slate-700/70 bg-slate-900/30 p-5">
+              <div className="text-sm font-semibold text-white">Mapping: same concern, different wrapper</div>
+              <div className="mt-3 overflow-x-auto">
+                <table className="min-w-full text-sm">
+                  <thead>
+                    <tr className="text-left text-slate-300">
+                      <th className="py-2 pr-6 font-semibold">Concern</th>
+                      <th className="py-2 pr-6 font-semibold">Client (Java)</th>
+                      <th className="py-2 pr-6 font-semibold">Backend (Spring)</th>
+                      <th className="py-2 pr-2 font-semibold">Under the hood</th>
+                    </tr>
+                  </thead>
+                  <tbody className="text-slate-300">
+                    <tr className="border-t border-slate-800">
+                      <td className="py-2 pr-6">Auth</td>
+                      <td className="py-2 pr-6 font-mono text-xs text-slate-200">CookieManager / Authorization</td>
+                      <td className="py-2 pr-6 font-mono text-xs text-slate-200">Filter + SecurityContext</td>
+                      <td className="py-2 pr-2">headers/cookies + token parsing</td>
+                    </tr>
+                    <tr className="border-t border-slate-800">
+                      <td className="py-2 pr-6">Validation</td>
+                      <td className="py-2 pr-6 font-mono text-xs text-slate-200">DTO checks before send</td>
+                      <td className="py-2 pr-6 font-mono text-xs text-slate-200">@Valid + bean validation</td>
+                      <td className="py-2 pr-2">guardrails around unsafe inputs</td>
+                    </tr>
+                    <tr className="border-t border-slate-800">
+                      <td className="py-2 pr-6">Retries/timeouts</td>
+                      <td className="py-2 pr-6 font-mono text-xs text-slate-200">HttpRequest timeout + retry policy</td>
+                      <td className="py-2 pr-6 font-mono text-xs text-slate-200">Resilience4j / gateway policy</td>
+                      <td className="py-2 pr-2">network failures + latency budgets</td>
+                    </tr>
+                    <tr className="border-t border-slate-800">
+                      <td className="py-2 pr-6">JSON</td>
+                      <td className="py-2 pr-6 font-mono text-xs text-slate-200">ObjectMapper serialize/deserialize</td>
+                      <td className="py-2 pr-6 font-mono text-xs text-slate-200">HttpMessageConverters</td>
+                      <td className="py-2 pr-2">bytes ⇄ objects</td>
+                    </tr>
+                    <tr className="border-t border-slate-800">
+                      <td className="py-2 pr-6">Errors</td>
+                      <td className="py-2 pr-6 font-mono text-xs text-slate-200">status + body → typed error</td>
+                      <td className="py-2 pr-6 font-mono text-xs text-slate-200">@ControllerAdvice</td>
+                      <td className="py-2 pr-2">consistent error envelope</td>
+                    </tr>
+                    <tr className="border-t border-slate-800">
+                      <td className="py-2 pr-6">Observability</td>
+                      <td className="py-2 pr-6 font-mono text-xs text-slate-200">request IDs + logs</td>
+                      <td className="py-2 pr-6 font-mono text-xs text-slate-200">filters + MDC + tracing</td>
+                      <td className="py-2 pr-2">correlation across hops</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
           <div className="mt-10 grid md:grid-cols-2 gap-6">
             <div className="rounded-2xl border border-slate-700 bg-slate-800/40 p-6">
               <h2 className="text-xl font-bold text-white">What to Master (Java)</h2>
