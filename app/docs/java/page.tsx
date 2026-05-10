@@ -563,12 +563,22 @@ server:
                       <td className="py-2 pr-6 font-mono text-xs text-slate-200">Resilience4j / gateway policy</td>
                       <td className="py-2 pr-2">network failures + latency budgets</td>
                     </tr>
-                    <tr className="border-t border-slate-800">
-                      <td className="py-2 pr-6">JSON</td>
-                      <td className="py-2 pr-6 font-mono text-xs text-slate-200">ObjectMapper serialize/deserialize</td>
-                      <td className="py-2 pr-6 font-mono text-xs text-slate-200">HttpMessageConverters</td>
-                      <td className="py-2 pr-2">bytes ⇄ objects</td>
-                    </tr>
+	                    <tr className="border-t border-slate-800">
+	                      <td className="py-2 pr-6">JSON</td>
+	                      <td className="py-2 pr-6 font-mono text-xs text-slate-200">ObjectMapper serialize/deserialize</td>
+	                      <td className="py-2 pr-6 font-mono text-xs text-slate-200">HttpMessageConverters</td>
+	                      <td className="py-2 pr-2">
+	                        <a
+	                          className="text-sky-300 hover:text-sky-200 underline underline-offset-2"
+	                          href="https://github.com/FasterXML/jackson-databind/blob/master/src/main/java/com/fasterxml/jackson/databind/ObjectMapper.java"
+	                          target="_blank"
+	                          rel="noreferrer"
+	                        >
+	                          ObjectMapper
+	                        </a>{" "}
+	                        mapper: maps JSON bytes ⇄ typed objects.
+	                      </td>
+	                    </tr>
                     <tr className="border-t border-slate-800">
                       <td className="py-2 pr-6">Errors</td>
                       <td className="py-2 pr-6 font-mono text-xs text-slate-200">status + body → typed error</td>
