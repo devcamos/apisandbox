@@ -18,6 +18,17 @@ export type OntologyRow = {
   codeElement: string
   why: string
   tags: OntologyTag[]
+  kind?: "annotation" | "type" | "method" | "field" | "import" | "other"
+}
+
+function inferKind(codeElement: string): NonNullable<OntologyRow["kind"]> {
+  const s = codeElement.trim()
+  if (s.startsWith("@")) return "annotation"
+  if (/\bclass\b/.test(s) || /^record\b/.test(s) || /\brecord\b/.test(s) || /\binterface\b/.test(s)) {
+    return "type"
+  }
+  if (s.includes("(") && s.includes(")")) return "method"
+  return "other"
 }
 
 function tagLabel(tag: OntologyTag) {
@@ -84,29 +95,60 @@ export function OntologyBreakdownTable({
   const [activeTags, setActiveTags] = useState<OntologyTag[] | null>(
     defaultTags && defaultTags.length ? defaultTags : null,
   )
+  const [preset, setPreset] = useState<"all" | "basic" | "custom">("all")
 
   const visibleRows = useMemo(() => {
-    if (!activeTags || activeTags.length === 0) return rows
+    const withKinds = preset === "basic"
+      ? rows.filter((r) => {
+          const kind = r.kind ?? inferKind(r.codeElement)
+          return kind === "annotation" || kind === "type"
+        })
+      : rows
+
+    if (preset !== "custom") return withKinds
+    if (!activeTags || activeTags.length === 0) return withKinds
     const tagSet = new Set(activeTags)
-    return rows.filter((r) => r.tags.some((t) => tagSet.has(t)))
-  }, [rows, activeTags])
+    return withKinds.filter((r) => r.tags.some((t) => tagSet.has(t)))
+  }, [rows, activeTags, preset])
 
   return (
     <div>
       <div className="flex flex-wrap items-center gap-2">
         <Chip
-          active={activeTags === null}
-          onClick={() => setActiveTags(null)}
+          active={preset === "all"}
+          onClick={() => {
+            setPreset("all")
+            setActiveTags(null)
+          }}
         >
           All
         </Chip>
+        <Chip
+          active={preset === "basic"}
+          onClick={() => {
+            setPreset("basic")
+            setActiveTags(null)
+          }}
+        >
+          Basic
+        </Chip>
+        <Chip
+          active={preset === "custom"}
+          onClick={() => {
+            setPreset("custom")
+            // Keep whatever tags the user already toggled; if none, show all rows.
+          }}
+        >
+          Filter
+        </Chip>
         {tags.map((t) => {
-          const active = (activeTags ?? []).includes(t)
+          const active = preset === "custom" && (activeTags ?? []).includes(t)
           return (
             <Chip
               key={t}
               active={active}
               onClick={() => {
+                setPreset("custom")
                 setActiveTags((prev) => {
                   const current = prev ?? []
                   if (current.includes(t)) return current.filter((x) => x !== t)
@@ -143,4 +185,3 @@ export function OntologyBreakdownTable({
     </div>
   )
 }
-
