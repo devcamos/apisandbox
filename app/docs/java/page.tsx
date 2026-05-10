@@ -125,6 +125,139 @@ export default function JavaTrackPage() {
                         webhooks, queues).
                       </div>
                     </div>
+
+                    <details className="mt-4 rounded-xl border border-slate-700 bg-slate-950/40">
+                      <summary className="cursor-pointer select-none px-4 py-3 text-xs font-semibold text-slate-200 hover:text-white">
+                        Show backend code samples (how wrappers look in Spring)
+                      </summary>
+                      <div className="px-4 pb-4">
+                        <div className="mt-3 text-xs font-semibold tracking-wide text-slate-300/90">
+                          Routing + validation (controller + DTO)
+                        </div>
+                        <HighlightedCodeBlock
+                          language="java"
+                          code={`import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequestMapping("/api/auth")
+@Validated
+final class AuthController {
+  private final AuthService auth;
+  AuthController(AuthService auth) { this.auth = auth; }
+
+  @PostMapping("/login")
+  AuthSession login(@RequestBody @Validated LoginRequest req) {
+    return auth.login(req.email(), req.password());
+  }
+}
+
+record LoginRequest(@Email String email, @NotBlank String password) {}
+record AuthSession(String token, int expiresIn) {}`}
+                        />
+
+                        <div className="mt-5 text-xs font-semibold tracking-wide text-slate-300/90">
+                          Filters/interceptors (auth + correlation IDs)
+                        </div>
+                        <HighlightedCodeBlock
+                          language="java"
+                          code={`import jakarta.servlet.FilterChain;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import org.slf4j.MDC;
+import org.springframework.web.filter.OncePerRequestFilter;
+
+final class CorrelationAndAuthFilter extends OncePerRequestFilter {
+  @Override
+  protected void doFilterInternal(HttpServletRequest req, HttpServletResponse res, FilterChain chain)
+      throws java.io.IOException, jakarta.servlet.ServletException {
+    var requestId = java.util.Optional.ofNullable(req.getHeader("X-Request-Id"))
+      .orElse(java.util.UUID.randomUUID().toString());
+    MDC.put("request_id", requestId);
+    res.setHeader("X-Request-Id", requestId);
+
+    // auth wrapper: read cookie/header, set a principal somewhere (SecurityContext, request attrs, etc.)
+    // var token = readBearerOrCookie(req);
+    // authenticate(token);
+
+    try { chain.doFilter(req, res); } finally { MDC.remove("request_id"); }
+  }
+}`}
+                        />
+
+                        <div className="mt-5 text-xs font-semibold tracking-wide text-slate-300/90">
+                          Uniform error responses (ControllerAdvice)
+                        </div>
+                        <HighlightedCodeBlock
+                          language="java"
+                          code={`import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.*;
+
+@RestControllerAdvice
+final class ApiErrors {
+  @ExceptionHandler(MethodArgumentNotValidException.class)
+  @ResponseStatus(HttpStatus.BAD_REQUEST)
+  ErrorEnvelope validation(MethodArgumentNotValidException ex) {
+    return new ErrorEnvelope("validation_error", "Invalid request");
+  }
+}
+
+record ErrorEnvelope(String category, String message) {}`}
+                        />
+
+                        <div className="mt-5 text-xs font-semibold tracking-wide text-slate-300/90">
+                          Transactions (service layer boundary)
+                        </div>
+                        <HighlightedCodeBlock
+                          language="java"
+                          code={`import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+@Service
+final class ProfileService {
+  private final UserRepository users;
+  ProfileService(UserRepository users) { this.users = users; }
+
+  @Transactional
+  void updateDisplayName(String userId, String name) {
+    var user = users.findById(userId).orElseThrow();
+    user.setName(name);
+    users.save(user);
+  }
+}`}
+                        />
+
+                        <div className="mt-5 text-xs font-semibold tracking-wide text-slate-300/90">
+                          Webhook verification (signature check sketch)
+                        </div>
+                        <HighlightedCodeBlock
+                          language="java"
+                          code={`// Webhooks must verify the signature over the *raw* request body.
+// Exact libs vary, but the pattern is consistent: compute HMAC, constant-time compare.
+final class WebhookVerifier {
+  static boolean verify(String rawBody, String signatureHeader, String secret) {
+    var expected = hmacSha256Hex(secret, rawBody);
+    return constantTimeEquals(expected, signatureHeader);
+  }
+}`}
+                        />
+
+                        <div className="mt-5 text-xs font-semibold tracking-wide text-slate-300/90">
+                          HTTP server tuning (config is also a “wrapper”)
+                        </div>
+                        <pre className="mt-2 bg-slate-950/70 border border-slate-800 rounded-xl p-3 overflow-x-auto text-xs text-slate-200 font-mono leading-relaxed whitespace-pre">
+{`# application.yml (example)
+server:
+  tomcat:
+    threads:
+      max: 200
+    accept-count: 100`}
+                        </pre>
+                      </div>
+                    </details>
                   </div>
                   <div>
                     <div className="text-xs font-semibold text-slate-200">Framework “magic” is mostly</div>
