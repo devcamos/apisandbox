@@ -337,6 +337,87 @@ export default function JavaTrackPage() {
             </div>
           </div>
 
+          <div className="mt-8 rounded-2xl border border-slate-700 bg-slate-800/40 p-6">
+            <h2 className="text-xl font-bold text-white">Pareto: Java Features APIs Use Most</h2>
+            <p className="mt-2 text-sm text-slate-300">
+              If you want maximum API-engineering payoff quickly, focus on the few Java features that
+              show up everywhere in production services and clients.
+            </p>
+
+            <div className="mt-4 overflow-x-auto">
+              <table className="min-w-full text-sm">
+                <thead>
+                  <tr className="text-left text-slate-300">
+                    <th className="py-2 pr-6 font-semibold">Java feature</th>
+                    <th className="py-2 pr-6 font-semibold">How APIs use it</th>
+                    <th className="py-2 pr-2 font-semibold">Why it matters</th>
+                  </tr>
+                </thead>
+                <tbody className="text-slate-300">
+                  <tr className="border-t border-slate-800">
+                    <td className="py-2 pr-6 font-mono text-xs text-emerald-200">records + strong typing</td>
+                    <td className="py-2 pr-6">DTOs for request/response bodies; typed errors</td>
+                    <td className="py-2 pr-2">removes “stringly typed” bugs; makes refactors safe</td>
+                  </tr>
+                  <tr className="border-t border-slate-800">
+                    <td className="py-2 pr-6 font-mono text-xs text-emerald-200">generics</td>
+                    <td className="py-2 pr-6">typed wrappers: ApiResult&lt;T&gt;, Page&lt;T&gt;, Retry&lt;T&gt;</td>
+                    <td className="py-2 pr-2">reusable patterns without losing type safety</td>
+                  </tr>
+                  <tr className="border-t border-slate-800">
+                    <td className="py-2 pr-6 font-mono text-xs text-emerald-200">annotations</td>
+                    <td className="py-2 pr-6">Spring controllers, validation, injection, tracing hooks</td>
+                    <td className="py-2 pr-2">declarative “wrappers” around HTTP and lifecycle</td>
+                  </tr>
+                  <tr className="border-t border-slate-800">
+                    <td className="py-2 pr-6 font-mono text-xs text-emerald-200">exceptions (disciplined)</td>
+                    <td className="py-2 pr-6">translate failures into a consistent error envelope</td>
+                    <td className="py-2 pr-2">predictable behavior under failure</td>
+                  </tr>
+                  <tr className="border-t border-slate-800">
+                    <td className="py-2 pr-6 font-mono text-xs text-emerald-200">concurrency</td>
+                    <td className="py-2 pr-6">parallel calls, timeouts, backpressure, background work</td>
+                    <td className="py-2 pr-2">latency and throughput are usually the real product</td>
+                  </tr>
+                  <tr className="border-t border-slate-800">
+                    <td className="py-2 pr-6 font-mono text-xs text-emerald-200">java.time</td>
+                    <td className="py-2 pr-6">token expiry, rate limit windows, audit trails</td>
+                    <td className="py-2 pr-2">time bugs are expensive; use Instant/Duration/ZonedDateTime</td>
+                  </tr>
+                  <tr className="border-t border-slate-800">
+                    <td className="py-2 pr-6 font-mono text-xs text-emerald-200">HttpClient + interceptors</td>
+                    <td className="py-2 pr-6">cookies, auth headers, retries, logging correlation IDs</td>
+                    <td className="py-2 pr-2">this is where reliability and security are enforced</td>
+                  </tr>
+                  <tr className="border-t border-slate-800">
+                    <td className="py-2 pr-6 font-mono text-xs text-emerald-200">tests (JUnit/Mockito)</td>
+                    <td className="py-2 pr-6">unit tests for edge cases; integration tests for real IO</td>
+                    <td className="py-2 pr-2">prevents regressions; increases change velocity</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <details className="mt-4 rounded-xl border border-slate-700 bg-slate-900/30">
+              <summary className="cursor-pointer select-none px-4 py-3 text-xs font-semibold text-slate-200 hover:text-white">
+                Show a small “API result wrapper” example (records + generics)
+              </summary>
+              <div className="px-4 pb-4">
+                <pre className="bg-slate-950/70 border border-slate-800 rounded-lg p-3 overflow-x-auto text-xs text-slate-200 font-mono leading-relaxed whitespace-pre">
+{`// A common API pattern: success-or-error without throwing everywhere.
+public sealed interface ApiResult<T> permits ApiResult.Ok, ApiResult.Err {
+  record Ok<T>(T value) implements ApiResult<T> {}
+  record Err<T>(int status, String message) implements ApiResult<T> {}
+}
+
+public record LoginRequest(String email, String password) {}
+public record MeResponse(String id, String email, String name) {}
+`}
+                </pre>
+              </div>
+            </details>
+          </div>
+
           <div className="mt-10 rounded-2xl border border-slate-700 bg-slate-800/40 p-6">
             <h2 className="text-xl font-bold text-white">Quick Start (Client)</h2>
             <p className="mt-2 text-sm text-slate-300">
