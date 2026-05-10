@@ -177,6 +177,20 @@ record AuthSession(String token, int expiresIn) {}`}
                                       kind: "annotation",
                                     },
                                     {
+                                      component: "Constructor / injection point",
+                                      codeElement: "AuthController(AuthService auth)",
+                                      why: "The DI container supplies dependencies here; it keeps the controller thin and testable.",
+                                      tags: ["di"],
+                                      kind: "method",
+                                    },
+                                    {
+                                      component: "Injected dependency",
+                                      codeElement: "private final AuthService auth",
+                                      why: "The controller depends on a service boundary rather than embedding auth logic in HTTP handlers.",
+                                      tags: ["di"],
+                                      kind: "field",
+                                    },
+                                    {
                                       component: "Routing wrapper",
                                       codeElement: "@RestController",
                                       why: "Declares “HTTP handlers live here” and defaults responses to JSON bodies.",
@@ -203,6 +217,13 @@ record AuthSession(String token, int expiresIn) {}`}
                                       why: "Maps HTTP method + path to this function. This is “routing” in its simplest form.",
                                       tags: ["routing"],
                                       kind: "annotation",
+                                    },
+                                    {
+                                      component: "Handler method signature",
+                                      codeElement: "AuthSession login(@RequestBody @Validated LoginRequest req)",
+                                      why: "This is the class’s core behavior: accept a typed request DTO and return a typed response contract. The framework wraps it with routing, binding, and validation.",
+                                      tags: ["routing", "binding", "validation", "contracts", "auth"],
+                                      kind: "method",
                                     },
                                     {
                                       component: "Body binding",

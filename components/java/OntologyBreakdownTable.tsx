@@ -95,7 +95,9 @@ export function OntologyBreakdownTable({
   const [activeTags, setActiveTags] = useState<OntologyTag[] | null>(
     defaultTags && defaultTags.length ? defaultTags : null,
   )
-  const [preset, setPreset] = useState<"all" | "basic" | "intermediate" | "custom">("all")
+  const [preset, setPreset] = useState<"all" | "basic" | "intermediate" | "expert" | "custom">(
+    "all",
+  )
 
   const visibleRows = useMemo(() => {
     const withKinds =
@@ -109,6 +111,11 @@ export function OntologyBreakdownTable({
               const kind = r.kind ?? inferKind(r.codeElement)
               return kind === "annotation" || kind === "type" || kind === "import"
             })
+          : preset === "expert"
+            ? rows.filter((r) => {
+                const kind = r.kind ?? inferKind(r.codeElement)
+                return kind === "method" || kind === "field"
+              })
           : rows
 
     if (preset !== "custom") return withKinds
@@ -146,6 +153,15 @@ export function OntologyBreakdownTable({
           }}
         >
           Intermediate
+        </Chip>
+        <Chip
+          active={preset === "expert"}
+          onClick={() => {
+            setPreset("expert")
+            setActiveTags(null)
+          }}
+        >
+          Expert
         </Chip>
         <Chip
           active={preset === "custom"}
