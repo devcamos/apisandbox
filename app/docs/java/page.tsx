@@ -51,14 +51,162 @@ export default function JavaTrackPage() {
 
             <div className="rounded-2xl border border-slate-700 bg-slate-800/40 p-6">
               <h2 className="text-xl font-bold text-white">Suggested Tooling</h2>
-              <ul className="mt-3 space-y-2 text-sm text-slate-300 list-disc pl-5">
-                <li>Build: Gradle (or Maven) with Java 21.</li>
-                <li>JSON: Jackson (databind).</li>
-                <li>HTTP: built-in HttpClient (or OkHttp if you prefer).</li>
-                <li>Backend: Spring Boot (MVC), Validation, Security (optional).</li>
-                <li>DB: Flyway + JPA (or jOOQ).</li>
-                <li>Tests: JUnit 5 + Mockito + Testcontainers.</li>
-              </ul>
+              <div className="mt-3 space-y-5 text-sm text-slate-300">
+                <div>
+                  <div className="text-sm font-semibold text-white">Highlighting</div>
+                  <ul className="mt-2 space-y-2 list-disc pl-5">
+                    <li>
+                      In-app: this page uses the built-in{" "}
+                      <span className="font-mono text-slate-200">HighlightedCodeBlock</span> component
+                      to highlight Java keywords and class-like identifiers.
+                    </li>
+                    <li>
+                      In Java projects: use IntelliJ IDEA’s inspections and formatter, and enable
+                      “unused imports/variables” warnings early.
+                    </li>
+                  </ul>
+                </div>
+
+                <div>
+                  <div className="text-sm font-semibold text-white">Core Dependencies (linked)</div>
+                  <ul className="mt-2 space-y-2 list-disc pl-5">
+                    <li>
+                      JSON:{" "}
+                      <a
+                        className="text-sky-300 hover:text-sky-200 underline underline-offset-2"
+                        href="https://github.com/FasterXML/jackson"
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        Jackson
+                      </a>{" "}
+                      (<span className="font-mono text-slate-200">com.fasterxml.jackson.core:jackson-databind</span>)
+                    </li>
+                    <li>
+                      HTTP (optional):{" "}
+                      <a
+                        className="text-sky-300 hover:text-sky-200 underline underline-offset-2"
+                        href="https://square.github.io/okhttp/"
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        OkHttp
+                      </a>{" "}
+                      (<span className="font-mono text-slate-200">com.squareup.okhttp3:okhttp</span>)
+                    </li>
+                    <li>
+                      Resilience:{" "}
+                      <a
+                        className="text-sky-300 hover:text-sky-200 underline underline-offset-2"
+                        href="https://resilience4j.readme.io/"
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        Resilience4j
+                      </a>{" "}
+                      (timeouts, retries, circuit breakers)
+                    </li>
+                    <li>
+                      Tests:{" "}
+                      <a
+                        className="text-sky-300 hover:text-sky-200 underline underline-offset-2"
+                        href="https://junit.org/junit5/"
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        JUnit 5
+                      </a>
+                      ,{" "}
+                      <a
+                        className="text-sky-300 hover:text-sky-200 underline underline-offset-2"
+                        href="https://site.mockito.org/"
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        Mockito
+                      </a>
+                      ,{" "}
+                      <a
+                        className="text-sky-300 hover:text-sky-200 underline underline-offset-2"
+                        href="https://www.testcontainers.org/"
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        Testcontainers
+                      </a>
+                    </li>
+                  </ul>
+
+                  <details className="mt-3 rounded-xl border border-slate-700 bg-slate-900/30">
+                    <summary className="cursor-pointer select-none px-4 py-3 text-xs font-semibold text-slate-200 hover:text-white">
+                      Show Gradle dependency snippet
+                    </summary>
+                    <div className="px-4 pb-4">
+                      <pre className="bg-slate-950/70 border border-slate-800 rounded-lg p-3 overflow-x-auto text-xs text-slate-200 font-mono leading-relaxed whitespace-pre">
+{`dependencies {
+  implementation("com.fasterxml.jackson.core:jackson-databind:<version>")
+  testImplementation("org.junit.jupiter:junit-jupiter:<version>")
+  testImplementation("org.mockito:mockito-core:<version>")
+  testImplementation("org.testcontainers:junit-jupiter:<version>")
+  testImplementation("org.testcontainers:postgresql:<version>")
+}`}
+                      </pre>
+                    </div>
+                  </details>
+                </div>
+
+                <div>
+                  <div className="text-sm font-semibold text-white">Security: CVEs</div>
+                  <ul className="mt-2 space-y-2 list-disc pl-5">
+                    <li>
+                      Track known vulnerabilities (CVEs) in your dependency tree, including transitive
+                      dependencies.
+                    </li>
+                    <li>
+                      Sources:{" "}
+                      <a
+                        className="text-sky-300 hover:text-sky-200 underline underline-offset-2"
+                        href="https://nvd.nist.gov/"
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        NVD
+                      </a>
+                      ,{" "}
+                      <a
+                        className="text-sky-300 hover:text-sky-200 underline underline-offset-2"
+                        href="https://osv.dev/"
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        OSV
+                      </a>
+                      ,{" "}
+                      <a
+                        className="text-sky-300 hover:text-sky-200 underline underline-offset-2"
+                        href="https://github.com/advisories"
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        GitHub Advisory Database
+                      </a>
+                      .
+                    </li>
+                    <li>
+                      Scanners:{" "}
+                      <a
+                        className="text-sky-300 hover:text-sky-200 underline underline-offset-2"
+                        href="https://owasp.org/www-project-dependency-check/"
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        OWASP Dependency-Check
+                      </a>{" "}
+                      (great for Java), plus automated update PRs (Dependabot/Snyk).
+                    </li>
+                  </ul>
+                </div>
+              </div>
             </div>
           </div>
 
