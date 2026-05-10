@@ -1,6 +1,9 @@
 import Link from "next/link"
 import { HighlightedCodeBlock } from "@/components/HighlightedCodeBlock"
+import { DependencyRadar } from "@/components/java/DependencyRadar"
 import { FrameworkOntologyExplorer } from "@/components/java/FrameworkOntologyExplorer"
+import { JavaLabs } from "@/components/java/JavaLabs"
+import { LearningMap } from "@/components/java/LearningMap"
 import { OntologyBreakdownTable } from "@/components/java/OntologyBreakdownTable"
 
 export default function JavaTrackPage() {
@@ -50,17 +53,34 @@ export default function JavaTrackPage() {
 	                    </a>{" "}
 	                    to understand what frameworks actually do.
 	                  </li>
-	                  <li>
-	                    Run{" "}
-	                    <a
-	                      className="text-sky-300 hover:text-sky-200 underline underline-offset-2"
-	                      href="#quick-start"
-	                    >
-	                      Quick Start
-	                    </a>{" "}
-	                    to call the Sandbox endpoints from Java.
-	                  </li>
-	                </ol>
+		                  <li>
+		                    Run{" "}
+		                    <a
+		                      className="text-sky-300 hover:text-sky-200 underline underline-offset-2"
+		                      href="#quick-start"
+		                    >
+		                      Quick Start
+		                    </a>{" "}
+		                    to call the Sandbox endpoints from Java.
+		                  </li>
+		                  <li>
+		                    Do{" "}
+		                    <a
+		                      className="text-sky-300 hover:text-sky-200 underline underline-offset-2"
+		                      href="#labs"
+		                    >
+		                      Labs
+		                    </a>{" "}
+		                    to build real client instincts, then skim{" "}
+		                    <a
+		                      className="text-sky-300 hover:text-sky-200 underline underline-offset-2"
+		                      href="#dependency-radar"
+		                    >
+		                      dependency security
+		                    </a>
+		                    .
+		                  </li>
+		                </ol>
 	              </div>
 
 	              <div className="shrink-0">
@@ -92,11 +112,13 @@ export default function JavaTrackPage() {
 	                </details>
 	              </div>
 	            </div>
-	          </div>
+		          </div>
 
-	          <div className="mt-8 grid sm:grid-cols-2 gap-4">
-	            <div className="rounded-2xl border border-slate-700 bg-slate-800/40 p-5">
-	              <div className="text-sm font-semibold text-white">Track A: Java API Client</div>
+		          <LearningMap />
+
+		          <div className="mt-8 grid sm:grid-cols-2 gap-4">
+		            <div className="rounded-2xl border border-slate-700 bg-slate-800/40 p-5">
+		              <div className="text-sm font-semibold text-white">Track A: Java API Client</div>
 	              <div className="mt-2 text-sm text-slate-300">
 	                Learn networking, JSON, cookies/sessions, timeouts, retries, typed DTOs, and tests by
                 calling the Sandbox endpoints.
@@ -738,9 +760,9 @@ server:
               </div>
             </div>
 
-            <div className="mt-5">
-              <FrameworkOntologyExplorer />
-            </div>
+	            <div id="framework-ontology" className="mt-5">
+	              <FrameworkOntologyExplorer />
+	            </div>
           </div>
 
 	          <div id="what-to-master" className="mt-10 grid md:grid-cols-2 gap-6">
@@ -821,7 +843,7 @@ server:
               <div className="mt-3 space-y-5 text-sm text-slate-300">
                 <div>
                   <div className="text-sm font-semibold text-white">Highlighting</div>
-                  <ul className="mt-2 space-y-2 list-disc pl-5">
+	                  <ul className="mt-2 space-y-2 list-disc pl-5">
                     <li>
                       In-app: this page uses the built-in{" "}
                       <span className="font-mono text-slate-200">HighlightedCodeBlock</span> component
@@ -1108,8 +1130,8 @@ server:
                       </a>
                       .
                     </li>
-                    <li>
-                      Scanners:{" "}
+	                    <li>
+	                      Scanners:{" "}
                       <a
                         className="text-sky-300 hover:text-sky-200 underline underline-offset-2"
                         href="https://owasp.org/www-project-dependency-check/"
@@ -1118,16 +1140,17 @@ server:
                       >
                         OWASP Dependency-Check
                       </a>{" "}
-                      (great for Java), plus automated update PRs (Dependabot/Snyk).
-                    </li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-          </div>
+	                      (great for Java), plus automated update PRs (Dependabot/Snyk).
+	                    </li>
+	                  </ul>
+	                  <DependencyRadar />
+	                </div>
+	              </div>
+	            </div>
+	          </div>
 
-          <div className="mt-8 rounded-2xl border border-slate-700 bg-slate-800/40 p-6">
-            <h2 className="text-xl font-bold text-white">Pareto: Java Features APIs Use Most</h2>
+	          <div id="java-pareto" className="mt-8 rounded-2xl border border-slate-700 bg-slate-800/40 p-6">
+	            <h2 className="text-xl font-bold text-white">Pareto: Java Features APIs Use Most</h2>
             <p className="mt-2 text-sm text-slate-300">
               If you want maximum API-engineering payoff quickly, focus on the few Java features that
               show up everywhere in production services and clients.
@@ -1312,14 +1335,16 @@ public class ApiSandboxClient {
               </div>
             </details>
 
-            <div className="mt-4 text-sm text-slate-300">
-              Tip: when running locally, your base URL is typically{" "}
-              <span className="font-mono text-slate-200">http://localhost:4000</span>.
-            </div>
-          </div>
+	            <div className="mt-4 text-sm text-slate-300">
+	              Tip: when running locally, your base URL is typically{" "}
+	              <span className="font-mono text-slate-200">http://localhost:4000</span>.
+	            </div>
+	          </div>
 
-	        </div>
-	      </div>
-	    </div>
+	          <JavaLabs />
+
+		        </div>
+		      </div>
+		    </div>
 	  )
 	}
