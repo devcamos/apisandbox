@@ -36,6 +36,32 @@ export default function JavaTrackPage() {
             </div>
           </div>
 
+          <div className="mt-10 grid md:grid-cols-2 gap-6">
+            <div className="rounded-2xl border border-slate-700 bg-slate-800/40 p-6">
+              <h2 className="text-xl font-bold text-white">What to Master (Java)</h2>
+              <ul className="mt-3 space-y-2 text-sm text-slate-300 list-disc pl-5">
+                <li>HTTP semantics: status codes, headers, content types, idempotency.</li>
+                <li>Resilience: timeouts, retries with backoff, circuit breakers.</li>
+                <li>Auth: cookies vs tokens, session renewal, safe redirects.</li>
+                <li>Persistence: Postgres + migrations + transactional boundaries.</li>
+                <li>Observability: structured logs, correlation IDs, metrics.</li>
+                <li>Testing: unit + integration (Testcontainers) + contract tests.</li>
+              </ul>
+            </div>
+
+            <div className="rounded-2xl border border-slate-700 bg-slate-800/40 p-6">
+              <h2 className="text-xl font-bold text-white">Suggested Tooling</h2>
+              <ul className="mt-3 space-y-2 text-sm text-slate-300 list-disc pl-5">
+                <li>Build: Gradle (or Maven) with Java 21.</li>
+                <li>JSON: Jackson (databind).</li>
+                <li>HTTP: built-in HttpClient (or OkHttp if you prefer).</li>
+                <li>Backend: Spring Boot (MVC), Validation, Security (optional).</li>
+                <li>DB: Flyway + JPA (or jOOQ).</li>
+                <li>Tests: JUnit 5 + Mockito + Testcontainers.</li>
+              </ul>
+            </div>
+          </div>
+
           <div className="mt-10 rounded-2xl border border-slate-700 bg-slate-800/40 p-6">
             <h2 className="text-xl font-bold text-white">Quick Start (Client)</h2>
             <p className="mt-2 text-sm text-slate-300">
@@ -144,32 +170,6 @@ public class ApiSandboxClient {
             <div className="mt-4 text-sm text-slate-300">
               Tip: when running locally, your base URL is typically{" "}
               <span className="font-mono text-slate-200">http://localhost:4000</span>.
-            </div>
-          </div>
-
-          <div className="mt-10 grid md:grid-cols-2 gap-6">
-            <div className="rounded-2xl border border-slate-700 bg-slate-800/40 p-6">
-              <h2 className="text-xl font-bold text-white">What to Master (Java)</h2>
-              <ul className="mt-3 space-y-2 text-sm text-slate-300 list-disc pl-5">
-                <li>HTTP semantics: status codes, headers, content types, idempotency.</li>
-                <li>Resilience: timeouts, retries with backoff, circuit breakers.</li>
-                <li>Auth: cookies vs tokens, session renewal, safe redirects.</li>
-                <li>Persistence: Postgres + migrations + transactional boundaries.</li>
-                <li>Observability: structured logs, correlation IDs, metrics.</li>
-                <li>Testing: unit + integration (Testcontainers) + contract tests.</li>
-              </ul>
-            </div>
-
-            <div className="rounded-2xl border border-slate-700 bg-slate-800/40 p-6">
-              <h2 className="text-xl font-bold text-white">Suggested Tooling</h2>
-              <ul className="mt-3 space-y-2 text-sm text-slate-300 list-disc pl-5">
-                <li>Build: Gradle (or Maven) with Java 21.</li>
-                <li>JSON: Jackson (databind).</li>
-                <li>HTTP: built-in HttpClient (or OkHttp if you prefer).</li>
-                <li>Backend: Spring Boot (MVC), Validation, Security (optional).</li>
-                <li>DB: Flyway + JPA (or jOOQ).</li>
-                <li>Tests: JUnit 5 + Mockito + Testcontainers.</li>
-              </ul>
             </div>
           </div>
 
