@@ -40,9 +40,18 @@ export default function JavaTrackPage() {
             <h2 className="text-xl font-bold text-white">Quick Start (Client)</h2>
             <p className="mt-2 text-sm text-slate-300">
               The Sandbox exposes simple auth endpoints you can hit from Java:
-              <span className="ml-2 font-mono text-slate-200">POST /api/auth/login</span>,
-              <span className="ml-2 font-mono text-slate-200">GET /api/auth/me</span>.
             </p>
+
+            <div className="mt-3 flex flex-wrap gap-2">
+              <span className="inline-flex items-center gap-2 rounded-full border border-slate-700 bg-slate-900/40 px-3 py-1 text-xs">
+                <span className="font-mono text-emerald-300">POST</span>
+                <span className="font-mono text-slate-200">/api/auth/login</span>
+              </span>
+              <span className="inline-flex items-center gap-2 rounded-full border border-slate-700 bg-slate-900/40 px-3 py-1 text-xs">
+                <span className="font-mono text-sky-300">GET</span>
+                <span className="font-mono text-slate-200">/api/auth/me</span>
+              </span>
+            </div>
 
             <div className="mt-4 rounded-xl border border-slate-700/80 bg-slate-900/30 p-4">
               <div className="text-sm font-semibold text-white">What’s happening in the code</div>
@@ -65,9 +74,16 @@ export default function JavaTrackPage() {
               </ul>
             </div>
 
-            <HighlightedCodeBlock
-              label="Java 21 HttpClient with cookies (session-style auth)"
-              code={`import java.net.CookieManager;
+            <details className="mt-5 rounded-xl border border-slate-700 bg-slate-950/40">
+              <summary className="cursor-pointer select-none px-4 py-3 text-sm font-semibold text-slate-200 hover:text-white">
+                Show Java client code (HttpClient + cookies)
+                <span className="ml-2 text-xs font-normal text-slate-400">
+                  (click to expand)
+                </span>
+              </summary>
+              <div className="px-4 pb-4">
+                <HighlightedCodeBlock
+                  code={`import java.net.CookieManager;
 import java.net.CookiePolicy;
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -121,7 +137,9 @@ public class ApiSandboxClient {
     return res.body();
   }
 }`}
-            />
+                />
+              </div>
+            </details>
 
             <div className="mt-4 text-sm text-slate-300">
               Tip: when running locally, your base URL is typically{" "}
