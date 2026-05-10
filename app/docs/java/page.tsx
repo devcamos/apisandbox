@@ -13,19 +13,92 @@ export default function JavaTrackPage() {
             <span className="text-emerald-300/80">Java</span>
           </div>
 
-          <h1 className="mt-4 text-4xl sm:text-5xl font-bold text-white">
-            Master APIs with Java, using API Sandbox
-          </h1>
-          <p className="mt-4 text-lg text-slate-300">
-            The app stays the same. You use Java to consume and re-implement the same real-world API
-            patterns: auth, error handling, retries, rate limits, webhooks, persistence, and testing.
-          </p>
+	          <h1 className="mt-4 text-4xl sm:text-5xl font-bold text-white">
+	            Master APIs with Java, using API Sandbox
+	          </h1>
+	          <p className="mt-4 text-lg text-slate-300">
+	            The app stays the same. You use Java to consume and re-implement the same real-world API
+	            patterns: auth, error handling, retries, rate limits, webhooks, persistence, and testing.
+	          </p>
 
-          <div className="mt-8 grid sm:grid-cols-2 gap-4">
-            <div className="rounded-2xl border border-slate-700 bg-slate-800/40 p-5">
-              <div className="text-sm font-semibold text-white">Track A: Java API Client</div>
-              <div className="mt-2 text-sm text-slate-300">
-                Learn networking, JSON, cookies/sessions, timeouts, retries, typed DTOs, and tests by
+	          <div className="mt-7 rounded-2xl border border-slate-700 bg-slate-800/40 p-6">
+	            <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+	              <div className="min-w-0">
+	                <h2 className="text-xl font-bold text-white">Start here</h2>
+	                <div className="mt-2 text-sm text-slate-300">
+	                  Use this page like a living Java “OS” for API work: master the concepts, then see how
+	                  Spring wraps HTTP and JSON into safe, repeatable patterns.
+	                </div>
+	                <ol className="mt-3 space-y-1 text-sm text-slate-300 list-decimal pl-5">
+	                  <li>
+	                    Skim{" "}
+	                    <a
+	                      className="text-sky-300 hover:text-sky-200 underline underline-offset-2"
+	                      href="#what-to-master"
+	                    >
+	                      What to Master
+	                    </a>{" "}
+	                    to set your learning targets.
+	                  </li>
+	                  <li>
+	                    Read{" "}
+	                    <a
+	                      className="text-sky-300 hover:text-sky-200 underline underline-offset-2"
+	                      href="#wrapper-stack"
+	                    >
+	                      the wrapper stack
+	                    </a>{" "}
+	                    to understand what frameworks actually do.
+	                  </li>
+	                  <li>
+	                    Run{" "}
+	                    <a
+	                      className="text-sky-300 hover:text-sky-200 underline underline-offset-2"
+	                      href="#quick-start"
+	                    >
+	                      Quick Start
+	                    </a>{" "}
+	                    to call the Sandbox endpoints from Java.
+	                  </li>
+	                </ol>
+	              </div>
+
+	              <div className="shrink-0">
+	                <div className="text-xs font-semibold text-slate-200">Next actions</div>
+	                <div className="mt-2 flex flex-wrap gap-3">
+	                  <Link
+	                    href="/docs/architecture"
+	                    className="px-4 py-2 rounded-lg bg-slate-900/60 border border-slate-700 text-slate-200 hover:bg-slate-900 transition-colors text-sm"
+	                  >
+	                    View Architecture
+	                  </Link>
+	                  <Link
+	                    href="/start"
+	                    className="px-4 py-2 rounded-lg bg-emerald-500/15 border border-emerald-500/30 text-emerald-100 hover:bg-emerald-500/20 transition-colors text-sm"
+	                  >
+	                    Back to Start
+	                  </Link>
+	                </div>
+
+	                <details className="mt-3 rounded-xl border border-slate-700 bg-slate-950/40">
+	                  <summary className="cursor-pointer select-none px-3 py-2 text-[11px] font-semibold text-slate-200 hover:text-white">
+	                    Next steps (repo starter + CI)
+	                  </summary>
+	                  <div className="px-3 pb-3 text-sm text-slate-300">
+	                    If you want, we can add a dedicated Java starter under this repo (for example,
+	                    <span className="ml-2 font-mono text-slate-200">/tracks/java-client</span>) and wire it
+	                    into CI so learners can run the Java tests against the local Sandbox.
+	                  </div>
+	                </details>
+	              </div>
+	            </div>
+	          </div>
+
+	          <div className="mt-8 grid sm:grid-cols-2 gap-4">
+	            <div className="rounded-2xl border border-slate-700 bg-slate-800/40 p-5">
+	              <div className="text-sm font-semibold text-white">Track A: Java API Client</div>
+	              <div className="mt-2 text-sm text-slate-300">
+	                Learn networking, JSON, cookies/sessions, timeouts, retries, typed DTOs, and tests by
                 calling the Sandbox endpoints.
               </div>
             </div>
@@ -35,16 +108,18 @@ export default function JavaTrackPage() {
                 Rebuild 2 to 3 endpoints in Spring Boot (or Micronaut/Quarkus) to master controllers,
                 validation, auth, persistence, and production readiness.
               </div>
-            </div>
-          </div>
+	            </div>
+	          </div>
 
-          <div className="mt-8 rounded-2xl border border-slate-700 bg-slate-800/40 p-6">
-            <h2 className="text-xl font-bold text-white">Client vs Backend: The Wrapper Stack</h2>
-            <p className="mt-2 text-sm text-slate-300">
-              The “quantum leap” is realizing frameworks don’t replace HTTP. They wrap it. They give you
-              safer defaults and consistent patterns for the same low-level primitives: sockets, TLS,
-              headers, cookies, JSON bytes, and timeouts.
-            </p>
+	          <div className="mt-8 rounded-2xl border border-slate-700 bg-slate-800/40 p-6">
+	            <h2 id="wrapper-stack" className="text-xl font-bold text-white">
+	              Client vs Backend: The Wrapper Stack
+	            </h2>
+	            <p className="mt-2 text-sm text-slate-300">
+	              The “quantum leap” is realizing frameworks don’t replace HTTP. They wrap it. They give you
+	              safer defaults and consistent patterns for the same low-level primitives: sockets, TLS,
+	              headers, cookies, JSON bytes, and timeouts.
+	            </p>
 
             <div className="mt-5 grid md:grid-cols-2 gap-4">
               <div className="rounded-2xl border border-slate-700/70 bg-slate-900/30 p-5">
@@ -668,10 +743,10 @@ server:
             </div>
           </div>
 
-          <div className="mt-10 grid md:grid-cols-2 gap-6">
-            <div className="rounded-2xl border border-slate-700 bg-slate-800/40 p-6">
-              <h2 className="text-xl font-bold text-white">What to Master (Java)</h2>
-              <ul className="mt-3 space-y-2 text-sm text-slate-300 list-disc pl-5">
+	          <div id="what-to-master" className="mt-10 grid md:grid-cols-2 gap-6">
+	            <div className="rounded-2xl border border-slate-700 bg-slate-800/40 p-6">
+	              <h2 className="text-xl font-bold text-white">What to Master (Java)</h2>
+	              <ul className="mt-3 space-y-2 text-sm text-slate-300 list-disc pl-5">
                 <li>
                   HTTP semantics: status codes, headers, content types, idempotency.{" "}
                   <a
@@ -1132,11 +1207,11 @@ public record MeResponse(String id, String email, String name) {}
             </details>
           </div>
 
-          <div className="mt-10 rounded-2xl border border-slate-700 bg-slate-800/40 p-6">
-            <h2 className="text-xl font-bold text-white">Quick Start (Client)</h2>
-            <p className="mt-2 text-sm text-slate-300">
-              The Sandbox exposes simple auth endpoints you can hit from Java:
-            </p>
+	          <div id="quick-start" className="mt-10 rounded-2xl border border-slate-700 bg-slate-800/40 p-6">
+	            <h2 className="text-xl font-bold text-white">Quick Start (Client)</h2>
+	            <p className="mt-2 text-sm text-slate-300">
+	              The Sandbox exposes simple auth endpoints you can hit from Java:
+	            </p>
 
             <div className="mt-3 flex flex-wrap gap-2">
               <span className="inline-flex items-center gap-2 rounded-full border border-slate-700 bg-slate-900/40 px-3 py-1 text-xs">
@@ -1243,30 +1318,8 @@ public class ApiSandboxClient {
             </div>
           </div>
 
-          <div className="mt-10 rounded-2xl border border-slate-700 bg-slate-800/40 p-6">
-            <h2 className="text-xl font-bold text-white">Next Steps</h2>
-            <div className="mt-2 text-sm text-slate-300">
-              If you want, we can add a dedicated Java starter under this repo (for example,
-              <span className="ml-2 font-mono text-slate-200">/tracks/java-client</span>) and wire it
-              into CI so learners can run the Java tests against the local Sandbox.
-            </div>
-            <div className="mt-4 flex flex-wrap gap-3">
-              <Link
-                href="/docs/architecture"
-                className="px-4 py-2 rounded-lg bg-slate-900/60 border border-slate-700 text-slate-200 hover:bg-slate-900 transition-colors text-sm"
-              >
-                View Architecture
-              </Link>
-              <Link
-                href="/start"
-                className="px-4 py-2 rounded-lg bg-emerald-500/15 border border-emerald-500/30 text-emerald-100 hover:bg-emerald-500/20 transition-colors text-sm"
-              >
-                Back to Start
-              </Link>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  )
-}
+	        </div>
+	      </div>
+	    </div>
+	  )
+	}
