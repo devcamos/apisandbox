@@ -160,6 +160,135 @@ final class AuthController {
 record LoginRequest(@Email String email, @NotBlank String password) {}
 record AuthSession(String token, int expiresIn) {}`}
                             />
+
+                            <details className="mt-3 rounded-xl border border-slate-800 bg-slate-950/40">
+                              <summary className="cursor-pointer select-none px-4 py-3 text-[11px] font-semibold text-slate-200 hover:text-white">
+                                Component breakdown (ontology)
+                              </summary>
+                              <div className="px-4 pb-4">
+                                <div className="mt-2 overflow-x-auto">
+                                  <table className="min-w-full text-xs text-slate-300">
+                                    <thead>
+                                      <tr className="text-left text-slate-300">
+                                        <th className="py-2 pr-6 font-semibold">Component</th>
+                                        <th className="py-2 pr-6 font-semibold">Code element</th>
+                                        <th className="py-2 pr-2 font-semibold">Why it exists</th>
+                                      </tr>
+                                    </thead>
+                                    <tbody>
+                                      <tr className="border-t border-slate-800">
+                                        <td className="py-2 pr-6">Routing wrapper</td>
+                                        <td className="py-2 pr-6 font-mono text-[11px] text-slate-200">
+                                          @RestController
+                                        </td>
+                                        <td className="py-2 pr-2">
+                                          Declares “HTTP handlers live here” and defaults responses to JSON bodies.
+                                        </td>
+                                      </tr>
+                                      <tr className="border-t border-slate-800">
+                                        <td className="py-2 pr-6">Path namespace</td>
+                                        <td className="py-2 pr-6 font-mono text-[11px] text-slate-200">
+                                          @RequestMapping("/api/auth")
+                                        </td>
+                                        <td className="py-2 pr-2">
+                                          Binds a base path once so all methods inherit it (prevents duplication and
+                                          drift).
+                                        </td>
+                                      </tr>
+                                      <tr className="border-t border-slate-800">
+                                        <td className="py-2 pr-6">Validation wrapper</td>
+                                        <td className="py-2 pr-6 font-mono text-[11px] text-slate-200">
+                                          @Validated (class + request body)
+                                        </td>
+                                        <td className="py-2 pr-2">
+                                          Activates bean validation so invalid input becomes a consistent 400 response
+                                          instead of leaking deeper errors.
+                                        </td>
+                                      </tr>
+                                      <tr className="border-t border-slate-800">
+                                        <td className="py-2 pr-6">Endpoint route</td>
+                                        <td className="py-2 pr-6 font-mono text-[11px] text-slate-200">
+                                          @PostMapping("/login")
+                                        </td>
+                                        <td className="py-2 pr-2">
+                                          Maps HTTP method + path to this function. This is “routing” in its simplest
+                                          form.
+                                        </td>
+                                      </tr>
+                                      <tr className="border-t border-slate-800">
+                                        <td className="py-2 pr-6">Body binding</td>
+                                        <td className="py-2 pr-6 font-mono text-[11px] text-slate-200">
+                                          @RequestBody LoginRequest
+                                        </td>
+                                        <td className="py-2 pr-2">
+                                          Tells Spring to parse JSON into a typed DTO (Jackson under the hood).
+                                        </td>
+                                      </tr>
+                                      <tr className="border-t border-slate-800">
+                                        <td className="py-2 pr-6">Controller class</td>
+                                        <td className="py-2 pr-6 font-mono text-[11px] text-slate-200">
+                                          final class AuthController
+                                        </td>
+                                        <td className="py-2 pr-2">
+                                          A thin wrapper that owns HTTP concerns and delegates business logic to a
+                                          service.
+                                        </td>
+                                      </tr>
+                                      <tr className="border-t border-slate-800">
+                                        <td className="py-2 pr-6">Business boundary</td>
+                                        <td className="py-2 pr-6 font-mono text-[11px] text-slate-200">
+                                          AuthService
+                                        </td>
+                                        <td className="py-2 pr-2">
+                                          Keeps auth logic testable and reusable; the controller stays glue code.
+                                        </td>
+                                      </tr>
+                                      <tr className="border-t border-slate-800">
+                                        <td className="py-2 pr-6">Input contract</td>
+                                        <td className="py-2 pr-6 font-mono text-[11px] text-slate-200">
+                                          record LoginRequest(...)
+                                        </td>
+                                        <td className="py-2 pr-2">
+                                          A stable request schema (and validation target) that prevents “loose maps”
+                                          from spreading through code.
+                                        </td>
+                                      </tr>
+                                      <tr className="border-t border-slate-800">
+                                        <td className="py-2 pr-6">Output contract</td>
+                                        <td className="py-2 pr-6 font-mono text-[11px] text-slate-200">
+                                          record AuthSession(token, expiresIn)
+                                        </td>
+                                        <td className="py-2 pr-2">
+                                          Returns a typed session payload (token + lifetime) so the client and server
+                                          share a clear auth contract.
+                                        </td>
+                                      </tr>
+                                    </tbody>
+                                  </table>
+                                </div>
+
+                                <div className="mt-3 rounded-xl border border-slate-800 bg-slate-950/60 p-4 text-sm text-slate-300">
+                                  <div className="text-xs font-semibold tracking-wide text-slate-300/90">
+                                    Why use AuthSession?
+                                  </div>
+                                  <div className="mt-2">
+                                    <span className="font-semibold text-slate-200">1.</span> It’s a stable response
+                                    schema: clients can depend on <span className="font-mono text-slate-200">token</span>{" "}
+                                    and <span className="font-mono text-slate-200">expiresIn</span> without guessing.
+                                  </div>
+                                  <div className="mt-1">
+                                    <span className="font-semibold text-slate-200">2.</span> It supports both cookie
+                                    auth and bearer auth: servers can set cookies and still return the token for
+                                    mobile/CLI clients.
+                                  </div>
+                                  <div className="mt-1">
+                                    <span className="font-semibold text-slate-200">3.</span> It’s extensible: you can
+                                    add fields (refresh token, scopes, user summary) without changing every endpoint
+                                    signature style.
+                                  </div>
+                                </div>
+                              </div>
+                            </details>
                           </div>
                         </details>
 
