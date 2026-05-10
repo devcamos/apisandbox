@@ -1,17 +1,5 @@
 import Link from "next/link"
-
-function CodeBlock({ code, label }: { code: string; label?: string }) {
-  return (
-    <div className="mt-3">
-      {label ? (
-        <div className="text-xs font-semibold tracking-wide text-slate-300/90 mb-2">{label}</div>
-      ) : null}
-      <pre className="bg-slate-950/80 border border-slate-700 rounded-xl p-4 overflow-x-auto text-xs text-slate-200 font-mono leading-relaxed whitespace-pre">
-        {code}
-      </pre>
-    </div>
-  )
-}
+import { HighlightedCodeBlock } from "@/components/HighlightedCodeBlock"
 
 export default function JavaTrackPage() {
   return (
@@ -56,7 +44,28 @@ export default function JavaTrackPage() {
               <span className="ml-2 font-mono text-slate-200">GET /api/auth/me</span>.
             </p>
 
-            <CodeBlock
+            <div className="mt-4 rounded-xl border border-slate-700/80 bg-slate-900/30 p-4">
+              <div className="text-sm font-semibold text-white">What’s happening in the code</div>
+              <ul className="mt-2 space-y-1 text-sm text-slate-300 list-disc pl-5">
+                <li>
+                  A <span className="font-mono text-slate-200">CookieManager</span> is attached to{" "}
+                  <span className="font-mono text-slate-200">HttpClient</span> so cookies from the
+                  login response are stored and automatically sent on later requests.
+                </li>
+                <li>
+                  <span className="font-mono text-slate-200">login()</span> POSTs JSON to{" "}
+                  <span className="font-mono text-slate-200">/api/auth/login</span>. The server sets an
+                  httpOnly cookie called <span className="font-mono text-slate-200">auth_token</span>.
+                </li>
+                <li>
+                  <span className="font-mono text-slate-200">me()</span> GETs{" "}
+                  <span className="font-mono text-slate-200">/api/auth/me</span>. Because the cookie is
+                  attached, the API can authenticate you and return the current user.
+                </li>
+              </ul>
+            </div>
+
+            <HighlightedCodeBlock
               label="Java 21 HttpClient with cookies (session-style auth)"
               code={`import java.net.CookieManager;
 import java.net.CookiePolicy;
@@ -173,4 +182,3 @@ public class ApiSandboxClient {
     </div>
   )
 }
-
