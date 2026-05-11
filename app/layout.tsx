@@ -8,6 +8,7 @@ import { isFeatureEnabled } from "@/config/featureFlags";
 import { getDemoUserEmail } from "@/lib/demo-login";
 import { CookieConsent } from "@/components/CookieConsent";
 import { AnalyticsProvider } from "@/components/AnalyticsProvider";
+import { LearningAssistantWidget } from "@/components/LearningAssistantWidget";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -39,6 +40,7 @@ export default function RootLayout({
           <main className="min-h-screen">
             {children}
           </main>
+          <LearningAssistantWidget />
           <CookieConsent />
           <AnalyticsProvider />
           <footer className="border-t border-slate-800 py-8 px-6">
@@ -56,4 +58,3 @@ export default function RootLayout({
     </html>
   );
 }
-
