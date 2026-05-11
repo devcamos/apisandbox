@@ -2,9 +2,11 @@
 
 import { useEffect, useRef, useState } from "react"
 import { usePathname } from "next/navigation"
+import { useRouter } from "next/navigation"
 import { MessageCircle, X, Send, Sparkles } from "lucide-react"
 
 type Msg = { id: string; role: "user" | "assistant"; content: string }
+type Redirect = { href: string; label: string; reason: string }
 
 function uid() {
   return Math.random().toString(16).slice(2)
@@ -12,10 +14,12 @@ function uid() {
 
 export function LearningAssistantWidget() {
   const pathname = usePathname()
+  const router = useRouter()
   const [open, setOpen] = useState(false)
   const [mode, setMode] = useState<"guided" | "expert">("guided")
   const [provider, setProvider] = useState<string | null>(null)
   const [model, setModel] = useState<string | null>(null)
+  const [redirect, setRedirect] = useState<Redirect | null>(null)
   const [loading, setLoading] = useState(false)
   const [input, setInput] = useState("")
   const [messages, setMessages] = useState<Msg[]>([
@@ -65,7 +69,14 @@ export function LearningAssistantWidget() {
       })
 
       const data = (await res.json().catch(() => null)) as
-        | { reply?: string; suggestions?: string[]; model?: string; provider?: string; error?: string }
+        | {
+            reply?: string
+            suggestions?: string[]
+            model?: string
+            provider?: string
+            redirect?: Redirect | null
+            error?: string
+          }
         | null
 
       if (!res.ok) {
@@ -83,6 +94,7 @@ export function LearningAssistantWidget() {
       ])
       setProvider(data?.provider ?? null)
       setModel(data?.model ?? null)
+      setRedirect(data?.redirect ?? null)
       setSuggestions((data?.suggestions ?? []).slice(0, 3))
     } catch (e) {
       const msg = e instanceof Error ? e.message : null
@@ -183,6 +195,25 @@ export function LearningAssistantWidget() {
                 </div>
               ) : null}
             </div>
+
+            {redirect ? (
+              <div className="mt-4 rounded-2xl border border-slate-800 bg-slate-900/40 p-3">
+                <div className="text-xs font-semibold text-slate-200">Best lesson match</div>
+                <div className="mt-1 text-sm text-slate-300">{redirect.reason}</div>
+                <div className="mt-3">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setOpen(false)
+                      router.push(redirect.href)
+                    }}
+                    className="w-full rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-3 py-2 text-sm font-semibold text-emerald-100 hover:bg-emerald-500/15 transition-colors"
+                  >
+                    {redirect.label}
+                  </button>
+                </div>
+              </div>
+            ) : null}
 
             {suggestions.length ? (
               <div className="mt-4 flex flex-wrap gap-2">

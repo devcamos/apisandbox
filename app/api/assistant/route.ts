@@ -1,6 +1,7 @@
 import OpenAI from "openai"
 import { NextResponse } from "next/server"
 import { GoogleGenAI } from "@google/genai"
+import { inferAssistantRedirect } from "@/lib/assistant/redirect"
 
 type AssistantRequest = {
   message: string
@@ -81,6 +82,7 @@ export async function POST(request: Request) {
 
   const pathname = body.pathname ?? "/"
   const mode = body.mode ?? "guided"
+  const redirect = inferAssistantRedirect({ message: body.message, pathname })
 
   const history = Array.isArray(body.history) ? body.history.slice(-12) : []
 
@@ -124,6 +126,7 @@ export async function POST(request: Request) {
       reply,
       provider: "gemini",
       model,
+      redirect,
       suggestions: ["Explain idempotency", "Cookies vs tokens", "Show a retry policy example"],
     })
   }
@@ -163,6 +166,7 @@ export async function POST(request: Request) {
     reply,
     provider: "openai",
     model: response.model ?? model,
+    redirect,
     suggestions: [
       "Explain idempotency",
       "Cookies vs tokens",
