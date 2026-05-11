@@ -14,6 +14,7 @@ export function LearningAssistantWidget() {
   const pathname = usePathname()
   const [open, setOpen] = useState(false)
   const [mode, setMode] = useState<"guided" | "expert">("guided")
+  const [model, setModel] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const [input, setInput] = useState("")
   const [messages, setMessages] = useState<Msg[]>([
@@ -62,26 +63,35 @@ export function LearningAssistantWidget() {
         }),
       })
 
-      if (!res.ok) throw new Error("assistant_error")
-      const data = (await res.json()) as { reply?: string; suggestions?: string[] }
+      const data = (await res.json().catch(() => null)) as
+        | { reply?: string; suggestions?: string[]; model?: string; error?: string }
+        | null
+
+      if (!res.ok) {
+        const msg = data?.error || "Assistant request failed."
+        throw new Error(msg)
+      }
 
       setMessages((prev) => [
         ...prev,
         {
           id: uid(),
           role: "assistant",
-          content: data.reply ?? "I couldn’t generate a response for that. Try rephrasing.",
+          content: data?.reply ?? "I couldn’t generate a response for that. Try rephrasing.",
         },
       ])
-      setSuggestions((data.suggestions ?? []).slice(0, 3))
-    } catch {
+      setModel(data?.model ?? null)
+      setSuggestions((data?.suggestions ?? []).slice(0, 3))
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : null
       setMessages((prev) => [
         ...prev,
         {
           id: uid(),
           role: "assistant",
           content:
-            "I hit a local error. Try again. If it keeps happening, we can check the /api/assistant endpoint.",
+            msg ||
+            "I couldn’t reach the AI backend. If you’re running locally, set `OPENAI_API_KEY` in `.env.local`, then reload.",
         },
       ])
     } finally {
@@ -110,6 +120,11 @@ export function LearningAssistantWidget() {
               <div className="mt-0.5 text-xs text-slate-400 truncate">
                 Context: <span className="font-mono">{pathname}</span>
               </div>
+              {model ? (
+                <div className="mt-0.5 text-xs text-slate-500 truncate">
+                  Model: <span className="font-mono">{model}</span>
+                </div>
+              ) : null}
             </div>
             <div className="flex items-center gap-2">
               <button
@@ -201,4 +216,3 @@ export function LearningAssistantWidget() {
     </div>
   )
 }
-
