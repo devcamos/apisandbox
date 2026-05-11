@@ -1,5 +1,6 @@
 import OpenAI from "openai"
 import { NextResponse } from "next/server"
+import { GoogleGenAI } from "@google/genai"
 
 type AssistantRequest = {
   message: string
@@ -56,6 +57,21 @@ function buildInstructions({ pathname, mode }: { pathname: string; mode: "guided
   ].join("\n")
 }
 
+function formatConversation({
+  history,
+  message,
+}: {
+  history: Array<{ role: "user" | "assistant"; content: string }>
+  message: string
+}) {
+  const lines: string[] = []
+  for (const m of history) {
+    lines.push(`${m.role.toUpperCase()}: ${m.content}`)
+  }
+  lines.push(`USER: ${message}`)
+  return lines.join("\n")
+}
+
 export async function POST(request: Request) {
   const body = (await request.json().catch(() => null)) as AssistantRequest | null
 
@@ -63,12 +79,62 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Invalid request" }, { status: 400 })
   }
 
+  const pathname = body.pathname ?? "/"
+  const mode = body.mode ?? "guided"
+
+  const history = Array.isArray(body.history) ? body.history.slice(-12) : []
+
+  const provider =
+    (process.env.ASSISTANT_PROVIDER as "openai" | "gemini" | undefined) ||
+    (process.env.GEMINI_API_KEY ? "gemini" : "openai")
+
+  if (provider === "gemini") {
+    const apiKey = process.env.GEMINI_API_KEY
+    if (!apiKey) {
+      return NextResponse.json(
+        {
+          error:
+            "Missing GEMINI_API_KEY. Set it in your environment (e.g. .env.local) to enable Gemini responses.",
+        },
+        { status: 500 },
+      )
+    }
+
+    // Default to a generally-available fast model; allow override via env.
+    const model = process.env.GEMINI_MODEL || "gemini-2.5-flash"
+    const ai = new GoogleGenAI({ apiKey })
+
+    const prompt = [
+      buildInstructions({ pathname, mode }),
+      "",
+      "Conversation:",
+      formatConversation({ history, message: body.message }),
+    ].join("\n")
+
+    const result = await ai.models.generateContent({
+      model,
+      contents: prompt,
+    })
+
+    const reply =
+      (typeof result.text === "string" ? result.text : "")?.trim() ||
+      "I didn’t produce any text output. Try asking again."
+
+    return NextResponse.json({
+      reply,
+      provider: "gemini",
+      model,
+      suggestions: ["Explain idempotency", "Cookies vs tokens", "Show a retry policy example"],
+    })
+  }
+
+  // Default: OpenAI
   const apiKey = process.env.OPENAI_API_KEY
   if (!apiKey) {
     return NextResponse.json(
       {
         error:
-          "Missing OPENAI_API_KEY. Set it in your environment (e.g. .env.local) to enable AI responses.",
+          "Missing OPENAI_API_KEY. Set it in your environment (e.g. .env.local) to enable OpenAI responses, or set ASSISTANT_PROVIDER=gemini with GEMINI_API_KEY.",
       },
       { status: 500 },
     )
@@ -76,10 +142,7 @@ export async function POST(request: Request) {
 
   const client = new OpenAI({ apiKey })
   const model = process.env.OPENAI_MODEL || "gpt-4.1-mini"
-  const pathname = body.pathname ?? "/"
-  const mode = body.mode ?? "guided"
 
-  const history = Array.isArray(body.history) ? body.history.slice(-12) : []
   const input = [
     ...history.map((m) => ({
       role: m.role,
@@ -94,12 +157,11 @@ export async function POST(request: Request) {
     input,
   })
 
-  // The SDK exposes a convenience field with concatenated text.
-  // If it is unexpectedly empty, return a helpful fallback.
   const reply = response.output_text?.trim() || "I didn’t produce any text output. Try asking again."
 
   return NextResponse.json({
     reply,
+    provider: "openai",
     model: response.model ?? model,
     suggestions: [
       "Explain idempotency",

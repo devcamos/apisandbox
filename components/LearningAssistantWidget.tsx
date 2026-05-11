@@ -14,6 +14,7 @@ export function LearningAssistantWidget() {
   const pathname = usePathname()
   const [open, setOpen] = useState(false)
   const [mode, setMode] = useState<"guided" | "expert">("guided")
+  const [provider, setProvider] = useState<string | null>(null)
   const [model, setModel] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const [input, setInput] = useState("")
@@ -64,7 +65,7 @@ export function LearningAssistantWidget() {
       })
 
       const data = (await res.json().catch(() => null)) as
-        | { reply?: string; suggestions?: string[]; model?: string; error?: string }
+        | { reply?: string; suggestions?: string[]; model?: string; provider?: string; error?: string }
         | null
 
       if (!res.ok) {
@@ -80,6 +81,7 @@ export function LearningAssistantWidget() {
           content: data?.reply ?? "I couldn’t generate a response for that. Try rephrasing.",
         },
       ])
+      setProvider(data?.provider ?? null)
       setModel(data?.model ?? null)
       setSuggestions((data?.suggestions ?? []).slice(0, 3))
     } catch (e) {
@@ -91,7 +93,7 @@ export function LearningAssistantWidget() {
           role: "assistant",
           content:
             msg ||
-            "I couldn’t reach the AI backend. If you’re running locally, set `OPENAI_API_KEY` in `.env.local`, then reload.",
+            "I couldn’t reach the AI backend. If you’re running locally, set `OPENAI_API_KEY` (OpenAI) or `GEMINI_API_KEY` (Gemini) in `.env.local`, then reload.",
         },
       ])
     } finally {
@@ -122,7 +124,16 @@ export function LearningAssistantWidget() {
               </div>
               {model ? (
                 <div className="mt-0.5 text-xs text-slate-500 truncate">
-                  Model: <span className="font-mono">{model}</span>
+                  {provider ? (
+                    <>
+                      Provider: <span className="font-mono">{provider}</span> · Model:{" "}
+                      <span className="font-mono">{model}</span>
+                    </>
+                  ) : (
+                    <>
+                      Model: <span className="font-mono">{model}</span>
+                    </>
+                  )}
                 </div>
               ) : null}
             </div>
