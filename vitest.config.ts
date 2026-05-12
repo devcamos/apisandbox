@@ -15,7 +15,9 @@ export default defineConfig({
       // Keep LCOV aligned with unit tests only. A broad `lib/**` include produced
       // thousands of 0%-covered lines in lcov.info; SonarCloud then fails Coverage on New Code.
       include: [
+        "lib/assistant/redirect.ts",
         "lib/auth-authorize-helpers.ts",
+        "lib/demo-login.ts",
         "lib/login-error-parser.ts",
         "lib/sanitize-mermaid-svg.ts",
         "lib/safe-redirect.ts",
