@@ -1,6 +1,7 @@
 # Continuous integration: lint, production build, unit tests, SonarCloud, Playwright smoke.
-# Continuous delivery: handled by Vercel when the GitHub repo is connected
-# (see docs/CI_CD_GITHUB_VERCEL.md).
+# Continuous delivery: Vercel Git integration builds Preview on each PR and Production on merge to main.
+# Manual gate: job `preview-deploy-gate` uses GitHub Environment `preview` (required reviewers) so
+# merges to `main` wait for human sign-off after reviewing the Vercel Preview URL (see docs/CI_CD_GITHUB_VERCEL.md).
 
 name: CI
 
@@ -110,8 +111,22 @@ jobs:
           key: ${{ runner.os }}-sonar-${{ hashFiles('**/sonar-project.properties', '**/package-lock.json') }}
           restore-keys: ${{ runner.os }}-sonar-
 
-      - name: SonarCloud Scan
+      - name: Validate SonarCloud token access
         if: env.SONAR_TOKEN != ''
+        run: |
+          set -euo pipefail
+          # Skip analysis (without failing CI) if the token can't access the project.
+          # This avoids noisy red PRs when a contributor doesn't have SonarCloud permissions.
+          resp="$(curl -sS -u "${SONAR_TOKEN}:" "https://sonarcloud.io/api/components/show?component=devcamos_apisandbox" || true)"
+          if echo "$resp" | grep -q '"errors"'; then
+            echo "SONAR_TOKEN_VALID=false" >> "$GITHUB_ENV"
+            echo "SonarCloud token cannot access project; skipping scan."
+          else
+            echo "SONAR_TOKEN_VALID=true" >> "$GITHUB_ENV"
+          fi
+
+      - name: SonarCloud Scan
+        if: env.SONAR_TOKEN != '' && env.SONAR_TOKEN_VALID == 'true'
         uses: SonarSource/sonarqube-scan-action@59db25f34e16620e48ab4bb9e4a5dce155cb5432
         with:
           # Hosted runners occasionally fail GPG keyserver fetch for scanner signature verify.
@@ -185,6 +200,21 @@ jobs:
           name: playwright-report
           path: playwright-report/
           if-no-files-found: ignore
+
+  # Runs only for PRs targeting main, after CI is green. Configure repo → Settings → Environments →
+  # "preview" with "Required reviewers" so deploys are not merged until someone approves this step
+  # (after checking the Vercel Preview deployment on the PR).
+  preview-deploy-gate:
+    name: Preview approved (Vercel)
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request' && github.base_ref == 'main' && github.event.pull_request.draft == false
+    needs: [lint-and-build, unit-tests, e2e-smoke, docker-compose-validate]
+    environment: preview
+    steps:
+      - name: Confirm preview reviewed
+        run: |
+          echo "Preview environment approved for PR #${{ github.event.pull_request.number }}"
+          echo "Merge to main only after verifying the Vercel Preview URL from the Vercel bot comment on this PR."
 
   dependency-review:
     if: github.event_name == 'pull_request'

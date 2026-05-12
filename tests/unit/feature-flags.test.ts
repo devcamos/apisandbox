@@ -37,6 +37,7 @@ describe("Feature Flags", () => {
     expect(flags).toHaveProperty("EMAIL_VERIFICATION")
     expect(flags).toHaveProperty("RATE_LIMITING")
     expect(flags).toHaveProperty("ANALYTICS")
+    expect(flags).toHaveProperty("DEMO_LOGIN")
     expect(flags.PREMIUM_PAYWALL).toHaveProperty("description")
     expect(flags.PREMIUM_PAYWALL).toHaveProperty("enabled")
   })

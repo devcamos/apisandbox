@@ -2,9 +2,13 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import Navigation from "@/components/Navigation";
+import { DemoSessionBanner } from "@/components/DemoSessionBanner";
 import { SessionProvider } from "@/components/providers/SessionProvider";
+import { isFeatureEnabled } from "@/config/featureFlags";
+import { getDemoUserEmail } from "@/lib/demo-login";
 import { CookieConsent } from "@/components/CookieConsent";
 import { AnalyticsProvider } from "@/components/AnalyticsProvider";
+import { LearningAssistantWidget } from "@/components/LearningAssistantWidget";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -25,14 +29,18 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const demoAccountEmail = isFeatureEnabled("DEMO_LOGIN") ? getDemoUserEmail() : null
+
   return (
     <html lang="en" className="dark" suppressHydrationWarning>
       <body className={`${inter.className} bg-slate-900 text-white`}>
         <SessionProvider>
           <Navigation />
+          <DemoSessionBanner demoAccountEmail={demoAccountEmail} />
           <main className="min-h-screen">
             {children}
           </main>
+          <LearningAssistantWidget />
           <CookieConsent />
           <AnalyticsProvider />
           <footer className="border-t border-slate-800 py-8 px-6">
@@ -50,4 +58,3 @@ export default function RootLayout({
     </html>
   );
 }
-

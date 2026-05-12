@@ -21,6 +21,7 @@ import { useAuthSessionWriter } from "@/components/providers/SessionProvider"
 import { parseLoginErrorMessage, type LoginErrorInfo } from "@/lib/login-error-parser"
 import AuthPageShell from "@/components/auth/AuthPageShell"
 import AuthSocialSection from "@/components/auth/AuthSocialSection"
+import { TryDemoButton } from "@/components/auth/TryDemoButton"
 
 declare global {
   interface Window {
@@ -409,6 +410,10 @@ function LoginForm() {
               )}
             </button>
           </form>
+
+          <div className="mt-6 space-y-3">
+            <TryDemoButton nextPath={callbackUrl} />
+          </div>
 
           <AuthSocialSection
             googleClientId={googleClientId}
