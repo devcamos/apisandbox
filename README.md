@@ -2,6 +2,10 @@
 
 A comprehensive Next.js application for learning API integrations from fundamentals to principal-level architecture.
 
+### For development agents (Cursor, Codex, automation)
+
+**Onboard quickly:** read **[docs/AGENT_ONBOARDING.md](docs/AGENT_ONBOARDING.md)** for setup order, where tickets and URLs live, how to verify changes, and merge conventions. **[docs/AGENT_WORKSPACES.md](docs/AGENT_WORKSPACES.md)** lists GitHub, Vercel, SonarCloud, Notion links, and key app routes.
+
 ## 🚀 Getting Started
 
 ### Prerequisites
@@ -111,7 +115,7 @@ For detailed architecture documentation with visual diagrams:
 - **[Architecture Viewer](/docs/architecture)** - Interactive architecture diagrams in the app
 - **[Developer Setup](./docs/DEV_SETUP.md)** - How to view diagrams locally for developers
 - **[Test Users](./docs/TEST_USERS.md)** - Local test credentials bootstrap
-- **[Feature Management](./docs/FEATURE_MANAGEMENT.md)** - Notion is the source of truth for feature tickets, maintenance work, and delivery status
+- **[Feature and backlog management](./docs/FEATURE_MANAGEMENT.md)** — Notion hub + work tracker; single backlog, status workflow, field guidance
 
 ### Quick View (Local Development)
 

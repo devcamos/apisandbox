@@ -111,8 +111,22 @@ jobs:
           key: ${{ runner.os }}-sonar-${{ hashFiles('**/sonar-project.properties', '**/package-lock.json') }}
           restore-keys: ${{ runner.os }}-sonar-
 
-      - name: SonarCloud Scan
+      - name: Validate SonarCloud token access
         if: env.SONAR_TOKEN != ''
+        run: |
+          set -euo pipefail
+          # Skip analysis (without failing CI) if the token can't access the project.
+          # This avoids noisy red PRs when a contributor doesn't have SonarCloud permissions.
+          resp="$(curl -sS -u "${SONAR_TOKEN}:" "https://sonarcloud.io/api/components/show?component=devcamos_apisandbox" || true)"
+          if echo "$resp" | grep -q '"errors"'; then
+            echo "SONAR_TOKEN_VALID=false" >> "$GITHUB_ENV"
+            echo "SonarCloud token cannot access project; skipping scan."
+          else
+            echo "SONAR_TOKEN_VALID=true" >> "$GITHUB_ENV"
+          fi
+
+      - name: SonarCloud Scan
+        if: env.SONAR_TOKEN != '' && env.SONAR_TOKEN_VALID == 'true'
         uses: SonarSource/sonarqube-scan-action@59db25f34e16620e48ab4bb9e4a5dce155cb5432
         with:
           # Hosted runners occasionally fail GPG keyserver fetch for scanner signature verify.
