@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import PhaseLayout from "@/components/PhaseLayout";
+import PhaseQuiz from "@/components/PhaseQuiz";
+import { LessonTracker } from "@/components/LessonTracker";
 import { Database, ArrowRight, Flame, ExternalLink, AlertTriangle } from "lucide-react";
 import { dsCategories, type DSCategory } from "@/lib/learning/data-science-production";
 import SelectableLearningCard from "@/components/learning/SelectableLearningCard";
@@ -167,6 +169,8 @@ export default function Phase8() {
       icon={Database}
       color="from-purple-500 to-violet-500"
     >
+      <LessonTracker phase={8} />
+
       <div className="bg-gradient-to-r from-purple-500/10 to-violet-500/10 border border-purple-500/20 rounded-xl p-6 mb-8">
         <h2 className="text-2xl font-bold text-white mb-3 flex items-center gap-2">
           <Flame className="w-6 h-6 text-purple-400" />
@@ -237,6 +241,8 @@ export default function Phase8() {
           ))}
         </div>
       </div>
+
+      <PhaseQuiz phaseNumber={8} accentClass="from-purple-500 to-violet-500" />
     </PhaseLayout>
   );
 }

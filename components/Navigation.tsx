@@ -118,7 +118,7 @@ export default function Navigation() {
           {/* Logo */}
           <Link href="/" className="flex items-center space-x-2">
             <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-lg"></div>
-            <span className="font-bold text-white text-xl">API Training</span>
+            <span className="font-bold text-white text-xl">API Sandbox</span>
           </Link>
 
           {/* Desktop Navigation - Explore and free/premium open to all */}

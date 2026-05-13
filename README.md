@@ -208,9 +208,7 @@ apisandbox/
 │   ├── PhaseLayout.tsx     # Phase page layout
 │   ├── ConceptCard.tsx     # Concept display card
 │   ├── ProjectCard.tsx     # Project card
-│   ├── AwsMigrationDashboard.tsx  # Migration dashboard
-│   ├── AwsServiceSelector.tsx     # Service selector
-│   └── CostCalculator.tsx         # Cost calculator
+│   └── ...                        # Learning + UI components
 ├── config/
 │   ├── environmentManager.ts          # Environment configuration manager
 │   └── environments/

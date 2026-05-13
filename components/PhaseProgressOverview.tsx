@@ -13,6 +13,9 @@ const phaseMeta = [
   { phaseNumber: 2, title: "Third-Party Integrations", href: "/phase-2", color: "from-purple-500 to-pink-500" },
   { phaseNumber: 3, title: "Inter-Service Communication", href: "/phase-3", color: "from-orange-500 to-red-500" },
   { phaseNumber: 4, title: "Principal-Level Architecture", href: "/phase-4", color: "from-emerald-500 to-cyan-500" },
+  { phaseNumber: 5, title: "API Algorithms", href: "/phase-5", color: "from-cyan-500 to-blue-500" },
+  { phaseNumber: 7, title: "Monetisation", href: "/phase-7", color: "from-amber-500 to-orange-500" },
+  { phaseNumber: 8, title: "Data Science", href: "/phase-8", color: "from-purple-500 to-violet-500" },
 ]
 
 interface PhaseProgress {
@@ -72,7 +75,7 @@ export default function PhaseProgressOverview() {
           </div>
         </div>
 
-        <div className="grid md:grid-cols-2 xl:grid-cols-5 gap-4">
+        <div className="grid md:grid-cols-2 xl:grid-cols-4 gap-4">
           {phaseMeta.map((phase) => {
             const item = progressByPhase.get(phase.phaseNumber)
             return (

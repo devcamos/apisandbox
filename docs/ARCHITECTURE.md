@@ -212,9 +212,7 @@ graph TD
     
     SubscriptionGate --> UpgradePrompt[UpgradePrompt]
     
-    CloudPages --> AwsMigrationDashboard[AwsMigrationDashboard]
-    CloudPages --> AwsServiceSelector[AwsServiceSelector]
-    CloudPages --> CostCalculator[CostCalculator]
+    CloudPages --> CloudContent[Cloud Content Pages]
     
     PhasePages --> InteractiveDemos[Interactive Demos]
     InteractiveDemos --> OAuth2Simulator[OAuth2Simulator]

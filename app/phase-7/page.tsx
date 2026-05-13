@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import PhaseLayout from "@/components/PhaseLayout";
+import PhaseQuiz from "@/components/PhaseQuiz";
+import { LessonTracker } from "@/components/LessonTracker";
 import { DollarSign, ArrowRight, Clock, Flame, TrendingUp } from "lucide-react";
 import { monetisationPaths, type MonetisationPath } from "@/lib/learning/monetisation-paths";
 import SelectableLearningCard from "@/components/learning/SelectableLearningCard";
@@ -215,6 +217,8 @@ export default function Phase7() {
       icon={DollarSign}
       color="from-amber-500 to-orange-500"
     >
+      <LessonTracker phase={7} />
+
       <div className="bg-gradient-to-r from-amber-500/10 to-orange-500/10 border border-amber-500/20 rounded-xl p-6 mb-8">
         <h2 className="text-2xl font-bold text-white mb-3 flex items-center gap-2">
           <Flame className="w-6 h-6 text-amber-400" />
@@ -309,6 +313,8 @@ export default function Phase7() {
           </table>
         </div>
       </div>
+
+      <PhaseQuiz phaseNumber={7} accentClass="from-amber-500 to-orange-500" />
     </PhaseLayout>
   );
 }
