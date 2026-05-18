@@ -812,6 +812,48 @@ public ResponseEntity<?> getUser(@PathVariable String id) {
                 "Database connection failures",
                 "Distributed system temporary inconsistencies"
               ],
+              transientFailureCauses: {
+                title: "Leading Causes of Transient Failures",
+                points: [
+                  "Short-lived network instability: packet loss, DNS lookup hiccups, TLS handshake failures, and temporary connection resets.",
+                  "Dependency overload: downstream service is saturated, queue depth spikes, or a database pool is exhausted for a brief period.",
+                  "Rate limiting and protection controls: 429 responses, burst caps, WAF throttles, and provider-side concurrency limits.",
+                  "Cold starts and rolling deploys: new instances warming up, pods draining, or one zone recovering while others stay healthy.",
+                  "Timeout mismatches: your client deadline is shorter than the dependency's temporary latency spike, even though the dependency is not permanently broken."
+                ]
+              },
+              retryConfigs: {
+                title: "Best Retry Configs (Good Defaults)",
+                profiles: [
+                  {
+                    label: "Read-heavy external APIs",
+                    config: "3 attempts, 250ms base delay, exponential factor 2, full jitter, max delay 2s",
+                    why: "Fast recovery for brief provider hiccups without stretching user latency too far."
+                  },
+                  {
+                    label: "Background jobs and webhooks",
+                    config: "5 attempts, 1s base delay, exponential factor 2, full jitter, max delay 30s",
+                    why: "Async work can tolerate a wider retry window and should trade speed for delivery success."
+                  },
+                  {
+                    label: "Rate-limited providers",
+                    config: "Honor Retry-After first, otherwise 3 attempts, 1s base delay, exponential factor 2, max delay 60s",
+                    why: "Provider guidance beats guesswork. Retrying too early just burns quota and extends incidents."
+                  },
+                  {
+                    label: "User-facing writes with idempotency keys",
+                    config: "2 to 3 attempts, 500ms base delay, exponential factor 2, jitter, strict overall deadline",
+                    why: "Keep duplicate-side-effect risk low and fail fast enough that the caller can still recover sensibly."
+                  }
+                ],
+                rules: [
+                  "Always set an overall deadline or retry budget, not just max attempts.",
+                  "Retry only transient classes: 5xx, connection resets, timeouts, and 429 when policy allows it.",
+                  "Do not retry validation/auth failures or business-logic rejections.",
+                  "Prefer full jitter over synchronized fixed waits during outages.",
+                  "Pair retries with idempotency keys or safe HTTP semantics when writes are involved."
+                ]
+              },
               paretoKnowledge: {
                 title: "The 20% You Need to Know",
                 points: [

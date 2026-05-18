@@ -18,6 +18,19 @@ interface ConceptCardProps {
     overview: string;
     description: string[];
     useCases: string[];
+    transientFailureCauses?: {
+      title: string;
+      points: string[];
+    };
+    retryConfigs?: {
+      title: string;
+      profiles: {
+        label: string;
+        config: string;
+        why: string;
+      }[];
+      rules: string[];
+    };
     corePrinciples?: {
       title: string;
       points: string[];
@@ -123,4 +136,3 @@ export default function ConceptCard({
     </>
   );
 }
-

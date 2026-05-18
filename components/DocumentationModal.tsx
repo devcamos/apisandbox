@@ -12,6 +12,19 @@ interface DocumentationModalProps {
     overview: string;
     description: string[];
     useCases: string[];
+    transientFailureCauses?: {
+      title: string;
+      points: string[];
+    };
+    retryConfigs?: {
+      title: string;
+      profiles: {
+        label: string;
+        config: string;
+        why: string;
+      }[];
+      rules: string[];
+    };
     corePrinciples?: {
       title: string;
       points: string[];
@@ -129,6 +142,50 @@ export default function DocumentationModal({
             </div>
           </section>
 
+          {documentation.transientFailureCauses && (
+            <section className="bg-gradient-to-r from-amber-500/10 to-orange-500/10 border border-amber-500/20 rounded-xl p-6">
+              <h3 className="text-2xl font-bold text-white mb-4 flex items-center gap-2">
+                <Lightbulb className="w-6 h-6 text-amber-400" />
+                {documentation.transientFailureCauses.title}
+              </h3>
+              <div className="space-y-3">
+                {documentation.transientFailureCauses.points.map((point, idx) => (
+                  <div key={idx} className="bg-amber-500/10 border border-amber-500/20 p-4 rounded-lg">
+                    <p className="text-gray-300 text-sm">{point}</p>
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
+
+          {documentation.retryConfigs && (
+            <section className="bg-gradient-to-r from-cyan-500/10 to-blue-500/10 border border-cyan-500/20 rounded-xl p-6">
+              <h3 className="text-2xl font-bold text-white mb-4 flex items-center gap-2">
+                <Target className="w-6 h-6 text-cyan-400" />
+                {documentation.retryConfigs.title}
+              </h3>
+              <div className="grid gap-4 md:grid-cols-2">
+                {documentation.retryConfigs.profiles.map((profile, idx) => (
+                  <div key={idx} className="bg-slate-800/60 border border-slate-700 rounded-lg p-4">
+                    <h4 className="text-white font-semibold mb-2">{profile.label}</h4>
+                    <p className="text-cyan-100 text-sm font-mono mb-3">{profile.config}</p>
+                    <p className="text-gray-300 text-sm">{profile.why}</p>
+                  </div>
+                ))}
+              </div>
+              <div className="mt-5 space-y-2">
+                {documentation.retryConfigs.rules.map((rule, idx) => (
+                  <div key={idx} className="flex items-start gap-3">
+                    <span className="bg-cyan-500/20 text-cyan-300 font-bold rounded-full w-6 h-6 flex items-center justify-center flex-shrink-0 text-sm">
+                      {idx + 1}
+                    </span>
+                    <p className="text-gray-200 text-sm">{rule}</p>
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
+
           {/* Core Principles */}
           {documentation.corePrinciples && (
             <section className="bg-gradient-to-r from-blue-500/10 to-cyan-500/10 border border-blue-500/20 rounded-xl p-6">
@@ -244,4 +301,3 @@ export default function DocumentationModal({
     </div>
   );
 }
-
