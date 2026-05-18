@@ -17,6 +17,7 @@ on:
 
 permissions:
   contents: read
+  checks: write
   pull-requests: read
 
 concurrency:
@@ -74,7 +75,7 @@ jobs:
       - name: Unit tests with coverage
         run: |
           mkdir -p reports
-          npx vitest run --coverage --reporter=default --reporter=json --outputFile=reports/vitest-results.json
+          npx vitest run --coverage --reporter=default --reporter=json --reporter=junit --outputFile.json=reports/vitest-results.json --outputFile.junit=reports/vitest-junit.xml
 
       - name: Publish unit test summary
         if: always()
@@ -102,6 +103,14 @@ jobs:
           fs.appendFileSync(summaryFile, `${lines.join("\n")}\n`)
           EOF
 
+      - name: Publish unit test check
+        if: ${{ !cancelled() && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.fork == false) }}
+        uses: dorny/test-reporter@v3
+        with:
+          name: Unit Tests
+          path: reports/vitest-junit.xml
+          reporter: java-junit
+
       - name: Upload coverage artifact
         uses: actions/upload-artifact@v4
         with:
@@ -114,7 +123,9 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: unit-test-report
-          path: reports/vitest-results.json
+          path: |
+            reports/vitest-results.json
+            reports/vitest-junit.xml
           if-no-files-found: warn
 
   sonarcloud:
@@ -229,7 +240,7 @@ jobs:
       - name: Run E2E smoke (Chromium)
         run: |
           mkdir -p reports
-          npx playwright test tests/ci-smoke.spec.ts --project=chromium --reporter=json > reports/playwright-smoke.json
+          PLAYWRIGHT_JSON_OUTPUT_NAME=reports/playwright-smoke.json PLAYWRIGHT_JUNIT_OUTPUT_NAME=reports/playwright-smoke-junit.xml npx playwright test tests/ci-smoke.spec.ts --project=chromium --reporter=json,junit
 
       - name: Publish smoke test summary
         if: always()
@@ -265,12 +276,22 @@ jobs:
           fs.appendFileSync(summaryFile, `${lines.join("\n")}\n`)
           EOF
 
+      - name: Publish smoke test check
+        if: ${{ !cancelled() && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.fork == false) }}
+        uses: dorny/test-reporter@v3
+        with:
+          name: E2E Smoke Tests
+          path: reports/playwright-smoke-junit.xml
+          reporter: java-junit
+
       - name: Upload smoke test report
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: playwright-smoke-report-json
-          path: reports/playwright-smoke.json
+          path: |
+            reports/playwright-smoke.json
+            reports/playwright-smoke-junit.xml
           if-no-files-found: warn
 
       - name: Upload Playwright report
