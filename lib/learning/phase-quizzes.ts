@@ -4,6 +4,11 @@ export interface PhaseQuizQuestion {
   options: string[]
   correctIndex: number
   explanation: string
+  concept: string
+  redirect?: {
+    href: string
+    label: string
+  }
 }
 
 export interface PhaseQuizDefinition {
@@ -26,7 +31,9 @@ export const phaseQuizzes: Record<number, PhaseQuizDefinition> = {
         prompt: "Which HTTP status code usually indicates a successful GET request?",
         options: ["201", "200", "404", "500"],
         correctIndex: 1,
-        explanation: "200 OK is the standard successful response for a GET request."
+        explanation: "200 OK is the standard successful response for a GET request.",
+        concept: "HTTP semantics",
+        redirect: { href: "/phase-0", label: "Review HTTP fundamentals" },
       },
       {
         id: "git-purpose",
@@ -38,7 +45,9 @@ export const phaseQuizzes: Record<number, PhaseQuizDefinition> = {
           "It encrypts HTTP traffic"
         ],
         correctIndex: 1,
-        explanation: "Git is the core collaboration and version-control system for shipping and maintaining software safely."
+        explanation: "Git is the core collaboration and version-control system for shipping and maintaining software safely.",
+        concept: "Version control",
+        redirect: { href: "/phase-0", label: "Review foundational tooling" },
       },
       {
         id: "vm-definition",
@@ -50,7 +59,9 @@ export const phaseQuizzes: Record<number, PhaseQuizDefinition> = {
           "A database replication node"
         ],
         correctIndex: 1,
-        explanation: "A VM is a software-defined machine backed by underlying physical hardware."
+        explanation: "A VM is a software-defined machine backed by underlying physical hardware.",
+        concept: "Cloud compute basics",
+        redirect: { href: "/phase-0", label: "Review VM and cloud basics" },
       }
     ]
   },
@@ -65,7 +76,9 @@ export const phaseQuizzes: Record<number, PhaseQuizDefinition> = {
         prompt: "Which style is usually the best default for a public CRUD API?",
         options: ["REST", "WebSocket", "Kafka", "gRPC streaming"],
         correctIndex: 0,
-        explanation: "REST is typically the clearest and most widely consumable default for public CRUD APIs."
+        explanation: "REST is typically the clearest and most widely consumable default for public CRUD APIs.",
+        concept: "API style selection",
+        redirect: { href: "/phase-1", label: "Review API style tradeoffs" },
       },
       {
         id: "graphql-fit",
@@ -77,7 +90,9 @@ export const phaseQuizzes: Record<number, PhaseQuizDefinition> = {
           "When browsers cannot make HTTP requests"
         ],
         correctIndex: 0,
-        explanation: "GraphQL is strongest when clients need to shape and combine data flexibly."
+        explanation: "GraphQL is strongest when clients need to shape and combine data flexibly.",
+        concept: "GraphQL fit",
+        redirect: { href: "/phase-1", label: "Review GraphQL vs REST" },
       },
       {
         id: "event-driven-fit",
@@ -89,7 +104,9 @@ export const phaseQuizzes: Record<number, PhaseQuizDefinition> = {
           "To avoid retries entirely"
         ],
         correctIndex: 2,
-        explanation: "Events help decouple services and support asynchronous workflows and scale."
+        explanation: "Events help decouple services and support asynchronous workflows and scale.",
+        concept: "Event-driven architecture",
+        redirect: { href: "/phase-1", label: "Review event-driven patterns" },
       }
     ]
   },
@@ -109,7 +126,9 @@ export const phaseQuizzes: Record<number, PhaseQuizDefinition> = {
           "Schema migration"
         ],
         correctIndex: 1,
-        explanation: "OAuth2 allows one system to access another on a user’s behalf without sharing the user’s password."
+        explanation: "OAuth2 allows one system to access another on a user’s behalf without sharing the user’s password.",
+        concept: "OAuth2",
+        redirect: { href: "/phase-2/demos/oauth2", label: "Open the OAuth2 demo" },
       },
       {
         id: "retry-risk",
@@ -121,7 +140,9 @@ export const phaseQuizzes: Record<number, PhaseQuizDefinition> = {
           "They force synchronous processing"
         ],
         correctIndex: 0,
-        explanation: "Retries can multiply traffic against a degraded dependency and worsen the incident."
+        explanation: "Retries can multiply traffic against a degraded dependency and worsen the incident.",
+        concept: "Retries and backoff",
+        redirect: { href: "/phase-2/demos/retry", label: "Open the retry demo" },
       },
       {
         id: "circuit-breaker-purpose",
@@ -133,7 +154,9 @@ export const phaseQuizzes: Record<number, PhaseQuizDefinition> = {
           "To replace authentication"
         ],
         correctIndex: 2,
-        explanation: "A circuit breaker protects your system by failing fast when a dependency is unhealthy."
+        explanation: "A circuit breaker protects your system by failing fast when a dependency is unhealthy.",
+        concept: "Circuit breakers",
+        redirect: { href: "/phase-2/demos/circuit-breaker", label: "Open the circuit-breaker demo" },
       }
     ]
   },
@@ -153,7 +176,9 @@ export const phaseQuizzes: Record<number, PhaseQuizDefinition> = {
           "It removes the need for idempotency"
         ],
         correctIndex: 1,
-        explanation: "Async messaging decouples producers and consumers in time, which helps absorb load and isolate failures."
+        explanation: "Async messaging decouples producers and consumers in time, which helps absorb load and isolate failures.",
+        concept: "Async messaging",
+        redirect: { href: "/phase-3", label: "Review sync vs async communication" },
       },
       {
         id: "distributed-tracing",
@@ -165,7 +190,9 @@ export const phaseQuizzes: Record<number, PhaseQuizDefinition> = {
           "Running database backups"
         ],
         correctIndex: 1,
-        explanation: "Tracing lets you follow a request path end-to-end across service boundaries."
+        explanation: "Tracing lets you follow a request path end-to-end across service boundaries.",
+        concept: "Distributed tracing",
+        redirect: { href: "/observability", label: "Open observability" },
       },
       {
         id: "event-idempotency",
@@ -177,7 +204,9 @@ export const phaseQuizzes: Record<number, PhaseQuizDefinition> = {
           "Because it removes the need for monitoring"
         ],
         correctIndex: 0,
-        explanation: "Event systems can redeliver messages, so handlers must tolerate duplicate processing."
+        explanation: "Event systems can redeliver messages, so handlers must tolerate duplicate processing.",
+        concept: "Idempotency in event systems",
+        redirect: { href: "/phase-3", label: "Review event-driven safety" },
       }
     ]
   },
@@ -197,7 +226,9 @@ export const phaseQuizzes: Record<number, PhaseQuizDefinition> = {
           "Benchmarking the UI"
         ],
         correctIndex: 1,
-        explanation: "The system’s constraints and failure modes should drive which components exist at all."
+        explanation: "The system’s constraints and failure modes should drive which components exist at all.",
+        concept: "Constraint-driven design",
+        redirect: { href: "/docs/architecture", label: "Review architecture reasoning" },
       },
       {
         id: "tradeoff-proof",
@@ -209,7 +240,9 @@ export const phaseQuizzes: Record<number, PhaseQuizDefinition> = {
           "You can add retries everywhere"
         ],
         correctIndex: 1,
-        explanation: "Owning a design means articulating the trade-offs and the conditions where it stops being the right choice."
+        explanation: "Owning a design means articulating the trade-offs and the conditions where it stops being the right choice.",
+        concept: "Architecture tradeoffs",
+        redirect: { href: "/docs/architecture", label: "Review tradeoff analysis" },
       },
       {
         id: "partial-failure",
@@ -221,7 +254,9 @@ export const phaseQuizzes: Record<number, PhaseQuizDefinition> = {
           "Because it only affects stateless services"
         ],
         correctIndex: 1,
-        explanation: "Partial failure is dangerous because parts of the system still appear healthy while the overall behavior degrades."
+        explanation: "Partial failure is dangerous because parts of the system still appear healthy while the overall behavior degrades.",
+        concept: "Partial failure",
+        redirect: { href: "/phase-4", label: "Review failure-mode reasoning" },
       }
     ]
   },
@@ -241,7 +276,9 @@ export const phaseQuizzes: Record<number, PhaseQuizDefinition> = {
           "GitHub stars"
         ],
         correctIndex: 1,
-        explanation: "MRR is the north star for SaaS — it represents predictable, recurring income that compounds over time."
+        explanation: "MRR is the north star for SaaS — it represents predictable, recurring income that compounds over time.",
+        concept: "SaaS metrics",
+        redirect: { href: "/phase-7", label: "Review monetisation metrics" },
       },
       {
         id: "mvp-scope",
@@ -253,7 +290,9 @@ export const phaseQuizzes: Record<number, PhaseQuizDefinition> = {
           "At least 20 API endpoints"
         ],
         correctIndex: 1,
-        explanation: "An MVP is the smallest thing someone will pay for. Auth, one core feature, and payment is the proven formula."
+        explanation: "An MVP is the smallest thing someone will pay for. Auth, one core feature, and payment is the proven formula.",
+        concept: "MVP scope",
+        redirect: { href: "/phase-7", label: "Review MVP scoping" },
       },
       {
         id: "pricing-strategy",
@@ -265,7 +304,9 @@ export const phaseQuizzes: Record<number, PhaseQuizDefinition> = {
           "To prevent competitors from copying you"
         ],
         correctIndex: 1,
-        explanation: "Paying customers prove demand. Free users will say they love it but never convert. Payment is the ultimate validation."
+        explanation: "Paying customers prove demand. Free users will say they love it but never convert. Payment is the ultimate validation.",
+        concept: "Pricing signal",
+        redirect: { href: "/phase-7", label: "Review pricing strategy" },
       }
     ]
   },
@@ -285,7 +326,9 @@ export const phaseQuizzes: Record<number, PhaseQuizDefinition> = {
           "Not using GPU for inference"
         ],
         correctIndex: 1,
-        explanation: "Model loading can take 5-30 seconds. Loading on every request makes the API unusable. Load once at startup and hold in memory."
+        explanation: "Model loading can take 5-30 seconds. Loading on every request makes the API unusable. Load once at startup and hold in memory.",
+        concept: "Model serving",
+        redirect: { href: "/phase-8", label: "Review production ML serving" },
       },
       {
         id: "training-serving-skew",
@@ -297,7 +340,9 @@ export const phaseQuizzes: Record<number, PhaseQuizDefinition> = {
           "When the model file is too large for the container"
         ],
         correctIndex: 2,
-        explanation: "Training-serving skew is the #1 silent killer of ML models. Feature stores exist to ensure the model sees the same features in training and production."
+        explanation: "Training-serving skew is the #1 silent killer of ML models. Feature stores exist to ensure the model sees the same features in training and production.",
+        concept: "Training-serving skew",
+        redirect: { href: "/phase-8", label: "Review feature consistency" },
       },
       {
         id: "data-drift",
@@ -309,7 +354,9 @@ export const phaseQuizzes: Record<number, PhaseQuizDefinition> = {
           "The database connection pool is exhausted"
         ],
         correctIndex: 2,
-        explanation: "A sudden change in prediction distribution almost always means the input data has shifted. This is data drift, and it's why ML monitoring focuses on input distributions."
+        explanation: "A sudden change in prediction distribution almost always means the input data has shifted. This is data drift, and it's why ML monitoring focuses on input distributions.",
+        concept: "Data drift",
+        redirect: { href: "/phase-8", label: "Review ML monitoring" },
       },
       {
         id: "ab-testing",
@@ -321,7 +368,9 @@ export const phaseQuizzes: Record<number, PhaseQuizDefinition> = {
           "It violates GDPR regulations"
         ],
         correctIndex: 1,
-        explanation: "Peeking and stopping early is called 'optional stopping' and it dramatically inflates false positives. Pre-commit to a run duration based on sample size calculations."
+        explanation: "Peeking and stopping early is called 'optional stopping' and it dramatically inflates false positives. Pre-commit to a run duration based on sample size calculations.",
+        concept: "A/B test validity",
+        redirect: { href: "/phase-8", label: "Review experimentation rigor" },
       }
     ]
   }
@@ -341,10 +390,11 @@ export function getSanitizedPhaseQuiz(phaseNumber: number) {
     description: quiz.description,
     xpPerCorrect: quiz.xpPerCorrect,
     totalQuestions: quiz.questions.length,
-    questions: quiz.questions.map(({ id, prompt, options }) => ({
+    questions: quiz.questions.map(({ id, prompt, options, concept }) => ({
       id,
       prompt,
       options,
+      concept,
     })),
   }
 }
@@ -366,6 +416,8 @@ export function gradePhaseQuiz(
       correctIndex: question.correctIndex,
       isCorrect,
       explanation: question.explanation,
+      concept: question.concept,
+      redirect: question.redirect ?? null,
     }
   })
 
