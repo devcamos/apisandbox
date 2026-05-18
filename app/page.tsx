@@ -21,7 +21,7 @@ import Link from "next/link";
 import { useSession } from "@/components/providers/SessionProvider";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
-import { ArrowRight, Check, Star, Shield, Zap, BookOpen, BarChart3, Lock } from "lucide-react";
+import { ArrowRight, Check, Star, Shield, Zap, BookOpen, BarChart3, Lock, Layers3, Route, Drill, FlaskConical } from "lucide-react";
 
 export default function Home() {
   const { data: session, status } = useSession();
@@ -80,86 +80,135 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Pareto Principle Methodology Section */}
+      {/* How It Works Section */}
       <section className="container mx-auto px-6 py-16">
-        <div className="bg-gradient-to-br from-yellow-500/20 via-orange-500/20 to-red-500/20 border-2 border-yellow-500/30 rounded-2xl p-8 md:p-12 mb-16">
+        <div className="bg-gradient-to-br from-cyan-500/15 via-slate-800 to-orange-500/15 border border-cyan-500/20 rounded-3xl p-8 md:p-12 mb-16 shadow-[0_20px_80px_rgba(15,23,42,0.35)]">
           <div className="max-w-4xl mx-auto">
             <div className="flex items-center gap-4 mb-6">
-              <div className="p-4 bg-yellow-500/20 rounded-xl">
-                <span className="text-4xl">📊</span>
+              <div className="p-4 bg-cyan-500/15 rounded-2xl border border-cyan-400/20">
+                <Layers3 className="w-8 h-8 text-cyan-300" />
               </div>
               <div>
                 <h2 className="text-3xl md:text-4xl font-bold text-white mb-2">
-                  Powered by the Pareto Principle
+                  How API Sandbox works
                 </h2>
                 <p className="text-lg text-gray-300">
-                  The 80/20 Rule: Master the 20% that delivers 80% of results
+                  Learn the app dynamics before you sign up: what we teach first, how we connect concepts, and how you build production instincts.
                 </p>
               </div>
             </div>
-            
-            <div className="grid md:grid-cols-2 gap-6 mb-8">
-              <div className="bg-slate-800/70 rounded-xl p-6 border border-slate-700">
-                <h3 className="text-xl font-bold text-yellow-400 mb-3 flex items-center gap-2">
-                  <span>🎯</span> Content Selection Engine
-                </h3>
-                <p className="text-gray-300 mb-4">
-                  Every concept in this training is carefully selected using the Pareto Principle. We identify the <strong className="text-white">20% of concepts</strong> that solve <strong className="text-white">80% of real-world API integration challenges</strong>.
+
+            <div className="grid md:grid-cols-2 xl:grid-cols-4 gap-5 mb-8">
+              <div className="bg-slate-900/60 rounded-2xl p-6 border border-slate-700">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-10 h-10 rounded-xl bg-cyan-500/15 border border-cyan-400/20 flex items-center justify-center">
+                    <Layers3 className="w-5 h-5 text-cyan-300" />
+                  </div>
+                  <div>
+                    <div className="text-xs uppercase tracking-[0.18em] text-cyan-300/80">Step 1</div>
+                    <h3 className="text-lg font-bold text-white">Learn the critical concept</h3>
+                  </div>
+                </div>
+                <p className="text-sm text-gray-300">
+                  Start with the smallest set of ideas that explain most API behavior: HTTP semantics, auth, retries, validation, and observability.
                 </p>
-                <ul className="space-y-2 text-sm text-gray-300">
-                  <li className="flex items-start gap-2">
-                    <span className="text-yellow-400 font-bold">✓</span>
-                    <span>Focus on high-impact patterns used in 80% of integrations</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="text-yellow-400 font-bold">✓</span>
-                    <span>Skip edge cases that rarely occur in practice</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="text-yellow-400 font-bold">✓</span>
-                    <span>Prioritize concepts that unlock multiple use cases</span>
-                  </li>
-                </ul>
               </div>
-              
-              <div className="bg-slate-800/70 rounded-xl p-6 border border-slate-700">
-                <h3 className="text-xl font-bold text-orange-400 mb-3 flex items-center gap-2">
-                  <span>🚀</span> Deep Dive for Growth
-                </h3>
-                <p className="text-gray-300 mb-4">
-                  Once we've identified the vital 20%, we provide <strong className="text-white">comprehensive deep dives</strong> to ensure you truly master each concept and can apply it confidently in production.
+
+              <div className="bg-slate-900/60 rounded-2xl p-6 border border-slate-700">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-10 h-10 rounded-xl bg-blue-500/15 border border-blue-400/20 flex items-center justify-center">
+                    <Route className="w-5 h-5 text-blue-300" />
+                  </div>
+                  <div>
+                    <div className="text-xs uppercase tracking-[0.18em] text-blue-300/80">Step 2</div>
+                    <h3 className="text-lg font-bold text-white">See where it appears</h3>
+                  </div>
+                </div>
+                <p className="text-sm text-gray-300">
+                  Every concept is tied to real workflows like OAuth callbacks, API keys, webhooks, persistence, and service-to-service communication.
                 </p>
-                <ul className="space-y-2 text-sm text-gray-300">
-                  <li className="flex items-start gap-2">
-                    <span className="text-orange-400 font-bold">✓</span>
-                    <span>Detailed documentation with real-world examples</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="text-orange-400 font-bold">✓</span>
-                    <span>Interactive demos to reinforce understanding</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="text-orange-400 font-bold">✓</span>
-                    <span>Practical use cases and best practices</span>
-                  </li>
-                </ul>
+              </div>
+
+              <div className="bg-slate-900/60 rounded-2xl p-6 border border-slate-700">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-10 h-10 rounded-xl bg-orange-500/15 border border-orange-400/20 flex items-center justify-center">
+                    <Drill className="w-5 h-5 text-orange-300" />
+                  </div>
+                  <div>
+                    <div className="text-xs uppercase tracking-[0.18em] text-orange-300/80">Step 3</div>
+                    <h3 className="text-lg font-bold text-white">Go deeper when needed</h3>
+                  </div>
+                </div>
+                <p className="text-sm text-gray-300">
+                  Expand into docs, examples, framework mappings, failure modes, and production tradeoffs only when the concept matters to your current task.
+                </p>
+              </div>
+
+              <div className="bg-slate-900/60 rounded-2xl p-6 border border-slate-700">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-10 h-10 rounded-xl bg-emerald-500/15 border border-emerald-400/20 flex items-center justify-center">
+                    <FlaskConical className="w-5 h-5 text-emerald-300" />
+                  </div>
+                  <div>
+                    <div className="text-xs uppercase tracking-[0.18em] text-emerald-300/80">Step 4</div>
+                    <h3 className="text-lg font-bold text-white">Apply it in context</h3>
+                  </div>
+                </div>
+                <p className="text-sm text-gray-300">
+                  Use demos, labs, and the assistant to connect the idea to production behavior so you can implement it, not just recognise the term.
+                </p>
               </div>
             </div>
-            
-            <div className="bg-gradient-to-r from-blue-500/10 to-purple-500/10 rounded-xl p-6 border border-blue-500/20">
-              <h3 className="text-lg font-bold text-white mb-3">💡 How It Works</h3>
-              <div className="grid md:grid-cols-3 gap-4 text-sm">
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-blue-400 mb-2">1</div>
-                  <p className="text-gray-300">Identify the 20% of concepts that solve 80% of problems</p>
+
+            <div className="grid lg:grid-cols-[1.2fr_0.8fr] gap-6">
+              <div className="bg-gradient-to-r from-slate-900/80 to-slate-800/80 rounded-2xl p-6 border border-slate-700">
+                <h3 className="text-lg font-bold text-white mb-4">Example path: from concept to production instinct</h3>
+                <div className="flex flex-col md:flex-row md:items-center gap-3 text-sm">
+                  <div className="rounded-xl border border-cyan-500/20 bg-cyan-500/10 px-4 py-3 text-cyan-100 font-semibold">
+                    OAuth callback
+                  </div>
+                  <ArrowRight className="w-4 h-4 text-slate-500 hidden md:block" />
+                  <div className="rounded-xl border border-blue-500/20 bg-blue-500/10 px-4 py-3 text-blue-100 font-semibold">
+                    Auth flow + redirects
+                  </div>
+                  <ArrowRight className="w-4 h-4 text-slate-500 hidden md:block" />
+                  <div className="rounded-xl border border-orange-500/20 bg-orange-500/10 px-4 py-3 text-orange-100 font-semibold">
+                    Retry + error handling
+                  </div>
+                  <ArrowRight className="w-4 h-4 text-slate-500 hidden md:block" />
+                  <div className="rounded-xl border border-emerald-500/20 bg-emerald-500/10 px-4 py-3 text-emerald-100 font-semibold">
+                    Production-safe implementation
+                  </div>
                 </div>
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-purple-400 mb-2">2</div>
-                  <p className="text-gray-300">Structure content around these high-impact concepts</p>
-                </div>
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-pink-400 mb-2">3</div>
-                  <p className="text-gray-300">Deep dive into each concept to ensure mastery</p>
+                <p className="mt-4 text-sm text-gray-300">
+                  The app does not teach isolated terms. It shows how one concept expands into routing, auth boundaries, retry rules, and real deployment decisions.
+                </p>
+              </div>
+
+              <div className="bg-gradient-to-br from-cyan-500/10 to-purple-500/10 rounded-2xl p-6 border border-cyan-500/20">
+                <h3 className="text-lg font-bold text-white mb-3">What you get before signup</h3>
+                <ul className="space-y-3 text-sm text-gray-300">
+                  <li className="flex items-start gap-3">
+                    <Check className="w-4 h-4 text-cyan-300 mt-0.5 shrink-0" />
+                    A clear mental model of how the curriculum progresses
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <Check className="w-4 h-4 text-cyan-300 mt-0.5 shrink-0" />
+                    Concrete examples of what each phase unlocks
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <Check className="w-4 h-4 text-cyan-300 mt-0.5 shrink-0" />
+                    A faster path from concept recognition to production judgment
+                  </li>
+                </ul>
+                <div className="mt-5">
+                  <Link
+                    href="/start"
+                    className="inline-flex items-center gap-2 rounded-xl border border-cyan-400/20 bg-cyan-500/10 px-4 py-3 text-sm font-semibold text-cyan-100 hover:bg-cyan-500/15 transition-all"
+                  >
+                    Preview the learning path
+                    <ArrowRight className="w-4 h-4" />
+                  </Link>
                 </div>
               </div>
             </div>

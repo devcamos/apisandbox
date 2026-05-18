@@ -2,8 +2,9 @@
 
 import Link from "next/link"
 import { useCallback, useEffect, useMemo, useState } from "react"
-import { Trophy, CheckCircle2, AlertCircle, Lock } from "lucide-react"
+import { CheckCircle2, AlertCircle, Lock, Route, Target, TrendingUp } from "lucide-react"
 import { useSession } from "@/components/providers/SessionProvider"
+import { masteryLabel, masterySummary, recommendedRedirects } from "@/lib/learning/phase-quiz-insights"
 
 interface PhaseQuizProps {
   phaseNumber: number
@@ -14,6 +15,7 @@ interface QuizQuestion {
   id: string
   prompt: string
   options: string[]
+  concept: string
 }
 
 interface QuizPayload {
@@ -132,6 +134,11 @@ interface SubmissionResult {
     correctIndex: number
     isCorrect: boolean
     explanation: string
+    concept: string
+    redirect?: {
+      href: string
+      label: string
+    } | null
   }>
 }
 
@@ -196,6 +203,14 @@ export default function PhaseQuiz({ phaseNumber, accentClass }: PhaseQuizProps) 
   }, [phaseNumber, status])
 
   const answeredCount = useMemo(() => Object.keys(answers).length, [answers])
+  const mastery = useMemo(() => {
+    if (!result) return null
+    return {
+      label: masteryLabel(result.correctAnswers, result.totalQuestions),
+      ...masterySummary(result.details),
+      redirects: recommendedRedirects(result.details),
+    }
+  }, [result])
 
   const selectQuizOption = useCallback((questionId: string, optionIndex: number) => {
     setAnswers((prev) => ({ ...prev, [questionId]: optionIndex }))
@@ -235,12 +250,12 @@ export default function PhaseQuiz({ phaseNumber, accentClass }: PhaseQuizProps) 
     return (
       <section className="mb-12">
         <div className="bg-slate-800/50 border border-slate-700 rounded-2xl p-8">
-          <div className="flex items-center gap-3 mb-4">
-            <Lock className="w-6 h-6 text-yellow-400" />
-            <h2 className="text-3xl font-bold text-white">Phase Quiz & XP</h2>
-          </div>
+            <div className="flex items-center gap-3 mb-4">
+              <Lock className="w-6 h-6 text-yellow-400" />
+              <h2 className="text-3xl font-bold text-white">Phase mastery checkpoint</h2>
+            </div>
           <p className="text-gray-300 mb-4">
-            Sign in to take the phase quiz, earn XP, and keep progress tied to your account.
+            Sign in to run the checkpoint, see where your understanding is strong, and keep progress tied to your account.
           </p>
           <Link
             href="/login"
@@ -281,21 +296,26 @@ export default function PhaseQuiz({ phaseNumber, accentClass }: PhaseQuizProps) 
         <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between mb-6">
           <div>
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-900 border border-slate-700 text-sm text-gray-300 mb-3">
-              <Trophy className="w-4 h-4 text-yellow-400" />
-              Phase quiz
+              <Target className="w-4 h-4 text-cyan-400" />
+              Mastery checkpoint
             </div>
             <h2 className="text-3xl font-bold text-white mb-2">{quiz.title}</h2>
             <p className="text-gray-300">{quiz.description}</p>
+            <p className="text-sm text-slate-400 mt-3">
+              Use this as a short diagnostic: retrieve what you know, inspect the explanations, then revisit weak spots before moving on.
+            </p>
           </div>
           <div className="grid grid-cols-2 gap-3 min-w-full lg:min-w-[320px]">
             <div className="bg-slate-900/60 border border-slate-700 rounded-xl p-4">
-              <div className="text-xs uppercase tracking-wide text-gray-400">Best XP</div>
-              <div className="text-2xl font-bold text-white">{progress?.xpEarned ?? 0}</div>
-            </div>
-            <div className="bg-slate-900/60 border border-slate-700 rounded-xl p-4">
-              <div className="text-xs uppercase tracking-wide text-gray-400">Best score</div>
+              <div className="text-xs uppercase tracking-wide text-gray-400">Best checkpoint</div>
               <div className="text-2xl font-bold text-white">
                 {progress?.correctAnswers ?? 0}/{quiz.totalQuestions}
+              </div>
+            </div>
+            <div className="bg-slate-900/60 border border-slate-700 rounded-xl p-4">
+              <div className="text-xs uppercase tracking-wide text-gray-400">Attempts</div>
+              <div className="text-2xl font-bold text-white">
+                {progress?.attempts ?? 0}
               </div>
             </div>
           </div>
@@ -316,7 +336,7 @@ export default function PhaseQuiz({ phaseNumber, accentClass }: PhaseQuizProps) 
 
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between mt-8">
           <div className="text-sm text-gray-400">
-            {answeredCount}/{quiz.totalQuestions} answered • {quiz.xpPerCorrect} XP per correct answer
+            {answeredCount}/{quiz.totalQuestions} answered • short diagnostic, scenario-first, explanation-heavy
           </div>
           <button
             onClick={() => void submitQuiz()}
@@ -327,18 +347,60 @@ export default function PhaseQuiz({ phaseNumber, accentClass }: PhaseQuizProps) 
                 : "bg-slate-700 cursor-not-allowed"
             }`}
           >
-            {submitting ? "Submitting..." : "Submit for XP"}
+            {submitting ? "Checking..." : "Check my understanding"}
           </button>
         </div>
 
         {result && (
           <div className="mt-6 bg-slate-900/60 border border-slate-700 rounded-xl p-5">
-            <h3 className="text-xl font-bold text-white mb-2">Attempt result</h3>
+            <h3 className="text-xl font-bold text-white mb-2">Checkpoint result</h3>
             <p className="text-gray-300">
-              You scored <strong className="text-white">{result.correctAnswers}/{result.totalQuestions}</strong> and earned{" "}
-              <strong className="text-yellow-300">{result.xpEarned} XP</strong> for this attempt.
-              Best stored XP for this phase: <strong className="text-white">{progress?.xpEarned ?? result.xpEarned}</strong>.
+              You got <strong className="text-white">{result.correctAnswers}/{result.totalQuestions}</strong> correct.
+              Current reading: <strong className="text-cyan-200">{mastery?.label}</strong>.
             </p>
+            {mastery ? (
+              <div className="mt-5 grid gap-4 lg:grid-cols-3">
+                <div className="rounded-xl border border-emerald-500/20 bg-emerald-500/5 p-4">
+                  <div className="flex items-center gap-2 text-sm font-semibold text-white mb-2">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                    Stronger areas
+                  </div>
+                  <div className="text-sm text-gray-300">
+                    {mastery.strengths.length ? mastery.strengths.join(", ") : "No clear strengths yet from this attempt."}
+                  </div>
+                </div>
+                <div className="rounded-xl border border-amber-500/20 bg-amber-500/5 p-4">
+                  <div className="flex items-center gap-2 text-sm font-semibold text-white mb-2">
+                    <TrendingUp className="w-4 h-4 text-amber-400" />
+                    Revisit next
+                  </div>
+                  <div className="text-sm text-gray-300">
+                    {mastery.gaps.length ? mastery.gaps.join(", ") : "No urgent gaps from this attempt."}
+                  </div>
+                </div>
+                <div className="rounded-xl border border-cyan-500/20 bg-cyan-500/5 p-4">
+                  <div className="flex items-center gap-2 text-sm font-semibold text-white mb-2">
+                    <Route className="w-4 h-4 text-cyan-400" />
+                    Best next move
+                  </div>
+                  <div className="flex flex-col gap-2">
+                    {mastery.redirects.length ? (
+                      mastery.redirects.map((redirect) => (
+                        <Link
+                          key={redirect.href}
+                          href={redirect.href}
+                          className="inline-flex items-center rounded-lg border border-cyan-500/20 bg-slate-950/40 px-3 py-2 text-sm text-cyan-100 hover:bg-slate-900/70 transition-colors"
+                        >
+                          {redirect.label}
+                        </Link>
+                      ))
+                    ) : (
+                      <span className="text-sm text-gray-300">Move on to the next phase or retake this checkpoint later.</span>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ) : null}
           </div>
         )}
 

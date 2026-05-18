@@ -1,54 +1,57 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from "@playwright/test";
 
-test.describe('Homepage', () => {
+test.describe("Homepage", () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/');
+    await page.goto("/");
   });
 
-  test('should display the main title and description', async ({ page }) => {
-    await expect(page.getByRole('heading', { name: 'API Integration Training' })).toBeVisible();
-    await expect(page.getByText('Master the art of API integrations from fundamentals to principal-level architecture')).toBeVisible();
+  test("shows the hero and primary entry CTAs", async ({ page }) => {
+    await expect(page.getByRole("heading", { name: "API Integration Training" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Master API Integrations" })).toBeVisible();
+
+    const exploreHero = page.getByRole("link", { name: /^Explore Free$/ }).first();
+    await expect(exploreHero).toHaveAttribute("href", "/signup");
+
+    await expect(page.getByRole("main").getByRole("link", { name: "Sign In" })).toHaveAttribute(
+      "href",
+      "/login",
+    );
   });
 
-  test('should have working Start Learning button', async ({ page }) => {
-    const startButton = page.getByRole('link', { name: 'Start Learning' });
-    await expect(startButton).toBeVisible();
-    await expect(startButton).toHaveAttribute('href', '/start');
+  test("explains how API Sandbox works before signup", async ({ page }) => {
+    await expect(page.getByRole("heading", { name: "How API Sandbox works" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Learn the critical concept" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "See where it appears" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Go deeper when needed" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Apply it in context" })).toBeVisible();
+
+    await expect(page.getByText("Example path: from concept to production instinct")).toBeVisible();
+    await expect(page.getByText("OAuth callback", { exact: true })).toBeVisible();
+    await expect(page.getByText("Production-safe implementation")).toBeVisible();
+
+    await expect(page.getByRole("link", { name: "Preview the learning path" })).toHaveAttribute(
+      "href",
+      "/start",
+    );
   });
 
-  test('should have working View Dashboard button', async ({ page }) => {
-    const dashboardButton = page.getByRole('link', { name: 'View Dashboard' });
-    await expect(dashboardButton).toBeVisible();
-    await expect(dashboardButton).toHaveAttribute('href', '/observability');
+  test("shows core marketing sections and final CTA", async ({ page }) => {
+    await expect(page.getByRole("heading", { name: "Why Choose Our Training?" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "What You'll Master" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Preview Your Learning Path" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Simple Pricing" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Ready to Explore?" })).toBeVisible();
+
+    const finalCta = page.getByRole("link", { name: /^Explore Free$/ }).last();
+    await expect(finalCta).toHaveAttribute("href", "/signup");
   });
 
-  test('should display features section', async ({ page }) => {
-    await expect(page.getByRole('heading', { name: 'Why Choose Our Training?' })).toBeVisible();
-    await expect(page.getByRole('heading', { name: 'Interactive Demos' })).toBeVisible();
-    await expect(page.getByRole('heading', { name: 'Comprehensive Learning' })).toBeVisible();
-    await expect(page.getByRole('heading', { name: 'Real-time Metrics' })).toBeVisible();
-  });
+  test("renders the explainer section on mobile", async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto("/");
 
-  test('should display stats section', async ({ page }) => {
-    await expect(page.getByRole('heading', { name: "What You'll Master" })).toBeVisible();
-    await expect(page.getByText('5')).toBeVisible(); // API Types
-    await expect(page.getByText('10+')).toBeVisible(); // Resilience Patterns
-    await expect(page.getByText('4')).toBeVisible(); // Learning Phases
-    await expect(page.getByText('100%')).toBeVisible(); // Hands-on
-  });
-
-  test('should have final CTA section', async ({ page }) => {
-    await expect(page.getByRole('heading', { name: 'Ready to Start?' })).toBeVisible();
-    const finalCTA = page.getByRole('link', { name: 'Start Your Journey' });
-    await expect(finalCTA).toBeVisible();
-    await expect(finalCTA).toHaveAttribute('href', '/start');
-  });
-
-  test('should be responsive on mobile', async ({ page }) => {
-    await page.setViewportSize({ width: 375, height: 667 });
-    
-    // Check that main elements are still visible
-    await expect(page.getByRole('heading', { name: 'API Integration Training' })).toBeVisible();
-    await expect(page.getByRole('link', { name: 'Start Learning' })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "How API Sandbox works" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Learn the critical concept" })).toBeVisible();
+    await expect(page.getByRole("link", { name: "Preview the learning path" })).toBeVisible();
   });
 });
