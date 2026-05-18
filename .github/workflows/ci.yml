@@ -72,13 +72,49 @@ jobs:
         run: npm ci
 
       - name: Unit tests with coverage
-        run: npm run test:unit -- --coverage
+        run: |
+          mkdir -p reports
+          npx vitest run --coverage --reporter=default --reporter=json --outputFile=reports/vitest-results.json
+
+      - name: Publish unit test summary
+        if: always()
+        run: |
+          node <<'EOF'
+          const fs = require("fs")
+          const path = "reports/vitest-results.json"
+          const summaryFile = process.env.GITHUB_STEP_SUMMARY
+
+          if (!fs.existsSync(path)) {
+            fs.appendFileSync(summaryFile, "## Unit tests\n\nNo unit test report was generated.\n")
+            process.exit(0)
+          }
+
+          const report = JSON.parse(fs.readFileSync(path, "utf8"))
+          const lines = [
+            "## Unit tests",
+            "",
+            `- Passed: ${report.numPassedTests}`,
+            `- Failed: ${report.numFailedTests}`,
+            `- Pending: ${report.numPendingTests}`,
+            `- Total: ${report.numTotalTests}`,
+            `- Suites passed: ${report.numPassedTestSuites}/${report.numTotalTestSuites}`,
+          ]
+          fs.appendFileSync(summaryFile, `${lines.join("\n")}\n`)
+          EOF
 
       - name: Upload coverage artifact
         uses: actions/upload-artifact@v4
         with:
           name: coverage
           path: coverage/
+          if-no-files-found: warn
+
+      - name: Upload unit test report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: unit-test-report
+          path: reports/vitest-results.json
           if-no-files-found: warn
 
   sonarcloud:
@@ -191,7 +227,51 @@ jobs:
         run: npx playwright install chromium --with-deps
 
       - name: Run E2E smoke (Chromium)
-        run: npm run test:ci:smoke
+        run: |
+          mkdir -p reports
+          npx playwright test tests/ci-smoke.spec.ts --project=chromium --reporter=json > reports/playwright-smoke.json
+
+      - name: Publish smoke test summary
+        if: always()
+        run: |
+          node <<'EOF'
+          const fs = require("fs")
+          const path = "reports/playwright-smoke.json"
+          const summaryFile = process.env.GITHUB_STEP_SUMMARY
+
+          if (!fs.existsSync(path)) {
+            fs.appendFileSync(summaryFile, "## E2E smoke tests\n\nNo Playwright smoke report was generated.\n")
+            process.exit(0)
+          }
+
+          const report = JSON.parse(fs.readFileSync(path, "utf8"))
+          const stats = report.stats || {}
+          const passed = stats.expected ?? 0
+          const failed = stats.unexpected ?? 0
+          const flaky = stats.flaky ?? 0
+          const skipped = stats.skipped ?? 0
+          const total = passed + failed + flaky + skipped
+
+          const lines = [
+            "## E2E smoke tests",
+            "",
+            `- Passed: ${passed}`,
+            `- Failed: ${failed}`,
+            `- Flaky: ${flaky}`,
+            `- Skipped: ${skipped}`,
+            `- Total: ${total}`,
+            `- Duration: ${Math.round((stats.duration ?? 0) / 1000)}s`,
+          ]
+          fs.appendFileSync(summaryFile, `${lines.join("\n")}\n`)
+          EOF
+
+      - name: Upload smoke test report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-smoke-report-json
+          path: reports/playwright-smoke.json
+          if-no-files-found: warn
 
       - name: Upload Playwright report
         if: failure()
