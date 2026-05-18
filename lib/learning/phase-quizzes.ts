@@ -62,6 +62,34 @@ export const phaseQuizzes: Record<number, PhaseQuizDefinition> = {
         explanation: "A VM is a software-defined machine backed by underlying physical hardware.",
         concept: "Cloud compute basics",
         redirect: { href: "/phase-0", label: "Review VM and cloud basics" },
+      },
+      {
+        id: "dns-purpose",
+        prompt: "What does DNS primarily do for applications on the internet?",
+        options: [
+          "Encrypts requests between services",
+          "Translates domain names into reachable IP addresses",
+          "Stores JSON payloads for APIs",
+          "Balances CPU across containers"
+        ],
+        correctIndex: 1,
+        explanation: "DNS maps human-readable hostnames to IP addresses so clients can find the right system.",
+        concept: "Networking foundations",
+        redirect: { href: "/phase-0", label: "Review internet and DNS basics" },
+      },
+      {
+        id: "json-role",
+        prompt: "Why is JSON so common in APIs?",
+        options: [
+          "It is a binary protocol optimised for GPUs",
+          "It is lightweight, readable, and supported by nearly every language",
+          "It replaces HTTP status codes",
+          "It automatically validates database schemas"
+        ],
+        correctIndex: 1,
+        explanation: "JSON is widely adopted because it is easy to produce and consume across different languages and systems.",
+        concept: "JSON fundamentals",
+        redirect: { href: "/phase-0", label: "Review core API data formats" },
       }
     ]
   },
@@ -107,6 +135,34 @@ export const phaseQuizzes: Record<number, PhaseQuizDefinition> = {
         explanation: "Events help decouple services and support asynchronous workflows and scale.",
         concept: "Event-driven architecture",
         redirect: { href: "/phase-1", label: "Review event-driven patterns" },
+      },
+      {
+        id: "http-json-default",
+        prompt: "Why do most modern beginner-friendly APIs start with HTTP plus JSON?",
+        options: [
+          "Because browsers cannot read any other format",
+          "Because they create a widely interoperable default across languages and platforms",
+          "Because they remove the need for versioning",
+          "Because they guarantee lower latency than gRPC"
+        ],
+        correctIndex: 1,
+        explanation: "HTTP plus JSON is the easiest shared contract across teams, platforms, and languages, which is why it becomes the default starting point.",
+        concept: "Universal API standards",
+        redirect: { href: "/phase-1", label: "Review universal standards" },
+      },
+      {
+        id: "sync-vs-async-choice",
+        prompt: "When is a synchronous API call usually the better default than async messaging?",
+        options: [
+          "When the caller needs an immediate response to continue",
+          "When you want producers and consumers to be loosely coupled in time",
+          "When duplicate handling is too easy",
+          "When you never want retries"
+        ],
+        correctIndex: 0,
+        explanation: "If the caller cannot continue without the response, a synchronous request/response pattern is usually the right starting point.",
+        concept: "Sync request-response",
+        redirect: { href: "/phase-1", label: "Review integration decision making" },
       }
     ]
   },
@@ -157,6 +213,34 @@ export const phaseQuizzes: Record<number, PhaseQuizDefinition> = {
         explanation: "A circuit breaker protects your system by failing fast when a dependency is unhealthy.",
         concept: "Circuit breakers",
         redirect: { href: "/phase-2/demos/circuit-breaker", label: "Open the circuit-breaker demo" },
+      },
+      {
+        id: "idempotency-purpose",
+        prompt: "Why is idempotency important when calling external APIs with retries?",
+        options: [
+          "It guarantees faster JSON serialization",
+          "It helps repeated requests avoid creating duplicate side effects",
+          "It removes the need for authentication",
+          "It prevents rate limits from happening"
+        ],
+        correctIndex: 1,
+        explanation: "Idempotency protects operations like payments or order creation from accidental duplication when retries happen.",
+        concept: "Idempotency",
+        redirect: { href: "/phase-2/demos/retry", label: "Review retry safety" },
+      },
+      {
+        id: "token-vs-key",
+        prompt: "What is a practical difference between OAuth2 tokens and simple API keys?",
+        options: [
+          "OAuth2 tokens support delegated access and expiry semantics",
+          "API keys can only be used over WebSocket",
+          "OAuth2 removes the need for HTTPS",
+          "API keys always provide user-specific consent screens"
+        ],
+        correctIndex: 0,
+        explanation: "OAuth2 is built for delegated access, consent, and scoped expiry. API keys are simpler but usually less expressive.",
+        concept: "Auth model selection",
+        redirect: { href: "/phase-2/demos/oauth2", label: "Review OAuth2 vs API keys" },
       }
     ]
   },
@@ -207,6 +291,34 @@ export const phaseQuizzes: Record<number, PhaseQuizDefinition> = {
         explanation: "Event systems can redeliver messages, so handlers must tolerate duplicate processing.",
         concept: "Idempotency in event systems",
         redirect: { href: "/phase-3", label: "Review event-driven safety" },
+      },
+      {
+        id: "correlation-id-purpose",
+        prompt: "Why do teams add correlation IDs to requests and events?",
+        options: [
+          "To compress payloads before transport",
+          "To connect logs and traces across multiple hops",
+          "To replace authentication headers",
+          "To avoid database transactions"
+        ],
+        correctIndex: 1,
+        explanation: "Correlation IDs let you follow one request path through services, logs, and queues during debugging and incident response.",
+        concept: "Correlation IDs",
+        redirect: { href: "/observability", label: "Review correlation and tracing" },
+      },
+      {
+        id: "queue-benefit",
+        prompt: "What is a major benefit of introducing a queue between services?",
+        options: [
+          "It guarantees zero failures",
+          "It smooths bursts and decouples producer speed from consumer speed",
+          "It removes the need for monitoring",
+          "It makes every workflow synchronous"
+        ],
+        correctIndex: 1,
+        explanation: "Queues absorb bursts and let consumers process work at their own pace, which improves resilience under load.",
+        concept: "Queue decoupling",
+        redirect: { href: "/phase-3", label: "Review service decoupling patterns" },
       }
     ]
   },
@@ -257,6 +369,34 @@ export const phaseQuizzes: Record<number, PhaseQuizDefinition> = {
         explanation: "Partial failure is dangerous because parts of the system still appear healthy while the overall behavior degrades.",
         concept: "Partial failure",
         redirect: { href: "/phase-4", label: "Review failure-mode reasoning" },
+      },
+      {
+        id: "bottleneck-thinking",
+        prompt: "Why should architecture reviews identify bottlenecks early?",
+        options: [
+          "Because the slowest or most fragile part often determines overall system behavior",
+          "Because bottlenecks only matter after launch",
+          "Because queues automatically remove all bottlenecks",
+          "Because bottlenecks only exist in databases"
+        ],
+        correctIndex: 0,
+        explanation: "Systems are constrained by their weakest or slowest links, so good architecture identifies those limits before scaling pain appears.",
+        concept: "System bottlenecks",
+        redirect: { href: "/docs/architecture", label: "Review system constraints" },
+      },
+      {
+        id: "operability-proof",
+        prompt: "What makes an architecture production-ready beyond the diagram itself?",
+        options: [
+          "Having many premium vendor tools",
+          "Clear observability, failure handling, and operational runbooks",
+          "Using only synchronous REST",
+          "Avoiding all third-party dependencies"
+        ],
+        correctIndex: 1,
+        explanation: "A design is only production-ready if operators can observe it, respond to failure, and run it safely over time.",
+        concept: "Operability",
+        redirect: { href: "/docs/architecture", label: "Review production readiness" },
       }
     ]
   },
@@ -307,6 +447,34 @@ export const phaseQuizzes: Record<number, PhaseQuizDefinition> = {
         explanation: "Paying customers prove demand. Free users will say they love it but never convert. Payment is the ultimate validation.",
         concept: "Pricing signal",
         redirect: { href: "/phase-7", label: "Review pricing strategy" },
+      },
+      {
+        id: "retention-meaning",
+        prompt: "Why is retention more valuable than a spike in signups?",
+        options: [
+          "Because retained users prove recurring value and product fit",
+          "Because signups never matter",
+          "Because retention replaces pricing strategy",
+          "Because investors only track retention charts"
+        ],
+        correctIndex: 0,
+        explanation: "Retention shows that users continue getting value, which is a stronger signal than one-time acquisition.",
+        concept: "Retention",
+        redirect: { href: "/phase-7", label: "Review product-market fit signals" },
+      },
+      {
+        id: "distribution-choice",
+        prompt: "What should usually come before scaling growth channels aggressively?",
+        options: [
+          "A validated offer with evidence someone will pay",
+          "A complete enterprise feature set",
+          "A larger infrastructure budget",
+          "A second product line"
+        ],
+        correctIndex: 0,
+        explanation: "Growth amplifies what already works. Without a validated offer, scaling distribution just accelerates waste.",
+        concept: "Distribution readiness",
+        redirect: { href: "/phase-7", label: "Review go-to-market foundations" },
       }
     ]
   },
@@ -371,6 +539,20 @@ export const phaseQuizzes: Record<number, PhaseQuizDefinition> = {
         explanation: "Peeking and stopping early is called 'optional stopping' and it dramatically inflates false positives. Pre-commit to a run duration based on sample size calculations.",
         concept: "A/B test validity",
         redirect: { href: "/phase-8", label: "Review experimentation rigor" },
+      },
+      {
+        id: "feature-store-purpose",
+        prompt: "Why do teams introduce a feature store in production ML systems?",
+        options: [
+          "To guarantee that models always use GPUs",
+          "To keep feature definitions consistent between training and serving",
+          "To replace model monitoring entirely",
+          "To make labeling unnecessary"
+        ],
+        correctIndex: 1,
+        explanation: "Feature stores help ensure that the same feature logic is reused consistently across training and serving environments.",
+        concept: "Feature consistency",
+        redirect: { href: "/phase-8", label: "Review training-serving consistency" },
       }
     ]
   }

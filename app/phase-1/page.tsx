@@ -83,9 +83,9 @@ export default function Phase1() {
         </div>
       </div>
 
-      {/* Universal Technologies Section */}
+      {/* Universal Standards Section */}
       <section className="mb-12">
-        <h2 className="text-3xl font-bold text-white mb-6">Universal Technologies: The Foundation of Modern APIs</h2>
+        <h2 className="text-3xl font-bold text-white mb-6">Universal Standards: The Foundation of Modern APIs</h2>
         
         {/* Introduction */}
         <div className="bg-gradient-to-br from-indigo-500/10 to-purple-500/10 border-2 border-indigo-500/30 rounded-xl p-6 mb-6">

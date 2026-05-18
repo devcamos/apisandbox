@@ -736,29 +736,6 @@ export default function Phase0() {
       </section>
 
       <PhaseQuiz phaseNumber={0} accentClass="from-green-500 to-emerald-500" />
-
-      {/* Next Steps */}
-      <section className="mb-12">
-        <div className="bg-gradient-to-r from-green-500/20 to-emerald-500/20 rounded-xl p-6 border border-green-500/30">
-          <h2 className="text-2xl font-bold text-white mb-4">✅ What's Next?</h2>
-          <p className="text-gray-300 mb-4">
-            Once you've mastered these fundamentals, you're ready to move on to Phase 1: Integration Mindset. 
-            These concepts will be used throughout all phases.
-          </p>
-          <div className="flex items-center gap-4">
-            <a
-              href="/phase-1"
-              className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-500 to-cyan-500 text-white rounded-lg font-semibold hover:shadow-lg transition-all"
-            >
-              Continue to Phase 1
-              <Zap className="w-5 h-5" />
-            </a>
-            <span className="text-gray-400 text-sm">
-              Phase 1 is also free and builds on these fundamentals
-            </span>
-          </div>
-        </div>
-      </section>
     </PhaseLayout>
   );
 }

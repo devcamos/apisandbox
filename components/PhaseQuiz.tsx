@@ -11,6 +11,34 @@ interface PhaseQuizProps {
   accentClass: string
 }
 
+const phaseNextSteps: Record<number, { href: string; cta: string; note: string }> = {
+  0: {
+    href: "/phase-1",
+    cta: "Continue to Phase 1",
+    note: "Phase 1 is also free and builds directly on these fundamentals.",
+  },
+  1: {
+    href: "/phase-2",
+    cta: "Continue to Phase 2",
+    note: "Phase 2 turns these standards and patterns into real third-party integration practice.",
+  },
+  2: {
+    href: "/phase-3",
+    cta: "Continue to Phase 3",
+    note: "Phase 3 shifts from single integrations to service-to-service communication and observability.",
+  },
+  3: {
+    href: "/phase-4",
+    cta: "Continue to Phase 4",
+    note: "Phase 4 raises the bar from service mechanics to architecture-level judgement.",
+  },
+  4: {
+    href: "/phase-5",
+    cta: "Continue to Phase 5",
+    note: "Phase 5 moves from architectural judgement into production-grade problem solving and execution.",
+  },
+}
+
 interface QuizQuestion {
   id: string
   prompt: string
@@ -211,6 +239,7 @@ export default function PhaseQuiz({ phaseNumber, accentClass }: PhaseQuizProps) 
       redirects: recommendedRedirects(result.details),
     }
   }, [result])
+  const nextStep = phaseNextSteps[phaseNumber] ?? null
 
   const selectQuizOption = useCallback((questionId: string, optionIndex: number) => {
     setAnswers((prev) => ({ ...prev, [questionId]: optionIndex }))
@@ -352,8 +381,9 @@ export default function PhaseQuiz({ phaseNumber, accentClass }: PhaseQuizProps) 
         </div>
 
         {result && (
-          <div className="mt-6 bg-slate-900/60 border border-slate-700 rounded-xl p-5">
-            <h3 className="text-xl font-bold text-white mb-2">Checkpoint result</h3>
+          <div className="mt-6 space-y-6">
+            <div className="bg-slate-900/60 border border-slate-700 rounded-xl p-5">
+              <h3 className="text-xl font-bold text-white mb-2">Checkpoint result</h3>
             <p className="text-gray-300">
               You got <strong className="text-white">{result.correctAnswers}/{result.totalQuestions}</strong> correct.
               Current reading: <strong className="text-cyan-200">{mastery?.label}</strong>.
@@ -398,6 +428,27 @@ export default function PhaseQuiz({ phaseNumber, accentClass }: PhaseQuizProps) 
                       <span className="text-sm text-gray-300">Move on to the next phase or retake this checkpoint later.</span>
                     )}
                   </div>
+                </div>
+              </div>
+            ) : null}
+            </div>
+
+            {nextStep ? (
+              <div className="rounded-xl border border-green-500/30 bg-gradient-to-r from-green-500/15 to-emerald-500/15 p-6">
+                <h3 className="text-2xl font-bold text-white mb-3">✅ What&apos;s Next?</h3>
+                <p className="text-gray-300 mb-4">
+                  {mastery?.label === "Ready for the next phase"
+                    ? "You have enough signal from this checkpoint to move forward. Keep the explanations in mind and build on them in the next phase."
+                    : "You can move forward, but the strongest path is to review the flagged concepts first, then continue once the weak spots feel mechanical instead of fuzzy."}
+                </p>
+                <div className="flex flex-col gap-3 lg:flex-row lg:items-center">
+                  <Link
+                    href={nextStep.href}
+                    className={`inline-flex items-center justify-center gap-2 rounded-lg bg-gradient-to-r px-6 py-3 text-white font-semibold transition-all ${accentClass}`}
+                  >
+                    {nextStep.cta}
+                  </Link>
+                  <span className="text-sm text-gray-300">{nextStep.note}</span>
                 </div>
               </div>
             ) : null}

@@ -33,6 +33,8 @@ test.describe("Phase quiz mastery", () => {
     await page.getByLabel("REST").check()
     await page.getByLabel("When you need ultra-low binary overhead between internal services").check()
     await page.getByLabel("To guarantee immediate consistency everywhere").check()
+    await page.getByLabel("Because browsers cannot read any other format").check()
+    await page.getByLabel("When you want producers and consumers to be loosely coupled in time").check()
 
     await page.getByRole("button", { name: /Check my understanding/i }).click()
 
@@ -41,7 +43,11 @@ test.describe("Phase quiz mastery", () => {
     await expect(page.getByText(/API style selection/i)).toBeVisible()
     await expect(page.getByText(/GraphQL fit/i)).toBeVisible()
     await expect(page.getByText(/Event-driven architecture/i)).toBeVisible()
+    await expect(page.getByText(/Universal API standards/i)).toBeVisible()
+    await expect(page.getByText(/Sync request-response/i)).toBeVisible()
     await expect(page.getByRole("link", { name: /Review GraphQL vs REST/i })).toBeVisible()
+    await expect(page.getByRole("heading", { name: /✅ What's Next\\?/i })).toBeVisible()
+    await expect(page.getByRole("link", { name: /Continue to Phase 2/i })).toBeVisible()
 
     await page.goto("/dashboard")
 
@@ -49,7 +55,7 @@ test.describe("Phase quiz mastery", () => {
     await expect(masterySection.getByRole("heading", { name: /Checkpoint mastery across phases/i })).toBeVisible()
     await expect(masterySection.getByText(/Next focus/i)).toBeVisible()
     const phaseCard = masterySection.getByRole("link", { name: /Integration Mindset/i })
-    await expect(phaseCard).toContainText("Best checkpoint: 1/3")
+    await expect(phaseCard).toContainText("Best checkpoint: 1/5")
     await expect(phaseCard).toContainText("Attempts: 1")
     await expect(phaseCard).toContainText("Needs reinforcement")
   })

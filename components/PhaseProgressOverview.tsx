@@ -135,7 +135,7 @@ export default function PhaseProgressOverview() {
                 <h3 className="font-bold text-white mb-2">{phase.title}</h3>
                 <div className="text-sm text-cyan-100 mb-3">{label}</div>
                 <div className="text-sm text-gray-400 mb-1">
-                  Best checkpoint: <span className="text-white">{item?.correctAnswers ?? 0}/{item?.totalQuestions ?? 3}</span>
+                  Best checkpoint: <span className="text-white">{item?.correctAnswers ?? 0}/{item?.totalQuestions ?? 5}</span>
                 </div>
                 <div className="text-sm text-gray-400 mb-1">
                   Attempts: <span className="text-white">{item?.attempts ?? 0}</span>
