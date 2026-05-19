@@ -11,6 +11,7 @@ import { LessonTracker } from "@/components/LessonTracker";
 import SystemDesignTracker from "@/components/SystemDesignTracker";
 import { Compass, AlertTriangle, Shield, GitMerge, Clock, Archive, Target, Workflow, Gauge, Siren, Scale, BrainCircuit, ArrowRight } from "lucide-react";
 
+import { ExpandableCodeBlock } from "@/components/HighlightedCodeBlock"
 export default function Phase4() {
   return (
     <SubscriptionGate phaseNumber={4} lockedContentName="Phase 4: Principal-Level Architecture">
@@ -344,7 +345,7 @@ export default function Phase4() {
           <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border border-slate-700">
             <h3 className="text-xl font-bold text-white mb-4">Consumer Contract</h3>
             <div className="bg-slate-900/50 p-4 rounded-lg font-mono text-xs text-gray-300 overflow-x-auto">
-              <pre>{`const { Pact } = require('@pact-foundation/pact');
+              <ExpandableCodeBlock code={`const { Pact } = require('@pact-foundation/pact');
 
 const provider = new Pact({
   consumer: 'OrderService',
@@ -372,14 +373,14 @@ describe('User API', () => {
     const user = await fetchUser('123');
     expect(user.name).toBe('John Doe');
   });
-});`}</pre>
+});`} />
             </div>
           </div>
 
           <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border border-slate-700">
             <h3 className="text-xl font-bold text-white mb-4">Provider Verification</h3>
             <div className="bg-slate-900/50 p-4 rounded-lg font-mono text-xs text-gray-300 overflow-x-auto">
-              <pre>{`const { Verifier } = require('@pact-foundation/pact');
+              <ExpandableCodeBlock code={`const { Verifier } = require('@pact-foundation/pact');
 
 describe('Pact Verification', () => {
   it('validates pacts', () => {
@@ -398,7 +399,7 @@ describe('Pact Verification', () => {
       }
     }).verifyProvider();
   });
-});`}</pre>
+});`} />
             </div>
           </div>
         </div>
@@ -413,7 +414,7 @@ describe('Pact Verification', () => {
                 <h4 className="text-lg font-bold text-white">Java Consumer (JUnit)</h4>
               </div>
               <div className="bg-slate-900/50 p-4 rounded-lg font-mono text-xs text-gray-300 overflow-x-auto">
-                <pre>{`import au.com.dius.pact.consumer.MockServer;
+                <ExpandableCodeBlock code={`import au.com.dius.pact.consumer.MockServer;
 import au.com.dius.pact.consumer.dsl.PactDslWithProvider;
 import au.com.dius.pact.consumer.junit5.PactConsumerTestExt;
 import au.com.dius.pact.consumer.junit5.PactTestFor;
@@ -445,7 +446,7 @@ public class UserServiceContractTest {
         
         assertEquals("John Doe", user.getName());
     }
-}`}</pre>
+}`} />
               </div>
             </div>
 
@@ -455,7 +456,7 @@ public class UserServiceContractTest {
                 <h4 className="text-lg font-bold text-white">Java Provider Verification</h4>
               </div>
               <div className="bg-slate-900/50 p-4 rounded-lg font-mono text-xs text-gray-300 overflow-x-auto">
-                <pre>{`import au.com.dius.pact.provider.junit5.PactVerificationContext;
+                <ExpandableCodeBlock code={`import au.com.dius.pact.provider.junit5.PactVerificationContext;
 import au.com.dius.pact.provider.junit5.PactVerificationInvocationContextProvider;
 import au.com.dius.pact.provider.junitsupport.Provider;
 import au.com.dius.pact.provider.junitsupport.State;
@@ -482,7 +483,7 @@ public class UserServiceProviderTest {
         userRepository.save(new User(
             "123", "John Doe", "john@example.com"));
     }
-}`}</pre>
+}`} />
               </div>
             </div>
           </div>
@@ -495,25 +496,33 @@ public class UserServiceProviderTest {
         <div className="grid md:grid-cols-3 gap-6 mb-6">
           <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border border-slate-700">
             <h3 className="text-xl font-bold text-white mb-3">URL Versioning</h3>
-            <div className="bg-slate-900/50 p-3 rounded-lg font-mono text-xs text-gray-300 mb-3">
-              <pre>/api/v1/users{'\n'}/api/v2/users</pre>
-            </div>
+            <ExpandableCodeBlock
+              label="URL versioning example"
+              code={`/api/v1/users
+/api/v2/users`}
+              className="mb-3"
+            />
             <p className="text-sm text-gray-400">Most explicit and widely used</p>
           </div>
 
           <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border border-slate-700">
             <h3 className="text-xl font-bold text-white mb-3">Header Versioning</h3>
-            <div className="bg-slate-900/50 p-3 rounded-lg font-mono text-xs text-gray-300 mb-3">
-              <pre>Accept: application/vnd.api+json;{'\n'}       version=2</pre>
-            </div>
+            <ExpandableCodeBlock
+              label="Header versioning example"
+              code={`Accept: application/vnd.api+json;
+       version=2`}
+              className="mb-3"
+            />
             <p className="text-sm text-gray-400">Clean URLs, follows REST principles</p>
           </div>
 
           <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border border-slate-700">
             <h3 className="text-xl font-bold text-white mb-3">Query Param</h3>
-            <div className="bg-slate-900/50 p-3 rounded-lg font-mono text-xs text-gray-300 mb-3">
-              <pre>/api/users?version=2</pre>
-            </div>
+            <ExpandableCodeBlock
+              label="Query param versioning example"
+              code={`/api/users?version=2`}
+              className="mb-3"
+            />
             <p className="text-sm text-gray-400">Simple, easy to test in browser</p>
           </div>
         </div>
@@ -525,7 +534,7 @@ public class UserServiceProviderTest {
             <div>
               <h4 className="text-lg font-bold text-white mb-3">URL Versioning</h4>
               <div className="bg-slate-900/50 p-4 rounded-lg font-mono text-xs text-gray-300 overflow-x-auto">
-                <pre>{`@RestController
+                <ExpandableCodeBlock code={`@RestController
 @RequestMapping("/api/v1/users")
 public class UserControllerV1 {
     
@@ -550,14 +559,14 @@ public class UserControllerV2 {
             user.getEmail(),
             user.getCreatedAt()));
     }
-}`}</pre>
+}`} />
               </div>
             </div>
 
             <div>
               <h4 className="text-lg font-bold text-white mb-3">Header Versioning</h4>
               <div className="bg-slate-900/50 p-4 rounded-lg font-mono text-xs text-gray-300 overflow-x-auto">
-                <pre>{`@RestController
+                <ExpandableCodeBlock code={`@RestController
 @RequestMapping("/api/users")
 public class UserController {
     
@@ -589,7 +598,7 @@ public class UserController {
         }
         return ResponseEntity.ok(getUserV1(id));
     }
-}`}</pre>
+}`} />
               </div>
             </div>
           </div>
@@ -619,7 +628,7 @@ public class UserController {
               Create an adapter layer to translate between legacy and modern systems, protecting your new code from legacy constraints.
             </p>
             <div className="bg-slate-900/50 p-4 rounded-lg font-mono text-xs text-gray-300">
-              <pre>{`// Anti-corruption layer
+              <ExpandableCodeBlock code={`// Anti-corruption layer
 class LegacyUserAdapter {
   async getUser(id: string): Promise<User> {
     // Legacy SOAP call
@@ -636,7 +645,7 @@ class LegacyUserAdapter {
       createdAt: new Date(legacyUser.CREATE_TS)
     };
   }
-}`}</pre>
+}`} />
             </div>
           </div>
         </div>

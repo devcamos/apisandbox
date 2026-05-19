@@ -31,7 +31,7 @@ export interface LearningPhase {
 const fundamentalsPhase: LearningPhase = {
   id: 0,
   icon: GraduationCap,
-  title: "Fundamentals",
+  title: "Getting Started",
   description: "Essential building blocks: algorithms, data structures, callbacks, VMs, HTTP",
   topics: ["Callbacks & Async", "Data Structures", "VMs & EC2", "HTTP Basics", "Git", "Algorithms"],
   color: "from-green-500 to-emerald-500",

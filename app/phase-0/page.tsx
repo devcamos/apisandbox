@@ -3,57 +3,21 @@
 import PhaseLayout from "@/components/PhaseLayout";
 import ConceptCard from "@/components/ConceptCard";
 import PhaseQuiz from "@/components/PhaseQuiz";
+import SpringTermModal from "@/components/SpringTermModal";
 import { LessonTracker } from "@/components/LessonTracker";
-import { BookOpen, Code, Server, Database, GitBranch, Zap, RefreshCw, type LucideIcon } from "lucide-react";
+import { BookOpen, Code, Server, Database, GitBranch, Zap, RefreshCw } from "lucide-react";
 import { useState } from "react";
-
-const springTabs: { id: string; label: string; icon: LucideIcon; items: { term: string; desc: string }[] }[] = [
-  { id: "async", label: "Async", icon: RefreshCw, items: [
-    { term: "@Async", desc: "Marks a method to run on a separate thread pool, returning CompletableFuture<T>" },
-    { term: "WebClient", desc: "Spring WebFlux\u2019s non-blocking HTTP client — the reactive equivalent of fetch/promises" },
-    { term: "@EventListener", desc: "Decoupled event callbacks within the application context (pub/sub in one JVM)" },
-    { term: "@Scheduled", desc: "Cron and fixed-rate callbacks Spring invokes on a timer (analogous to setInterval)" },
-  ]},
-  { id: "data", label: "Data", icon: Database, items: [
-    { term: "JPA Entities", desc: "POJOs with @Entity annotations; Jackson serialises them to/from JSON automatically" },
-    { term: "ResponseEntity<T>", desc: "Wraps response body, headers, and status code into one object" },
-    { term: "Stream API", desc: ".filter(), .map(), .collect() are Java\u2019s equivalent of array methods" },
-    { term: "ConcurrentHashMap", desc: "Used everywhere for caches, config lookups, and in-memory state" },
-  ]},
-  { id: "http", label: "HTTP", icon: Zap, items: [
-    { term: "@RestController", desc: "Marks a class as an HTTP endpoint; every method returns a response body" },
-    { term: "@GetMapping / @PostMapping", desc: "Maps HTTP methods to Java methods (GET, POST, PUT, DELETE)" },
-    { term: "@RequestBody / @PathVariable", desc: "Binds JSON body or URL parameters to method arguments" },
-    { term: "HttpStatus", desc: "Enum with all status codes (OK, CREATED, BAD_REQUEST, NOT_FOUND)" },
-  ]},
-  { id: "cloud", label: "Cloud", icon: Server, items: [
-    { term: "Embedded Tomcat", desc: "Spring Boot packages its own server inside the JAR; java -jar app.jar runs anywhere" },
-    { term: "Docker + Spring", desc: "Multi-stage Dockerfile builds a slim JRE image; deploys to EC2, ECS, or Kubernetes" },
-    { term: "Spring Profiles", desc: "application-dev.yml vs application-prod.yml swaps config per environment" },
-    { term: "Actuator", desc: "/actuator/health endpoint for load balancer health checks on VMs and containers" },
-  ]},
-  { id: "algo", label: "Algorithms", icon: Code, items: [
-    { term: "Collections.sort()", desc: "TimSort under the hood; pass a Comparator for custom ordering" },
-    { term: "Stream pipeline", desc: "Declarative .filter().map().collect() that mirrors JS array methods" },
-    { term: "HashMap O(1)", desc: "Spring\u2019s bean registry, @Cacheable, and config resolution all rely on hash maps" },
-    { term: "Sort.by()", desc: "Translates to SQL ORDER BY, letting the database\u2019s own sort algorithm handle it" },
-  ]},
-  { id: "devops", label: "DevOps", icon: GitBranch, items: [
-    { term: "Maven / Gradle", desc: "Spring Boot plugin builds a fat JAR; ./gradlew bootJar or mvn package" },
-    { term: "GitHub Actions", desc: "CI pipeline: checkout \u2192 setup-java \u2192 gradle build \u2192 docker push \u2192 deploy" },
-    { term: "Spring Cloud Config", desc: "Externalised configuration backed by a Git repository (config-as-code)" },
-    { term: "Feature flags", desc: "Combine Spring Profiles + Git branches for feature toggles across environments" },
-  ]},
-];
+import { springTabs, type SpringTermItem } from "@/lib/learning/spring-perspective";
 
 export default function Phase0() {
   const [activeSpringTab, setActiveSpringTab] = useState("async");
+  const [selectedSpringTerm, setSelectedSpringTerm] = useState<SpringTermItem | null>(null);
   const activePanel = springTabs.find((t) => t.id === activeSpringTab)!;
 
   return (
     <PhaseLayout
       phaseNumber={0}
-      title="Fundamentals"
+      title="Getting Started"
       description="Essential building blocks for API integration and cloud development"
       icon={BookOpen}
       color="from-green-500 to-emerald-500"
@@ -128,7 +92,7 @@ export default function Phase0() {
 
       {/* Core Concepts */}
       <section className="mb-12">
-        <h2 className="text-3xl font-bold text-white mb-6">Core Fundamentals</h2>
+        <h2 className="text-3xl font-bold text-white mb-6">Core Concepts</h2>
         <div className="grid md:grid-cols-2 gap-6">
           {/* Callbacks & Async Programming */}
           <ConceptCard
@@ -144,7 +108,6 @@ export default function Phase0() {
               "Event-driven programming"
             ]}
             color="from-blue-500 to-cyan-500"
-            usedBy={["Google OAuth", "GitHub OAuth", "Stripe", "NextAuth.js"]}
             documentation={{
               overview: "Asynchronous programming is fundamental to modern web development. Callbacks, promises, and async/await are the building blocks for handling API calls, authentication flows, and event-driven operations. Notable example: Google OAuth uses callbacks for authentication redirects.",
               description: [
@@ -203,7 +166,6 @@ export default function Phase0() {
               "Data transformation"
             ]}
             color="from-purple-500 to-pink-500"
-            usedBy={["REST APIs", "GraphQL", "MongoDB", "PostgreSQL"]}
             documentation={{
               overview: "Data structures are how we organize and manipulate data. Understanding arrays, objects, and maps is essential for working with API responses and building integrations.",
               description: [
@@ -261,7 +223,6 @@ export default function Phase0() {
               "Resource allocation"
             ]}
             color="from-orange-500 to-red-500"
-            usedBy={["AWS EC2", "Google Compute", "Azure VMs", "Docker"]}
             documentation={{
               overview: "A Virtual Machine (VM) is a software emulation of a physical computer. EC2 instances are VMs running in AWS's cloud infrastructure. Understanding VMs helps you understand cloud computing. Notable example: AWS EC2 = Virtual Machines in the cloud.",
               description: [
@@ -320,7 +281,6 @@ export default function Phase0() {
               "Algorithm selection"
             ]}
             color="from-green-500 to-emerald-500"
-            usedBy={["Array.filter()", "Array.map()", "Array.sort()"]}
             documentation={{
               overview: "Algorithms are step-by-step procedures for solving problems. While you don't need to implement complex algorithms, understanding basic ones helps with data processing in API integrations.",
               description: [
@@ -378,7 +338,6 @@ export default function Phase0() {
               "HTTPS and security"
             ]}
             color="from-indigo-500 to-blue-500"
-            usedBy={["REST APIs", "Express.js", "FastAPI", "Spring Boot"]}
             documentation={{
               overview: "HTTP (Hypertext Transfer Protocol) is the foundation of web communication and REST APIs. Understanding HTTP is essential for working with any API.",
               description: [
@@ -436,7 +395,6 @@ export default function Phase0() {
               "Best practices"
             ]}
             color="from-teal-500 to-cyan-500"
-            usedBy={["GitHub Actions", "AWS CodePipeline", "GitLab CI", "Vercel"]}
             documentation={{
               overview: "Version control (Git) is essential for managing code changes, collaborating, and deploying applications. Understanding Git basics is crucial for modern development.",
               description: [
@@ -725,10 +683,20 @@ export default function Phase0() {
           <div className="px-6 pb-5">
             <div className="bg-slate-800/60 rounded-lg border border-slate-700 divide-y divide-slate-700/60">
               {activePanel.items.map((item) => (
-                <div key={item.term} className="flex items-start gap-3 px-4 py-3">
-                  <code className="text-green-300 text-xs font-bold bg-green-500/10 px-2 py-0.5 rounded shrink-0 mt-0.5">{item.term}</code>
-                  <span className="text-sm text-gray-300">{item.desc}</span>
-                </div>
+                <button
+                  key={item.id}
+                  type="button"
+                  onClick={() => setSelectedSpringTerm(item)}
+                  className="flex w-full items-start gap-3 px-4 py-3 text-left transition-colors hover:bg-slate-700/40"
+                >
+                  <code className="mt-0.5 shrink-0 rounded bg-green-500/10 px-2 py-0.5 text-xs font-bold text-green-300">{item.term}</code>
+                  <div className="min-w-0 flex-1">
+                    <div className="text-sm text-gray-300">{item.desc}</div>
+                    <div className="mt-2 text-xs font-medium text-emerald-300">
+                      Open sample + implementation notes
+                    </div>
+                  </div>
+                </button>
               ))}
             </div>
           </div>
@@ -736,6 +704,11 @@ export default function Phase0() {
       </section>
 
       <PhaseQuiz phaseNumber={0} accentClass="from-green-500 to-emerald-500" />
+      <SpringTermModal
+        isOpen={selectedSpringTerm !== null}
+        item={selectedSpringTerm}
+        onClose={() => setSelectedSpringTerm(null)}
+      />
     </PhaseLayout>
   );
 }

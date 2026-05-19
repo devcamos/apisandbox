@@ -8,6 +8,7 @@ import { SubscriptionGate } from "@/components/SubscriptionGate";
 import { LessonTracker } from "@/components/LessonTracker";
 import { Plug, Key, Shield, RefreshCw, Zap, Database, CreditCard, Mail, Folder } from "lucide-react";
 
+import { ExpandableCodeBlock } from "@/components/HighlightedCodeBlock"
 export default function Phase2() {
   return (
     <SubscriptionGate phaseNumber={2} lockedContentName="Phase 2: Third-Party Integrations">
@@ -262,7 +263,7 @@ export default function Phase2() {
                 <h4 className="text-lg font-bold text-white">TypeScript/Node.js</h4>
               </div>
               <div className="bg-slate-900/50 p-4 rounded-lg font-mono text-xs text-gray-300 overflow-x-auto">
-                <pre>{`// 1. Redirect to authorization endpoint
+                <ExpandableCodeBlock code={`// 1. Redirect to authorization endpoint
 const authUrl = \`https://auth.example.com/authorize?
   client_id=\${clientId}&
   redirect_uri=\${redirectUri}&
@@ -284,7 +285,7 @@ const tokenResponse = await fetch(
 );
 
 const { access_token, refresh_token } = 
-  await tokenResponse.json();`}</pre>
+  await tokenResponse.json();`} />
               </div>
             </div>
 
@@ -294,7 +295,7 @@ const { access_token, refresh_token } =
                 <h4 className="text-lg font-bold text-white">Java Spring Boot</h4>
               </div>
               <div className="bg-slate-900/50 p-4 rounded-lg font-mono text-xs text-gray-300 overflow-x-auto">
-                <pre>{`@RestController
+                <ExpandableCodeBlock code={`@RestController
 @RequestMapping("/api/auth")
 public class OAuth2Controller {
     
@@ -325,7 +326,7 @@ public class OAuth2Controller {
             response.getRefreshToken().getTokenValue()
         ));
     }
-}`}</pre>
+}`} />
               </div>
             </div>
           </div>
@@ -341,7 +342,7 @@ public class OAuth2Controller {
                 <h4 className="text-lg font-bold text-white">TypeScript/Node.js</h4>
               </div>
               <div className="bg-slate-900/50 p-4 rounded-lg font-mono text-xs text-gray-300 overflow-x-auto">
-                <pre>{`import jwt from 'jsonwebtoken';
+                <ExpandableCodeBlock code={`import jwt from 'jsonwebtoken';
 
 // Verify JWT token
 function verifyToken(token: string) {
@@ -369,7 +370,7 @@ app.use((req, res, next) => {
   
   req.user = verifyToken(token);
   next();
-});`}</pre>
+});`} />
               </div>
             </div>
 
@@ -379,7 +380,7 @@ app.use((req, res, next) => {
                 <h4 className="text-lg font-bold text-white">Java Spring Boot</h4>
               </div>
               <div className="bg-slate-900/50 p-4 rounded-lg font-mono text-xs text-gray-300 overflow-x-auto">
-                <pre>{`import io.jsonwebtoken.Jwts;
+                <ExpandableCodeBlock code={`import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.Claims;
 
 @Service
@@ -420,7 +421,7 @@ public class JwtAuthenticationFilter
         }
         filterChain.doFilter(request, response);
     }
-}`}</pre>
+}`} />
               </div>
             </div>
           </div>
@@ -495,7 +496,7 @@ public class JwtAuthenticationFilter
                 <h4 className="text-lg font-bold text-white">React Frontend</h4>
               </div>
               <div className="bg-slate-900/50 p-4 rounded-lg font-mono text-xs text-gray-300 overflow-x-auto">
-                <pre>{`import { useState, useEffect } from 'react';
+                <ExpandableCodeBlock code={`import { useState, useEffect } from 'react';
 
 function UserProfile({ userId }) {
   const [user, setUser] = useState(null);
@@ -536,7 +537,7 @@ function UserProfile({ userId }) {
       <p>{user.email}</p>
     </div>
   );
-}`}</pre>
+}`} />
               </div>
               <div className="mt-3 p-3 bg-blue-500/10 border border-blue-500/20 rounded text-xs text-gray-300">
                 <strong className="text-blue-400">Key Point:</strong> React doesn't care if the backend 
@@ -551,7 +552,7 @@ function UserProfile({ userId }) {
                 <h4 className="text-lg font-bold text-white">Java Backend</h4>
               </div>
               <div className="bg-slate-900/50 p-4 rounded-lg font-mono text-xs text-gray-300 overflow-x-auto">
-                <pre>{`@RestController
+                <ExpandableCodeBlock code={`@RestController
 @RequestMapping("/api/users")
 public class UserController {
     
@@ -595,7 +596,7 @@ public class User {
     public String getName() { return name; }
     public String getEmail() { return email; }
     // ...
-}`}</pre>
+}`} />
               </div>
               <div className="mt-3 p-3 bg-orange-500/10 border border-orange-500/20 rounded text-xs text-gray-300">
                 <strong className="text-orange-400">Key Point:</strong> Java doesn't care if the frontend 
@@ -612,23 +613,23 @@ public class User {
             <div>
               <h4 className="font-semibold text-white mb-2 text-sm">Request (React → Java)</h4>
               <div className="bg-slate-900/50 p-4 rounded-lg font-mono text-xs text-gray-300 overflow-x-auto">
-                <pre>{`// POST /api/users
+                <ExpandableCodeBlock code={`// POST /api/users
 {
   "name": "John Doe",
   "email": "john@example.com"
-}`}</pre>
+}`} />
               </div>
             </div>
             <div>
               <h4 className="font-semibold text-white mb-2 text-sm">Response (Java → React)</h4>
               <div className="bg-slate-900/50 p-4 rounded-lg font-mono text-xs text-gray-300 overflow-x-auto">
-                <pre>{`// 200 OK
+                <ExpandableCodeBlock code={`// 200 OK
 {
   "id": "123",
   "name": "John Doe",
   "email": "john@example.com",
   "createdAt": "2024-01-15T10:30:00Z"
-}`}</pre>
+}`} />
               </div>
             </div>
           </div>
@@ -651,7 +652,7 @@ public class User {
               <div>
                 <p className="text-gray-400 text-xs mb-2">React:</p>
                 <div className="bg-slate-900/50 p-3 rounded-lg font-mono text-xs text-gray-300 overflow-x-auto">
-                  <pre>{`const createUser = async (userData) => {
+                  <ExpandableCodeBlock code={`const createUser = async (userData) => {
   const response = await fetch('/api/users', {
     method: 'POST',
     headers: {
@@ -660,21 +661,21 @@ public class User {
     body: JSON.stringify(userData)
   });
   return response.json();
-};`}</pre>
+};`} />
                 </div>
               </div>
               
               <div>
                 <p className="text-gray-400 text-xs mb-2">Java:</p>
                 <div className="bg-slate-900/50 p-3 rounded-lg font-mono text-xs text-gray-300 overflow-x-auto">
-                  <pre>{`@PostMapping
+                  <ExpandableCodeBlock code={`@PostMapping
 public ResponseEntity<User> createUser(
     @RequestBody User user) {
     User created = userService.save(user);
     return ResponseEntity
         .status(201)
         .body(created);
-}`}</pre>
+}`} />
                 </div>
               </div>
             </div>
@@ -688,7 +689,7 @@ public ResponseEntity<User> createUser(
               <div>
                 <p className="text-gray-400 text-xs mb-2">React:</p>
                 <div className="bg-slate-900/50 p-3 rounded-lg font-mono text-xs text-gray-300 overflow-x-auto">
-                  <pre>{`try {
+                  <ExpandableCodeBlock code={`try {
   const response = await fetch('/api/users/123');
   if (!response.ok) {
     const error = await response.json();
@@ -697,14 +698,14 @@ public ResponseEntity<User> createUser(
   const user = await response.json();
 } catch (error) {
   console.error('Failed:', error);
-}`}</pre>
+}`} />
                 </div>
               </div>
               
               <div>
                 <p className="text-gray-400 text-xs mb-2">Java:</p>
                 <div className="bg-slate-900/50 p-3 rounded-lg font-mono text-xs text-gray-300 overflow-x-auto">
-                  <pre>{`@GetMapping("/{id}")
+                  <ExpandableCodeBlock code={`@GetMapping("/{id}")
 public ResponseEntity<?> getUser(@PathVariable String id) {
     try {
         User user = userService.findById(id);
@@ -714,7 +715,7 @@ public ResponseEntity<?> getUser(@PathVariable String id) {
             .status(404)
             .body(new ErrorResponse("User not found"));
     }
-}`}</pre>
+}`} />
                 </div>
               </div>
             </div>
@@ -979,7 +980,7 @@ public ResponseEntity<?> getUser(@PathVariable String id) {
                 <h4 className="text-lg font-bold text-white">TypeScript/Node.js</h4>
               </div>
               <div className="bg-slate-900/50 p-4 rounded-lg font-mono text-xs text-gray-300 overflow-x-auto">
-                <pre>{`async function fetchWithRetry(
+                <ExpandableCodeBlock code={`async function fetchWithRetry(
   url: string, 
   options: RequestInit = {}, 
   maxRetries = 3
@@ -1016,7 +1017,7 @@ public ResponseEntity<?> getUser(@PathVariable String id) {
   }
   
   throw lastError;
-}`}</pre>
+}`} />
               </div>
             </div>
 
@@ -1026,7 +1027,7 @@ public ResponseEntity<?> getUser(@PathVariable String id) {
                 <h4 className="text-lg font-bold text-white">Java Spring Boot (Resilience4j)</h4>
               </div>
               <div className="bg-slate-900/50 p-4 rounded-lg font-mono text-xs text-gray-300 overflow-x-auto">
-                <pre>{`import io.github.resilience4j.retry.annotation.Retry;
+                <ExpandableCodeBlock code={`import io.github.resilience4j.retry.annotation.Retry;
 import io.github.resilience4j.retry.RetryConfig;
 
 @Service
@@ -1062,7 +1063,7 @@ public class RetryConfig {
                 e instanceof HttpServerErrorException)
             .build();
     }
-}`}</pre>
+}`} />
               </div>
             </div>
           </div>
@@ -1078,7 +1079,7 @@ public class RetryConfig {
                 <h4 className="text-lg font-bold text-white">TypeScript/Node.js</h4>
               </div>
               <div className="bg-slate-900/50 p-4 rounded-lg font-mono text-xs text-gray-300 overflow-x-auto">
-                <pre>{`class CircuitBreaker {
+                <ExpandableCodeBlock code={`class CircuitBreaker {
   private state: 'CLOSED' | 'OPEN' | 'HALF_OPEN' = 'CLOSED';
   private failureCount = 0;
   private lastFailureTime?: number;
@@ -1120,7 +1121,7 @@ public class RetryConfig {
       this.state = 'OPEN';
     }
   }
-}`}</pre>
+}`} />
               </div>
             </div>
 
@@ -1130,7 +1131,7 @@ public class RetryConfig {
                 <h4 className="text-lg font-bold text-white">Java Spring Boot (Resilience4j)</h4>
               </div>
               <div className="bg-slate-900/50 p-4 rounded-lg font-mono text-xs text-gray-300 overflow-x-auto">
-                <pre>{`import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+                <ExpandableCodeBlock code={`import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.circuitbreaker.CircuitBreakerConfig;
 
 @Service
@@ -1167,7 +1168,7 @@ public class CircuitBreakerConfig {
             .minimumNumberOfCalls(5)
             .build();
     }
-}`}</pre>
+}`} />
               </div>
             </div>
           </div>
@@ -1186,7 +1187,7 @@ public class CircuitBreakerConfig {
             <div>
               <h4 className="font-semibold text-white mb-3">External API Response</h4>
               <div className="bg-slate-900/50 p-4 rounded-lg font-mono text-xs text-gray-300">
-                <pre>{`{
+                <ExpandableCodeBlock code={`{
   "user_id": "ext_123",
   "full_name": "John Doe",
   "email_address": "john@example.com",
@@ -1195,13 +1196,13 @@ public class CircuitBreakerConfig {
     "plan_name": "premium",
     "expires": "2024-12-31"
   }
-}`}</pre>
+}`} />
               </div>
             </div>
             <div>
               <h4 className="font-semibold text-white mb-3">Internal Domain Model</h4>
               <div className="bg-slate-900/50 p-4 rounded-lg font-mono text-xs text-gray-300">
-                <pre>{`interface User {
+                <ExpandableCodeBlock code={`interface User {
   id: string;
   name: string;
   email: string;
@@ -1224,7 +1225,7 @@ function mapToUser(external: any): User {
       expiresAt: new Date(external.subscription.expires)
     }
   };
-}`}</pre>
+}`} />
               </div>
             </div>
           </div>
@@ -1291,7 +1292,7 @@ function mapToUser(external: any): User {
           <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border border-slate-700">
             <h4 className="text-lg font-bold text-white mb-3">Create Checkout Session</h4>
             <div className="bg-slate-900/50 p-4 rounded-lg font-mono text-xs text-gray-300 overflow-x-auto">
-              <pre>{`import Stripe from 'stripe'
+              <ExpandableCodeBlock code={`import Stripe from 'stripe'
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
 
@@ -1307,13 +1308,13 @@ const session = await stripe.checkout.sessions.create({
   cancel_url: 'https://yourapp.com/cancel',
 })
 
-// Redirect user to session.url`}</pre>
+// Redirect user to session.url`} />
             </div>
           </div>
           <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border border-slate-700">
             <h4 className="text-lg font-bold text-white mb-3">Webhook Handler</h4>
             <div className="bg-slate-900/50 p-4 rounded-lg font-mono text-xs text-gray-300 overflow-x-auto">
-              <pre>{`// app/api/stripe/webhook/route.ts
+              <ExpandableCodeBlock code={`// app/api/stripe/webhook/route.ts
 import { stripe } from '@/lib/stripe'
 
 export async function POST(request: Request) {
@@ -1336,7 +1337,7 @@ export async function POST(request: Request) {
   }
   
   return Response.json({ received: true })
-}`}</pre>
+}`} />
             </div>
           </div>
         </div>
@@ -1402,7 +1403,7 @@ export async function POST(request: Request) {
           <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border border-slate-700">
             <h4 className="text-lg font-bold text-white mb-3">Send Email</h4>
             <div className="bg-slate-900/50 p-4 rounded-lg font-mono text-xs text-gray-300 overflow-x-auto">
-              <pre>{`import { Resend } from 'resend'
+              <ExpandableCodeBlock code={`import { Resend } from 'resend'
 
 const resend = new Resend(process.env.RESEND_API_KEY)
 
@@ -1411,13 +1412,13 @@ await resend.emails.send({
   to: user.email,
   subject: 'Welcome!',
   html: '<h1>Welcome to our app!</h1>',
-})`}</pre>
+})`} />
             </div>
           </div>
           <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border border-slate-700">
             <h4 className="text-lg font-bold text-white mb-3">Email Service Wrapper</h4>
             <div className="bg-slate-900/50 p-4 rounded-lg font-mono text-xs text-gray-300 overflow-x-auto">
-              <pre>{`// lib/email.ts
+              <ExpandableCodeBlock code={`// lib/email.ts
 export async function sendEmail({
   to,
   subject,
@@ -1440,7 +1441,7 @@ export async function sendEmail({
   })
   
   return { success: true, id: result.data?.id }
-}`}</pre>
+}`} />
             </div>
           </div>
         </div>

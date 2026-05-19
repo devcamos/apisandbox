@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { HighlightedCodeBlock } from "@/components/HighlightedCodeBlock"
+import { ExpandableCodeBlock, HighlightedCodeBlock } from "@/components/HighlightedCodeBlock"
 import { DependencyRadar } from "@/components/java/DependencyRadar"
 import { FrameworkOntologyExplorer } from "@/components/java/FrameworkOntologyExplorer"
 import { JavaLabs } from "@/components/java/JavaLabs"
@@ -156,15 +156,17 @@ export default function JavaTrackPage() {
                   </div>
                   <div>
                     <div className="text-xs font-semibold text-slate-200">Wrapper layers</div>
-                    <pre className="mt-2 bg-slate-950/70 border border-slate-800 rounded-xl p-3 overflow-x-auto text-xs text-slate-200 font-mono leading-relaxed whitespace-pre">
-{`Your code
+                    <ExpandableCodeBlock
+                      label="Client wrapper stack"
+                      code={`Your code
   -> (JSON serialize / validate)
   -> HttpClient (or OkHttp)
   -> Connection pool + DNS
   -> TLS
   -> TCP sockets
   -> Remote server`}
-                    </pre>
+                      preClassName="mt-2 whitespace-pre"
+                    />
                   </div>
                   <div>
                     <div className="text-xs font-semibold text-slate-200">Framework “magic” is mostly</div>
@@ -187,15 +189,17 @@ export default function JavaTrackPage() {
                   </div>
                   <div>
                     <div className="text-xs font-semibold text-slate-200">Wrapper layers</div>
-                    <pre className="mt-2 bg-slate-950/70 border border-slate-800 rounded-xl p-3 overflow-x-auto text-xs text-slate-200 font-mono leading-relaxed whitespace-pre">
-{`Internet
+                    <ExpandableCodeBlock
+                      label="Backend wrapper stack"
+                      code={`Internet
   -> TCP + TLS termination
   -> HTTP server (Tomcat/Jetty/Netty)
   -> Framework routing (Spring MVC)
   -> Filters/interceptors (auth, logs)
   -> JSON bind (Jackson)
   -> Your controller/service code`}
-                    </pre>
+                      preClassName="mt-2 whitespace-pre"
+                    />
                     <div className="mt-3 grid gap-2 text-sm text-slate-300">
                       <div>
                         <span className="font-semibold text-slate-200">TCP + TLS termination:</span>{" "}
@@ -673,14 +677,16 @@ final class WebhookVerifier {
                             HTTP server tuning (config is also a “wrapper”)
                           </summary>
                           <div className="px-4 pb-4">
-                            <pre className="mt-2 bg-slate-950/70 border border-slate-800 rounded-xl p-3 overflow-x-auto text-xs text-slate-200 font-mono leading-relaxed whitespace-pre">
-{`# application.yml (example)
+                            <ExpandableCodeBlock
+                              label="HTTP server tuning example"
+                              code={`# application.yml (example)
 server:
   tomcat:
     threads:
       max: 200
     accept-count: 100`}
-                            </pre>
+                              preClassName="mt-2 whitespace-pre"
+                            />
                           </div>
                         </details>
                       </div>
@@ -1080,15 +1086,17 @@ server:
                       Show Gradle dependency snippet
                     </summary>
                     <div className="px-4 pb-4">
-                      <pre className="bg-slate-950/70 border border-slate-800 rounded-lg p-3 overflow-x-auto text-xs text-slate-200 font-mono leading-relaxed whitespace-pre">
-{`dependencies {
+                      <ExpandableCodeBlock
+                        label="Gradle dependency snippet"
+                        code={`dependencies {
   implementation("com.fasterxml.jackson.core:jackson-databind:<version>")
   testImplementation("org.junit.jupiter:junit-jupiter:<version>")
   testImplementation("org.mockito:mockito-core:<version>")
   testImplementation("org.testcontainers:junit-jupiter:<version>")
   testImplementation("org.testcontainers:postgresql:<version>")
 }`}
-                      </pre>
+                        preClassName="whitespace-pre"
+                      />
                     </div>
                   </details>
                 </div>
@@ -1215,8 +1223,9 @@ server:
                 Show a small “API result wrapper” example (records + generics)
               </summary>
               <div className="px-4 pb-4">
-                <pre className="bg-slate-950/70 border border-slate-800 rounded-lg p-3 overflow-x-auto text-xs text-slate-200 font-mono leading-relaxed whitespace-pre">
-{`// A common API pattern: success-or-error without throwing everywhere.
+                <ExpandableCodeBlock
+                  label="API result wrapper example"
+                  code={`// A common API pattern: success-or-error without throwing everywhere.
 public sealed interface ApiResult<T> permits ApiResult.Ok, ApiResult.Err {
   record Ok<T>(T value) implements ApiResult<T> {}
   record Err<T>(int status, String message) implements ApiResult<T> {}
@@ -1225,7 +1234,8 @@ public sealed interface ApiResult<T> permits ApiResult.Ok, ApiResult.Err {
 public record LoginRequest(String email, String password) {}
 public record MeResponse(String id, String email, String name) {}
 `}
-                </pre>
+                  preClassName="whitespace-pre"
+                />
               </div>
             </details>
           </div>

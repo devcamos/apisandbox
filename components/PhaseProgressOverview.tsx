@@ -6,10 +6,8 @@ import { Trophy, BarChart3, Target, TrendingUp } from "lucide-react"
 import { useSession } from "@/components/providers/SessionProvider"
 import { masteryLabel } from "@/lib/learning/phase-quiz-insights"
 
-const AUTH_STORAGE_KEY = "auth_jwt"
-
 const phaseMeta = [
-  { phaseNumber: 0, title: "Fundamentals", href: "/phase-0", color: "from-green-500 to-emerald-500" },
+  { phaseNumber: 0, title: "Getting Started", href: "/phase-0", color: "from-green-500 to-emerald-500" },
   { phaseNumber: 1, title: "Integration Mindset", href: "/phase-1", color: "from-blue-500 to-cyan-500" },
   { phaseNumber: 2, title: "Third-Party Integrations", href: "/phase-2", color: "from-purple-500 to-pink-500" },
   { phaseNumber: 3, title: "Inter-Service Communication", href: "/phase-3", color: "from-orange-500 to-red-500" },
@@ -30,13 +28,9 @@ export default function PhaseProgressOverview() {
 
   useEffect(() => {
     if (status !== "authenticated") return
-    const token = localStorage.getItem(AUTH_STORAGE_KEY)
-    if (!token) return
 
     async function loadProgress() {
-      const res = await fetch("/api/phase-progress", {
-        headers: { Authorization: `Bearer ${token}` },
-      })
+      const res = await fetch("/api/phase-progress")
       if (!res.ok) return
       const payload = await res.json()
       setProgress(payload.data.progress ?? [])

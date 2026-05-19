@@ -17,6 +17,28 @@ npm run db:ensure-test-users
 - `test@example.com` / `Test1234!@#$`
 - `qa@example.com` / `QaTest1234!@#$`
 
+## Demo Credentials
+
+- Demo email: `demo@apisandbox.demo` by default
+- Override email with: `DEMO_USER_EMAIL`
+- Demo password source: `DEMO_USER_PASSWORD`
+- Demo password is intentionally not committed to the repo
+
+### How demo sign-in works
+
+- UI entrypoint: **Try live demo (full app)** on `/login` and `/start`
+- API route: `POST /api/auth/demo`
+- Server behavior: signs in with `DEMO_USER_EMAIL` + `DEMO_USER_PASSWORD` entirely on the server
+- Browser behavior: the raw demo password is never exposed to the client
+
+### Quick reference
+
+| Type | Email | Password |
+|------|-------|----------|
+| Local test user | `test@example.com` | `Test1234!@#$` |
+| Local test user | `qa@example.com` | `QaTest1234!@#$` |
+| Live demo user | `demo@apisandbox.demo` by default | From `DEMO_USER_PASSWORD` env var |
+
 ## Typical Setup Flow
 
 ```bash

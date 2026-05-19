@@ -13,7 +13,6 @@ interface ConceptCardProps {
   items?: string[];
   color?: string;
   demoLink?: string;
-  usedBy?: string[];
   documentation?: {
     overview: string;
     description: string[];
@@ -63,7 +62,6 @@ export default function ConceptCard({
   items,
   color = "from-blue-500 to-cyan-500",
   demoLink,
-  usedBy,
   documentation
 }: ConceptCardProps) {
   const [showDocs, setShowDocs] = useState(false);
@@ -86,7 +84,7 @@ export default function ConceptCard({
             ))}
           </ul>
         )}
-        <div className="grid grid-cols-2 gap-2 mt-4">
+        <div className={`mt-4 grid gap-2 ${documentation && demoLink ? "grid-cols-2" : "grid-cols-1"}`}>
           {documentation && (
             <button
               onClick={() => setShowDocs(true)}
@@ -96,31 +94,14 @@ export default function ConceptCard({
               Docs
             </button>
           )}
-          {usedBy && usedBy.length > 0 ? (
-            <div className="py-3 bg-slate-700/50 border border-slate-600 rounded-lg flex flex-col items-center justify-center gap-1 px-2">
-              <span className="text-xs text-gray-400 font-medium">(used by)</span>
-              <div className="flex flex-wrap items-center justify-center gap-1">
-                {usedBy.slice(0, 2).map((tech, idx) => (
-                  <span key={idx} className="text-xs text-gray-300 font-semibold">
-                    {tech}
-                    {idx < Math.min(usedBy.length, 2) - 1 && <span className="text-gray-500 mx-1">•</span>}
-                  </span>
-                ))}
-                {usedBy.length > 2 && (
-                  <span className="text-xs text-gray-500">+{usedBy.length - 2}</span>
-                )}
-              </div>
-            </div>
-          ) : demoLink ? (
+          {demoLink ? (
             <Link 
               href={demoLink}
               className={`py-3 bg-gradient-to-r ${color} text-white rounded-lg font-semibold text-center hover:shadow-lg hover:scale-105 transition-all flex items-center justify-center gap-2`}
             >
               🎮 Try Demo
             </Link>
-          ) : (
-            <div></div>
-          )}
+          ) : null}
         </div>
       </div>
 

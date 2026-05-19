@@ -6,6 +6,7 @@ import PhaseQuiz from "@/components/PhaseQuiz";
 import { LessonTracker } from "@/components/LessonTracker";
 import { Brain, Network, GitBranch, Zap, RefreshCw, Database } from "lucide-react";
 
+import { ExpandableCodeBlock } from "@/components/HighlightedCodeBlock"
 export default function Phase1() {
   return (
     <PhaseLayout
@@ -154,11 +155,11 @@ export default function Phase1() {
               <div className="text-green-400">✓ Standard across all modern APIs</div>
             </div>
             <div className="bg-slate-900/50 p-4 rounded-lg font-mono text-xs text-gray-300 overflow-x-auto">
-              <pre>{`{
+              <ExpandableCodeBlock code={`{
   "id": "123",
   "name": "John Doe",
   "email": "john@example.com"
-}`}</pre>
+}`} />
             </div>
           </div>
         </div>
@@ -194,7 +195,7 @@ export default function Phase1() {
               <div>
                 <p className="text-gray-400 text-xs mb-2">Java Backend (Spring Boot):</p>
                 <div className="bg-slate-900/50 p-3 rounded font-mono text-xs text-gray-300 overflow-x-auto">
-                  <pre>{`@RestController
+                  <ExpandableCodeBlock code={`@RestController
 @RequestMapping("/api/users")
 public class UserController {
     @GetMapping("/{id}")
@@ -204,13 +205,13 @@ public class UserController {
         return ResponseEntity.ok(user);
         // Automatically serialized to JSON
     }
-}`}</pre>
+}`} />
                 </div>
               </div>
               <div>
                 <p className="text-gray-400 text-xs mb-2">React Frontend:</p>
                 <div className="bg-slate-900/50 p-3 rounded font-mono text-xs text-gray-300 overflow-x-auto">
-                  <pre>{`function UserProfile({ userId }) {
+                  <ExpandableCodeBlock code={`function UserProfile({ userId }) {
   const [user, setUser] = useState(null);
   
   useEffect(() => {
@@ -221,7 +222,7 @@ public class UserController {
   }, [userId]);
   
   return <div>{user?.name}</div>;
-}`}</pre>
+}`} />
                 </div>
               </div>
             </div>
@@ -284,9 +285,9 @@ public class UserController {
                 languages to communicate:
               </p>
               <div className="bg-slate-800/50 p-3 rounded font-mono text-xs text-gray-300 overflow-x-auto">
-                <pre>{`Service A (Java) → HTTP + JSON → Service B (Python)
+                <ExpandableCodeBlock code={`Service A (Java) → HTTP + JSON → Service B (Python)
 Service B (Python) → HTTP + JSON → Service C (Node.js)
-Service C (Node.js) → HTTP + JSON → Service D (Go)`}</pre>
+Service C (Node.js) → HTTP + JSON → Service D (Go)`} />
               </div>
             </div>
 
@@ -296,9 +297,9 @@ Service C (Node.js) → HTTP + JSON → Service D (Go)`}</pre>
                 JSON allows frontend and backend teams to work independently:
               </p>
               <div className="bg-slate-800/50 p-3 rounded font-mono text-xs text-gray-300 overflow-x-auto">
-                <pre>{`React Team → Defines expected JSON structure
+                <ExpandableCodeBlock code={`React Team → Defines expected JSON structure
 Java Team → Implements API returning that JSON structure
-Both teams agree on the contract, work independently`}</pre>
+Both teams agree on the contract, work independently`} />
               </div>
             </div>
 
@@ -308,9 +309,9 @@ Both teams agree on the contract, work independently`}</pre>
                 JSON is the standard for integrating with external services:
               </p>
               <div className="bg-slate-800/50 p-3 rounded font-mono text-xs text-gray-300 overflow-x-auto">
-                <pre>{`Your Java App → JSON → Stripe API (Ruby)
+                <ExpandableCodeBlock code={`Your Java App → JSON → Stripe API (Ruby)
 Your Java App → JSON → GitHub API (Go)
-Your Java App → JSON → AWS API (Various)`}</pre>
+Your Java App → JSON → AWS API (Various)`} />
               </div>
             </div>
 
@@ -320,10 +321,10 @@ Your Java App → JSON → AWS API (Various)`}</pre>
                 JSON messages flow through message queues and event streams:
               </p>
               <div className="bg-slate-800/50 p-3 rounded font-mono text-xs text-gray-300 overflow-x-auto">
-                <pre>{`Kafka Topic: "user.created"
+                <ExpandableCodeBlock code={`Kafka Topic: "user.created"
 Message: {"userId": "123", "email": "user@example.com"}
 
-Any service can consume this JSON message, regardless of language`}</pre>
+Any service can consume this JSON message, regardless of language`} />
               </div>
             </div>
           </div>
@@ -339,7 +340,7 @@ Any service can consume this JSON message, regardless of language`}</pre>
               <div>
                 <p className="text-gray-400 text-xs mb-2">JSON Schema Definition:</p>
                 <div className="bg-slate-800/50 p-3 rounded-lg font-mono text-xs text-gray-300 overflow-x-auto">
-                  <pre>{`{
+                  <ExpandableCodeBlock code={`{
   "$schema": "http://json-schema.org/draft-07/schema#",
   "type": "object",
   "properties": {
@@ -349,18 +350,18 @@ Any service can consume this JSON message, regardless of language`}</pre>
     "createdAt": { "type": "string", "format": "date-time" }
   },
   "required": ["id", "name", "email"]
-}`}</pre>
+}`} />
                 </div>
               </div>
               <div>
                 <p className="text-gray-400 text-xs mb-2">Actual JSON Data:</p>
                 <div className="bg-slate-800/50 p-3 rounded-lg font-mono text-xs text-gray-300 overflow-x-auto">
-                  <pre>{`{
+                  <ExpandableCodeBlock code={`{
   "id": "123",
   "name": "John Doe",
   "email": "john@example.com",
   "createdAt": "2024-01-15T10:30:00Z"
-}`}</pre>
+}`} />
                 </div>
               </div>
             </div>

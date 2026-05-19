@@ -2,6 +2,7 @@
 
 import ConceptCard from "@/components/ConceptCard";
 import { SubscriptionGate } from "@/components/SubscriptionGate";
+import { ExpandableCodeBlock } from "@/components/HighlightedCodeBlock"
 import Link from "next/link";
 import { 
   Shield, 
@@ -445,7 +446,7 @@ export default function SecurityPage() {
               <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border border-slate-700">
                 <h4 className="text-lg font-bold text-white mb-3">Security Headers (Next.js)</h4>
                 <div className="bg-slate-900/50 p-4 rounded-lg font-mono text-xs text-gray-300 overflow-x-auto">
-                  <pre>{`// middleware.ts
+                  <ExpandableCodeBlock code={`// middleware.ts
 import { NextResponse } from 'next/server'
 
 export function middleware(request: Request) {
@@ -463,13 +464,13 @@ export function middleware(request: Request) {
   )
   
   return response
-}`}</pre>
+}`} />
                 </div>
               </div>
               <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border border-slate-700">
                 <h4 className="text-lg font-bold text-white mb-3">Input Validation (Zod)</h4>
                 <div className="bg-slate-900/50 p-4 rounded-lg font-mono text-xs text-gray-300 overflow-x-auto">
-                  <pre>{`import { z } from 'zod'
+                  <ExpandableCodeBlock code={`import { z } from 'zod'
 
 // Define schema
 const userSchema = z.object({
@@ -487,7 +488,7 @@ export async function POST(request: Request) {
   
   // Safe to use validated data
   return Response.json({ success: true })
-}`}</pre>
+}`} />
                 </div>
               </div>
             </div>
@@ -497,4 +498,3 @@ export async function POST(request: Request) {
     </SubscriptionGate>
   );
 }
-

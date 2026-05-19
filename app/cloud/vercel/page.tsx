@@ -2,6 +2,7 @@
 
 import ConceptCard from "@/components/ConceptCard";
 import { SubscriptionGate } from "@/components/SubscriptionGate";
+import { ExpandableCodeBlock } from "@/components/HighlightedCodeBlock"
 import Link from "next/link";
 import { 
   Zap, 
@@ -237,13 +238,13 @@ export default function VercelPage() {
                     Deploys your Next.js application with serverless functions for API routes.
                   </p>
                   <div className="bg-slate-900/50 p-4 rounded-lg font-mono text-xs text-gray-300">
-                    <pre>{`// app/api/users/route.ts
+                    <ExpandableCodeBlock code={`// app/api/users/route.ts
 import { prisma } from '@/lib/prisma'
 
 export async function GET() {
   const users = await prisma.user.findMany()
   return Response.json(users)
-}`}</pre>
+}`} />
                   </div>
                 </div>
 
@@ -253,9 +254,9 @@ export async function GET() {
                     Provides PostgreSQL database with connection pooling for serverless functions.
                   </p>
                   <div className="bg-slate-900/50 p-4 rounded-lg font-mono text-xs text-gray-300">
-                    <pre>{`// .env
+                    <ExpandableCodeBlock code={`// .env
 DATABASE_URL="postgresql://user:pass@db.xxx.supabase.co:6543/db?pgbouncer=true"
-// Port 6543 = connection pooler (essential for serverless)`}</pre>
+// Port 6543 = connection pooler (essential for serverless)`} />
                   </div>
                 </div>
 
@@ -265,13 +266,13 @@ DATABASE_URL="postgresql://user:pass@db.xxx.supabase.co:6543/db?pgbouncer=true"
                     Provides type-safe database access with automatic connection pooling.
                   </p>
                   <div className="bg-slate-900/50 p-4 rounded-lg font-mono text-xs text-gray-300">
-                    <pre>{`// lib/prisma.ts
+                    <ExpandableCodeBlock code={`// lib/prisma.ts
 import { PrismaClient } from '@prisma/client'
 
 export const prisma = new PrismaClient({
   // Automatically uses connection pooling
   // Multiple serverless functions share the pool
-})`}</pre>
+})`} />
                   </div>
                 </div>
               </div>
@@ -452,4 +453,3 @@ export const prisma = new PrismaClient({
     </SubscriptionGate>
   );
 }
-

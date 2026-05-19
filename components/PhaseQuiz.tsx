@@ -170,8 +170,6 @@ interface SubmissionResult {
   }>
 }
 
-const AUTH_STORAGE_KEY = "auth_jwt"
-
 export default function PhaseQuiz({ phaseNumber, accentClass }: PhaseQuizProps) {
   const { status } = useSession()
   const [quiz, setQuiz] = useState<QuizPayload | null>(null)
@@ -188,21 +186,13 @@ export default function PhaseQuiz({ phaseNumber, accentClass }: PhaseQuizProps) 
       return
     }
 
-    const token = localStorage.getItem(AUTH_STORAGE_KEY)
-    if (!token) {
-      setLoading(false)
-      return
-    }
-
     let cancelled = false
 
     async function loadQuiz() {
       try {
         setLoading(true)
         setError(null)
-        const res = await fetch(`/api/phase-progress/${phaseNumber}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        })
+        const res = await fetch(`/api/phase-progress/${phaseNumber}`)
 
         if (!res.ok) {
           throw new Error("Failed to load quiz")
@@ -246,8 +236,7 @@ export default function PhaseQuiz({ phaseNumber, accentClass }: PhaseQuizProps) 
   }, [])
 
   async function submitQuiz() {
-    const token = localStorage.getItem(AUTH_STORAGE_KEY)
-    if (!token || !quiz) return
+    if (!quiz) return
 
     try {
       setSubmitting(true)
@@ -256,7 +245,6 @@ export default function PhaseQuiz({ phaseNumber, accentClass }: PhaseQuizProps) 
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({ answers }),
       })

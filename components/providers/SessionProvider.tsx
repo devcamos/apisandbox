@@ -63,12 +63,15 @@ async function fetchCurrentUser(token?: string) {
     throw new Error("Not authenticated")
   }
   const payload = await res.json()
-  return payload?.data?.user as {
-    id: string
-    email: string
-    firstName: string | null
-    lastName: string | null
-    avatarUrl: string | null
+  return payload?.data as {
+    user: {
+      id: string
+      email: string
+      firstName: string | null
+      lastName: string | null
+      avatarUrl: string | null
+    }
+    token?: string
   }
 }
 
@@ -78,17 +81,17 @@ export function SessionProvider({ children }: Readonly<{ children: ReactNode }>)
 
   const refresh = async () => {
     const token = globalThis.window === undefined ? null : localStorage.getItem(STORAGE_KEY)
-    if (token) {
-      try {
-        const user = await fetchCurrentUser(token)
-        setData(mapToSessionData(user))
-        setStatus("authenticated")
-      } catch {
-        localStorage.removeItem(STORAGE_KEY)
-        setData(null)
-        setStatus("unauthenticated")
+    try {
+      const session = await fetchCurrentUser(token ?? undefined)
+      if (session.token && globalThis.window !== undefined) {
+        localStorage.setItem(STORAGE_KEY, session.token)
       }
-    } else {
+      setData(mapToSessionData(session.user))
+      setStatus("authenticated")
+    } catch {
+      if (token && globalThis.window !== undefined) {
+        localStorage.removeItem(STORAGE_KEY)
+      }
       setStatus("unauthenticated")
       setData(null)
     }
@@ -96,6 +99,28 @@ export function SessionProvider({ children }: Readonly<{ children: ReactNode }>)
 
   useEffect(() => {
     void refresh()
+  }, [])
+
+  useEffect(() => {
+    if (globalThis.window === undefined) return
+
+    function handleWindowFocus() {
+      void refresh()
+    }
+
+    function handleVisibilityChange() {
+      if (document.visibilityState === "visible") {
+        void refresh()
+      }
+    }
+
+    window.addEventListener("focus", handleWindowFocus)
+    document.addEventListener("visibilitychange", handleVisibilityChange)
+
+    return () => {
+      window.removeEventListener("focus", handleWindowFocus)
+      document.removeEventListener("visibilitychange", handleVisibilityChange)
+    }
   }, [])
 
   const setSessionFromAuthResponse: AuthContextValue["setSessionFromAuthResponse"] = (
@@ -157,4 +182,3 @@ export function useAuthSessionWriter() {
     clearSession: ctx.clearSession,
   }
 }
-

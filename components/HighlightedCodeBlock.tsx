@@ -1,6 +1,7 @@
 import React from "react"
 
 type Language = "java"
+type PlainLanguage = "plain"
 
 function isWordStart(ch: string) {
   return /[A-Za-z_]/.test(ch)
@@ -215,20 +216,68 @@ export function HighlightedCodeBlock({
   code,
   label,
   language = "java",
+  defaultOpen = false,
 }: {
   code: string
   label?: string
-  language?: Language
+  language?: Language | PlainLanguage
+  defaultOpen?: boolean
 }) {
   const highlighted = language === "java" ? renderJava(code) : [code]
   return (
-    <div className="mt-3">
-      {label ? (
-        <div className="text-xs font-semibold tracking-wide text-slate-300/90 mb-2">{label}</div>
-      ) : null}
-      <pre className="bg-slate-950/80 border border-slate-700 rounded-xl p-4 overflow-x-auto text-xs text-slate-200 font-mono leading-relaxed whitespace-pre">
-        <code>{highlighted}</code>
-      </pre>
-    </div>
+    <details className="mt-3 rounded-xl border border-slate-700 bg-slate-950/50 group" open={defaultOpen}>
+      <summary className="flex cursor-pointer list-none items-center justify-between gap-4 rounded-xl px-4 py-3 text-sm text-slate-200 marker:hidden">
+        <span className="font-semibold tracking-wide text-slate-300/90">
+          {label ?? "Code snippet"}
+        </span>
+        <span className="shrink-0 text-xs font-medium text-cyan-300 transition-colors group-hover:text-cyan-200">
+          <span className="group-open:hidden">Show code</span>
+          <span className="hidden group-open:inline">Hide code</span>
+        </span>
+      </summary>
+      <div className="px-4 pb-4">
+        <pre className="overflow-x-auto rounded-xl border border-slate-700 bg-slate-950/80 p-4 text-xs leading-relaxed text-slate-200 whitespace-pre font-mono">
+          <code>{highlighted}</code>
+        </pre>
+      </div>
+    </details>
+  )
+}
+
+export function ExpandableCodeBlock({
+  code,
+  label,
+  className,
+  preClassName,
+  defaultOpen = false,
+}: {
+  code: string
+  label?: string
+  className?: string
+  preClassName?: string
+  defaultOpen?: boolean
+}) {
+  return (
+    <details
+      className={`mt-3 rounded-xl border border-slate-700 bg-slate-950/50 group ${className ?? ""}`.trim()}
+      open={defaultOpen}
+    >
+      <summary className="flex cursor-pointer list-none items-center justify-between gap-4 rounded-xl px-4 py-3 text-sm text-slate-200 marker:hidden">
+        <span className="font-semibold tracking-wide text-slate-300/90">
+          {label ?? "Code snippet"}
+        </span>
+        <span className="shrink-0 text-xs font-medium text-cyan-300 transition-colors group-hover:text-cyan-200">
+          <span className="group-open:hidden">Show code</span>
+          <span className="hidden group-open:inline">Hide code</span>
+        </span>
+      </summary>
+      <div className="px-4 pb-4">
+        <pre
+          className={`overflow-x-auto rounded-xl border border-slate-700 bg-slate-950/80 p-4 text-xs leading-relaxed text-slate-200 whitespace-pre font-mono ${preClassName ?? ""}`.trim()}
+        >
+          <code>{code}</code>
+        </pre>
+      </div>
+    </details>
   )
 }

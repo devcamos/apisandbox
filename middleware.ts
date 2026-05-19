@@ -4,9 +4,12 @@ import { isSafeRelativeCallbackPath } from "@/lib/safe-redirect"
 
 const PREMIUM_PHASE_PATTERN = /^\/phase-([2-6])(\/|$)/
 const PROTECTED_API_PATTERN = /^\/api\/(subscription|profile|phase-progress)/
+const PROTECTED_RESOURCE_PATTERN =
+  /^\/(dashboard|observability|phase-\d+|cloud|ai|docs\/(architecture|java))(\/|$)/
 
 function getSessionToken(request: NextRequest): string | null {
   return (
+    request.cookies.get("auth_token")?.value ??
     request.cookies.get("next-auth.session-token")?.value ??
     request.cookies.get("__Secure-next-auth.session-token")?.value ??
     null
@@ -17,11 +20,7 @@ export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
   const paywallEnabled =
     process.env.NEXT_PUBLIC_FF_PREMIUM_PAYWALL === "true"
-
-  if (!paywallEnabled) {
-    return NextResponse.next()
-  }
-
+  const callbackPath = `${pathname}${request.nextUrl.search}`
   const token = getSessionToken(request)
 
   if (PROTECTED_API_PATTERN.test(pathname) && !token) {
@@ -31,10 +30,22 @@ export function middleware(request: NextRequest) {
     )
   }
 
+  if (PROTECTED_RESOURCE_PATTERN.test(pathname) && !token) {
+    const loginUrl = new URL("/login", request.url)
+    if (isSafeRelativeCallbackPath(callbackPath)) {
+      loginUrl.searchParams.set("callbackUrl", callbackPath)
+    }
+    return NextResponse.redirect(loginUrl)
+  }
+
+  if (!paywallEnabled) {
+    return NextResponse.next()
+  }
+
   if (PREMIUM_PHASE_PATTERN.test(pathname) && !token) {
     const loginUrl = new URL("/login", request.url)
-    if (isSafeRelativeCallbackPath(pathname)) {
-      loginUrl.searchParams.set("callbackUrl", pathname)
+    if (isSafeRelativeCallbackPath(callbackPath)) {
+      loginUrl.searchParams.set("callbackUrl", callbackPath)
     }
     return NextResponse.redirect(loginUrl)
   }

@@ -7,6 +7,7 @@ import { dsCategories, type DSCategory } from "@/lib/learning/data-science-produ
 import SelectableLearningCard from "@/components/learning/SelectableLearningCard";
 import DetailTabsShell from "@/components/learning/DetailTabsShell";
 import ParetoInsightCard from "@/components/learning/ParetoInsightCard";
+import { ExpandableCodeBlock } from "@/components/HighlightedCodeBlock";
 
 function CategoryCard({ cat, isSelected, onSelect }: Readonly<{ cat: DSCategory; isSelected: boolean; onSelect: () => void }>) {
   return (
@@ -94,9 +95,11 @@ function CategoryDetail({ cat }: Readonly<{ cat: DSCategory }>) {
                     </li>
                   ))}
                 </ul>
-                <pre className="bg-slate-950 border border-green-500/20 rounded-lg p-4 overflow-x-auto text-xs text-green-300 font-mono leading-relaxed">
-                  <code>{cat.springContext.codeSketch}</code>
-                </pre>
+                <ExpandableCodeBlock
+                  label="Spring code sketch"
+                  code={cat.springContext.codeSketch}
+                  preClassName="border-green-500/20 text-green-300"
+                />
               </div>
             </details>
           </div>

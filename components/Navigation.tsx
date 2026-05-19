@@ -43,7 +43,6 @@ export default function Navigation() {
     { name: "Architecture", href: "/docs/architecture" },
   ];
 
-  // Explore and free/premium options are open to all; show full nav when signed out too
   const navItems = session ? protectedNavItems : [...publicNavItems, { name: "Upgrade", href: "/upgrade" }];
 
   // Fetch subscription status
@@ -81,7 +80,7 @@ export default function Navigation() {
       title: "Phases",
       icon: BookOpen,
       items: [
-        { name: "Phase 0: Fundamentals", href: "/phase-0", badge: "Free" },
+        { name: "Phase 0: Getting Started", href: "/phase-0", badge: "Free" },
         { name: "Phase 1: Integration Mindset", href: "/phase-1", badge: "Free" },
         { name: "Phase 2: Third-Party Integrations", href: "/phase-2", badge: "Premium" },
         { name: "Phase 3: Inter-Service Communication", href: "/phase-3", badge: "Premium" },
@@ -121,72 +120,74 @@ export default function Navigation() {
             <span className="font-bold text-white text-xl">API Training</span>
           </Link>
 
-          {/* Desktop Navigation - Explore and free/premium open to all */}
+          {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-1">
-            <div className="relative" ref={exploreRef}>
-              <button
-                onClick={() => setExploreOpen(!exploreOpen)}
-                className={`px-4 py-2 rounded-lg transition-all flex items-center gap-1 ${
-                  pathname.startsWith("/phase") || pathname.startsWith("/cloud") || pathname.startsWith("/ai")
-                    ? "bg-blue-500/10 text-blue-400 font-semibold"
-                    : "text-gray-300 hover:text-white hover:bg-slate-800"
-                }`}
-              >
-                Explore
-                <ChevronDown className={`w-4 h-4 transition-transform ${exploreOpen ? "rotate-180" : ""}`} />
-              </button>
+            {session && (
+              <div className="relative" ref={exploreRef}>
+                <button
+                  onClick={() => setExploreOpen(!exploreOpen)}
+                  className={`px-4 py-2 rounded-lg transition-all flex items-center gap-1 ${
+                    pathname.startsWith("/phase") || pathname.startsWith("/cloud") || pathname.startsWith("/ai")
+                      ? "bg-blue-500/10 text-blue-400 font-semibold"
+                      : "text-gray-300 hover:text-white hover:bg-slate-800"
+                  }`}
+                >
+                  Explore
+                  <ChevronDown className={`w-4 h-4 transition-transform ${exploreOpen ? "rotate-180" : ""}`} />
+                </button>
 
-              {/* Explore Dropdown */}
-              {exploreOpen && (
-                <div className="absolute top-full left-0 mt-2 w-96 max-h-[min(90vh,40rem)] overflow-y-auto bg-slate-800 border border-slate-700 rounded-xl shadow-2xl z-50">
-                  <div className="p-4">
-                    {exploreSections.map((section, idx) => {
-                      const SectionIcon = section.icon;
-                      return (
-                        <div key={section.title} className={idx > 0 ? "mt-6 pt-6 border-t border-slate-700" : ""}>
-                          <div className="flex items-center gap-2 mb-3">
-                            <SectionIcon className="w-4 h-4 text-blue-400" />
-                            <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wide">
-                              {section.title}
-                            </h3>
+                {/* Explore Dropdown */}
+                {exploreOpen && (
+                  <div className="absolute top-full left-0 mt-2 w-96 max-h-[min(90vh,40rem)] overflow-y-auto bg-slate-800 border border-slate-700 rounded-xl shadow-2xl z-50">
+                    <div className="p-4">
+                      {exploreSections.map((section, idx) => {
+                        const SectionIcon = section.icon;
+                        return (
+                          <div key={section.title} className={idx > 0 ? "mt-6 pt-6 border-t border-slate-700" : ""}>
+                            <div className="flex items-center gap-2 mb-3">
+                              <SectionIcon className="w-4 h-4 text-blue-400" />
+                              <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wide">
+                                {section.title}
+                              </h3>
+                            </div>
+                            <div className="space-y-1">
+                              {section.items.map((item) => (
+                                <Link
+                                  key={item.href}
+                                  href={item.href}
+                                  onClick={() => setExploreOpen(false)}
+                                  className={`block px-3 py-2 rounded-lg transition-all group ${
+                                    pathname === item.href
+                                      ? "bg-blue-500/10 text-blue-400"
+                                      : "text-gray-300 hover:text-white hover:bg-slate-700"
+                                  }`}
+                                >
+                                  <div className="flex items-center justify-between">
+                                    <span className="text-sm">{item.name}</span>
+                                    <span className={`text-xs px-2 py-0.5 rounded ${mobileExploreBadgeClass(item.badge)}`}>
+                                      {item.badge}
+                                    </span>
+                                  </div>
+                                </Link>
+                              ))}
+                            </div>
                           </div>
-                          <div className="space-y-1">
-                            {section.items.map((item) => (
-                              <Link
-                                key={item.href}
-                                href={item.href}
-                                onClick={() => setExploreOpen(false)}
-                                className={`block px-3 py-2 rounded-lg transition-all group ${
-                                  pathname === item.href
-                                    ? "bg-blue-500/10 text-blue-400"
-                                    : "text-gray-300 hover:text-white hover:bg-slate-700"
-                                }`}
-                              >
-                                <div className="flex items-center justify-between">
-                                  <span className="text-sm">{item.name}</span>
-                                  <span className={`text-xs px-2 py-0.5 rounded ${mobileExploreBadgeClass(item.badge)}`}>
-                                    {item.badge}
-                                  </span>
-                                </div>
-                              </Link>
-                            ))}
-                          </div>
-                        </div>
-                      );
-                    })}
+                        );
+                      })}
+                    </div>
+                    <div className="border-t border-slate-700 p-4 bg-slate-900/50">
+                      <Link
+                        href="/dashboard"
+                        onClick={() => setExploreOpen(false)}
+                        className="block text-center px-4 py-2 bg-gradient-to-r from-blue-500 to-cyan-500 text-white rounded-lg font-semibold hover:shadow-lg transition-all text-sm"
+                      >
+                        View All in Dashboard
+                      </Link>
+                    </div>
                   </div>
-                  <div className="border-t border-slate-700 p-4 bg-slate-900/50">
-                    <Link
-                      href="/dashboard"
-                      onClick={() => setExploreOpen(false)}
-                      className="block text-center px-4 py-2 bg-gradient-to-r from-blue-500 to-cyan-500 text-white rounded-lg font-semibold hover:shadow-lg transition-all text-sm"
-                    >
-                      View All in Dashboard
-                    </Link>
-                  </div>
-                </div>
-              )}
-            </div>
+                )}
+              </div>
+            )}
 
             <Link
               href="/story"
@@ -356,7 +357,7 @@ export default function Navigation() {
           </button>
         </div>
 
-        {/* Mobile Navigation - Explore open to all */}
+        {/* Mobile Navigation */}
         {isOpen && (
           <div className="md:hidden py-4 space-y-2">
             <div className="px-4 py-2">
@@ -368,44 +369,48 @@ export default function Navigation() {
                 <Heart className="w-4 h-4" />
                 Before You Begin
               </Link>
-              <div className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2 flex items-center gap-2">
-                <BookOpen className="w-3 h-3" />
-                Explore
-              </div>
-              <div className="space-y-4 ml-2">
-                {exploreSections.map((section) => {
-                  const SectionIcon = section.icon;
-                  return (
-                    <div key={section.title}>
-                      <div className="flex items-center gap-2 mb-2 text-[11px] font-semibold text-gray-500 uppercase tracking-wide">
-                        <SectionIcon className="w-3 h-3 text-blue-400 shrink-0" />
-                        {section.title}
-                      </div>
-                      <div className="space-y-1 border-l border-slate-700 pl-3">
-                        {section.items.map((item) => (
-                          <Link
-                            key={item.href}
-                            href={item.href}
-                            onClick={() => setIsOpen(false)}
-                            className={`block px-3 py-2 rounded-lg transition-all ${
-                              pathname === item.href
-                                ? "bg-blue-500/10 text-blue-400 font-semibold"
-                                : "text-gray-300 hover:text-white hover:bg-slate-800"
-                            }`}
-                          >
-                            <div className="flex items-center justify-between gap-2">
-                              <span className="text-sm">{item.name}</span>
-                              <span className={`shrink-0 text-xs px-2 py-0.5 rounded ${mobileExploreBadgeClass(item.badge)}`}>
-                                {item.badge}
-                              </span>
-                            </div>
-                          </Link>
-                        ))}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
+              {session && (
+                <>
+                  <div className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2 flex items-center gap-2">
+                    <BookOpen className="w-3 h-3" />
+                    Explore
+                  </div>
+                  <div className="space-y-4 ml-2">
+                    {exploreSections.map((section) => {
+                      const SectionIcon = section.icon;
+                      return (
+                        <div key={section.title}>
+                          <div className="flex items-center gap-2 mb-2 text-[11px] font-semibold text-gray-500 uppercase tracking-wide">
+                            <SectionIcon className="w-3 h-3 text-blue-400 shrink-0" />
+                            {section.title}
+                          </div>
+                          <div className="space-y-1 border-l border-slate-700 pl-3">
+                            {section.items.map((item) => (
+                              <Link
+                                key={item.href}
+                                href={item.href}
+                                onClick={() => setIsOpen(false)}
+                                className={`block px-3 py-2 rounded-lg transition-all ${
+                                  pathname === item.href
+                                    ? "bg-blue-500/10 text-blue-400 font-semibold"
+                                    : "text-gray-300 hover:text-white hover:bg-slate-800"
+                                }`}
+                              >
+                                <div className="flex items-center justify-between gap-2">
+                                  <span className="text-sm">{item.name}</span>
+                                  <span className={`shrink-0 text-xs px-2 py-0.5 rounded ${mobileExploreBadgeClass(item.badge)}`}>
+                                    {item.badge}
+                                  </span>
+                                </div>
+                              </Link>
+                            ))}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </>
+              )}
             </div>
 
             {/* Mobile Search */}
