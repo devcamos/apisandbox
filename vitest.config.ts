@@ -17,6 +17,7 @@ export default defineConfig({
       include: [
         "lib/assistant/redirect.ts",
         "lib/auth-authorize-helpers.ts",
+        "lib/browser-credentials.ts",
         "lib/demo-login.ts",
         "lib/login-error-parser.ts",
         "lib/sanitize-mermaid-svg.ts",
