@@ -19,6 +19,7 @@ import { ArrowRight, Mail, Lock, User, AlertCircle, CheckCircle } from "lucide-r
 import { useAuthSessionWriter } from "@/components/providers/SessionProvider"
 import AuthPageShell from "@/components/auth/AuthPageShell"
 import AuthSocialSection from "@/components/auth/AuthSocialSection"
+import { promptSavePasswordCredential } from "@/lib/browser-credentials"
 
 export default function SignupPage() {
   const router = useRouter()
@@ -93,6 +94,8 @@ export default function SignupPage() {
       }
 
       setSessionFromAuthResponse(data.data)
+      await promptSavePasswordCredential(formData.email, formData.password)
+
       router.push("/dashboard")
       router.refresh()
     } catch (err) {
@@ -165,7 +168,28 @@ export default function SignupPage() {
       title="Create Account"
       subtitle="Start your API integration learning journey"
     >
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="mb-6 rounded-xl border border-slate-700/70 bg-slate-900/40 p-4" data-testid="auth-methods-intro">
+            <h2 className="text-sm font-semibold text-white">Create one account, use either method</h2>
+            <p className="mt-1 text-sm text-gray-400">
+              Start with Google or Gmail, or create a local email and password account.
+            </p>
+            <p className="mt-2 text-xs text-gray-500">
+              New accounts start on the free plan (Phases 0 &amp; 1). Upgrade anytime for full access.
+            </p>
+            <p className="mt-2 text-xs text-gray-500">
+              If you later use Google with the same email, the app links it to this account.
+            </p>
+          </div>
+
+          <AuthSocialSection
+            googleClientId={googleClientId}
+            googleButtonRef={googleButtonRef}
+            fallbackLabel="Continue with Google"
+            dividerLabel="Or create an account with email and password"
+            heading="Google or Gmail"
+            description="Use your Google account for a faster setup. Gmail addresses work here."
+          >
+          <form onSubmit={handleSubmit} method="post" className="space-y-6">
             {/* Name Field */}
             <div>
               <label htmlFor="name" className="block text-sm font-medium text-gray-300 mb-2">
@@ -175,7 +199,9 @@ export default function SignupPage() {
                 <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                 <input
                   id="name"
+                  name="name"
                   type="text"
+                  autoComplete="name"
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   className="w-full pl-10 pr-4 py-3 bg-slate-900/50 border border-slate-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -193,7 +219,9 @@ export default function SignupPage() {
                 <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                 <input
                   id="email"
+                  name="email"
                   type="email"
+                  autoComplete="email"
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                   required
@@ -212,7 +240,9 @@ export default function SignupPage() {
                 <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                 <input
                   id="password"
+                  name="password"
                   type="password"
+                  autoComplete="new-password"
                   value={formData.password}
                   onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                   required
@@ -264,7 +294,9 @@ export default function SignupPage() {
                 <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                 <input
                   id="confirmPassword"
+                  name="confirm-password"
                   type="password"
+                  autoComplete="new-password"
                   value={formData.confirmPassword}
                   onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
                   required
@@ -305,14 +337,6 @@ export default function SignupPage() {
               )}
             </button>
           </form>
-
-          <AuthSocialSection
-            googleClientId={googleClientId}
-            googleButtonRef={googleButtonRef}
-            fallbackLabel="Sign up with Google"
-            dividerLabel="Or sign up with"
-          >
-
           {/* Login Link */}
           <div className="mt-6 text-center text-sm text-gray-400">
             Already have an account?{" "}
@@ -324,4 +348,3 @@ export default function SignupPage() {
     </AuthPageShell>
   )
 }
-
