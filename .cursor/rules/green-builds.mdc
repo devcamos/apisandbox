@@ -35,8 +35,17 @@ Conventions: `.cursor/rules/auth-subscription.mdc`
 
 1. `npm run verify:ci` green
 2. No secrets or generated artifacts in diff
-3. Push; `gh pr checks --watch` should confirm (not discover) green CI
-4. PR body: Summary + Test plan with `verify:ci` checked
+3. **Push the full branch** — every commit, including `.github/workflows/` changes. If HTTPS push rejects workflow files (OAuth `workflow` scope), use SSH: `git push git@github.com:ORG/REPO.git HEAD:BRANCH`
+4. `gh pr checks --watch` should confirm (not discover) green CI
+5. PR body: Summary + Test plan with `verify:ci` checked
+
+## New logic in `lib/` (Sonar coverage)
+
+When adding or changing testable `lib/**` modules that Sonar tracks (not excluded in `sonar-project.properties`):
+
+1. Add unit tests under `tests/unit/`
+2. Add the file to `vitest.config.ts` → `coverage.include` so LCOV reaches SonarCloud
+3. Re-run `npm run verify:ci` before push — do not leave coverage for the user to request
 
 ## GitHub-only (acceptable surprises)
 
