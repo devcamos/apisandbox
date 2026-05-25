@@ -32,6 +32,7 @@ test.describe("Unified Auth", () => {
     expect(body.success).toBeTruthy()
     expect(body.data.token).toBeTruthy()
     expect(body.data.user.email).toBe(email)
+    expect(body.data.user.subscriptionTier).toBe("FREE")
   })
 
   test("password login returns same auth shape", async ({ request }) => {
@@ -55,6 +56,57 @@ test.describe("Unified Auth", () => {
     const body = await response.json()
     expect(body.data.token).toBeTruthy()
     expect(body.data.user.email).toBe(email)
+  })
+
+  test("google signup assigns FREE subscription tier", async ({ request }) => {
+    const email = randomEmail("google-free")
+    const response = await request.post("/api/auth/google", {
+      data: {
+        idToken: makeTestGoogleToken({
+          sub: `google-${Date.now()}`,
+          email,
+          given_name: "Google",
+          family_name: "Free",
+        }),
+      },
+    })
+
+    expect(response.status()).toBe(200)
+    const body = await response.json()
+    expect(body.data.user.subscriptionTier).toBe("FREE")
+  })
+
+  test("google login preserves existing subscription tier when linking", async ({ request }) => {
+    const email = randomEmail("google-premium")
+    const registerRes = await request.post("/api/auth/register", {
+      data: {
+        email,
+        password: "Test1234!@#$",
+        firstName: "Premium",
+        lastName: "User",
+      },
+    })
+    const registerBody = await registerRes.json()
+    const token = registerBody.data.token
+
+    await request.post("/api/subscription/upgrade", {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+
+    const response = await request.post("/api/auth/google", {
+      data: {
+        idToken: makeTestGoogleToken({
+          sub: `google-${Date.now()}`,
+          email,
+          given_name: "Premium",
+          family_name: "User",
+        }),
+      },
+    })
+
+    expect(response.status()).toBe(200)
+    const body = await response.json()
+    expect(body.data.user.subscriptionTier).toBe("PREMIUM")
   })
 
   test("google login links to existing email account", async ({ request }) => {

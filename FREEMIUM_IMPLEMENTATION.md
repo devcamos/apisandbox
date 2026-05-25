@@ -93,6 +93,8 @@ enum SubscriptionTier {
 }
 ```
 
+**Agent convention:** every new user (password or Google) is bootstrapped in `lib/services/auth/user-bootstrap-service.ts` → `createUserWithInitialData`, which **explicitly sets** `subscriptionTier: "FREE"`. Do not create users elsewhere. Google account linking preserves an existing `PREMIUM` tier. Details: `.cursor/rules/auth-subscription.mdc`.
+
 ---
 
 ## Infrastructure

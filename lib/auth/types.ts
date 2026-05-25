@@ -1,3 +1,5 @@
+export type AuthSubscriptionTier = "FREE" | "PREMIUM"
+
 export interface AuthUser {
   id: string
   email: string
@@ -6,6 +8,7 @@ export interface AuthUser {
   avatarUrl: string | null
   roleLabel: string | null
   identityStatement: string | null
+  subscriptionTier: AuthSubscriptionTier
 }
 
 export interface AuthPayload {

@@ -1,0 +1,21 @@
+# Ephemeral Postgres for local CI parity (mirrors GitHub Actions e2e-smoke service).
+# Port 5436 avoids conflicts with dev (5435), staging (5434), and system Postgres (5432).
+services:
+  postgres-ci:
+    profiles:
+      - ci
+    image: postgres:16-alpine
+    container_name: apisandbox-postgres-ci
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: apisandbox_ci
+    ports:
+      - "127.0.0.1:5436:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d apisandbox_ci"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      - apisandbox-network

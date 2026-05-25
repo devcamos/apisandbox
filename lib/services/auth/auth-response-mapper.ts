@@ -7,6 +7,7 @@ interface UserWithProfile {
   email: string
   name: string | null
   image: string | null
+  subscriptionTier: "FREE" | "PREMIUM"
   profile: {
     firstName: string | null
     lastName: string | null
@@ -26,6 +27,7 @@ export function mapUserToAuthUser(user: UserWithProfile): AuthUser {
     avatarUrl: user.profile?.avatarUrl ?? user.image ?? null,
     roleLabel: user.profile?.roleLabel ?? null,
     identityStatement: user.profile?.identityStatement ?? null,
+    subscriptionTier: user.subscriptionTier,
   }
 }
 

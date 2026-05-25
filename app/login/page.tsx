@@ -19,6 +19,7 @@ import Link from "next/link"
 import { ArrowRight, Mail, Lock, AlertCircle, CheckCircle, XCircle, Loader2 } from "lucide-react"
 import { useAuthSessionWriter } from "@/components/providers/SessionProvider"
 import { parseLoginErrorMessage, type LoginErrorInfo } from "@/lib/login-error-parser"
+import { promptSavePasswordCredential } from "@/lib/browser-credentials"
 import AuthPageShell from "@/components/auth/AuthPageShell"
 import AuthSocialSection from "@/components/auth/AuthSocialSection"
 import { TryDemoButton } from "@/components/auth/TryDemoButton"
@@ -156,6 +157,7 @@ function LoginForm() {
         return
       }
       setSessionFromAuthResponse(payload.data)
+      await promptSavePasswordCredential(email, password)
 
       router.push(callbackUrl)
       router.refresh()
@@ -251,7 +253,25 @@ function LoginForm() {
       title="Welcome Back"
       subtitle="Sign in to continue your API integration journey"
     >
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="mb-6 rounded-xl border border-slate-700/70 bg-slate-900/40 p-4" data-testid="auth-methods-intro">
+            <h2 className="text-sm font-semibold text-white">Choose a sign-in method</h2>
+            <p className="mt-1 text-sm text-gray-400">
+              Use your Google or Gmail account for a faster sign-in, or use your local email and password.
+            </p>
+            <p className="mt-2 text-xs text-gray-500">
+              If the same email exists in both methods, the app links them to one account.
+            </p>
+          </div>
+
+          <AuthSocialSection
+            googleClientId={googleClientId}
+            googleButtonRef={googleButtonRef}
+            fallbackLabel="Continue with Google"
+            dividerLabel="Or sign in with email and password"
+            heading="Google or Gmail"
+            description="Use your Google account for quick access. Gmail addresses work here."
+          >
+          <form onSubmit={handleSubmit} method="post" className="space-y-6">
             {/* Email Field */}
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-2">
@@ -261,7 +281,9 @@ function LoginForm() {
                 <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                 <input
                   id="email"
+                  name="email"
                   type="email"
+                  autoComplete="username"
                   value={email}
                   onChange={handleEmailChange}
                   onBlur={() => {
@@ -307,7 +329,9 @@ function LoginForm() {
                 <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                 <input
                   id="password"
+                  name="password"
                   type="password"
+                  autoComplete="current-password"
                   value={password}
                   onChange={handlePasswordChange}
                   onBlur={() => {
@@ -414,13 +438,6 @@ function LoginForm() {
           <div className="mt-6 space-y-3">
             <TryDemoButton nextPath={callbackUrl} />
           </div>
-
-          <AuthSocialSection
-            googleClientId={googleClientId}
-            googleButtonRef={googleButtonRef}
-            fallbackLabel="Sign in with Google"
-            dividerLabel="Or continue with"
-          >
 
           {/* Sign Up Link */}
           <div className="mt-6 text-center text-sm text-gray-400">

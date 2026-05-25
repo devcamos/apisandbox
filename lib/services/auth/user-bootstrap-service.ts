@@ -23,6 +23,7 @@ export async function createUserWithInitialData(input: BootstrapInput) {
           passwordHash: input.passwordHash,
           isActive: true,
           loginAttempts: 0,
+          subscriptionTier: "FREE",
         },
       })
 

@@ -6,7 +6,7 @@ const googleClientId = process.env.GOOGLE_CLIENT_ID
 const oauthClient = googleClientId ? new OAuth2Client(googleClientId) : null
 
 function parseTestIdentity(idToken: string): VerifiedGoogleIdentity | null {
-  if (process.env.NODE_ENV !== "test" || !idToken.startsWith("test-google:")) {
+  if (process.env.NODE_ENV === "production" || !idToken.startsWith("test-google:")) {
     return null
   }
 

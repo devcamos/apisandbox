@@ -1,8 +1,25 @@
+import { existsSync } from "node:fs";
 import { defineConfig, devices } from '@playwright/test';
 
 const baseURL =
   process.env.PLAYWRIGHT_BASE_URL ??
   (process.env.CI ? "http://127.0.0.1:4000" : "http://localhost:4000");
+
+const useProdServer =
+  process.env.CI_E2E_USE_PROD_SERVER === "1" && existsSync(".next/BUILD_ID");
+
+const useStandaloneServer =
+  useProdServer && existsSync(".next/standalone/server.js");
+
+const ciWebServerCommand = useStandaloneServer
+  ? "node .next/standalone/server.js"
+  : useProdServer
+    ? "npx next start -H 127.0.0.1 -p 4000"
+    : "npx next dev -H 127.0.0.1 -p 4000 --webpack";
+
+const ciWorkers = process.env.PLAYWRIGHT_WORKERS
+  ? Number.parseInt(process.env.PLAYWRIGHT_WORKERS, 10)
+  : 1;
 
 /**
  * @see https://playwright.dev/docs/test-configuration
@@ -15,8 +32,8 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   /* Retry on CI only */
   retries: process.env.CI ? 2 : 0,
-  /* Opt out of parallel tests on CI. */
-  workers: process.env.CI ? 1 : undefined,
+  /* Smoke runs can override workers via PLAYWRIGHT_WORKERS (default 1 on CI). */
+  workers: process.env.CI ? ciWorkers : undefined,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
   reporter: [
     ['html'],
@@ -99,15 +116,16 @@ export default defineConfig({
   webServer: process.env.STAGING_TEST
     ? undefined
     : {
-        // GitHub runners: bind explicitly to IPv4 (avoids localhost / ::1 mismatches with the health-check URL).
-        command: process.env.CI
-          ? "npx next dev -H 127.0.0.1 -p 4000 --webpack"
-          : "npm run dev",
+        // CI: reuse lint-and-build output via `next start` when CI_E2E_USE_PROD_SERVER=1.
+        command: process.env.CI ? ciWebServerCommand : "npm run dev",
         url: baseURL,
         reuseExistingServer: !process.env.CI,
-        timeout: process.env.CI ? 180 * 1000 : 120 * 1000,
+        timeout: process.env.CI ? (useProdServer ? 60 * 1000 : 180 * 1000) : 120 * 1000,
         env: {
           NODE_ENV: "test",
+          ...(useStandaloneServer
+            ? { HOSTNAME: "127.0.0.1", PORT: "4000" }
+            : {}),
         },
       },
 });

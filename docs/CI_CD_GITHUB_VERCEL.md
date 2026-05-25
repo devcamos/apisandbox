@@ -40,6 +40,10 @@ A one-off **`vercel deploy`** from a laptop uploads **whatever is on that machin
 | Push / merge to **`main`** | `CI` on the merged commit | **Production deployment** (Vercel production branch) |
 | Push to **`develop`** / **`dev`** | `CI` workflow | **Preview** for that branch (not production unless you set one of those as the production branch) |
 
+### Local CI parity (agents)
+
+Run **`npm run verify:ci`** before opening a PR. It mirrors blocking CI jobs locally (lint, build, unit tests with coverage, compose validate, npm audit, e2e-smoke with ephemeral Postgres). GitHub should only surface what cannot run locally: **Preview approved (Vercel)**, Vercel hosted deploy, and PR-only dependency diff nuances. See [AGENT_PR_CHECKLIST.md](./AGENT_PR_CHECKLIST.md).
+
 ### Manual approval before merging to `main`
 
 This repo gates PRs with a GitHub Actions **environment** named `preview`:
@@ -115,6 +119,22 @@ If you need it:
 - CI build: `npm run lint` && `npm run build`  
 - CI E2E gate: `npm run test:ci:smoke` (see `tests/ci-smoke.spec.ts`) — needs Postgres and a free port **4000** (stop `npm run dev` first), same env vars as in `.github/workflows/ci.yml`.  
 - Full browser matrix: `npm run test` or `npm run test:ci:chromium` locally / in a separate scheduled workflow if you add one.
+
+### CI performance (caching & smoke strategy)
+
+The workflow in `.github/workflows/ci.yml` uses several strategies so smoke stays fast without weakening coverage:
+
+| Strategy | Where | Effect |
+|----------|--------|--------|
+| **npm cache** | `setup-node` (`cache: npm`) | Faster `npm ci` across jobs |
+| **Next.js build cache** | `lint-and-build` (`.next/cache`) | Faster incremental `next build` |
+| **Build artifact reuse** | `lint-and-build` uploads `.next`; `e2e-smoke` downloads, runs `scripts/prepare-smoke-standalone.sh`, then `node .next/standalone/server.js` | Avoids a second dev-server compile on CI |
+| **Playwright browser cache** | `e2e-smoke` (`~/.cache/ms-playwright`) | Skips re-downloading Chromium when lockfile unchanged |
+| **Parallel smoke workers** | `PLAYWRIGHT_WORKERS=3` on smoke only | Independent smoke specs run concurrently |
+| **Third-party script blocking** | `tests/helpers/smoke-helpers.ts` | Aborts Google GSI / GTM in smoke (not under test) |
+| **Sonar scanner cache** | `sonarcloud` job | Reuses scanner artifacts between runs |
+
+`e2e-smoke` depends only on `lint-and-build` (not `unit-tests`), so it can start as soon as the build artifact is ready. `npm run verify:ci` mirrors the prod-server smoke path: it builds first, then runs smoke with `CI_E2E_USE_PROD_SERVER=1`.
 
 ### Prisma migrations vs CI
 

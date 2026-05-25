@@ -104,7 +104,15 @@ export async function getAuthenticatedUserFromToken(token: string) {
   const payload = verifyJwtToken(token)
   const user = await prisma.user.findUnique({
     where: { id: payload.sub },
-    include: { profile: true },
+    select: {
+      id: true,
+      email: true,
+      name: true,
+      image: true,
+      subscriptionTier: true,
+      isActive: true,
+      profile: true,
+    },
   })
   if (!user?.isActive) {
     throw new AppError("Unauthorized", 401, "auth_failure")
