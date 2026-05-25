@@ -20,6 +20,7 @@ export default defineConfig({
         "lib/browser-credentials.ts",
         "lib/demo-login.ts",
         "lib/login-error-parser.ts",
+        "lib/password-validation.ts",
         "lib/sanitize-mermaid-svg.ts",
         "lib/safe-redirect.ts",
         "lib/stripe-webhook-handlers.ts",

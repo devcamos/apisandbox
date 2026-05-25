@@ -68,28 +68,25 @@ export function getPasswordRequirements(password: string): PasswordRequirement[]
   ]
 }
 
+const PASSWORD_ERROR_MESSAGES: Record<
+  PasswordRequirement["id"],
+  string
+> = {
+  length: "Password must be at least 8 characters",
+  upper: "Password must contain at least one uppercase letter",
+  lower: "Password must contain at least one lowercase letter",
+  digit: "Password must contain at least one number",
+  special:
+    "Password must contain a special character, or be at least 12 characters with uppercase, lowercase, and a number",
+}
+
 export function validatePasswordStrength(password: string): {
   isValid: boolean
   errors: string[]
 } {
   const errors = getPasswordRequirements(password)
     .filter((requirement) => !requirement.met)
-    .map((requirement) => {
-      switch (requirement.id) {
-        case "length":
-          return "Password must be at least 8 characters"
-        case "upper":
-          return "Password must contain at least one uppercase letter"
-        case "lower":
-          return "Password must contain at least one lowercase letter"
-        case "digit":
-          return "Password must contain at least one number"
-        case "special":
-          return "Password must contain a special character, or be at least 12 characters with uppercase, lowercase, and a number"
-        default:
-          return requirement.label
-      }
-    })
+    .map((requirement) => PASSWORD_ERROR_MESSAGES[requirement.id])
 
   return {
     isValid: errors.length === 0,
