@@ -40,6 +40,10 @@ A one-off **`vercel deploy`** from a laptop uploads **whatever is on that machin
 | Push / merge to **`main`** | `CI` on the merged commit | **Production deployment** (Vercel production branch) |
 | Push to **`develop`** / **`dev`** | `CI` workflow | **Preview** for that branch (not production unless you set one of those as the production branch) |
 
+### Local CI parity (agents)
+
+Run **`npm run verify:ci`** before opening a PR. It mirrors blocking CI jobs locally (lint, build, unit tests with coverage, compose validate, npm audit, e2e-smoke with ephemeral Postgres). GitHub should only surface what cannot run locally: **Preview approved (Vercel)**, Vercel hosted deploy, and PR-only dependency diff nuances. See [AGENT_PR_CHECKLIST.md](./AGENT_PR_CHECKLIST.md).
+
 ### Manual approval before merging to `main`
 
 This repo gates PRs with a GitHub Actions **environment** named `preview`:

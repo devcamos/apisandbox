@@ -1,0 +1,54 @@
+---
+description: Auth signup conventions and freemium subscription bootstrap for password and Google flows
+globs: "{app/{login,signup}/**,app/api/auth/**,lib/services/auth/**,lib/auth/**,components/auth/**,tests/*auth*,tests/ci-smoke.spec.ts}"
+alwaysApply: false
+---
+
+# Auth & subscription conventions
+
+## Single bootstrap path for new users
+
+**All new accounts** (email/password or Google) must be created via `createUserWithInitialData` in `lib/services/auth/user-bootstrap-service.ts`.
+
+When adding signup paths, never call `prisma.user.create` directly elsewhere.
+
+```typescript
+// ✅ Required in createUserWithInitialData
+subscriptionTier: "FREE",
+```
+
+Prisma defaults to `FREE`, but the explicit field is intentional — keep it when editing bootstrap.
+
+## Auth response shape
+
+`mapUserToAuthResponse` must include `user.subscriptionTier` (`FREE` | `PREMIUM`) so clients know tier immediately after login/signup.
+
+## Google vs password
+
+| Method | UI | API |
+|--------|-----|-----|
+| Email/password | `/login`, `/signup` forms | `POST /api/auth/login`, `/register` |
+| Google | GSI button (`AuthSocialSection`) | `POST /api/auth/google` with `{ idToken }` |
+
+Login/signup UI does **not** use NextAuth `signIn("google")` redirect — custom JWT routes are canonical.
+
+## Account linking
+
+Same email → one account. Google login links to an existing password account **without changing** `subscriptionTier` (preserve `PREMIUM` if already upgraded).
+
+OAuth-only users (`passwordHash: null`) must reject password login with a clear Google-only message.
+
+## Browser password save
+
+Email/password success should call `promptSavePasswordCredential` from `lib/browser-credentials.ts`. Forms need `name` + `autoComplete` (`username`/`current-password` on login; `new-password` on signup).
+
+## Tests to update when changing auth
+
+- `tests/unified-auth.spec.ts` — API contracts, FREE tier, linking, premium preservation
+- `tests/ci-smoke.spec.ts` — login/signup UI smoke + password E2E
+
+Test Google tokens (`test-google:...`) work in non-production only — see `google-identity-service.ts`.
+
+## Freemium reference
+
+Tier rules and paywall flags: `lib/subscription.ts`, `FREEMIUM_IMPLEMENTATION.md`, `config/featureFlags.ts`.

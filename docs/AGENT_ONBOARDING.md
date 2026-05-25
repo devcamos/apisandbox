@@ -11,8 +11,10 @@ This page is for **any** automated or human developer working in this repository
 | Step | Document | Why |
 |------|----------|-----|
 | 1 | **This file** | Fast path: setup, verification, behaviour. |
-| 2 | [Agent workspace map](AGENT_WORKSPACES.md) | GitHub, Vercel, SonarCloud, **Notion page URLs**, app routes, Notion `?v=` rules for MCP. |
-| 3 | [Feature and backlog management](FEATURE_MANAGEMENT.md) | Hub vs tracker, status workflow, Notion fields, process. |
+| 2 | **`.cursor/rules/`** | Persistent agent rules (auto-loaded in Cursor): green builds, auth/subscription conventions. |
+| 3 | **[PR checklist](AGENT_PR_CHECKLIST.md)** | Pre-PR verification: local gates, CI parity, post-push checks, PR template. |
+| 4 | [Agent workspace map](AGENT_WORKSPACES.md) | GitHub, Vercel, SonarCloud, **Notion page URLs**, app routes, Notion `?v=` rules for MCP. |
+| 5 | [Feature and backlog management](FEATURE_MANAGEMENT.md) | Hub vs tracker, status workflow, Notion fields, process. |
 
 ---
 
@@ -76,16 +78,33 @@ All backlog rules, statuses, and fields are in **[Feature and backlog management
 
 ## How to verify a change
 
-Run what applies to your edit (smallest useful subset):
+**Principle:** Only surprises should come from GitHub (human preview approval, Vercel deploy). Run **`npm run verify:ci`** before every PR — it mirrors blocking CI jobs locally.
 
-| Check | Command |
-|-------|---------|
-| TypeScript | `npx tsc --noEmit` |
-| ESLint | `npm run lint` |
-| Unit tests | `npm run test:unit` |
-| E2E (heavier) | `npm run test` or `npm run test:ci:chromium` |
+- **Command:** `npm run verify:ci` (alias: `verify:pr`) — see `scripts/verify-ci-local.sh`
+- **Checklist:** [AGENT_PR_CHECKLIST.md](AGENT_PR_CHECKLIST.md)
+- **Cursor rule:** `.cursor/rules/green-builds.mdc`
 
-CI also runs Playwright, coverage expectations, and **SonarCloud** on the analysed scope. Project: **`devcamos_apisandbox`**, org **`devcamos`** — links in [AGENT_WORKSPACES](AGENT_WORKSPACES.md).
+**Prerequisites:** Docker running, port 4000 free, `npm ci` if lockfile changed.
+
+| What verify:ci covers | GitHub job |
+|-----------------------|------------|
+| lint + build | `lint-and-build` |
+| vitest with coverage | `unit-tests` |
+| compose validation | `docker-compose-validate` |
+| npm audit (critical) | `dependency-review` (approx.) |
+| postgres-ci + smoke tests | `e2e-smoke` |
+| sonar (if `SONAR_TOKEN` set) | `sonarcloud` |
+
+**Not local (GitHub-only):** Preview approved (Vercel), Vercel Preview URL.
+
+**After push:** `gh pr checks --watch` should confirm green CI, not discover failures.
+
+**Area-specific** (in addition to verify:ci when relevant):
+
+| Area | Command |
+|------|---------|
+| Auth / subscriptions | `CI=1 npx playwright test tests/unified-auth.spec.ts --project=chromium` |
+| Full E2E | `CI=1 npm run test:ci:chromium` |
 
 ---
 
@@ -93,7 +112,7 @@ CI also runs Playwright, coverage expectations, and **SonarCloud** on the analys
 
 - **Scope:** Change only what the task requires; match existing patterns (imports, naming, file layout).
 - **Secrets:** Never commit `.env.local` or real tokens. Use `*.example` files and Vercel/GitHub secrets for production.
-- **Auth / billing:** Sensitive flows live under `app/api/`, `lib/services/`, and middleware — read neighbouring routes before editing.
+- **Auth / billing:** Sensitive flows live under `app/api/`, `lib/services/`, and middleware — read neighbouring routes before editing. **New users:** always via `createUserWithInitialData` with explicit `subscriptionTier: "FREE"`; see `.cursor/rules/auth-subscription.mdc`.
 - **Docs:** Prefer updating this onboarding or [AGENT_WORKSPACES](AGENT_WORKSPACES.md) when you add a new external system agents must know about.
 
 ---
@@ -105,6 +124,7 @@ CI also runs Playwright, coverage expectations, and **SonarCloud** on the analys
 | Dev workflows, diagrams | [DEV_SETUP](DEV_SETUP.md) |
 | Architecture | [ARCHITECTURE](ARCHITECTURE.md), `/docs/architecture` in app |
 | CI / Vercel / GitHub | [CI_CD_GITHUB_VERCEL](CI_CD_GITHUB_VERCEL.md) |
+| **Pre-PR verification (agents)** | [AGENT_PR_CHECKLIST](AGENT_PR_CHECKLIST.md) |
 | Env vars (Vercel) | [VERCEL_ENV_VARIABLES](VERCEL_ENV_VARIABLES.md) |
 | Sonar quality gate | [SONAR_QUALITY_GATE](SONAR_QUALITY_GATE.md) |
 | Demo login / test users | [TEST_USERS](TEST_USERS.md) |
@@ -117,6 +137,8 @@ CI also runs Playwright, coverage expectations, and **SonarCloud** on the analys
 
 | Date | Change |
 |------|--------|
+| 2026-05-25 | Local-first CI parity: `npm run verify:ci` mirrors all blocking GitHub jobs (`scripts/verify-ci-local.sh`). |
+| 2026-05-25 | Cursor rules for green builds and auth/subscription conventions; stronger verify-before-ship guidance. |
 | 2026-05-07 | Initial agent onboarding (story, setup order, verification, Notion, conventions). |
 | 2026-05-07 | “Where work is tracked” defers to FEATURE_MANAGEMENT for backlog/workflow. |
 | 2026-05-07 | Deeper reference row for backlog / status review doc. |

@@ -1,0 +1,49 @@
+---
+description: Require green lint, build, and tests before marking work done or opening a PR
+alwaysApply: true
+---
+
+# Green builds before progressing
+
+**Principle:** Only surprises should come from GitHub — human preview approval, Vercel hosted deploy, PR-only dependency diff. Everything else must pass locally first.
+
+**Full checklist:** `docs/AGENT_PR_CHECKLIST.md`
+
+## Required before every PR
+
+```bash
+npm run verify:ci
+```
+
+Mirrors CI jobs: `lint-and-build`, `unit-tests` (with coverage), `docker-compose-validate`, `npm audit` (critical), `e2e-smoke` (Postgres + `db push` + smoke tests).
+
+Requires **Docker** for e2e parity. Stop any `npm run dev` on port 4000 first.
+
+Optional with `SONAR_TOKEN`: also runs Sonar local scan (CI `sonarcloud` job).
+
+## Auth / subscription changes
+
+Also run:
+
+```bash
+CI=1 npx playwright test tests/unified-auth.spec.ts --project=chromium
+```
+
+Conventions: `.cursor/rules/auth-subscription.mdc`
+
+## Before `gh pr create`
+
+1. `npm run verify:ci` green
+2. No secrets or generated artifacts in diff
+3. Push; `gh pr checks --watch` should confirm (not discover) green CI
+4. PR body: Summary + Test plan with `verify:ci` checked
+
+## GitHub-only (acceptable surprises)
+
+- **Preview approved (Vercel)** — human reviewer
+- **Vercel Preview URL** — hosted build
+- **dependency-review** — diff-based; local `npm audit --audit-level=critical` approximates critical gate
+
+## If a check fails
+
+Fix locally, re-run `npm run verify:ci`, push again.

@@ -5,6 +5,13 @@
  * Uses the Credential Management API where supported (Chrome, Edge, Safari).
  * Falls back silently when unavailable or when the user dismisses the prompt.
  */
+
+interface PasswordCredentialInit {
+  id: string
+  password: string
+  name?: string
+}
+
 export async function promptSavePasswordCredential(
   email: string,
   password: string,
@@ -16,7 +23,7 @@ export async function promptSavePasswordCredential(
 
   const PasswordCredentialCtor = (
     globalThis as typeof globalThis & {
-      PasswordCredential?: new (data: PasswordCredentialData) => PasswordCredential
+      PasswordCredential?: new (data: PasswordCredentialInit) => Credential
     }
   ).PasswordCredential
 
