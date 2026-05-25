@@ -53,11 +53,15 @@ test.describe('Auth Signup', () => {
     await passwordInput.fill('WeakPassword!');
     await expect(page.getByText(/one number/i)).toBeVisible();
     
-    // Test missing special character
-    await passwordInput.fill('WeakPassword123');
-    await expect(page.getByText(/one special character/i)).toBeVisible();
-    
-    // Test strong password
+    // Test missing special character on short passwords
+    await passwordInput.fill('ShortPass1A');
+    await expect(page.getByText(/one special character, or 12\+ characters/i)).toBeVisible();
+
+    // Password managers may omit symbols on long generated passwords
+    await passwordInput.fill('y6QigkgWG3kuT7j');
+    await expect(page.getByText(/password meets all requirements/i)).toBeVisible();
+
+    // Test strong password with symbol
     await passwordInput.fill('StrongPassword123!');
     await expect(page.getByText(/password meets all requirements/i)).toBeVisible();
   });

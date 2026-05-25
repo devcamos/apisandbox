@@ -75,6 +75,9 @@ export DATABASE_URL="$E2E_DATABASE_URL"
 npx prisma db push --accept-data-loss
 npx playwright install chromium --with-deps >/dev/null 2>&1 || npx playwright install chromium
 
+export CI_E2E_USE_PROD_SERVER=1
+export PLAYWRIGHT_WORKERS=3
+bash scripts/prepare-smoke-standalone.sh
 PLAYWRIGHT_JSON_OUTPUT_NAME=reports/playwright-smoke.json \
 PLAYWRIGHT_JUNIT_OUTPUT_NAME=reports/playwright-smoke-junit.xml \
   npx playwright test tests/ci-smoke.spec.ts --project=chromium --reporter=line

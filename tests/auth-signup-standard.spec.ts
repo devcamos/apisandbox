@@ -41,6 +41,21 @@ test.describe("Standard Signup API (/api/auth/signup)", () => {
     expect(data.details.length).toBeGreaterThan(0)
   })
 
+  test("accepts long password-manager style passwords without symbols", async ({ request }) => {
+    const email = uniqueEmail("std-pw-manager")
+    const response = await request.post("/api/auth/signup", {
+      data: {
+        email,
+        password: "y6QigkgWG3kuT7j",
+        name: "Password Manager User",
+      },
+    })
+
+    expect(response.status()).toBe(201)
+    const data = await response.json()
+    expect(data.user.email).toBe(email)
+  })
+
   test("returns 400 for duplicate email", async ({ request }) => {
     const email = uniqueEmail("std-dup")
     const first = await request.post("/api/auth/signup", {

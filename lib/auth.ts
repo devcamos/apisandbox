@@ -23,6 +23,12 @@
 
 import bcrypt from 'bcryptjs'
 
+export {
+  getPasswordRequirements,
+  meetsSpecialCharacterRequirement,
+  validatePasswordStrength,
+} from '@/lib/password-validation'
+
 // MENTOR NOTE: Salt rounds determine security vs performance
 // - 10 rounds = ~100ms to hash (good balance)
 // - 12 rounds = ~400ms to hash (more secure, slower)
@@ -65,40 +71,6 @@ export async function verifyPassword(
   // 2. Hashes the input password with that salt
   // 3. Compares the two hashes
   return bcrypt.compare(password, hash)
-}
-
-/**
- * Validate password strength
- * 
- * MENTOR NOTE: Client-side validation is for UX,
- * but ALWAYS validate server-side too!
- */
-export function validatePasswordStrength(password: string): {
-  isValid: boolean
-  errors: string[]
-} {
-  const errors: string[] = []
-
-  if (password.length < 8) {
-    errors.push('Password must be at least 8 characters')
-  }
-  if (!/[A-Z]/.test(password)) {
-    errors.push('Password must contain at least one uppercase letter')
-  }
-  if (!/[a-z]/.test(password)) {
-    errors.push('Password must contain at least one lowercase letter')
-  }
-  if (!/[0-9]/.test(password)) {
-    errors.push('Password must contain at least one number')
-  }
-  if (!/[@$!%*#?&]/.test(password)) {
-    errors.push('Password must contain at least one special character (@$!%*#?&)')
-  }
-
-  return {
-    isValid: errors.length === 0,
-    errors,
-  }
 }
 
 

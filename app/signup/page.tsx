@@ -20,6 +20,7 @@ import { useAuthSessionWriter } from "@/components/providers/SessionProvider"
 import AuthPageShell from "@/components/auth/AuthPageShell"
 import AuthSocialSection from "@/components/auth/AuthSocialSection"
 import { promptSavePasswordCredential } from "@/lib/browser-credentials"
+import { getPasswordRequirements } from "@/lib/password-validation"
 
 export default function SignupPage() {
   const router = useRouter()
@@ -35,17 +36,10 @@ export default function SignupPage() {
   const [errors, setErrors] = useState<string[]>([])
   const [isLoading, setIsLoading] = useState(false)
 
-  const validatePassword = (password: string): string[] => {
-    const errors: string[] = []
-    if (password.length < 8) errors.push("At least 8 characters")
-    if (!/[A-Z]/.test(password)) errors.push("One uppercase letter")
-    if (!/[a-z]/.test(password)) errors.push("One lowercase letter")
-    if (!/[0-9]/.test(password)) errors.push("One number")
-    if (!/[@$!%*#?&]/.test(password)) errors.push("One special character (@$!%*#?&)")
-    return errors
-  }
-
-  const passwordErrors = formData.password ? validatePassword(formData.password) : []
+  const passwordRequirements = formData.password
+    ? getPasswordRequirements(formData.password)
+    : []
+  const passwordErrors = passwordRequirements.filter((requirement) => !requirement.met)
   const passwordStrength = formData.password
     ? Math.max(0, 5 - passwordErrors.length)
     : 0
@@ -268,10 +262,10 @@ export default function SignupPage() {
                   </div>
                   <div className="text-xs text-gray-400 space-y-1">
                     {passwordErrors.length > 0 ? (
-                      passwordErrors.map((error, idx) => (
-                        <div key={idx} className="flex items-center gap-1">
+                      passwordErrors.map((requirement) => (
+                        <div key={requirement.id} className="flex items-center gap-1">
                           <AlertCircle className="w-3 h-3 text-red-400" />
-                          <span>{error}</span>
+                          <span>{requirement.label}</span>
                         </div>
                       ))
                     ) : (
