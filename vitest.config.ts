@@ -19,6 +19,7 @@ export default defineConfig({
         "lib/auth-authorize-helpers.ts",
         "lib/browser-credentials.ts",
         "lib/demo-login.ts",
+        "lib/google-client-id.ts",
         "lib/login-error-parser.ts",
         "lib/password-validation.ts",
         "lib/sanitize-mermaid-svg.ts",
