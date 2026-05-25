@@ -48,6 +48,15 @@ jobs:
           node-version: "22"
           cache: npm
 
+      - name: Restore Next.js build cache
+        uses: actions/cache@v4
+        with:
+          path: .next/cache
+          key: ${{ runner.os }}-nextjs-${{ hashFiles('package-lock.json') }}-${{ hashFiles('next.config.mjs', 'app/**', 'components/**', 'lib/**', 'prisma/schema.prisma') }}
+          restore-keys: |
+            ${{ runner.os }}-nextjs-${{ hashFiles('package-lock.json') }}-
+            ${{ runner.os }}-nextjs-
+
       - name: Install dependencies
         run: npm ci
 
@@ -56,6 +65,14 @@ jobs:
 
       - name: Build
         run: npm run build
+
+      - name: Upload Next.js build for smoke tests
+        uses: actions/upload-artifact@v4
+        with:
+          name: next-build
+          path: .next
+          retention-days: 1
+          if-no-files-found: error
 
   unit-tests:
     runs-on: ubuntu-latest
@@ -193,7 +210,7 @@ jobs:
         run: bash scripts/validate-compose.sh
 
   e2e-smoke:
-    needs: [lint-and-build, unit-tests]
+    needs: [lint-and-build]
     runs-on: ubuntu-latest
     services:
       postgres:
@@ -228,16 +245,40 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Download Next.js build
+        uses: actions/download-artifact@v4
+        with:
+          name: next-build
+          path: .next
+
       # Migrations in prisma/migrations are SQLite-era; fresh Postgres in CI is
       # synced from schema with db push. Use `prisma migrate deploy` in hosted
       # environments only after a Postgres-native migration baseline exists.
       - name: Sync Prisma schema to Postgres (CI)
         run: npx prisma db push --accept-data-loss
 
-      - name: Install Playwright Chromium
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        id: playwright-cache
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ hashFiles('package-lock.json') }}
+
+      - name: Install Playwright Chromium (with system deps)
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
         run: npx playwright install chromium --with-deps
 
+      - name: Install Playwright system deps (browser cache hit)
+        if: steps.playwright-cache.outputs.cache-hit == 'true'
+        run: npx playwright install-deps chromium
+
+      - name: Prepare standalone server for smoke
+        run: bash scripts/prepare-smoke-standalone.sh
+
       - name: Run E2E smoke (Chromium)
+        env:
+          CI_E2E_USE_PROD_SERVER: "1"
+          PLAYWRIGHT_WORKERS: "3"
         run: |
           mkdir -p reports
           PLAYWRIGHT_JSON_OUTPUT_NAME=reports/playwright-smoke.json PLAYWRIGHT_JUNIT_OUTPUT_NAME=reports/playwright-smoke-junit.xml npx playwright test tests/ci-smoke.spec.ts --project=chromium --reporter=json,junit
