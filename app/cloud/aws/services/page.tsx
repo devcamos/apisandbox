@@ -5,6 +5,7 @@ import { SubscriptionGate } from "@/components/SubscriptionGate";
 import Link from "next/link";
 import { Server, Database, Zap, Shield, Network, BarChart3, Home } from "lucide-react";
 
+import { ExpandableCodeBlock } from "@/components/HighlightedCodeBlock"
 export default function AwsServicesPage() {
   return (
     <SubscriptionGate phaseNumber="cloud" lockedContentName="AWS Cloud Services">
@@ -431,7 +432,7 @@ export default function AwsServicesPage() {
           <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border border-slate-700 mb-6">
             <h3 className="text-xl font-bold text-white mb-4">☕ AWS Lambda with Java</h3>
             <div className="bg-slate-900/50 p-4 rounded-lg font-mono text-xs text-gray-300 overflow-x-auto">
-              <pre>{`import com.amazonaws.services.lambda.runtime.Context;
+              <ExpandableCodeBlock code={`import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent;
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent;
@@ -479,7 +480,7 @@ public class User {
     private String name;
     private String email;
     // getters/setters
-}`}</pre>
+}`} />
             </div>
           </div>
 
@@ -490,7 +491,7 @@ public class User {
               <div>
                 <h4 className="text-lg font-bold text-white mb-3">Dockerfile</h4>
                 <div className="bg-slate-900/50 p-4 rounded-lg font-mono text-xs text-gray-300 overflow-x-auto">
-                  <pre>{`# Multi-stage build
+                  <ExpandableCodeBlock code={`# Multi-stage build
 FROM maven:3.9-eclipse-temurin-17 AS build
 WORKDIR /app
 COPY pom.xml .
@@ -502,14 +503,14 @@ FROM eclipse-temurin:17-jre-alpine
 WORKDIR /app
 COPY --from=build /app/target/*.jar app.jar
 EXPOSE 8080
-ENTRYPOINT ["java", "-jar", "app.jar"]`}</pre>
+ENTRYPOINT ["java", "-jar", "app.jar"]`} />
                 </div>
               </div>
 
               <div>
                 <h4 className="text-lg font-bold text-white mb-3">ECS Task Definition</h4>
                 <div className="bg-slate-900/50 p-4 rounded-lg font-mono text-xs text-gray-300 overflow-x-auto">
-                  <pre>{`{
+                  <ExpandableCodeBlock code={`{
   "family": "java-api",
   "containerDefinitions": [{
     "name": "java-api",
@@ -525,7 +526,7 @@ ENTRYPOINT ["java", "-jar", "app.jar"]`}</pre>
     "memory": 512,
     "cpu": 256
   }]
-}`}</pre>
+}`} />
                 </div>
               </div>
             </div>
@@ -538,7 +539,7 @@ ENTRYPOINT ["java", "-jar", "app.jar"]`}</pre>
               <div>
                 <h4 className="text-lg font-bold text-white mb-3">Java Spring Boot Controller</h4>
                 <div className="bg-slate-900/50 p-4 rounded-lg font-mono text-xs text-gray-300 overflow-x-auto">
-                  <pre>{`@RestController
+                  <ExpandableCodeBlock code={`@RestController
 @RequestMapping("/api/users")
 public class UserController {
     
@@ -564,14 +565,14 @@ public class UserController {
 
 // Application properties for API Gateway
 // server.port=8080
-// spring.application.name=user-service`}</pre>
+// spring.application.name=user-service`} />
                 </div>
               </div>
 
               <div>
                 <h4 className="text-lg font-bold text-white mb-3">API Gateway Integration</h4>
                 <div className="bg-slate-900/50 p-4 rounded-lg font-mono text-xs text-gray-300 overflow-x-auto">
-                  <pre>{`// API Gateway REST API Configuration
+                  <ExpandableCodeBlock code={`// API Gateway REST API Configuration
 // Endpoint: https://api.example.com/users/{id}
 // Integration Type: HTTP Proxy
 // Integration URL: http://ecs-service:8080/api/users/{id}
@@ -588,7 +589,7 @@ public class UserController {
 
 // Example: Add CORS headers
 // Access-Control-Allow-Origin: *
-// Access-Control-Allow-Methods: GET, POST, PUT, DELETE`}</pre>
+// Access-Control-Allow-Methods: GET, POST, PUT, DELETE`} />
                 </div>
               </div>
             </div>
@@ -601,7 +602,7 @@ public class UserController {
               <div>
                 <h4 className="text-lg font-bold text-white mb-3">React App Configuration</h4>
                 <div className="bg-slate-900/50 p-4 rounded-lg font-mono text-xs text-gray-300 overflow-x-auto">
-                  <pre>{`// .env.production
+                  <ExpandableCodeBlock code={`// .env.production
 REACT_APP_API_URL=https://api.example.com
 
 // App.js
@@ -619,14 +620,14 @@ function App() {
 
 // Build for production
 // npm run build
-// Output: build/ folder with static files`}</pre>
+// Output: build/ folder with static files`} />
                 </div>
               </div>
 
               <div>
                 <h4 className="text-lg font-bold text-white mb-3">AWS Deployment</h4>
                 <div className="bg-slate-900/50 p-4 rounded-lg font-mono text-xs text-gray-300 overflow-x-auto">
-                  <pre>{`# Deploy React to S3 + CloudFront
+                  <ExpandableCodeBlock code={`# Deploy React to S3 + CloudFront
 # 1. Build React app
 npm run build
 
@@ -645,7 +646,7 @@ aws s3 sync build/ s3://my-react-app-bucket
 
 # React app calls:
 # https://api.example.com/api/users
-# (API Gateway endpoint)`}</pre>
+# (API Gateway endpoint)`} />
                 </div>
               </div>
             </div>

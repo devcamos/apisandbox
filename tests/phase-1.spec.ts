@@ -15,8 +15,8 @@ test.describe('Phase 1: Integration Mindset', () => {
     await expect(page.getByText(/20% That Matters/i)).toBeVisible();
   });
 
-  test('should display Universal Technologies section', async ({ page }) => {
-    await expect(page.getByRole('heading', { name: /Universal Technologies/i })).toBeVisible();
+  test('should display Universal Standards section', async ({ page }) => {
+    await expect(page.getByRole('heading', { name: /Universal Standards/i })).toBeVisible();
     await expect(page.getByText(/HTTP - Universal Protocol/i)).toBeVisible();
     await expect(page.getByText(/JSON - Universal Data Format/i)).toBeVisible();
   });
@@ -26,21 +26,23 @@ test.describe('Phase 1: Integration Mindset', () => {
   });
 
   test('should display JSON Communicator subsection', async ({ page }) => {
-    await expect(page.getByText(/JSON Communicator/i)).toBeVisible();
-    await expect(page.getByText(/universal data interchange format/i)).toBeVisible();
+    const jsonSection = page.locator('section, div').filter({ hasText: 'JSON Communicator' }).first();
+    await expect(jsonSection.getByRole('heading', { name: /JSON Communicator/i })).toBeVisible();
+    await expect(jsonSection.getByText(/universal data interchange format/i).first()).toBeVisible();
   });
 
-  test('should display Java + React example in Universal Technologies', async ({ page }) => {
+  test('should display Java + React example in Universal Standards', async ({ page }) => {
     await expect(page.getByText(/Java Backend \+ React Frontend/i)).toBeVisible();
     await expect(page.getByText(/@RestController/i)).toBeVisible();
     await expect(page.getByText(/useState/i)).toBeVisible();
   });
 
   test('should display API Categories section', async ({ page }) => {
-    await expect(page.getByRole('heading', { name: /API Categories/i })).toBeVisible();
-    await expect(page.getByText(/REST/i)).toBeVisible();
-    await expect(page.getByText(/GraphQL/i)).toBeVisible();
-    await expect(page.getByText(/gRPC/i)).toBeVisible();
+    const categoriesSection = page.locator('section').filter({ has: page.getByRole('heading', { name: /API Categories/i }) }).first();
+    await expect(categoriesSection.getByRole('heading', { name: /API Categories/i })).toBeVisible();
+    await expect(categoriesSection.getByText(/^REST$/i).first()).toBeVisible();
+    await expect(categoriesSection.getByText(/^GraphQL$/i).first()).toBeVisible();
+    await expect(categoriesSection.getByText(/^gRPC$/i).first()).toBeVisible();
   });
 
   test('should navigate to categories page', async ({ page }) => {
@@ -51,5 +53,3 @@ test.describe('Phase 1: Integration Mindset', () => {
     }
   });
 });
-
-

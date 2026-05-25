@@ -157,7 +157,7 @@ export default function DashboardPage() {
                 </p>
           <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-4 max-w-2xl mx-auto">
             <p className="text-blue-200 text-sm">
-              <strong>💡 New to programming?</strong> Start with Phase 0 (Fundamentals). <strong>New to APIs?</strong> Start with Phase 1. <strong>Already comfortable with REST?</strong> Jump to Phase 2. <strong>Building microservices?</strong> Phase 3 is for you. <strong>Ready for cloud?</strong> Explore the Cloud section. <strong>Interested in AI?</strong> Check out the AI section.
+              <strong>💡 New to programming?</strong> Start with Phase 0 (Getting Started). <strong>New to APIs?</strong> Start with Phase 1. <strong>Already comfortable with REST?</strong> Jump to Phase 2. <strong>Building microservices?</strong> Phase 3 is for you. <strong>Ready for cloud?</strong> Explore the Cloud section. <strong>Interested in AI?</strong> Check out the AI section.
             </p>
           </div>
         </div>

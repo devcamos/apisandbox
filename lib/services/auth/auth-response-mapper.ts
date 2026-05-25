@@ -29,16 +29,24 @@ export function mapUserToAuthUser(user: UserWithProfile): AuthUser {
   }
 }
 
-export function mapUserToAuthResponse(user: UserWithProfile): AuthResponse {
-  const authUser = mapUserToAuthUser(user)
+export function issueAuthTokenForUser(authUser: AuthUser) {
   const { token, expiresIn } = issueJwtToken({
     sub: authUser.id,
     email: authUser.email,
   })
+
+  return {
+    token,
+    expiresIn,
+  }
+}
+
+export function mapUserToAuthResponse(user: UserWithProfile): AuthResponse {
+  const authUser = mapUserToAuthUser(user)
+  const { token, expiresIn } = issueAuthTokenForUser(authUser)
   return {
     token,
     expiresIn,
     user: authUser,
   }
 }
-

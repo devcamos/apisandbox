@@ -8,6 +8,7 @@ import { SubscriptionGate } from "@/components/SubscriptionGate";
 import { LessonTracker } from "@/components/LessonTracker";
 import { Network, Zap, MessageSquare, GitBranch, Activity, Eye } from "lucide-react";
 
+import { ExpandableCodeBlock } from "@/components/HighlightedCodeBlock"
 export default function Phase3() {
   return (
     <SubscriptionGate phaseNumber={3} lockedContentName="Phase 3: Inter-Service Communication">
@@ -104,14 +105,14 @@ export default function Phase3() {
               </div>
             </div>
             <div className="bg-slate-900/50 p-4 rounded-lg font-mono text-xs text-gray-300">
-              <pre>{`// REST API call
+              <ExpandableCodeBlock code={`// REST API call
 const user = await fetch(
   'http://user-service/api/users/123'
 ).then(r => r.json());
 
 // gRPC call
 const user = await userClient
-  .getUser({ userId: '123' });`}</pre>
+  .getUser({ userId: '123' });`} />
             </div>
           </div>
 
@@ -137,7 +138,7 @@ const user = await userClient
               </div>
             </div>
             <div className="bg-slate-900/50 p-4 rounded-lg font-mono text-xs text-gray-300">
-              <pre>{`// Kafka producer
+              <ExpandableCodeBlock code={`// Kafka producer
 await producer.send({
   topic: 'user.created',
   messages: [{
@@ -151,7 +152,7 @@ await producer.send({
 // Consumer handles it later
 consumer.on('message', async (msg) => {
   await processUser(msg.value);
-});`}</pre>
+});`} />
             </div>
           </div>
         </div>
@@ -193,7 +194,7 @@ consumer.on('message', async (msg) => {
           <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border border-slate-700">
             <h3 className="text-xl font-bold text-white mb-4">Proto Definition</h3>
             <div className="bg-slate-900/50 p-4 rounded-lg font-mono text-xs text-gray-300 overflow-x-auto">
-              <pre>{`syntax = "proto3";
+              <ExpandableCodeBlock code={`syntax = "proto3";
 
 package user.v1;
 
@@ -219,14 +220,14 @@ message GetUserRequest {
 message CreateUserRequest {
   string name = 1;
   string email = 2;
-}`}</pre>
+}`} />
             </div>
           </div>
 
           <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border border-slate-700">
             <h3 className="text-xl font-bold text-white mb-4">gRPC Server Implementation</h3>
             <div className="bg-slate-900/50 p-4 rounded-lg font-mono text-xs text-gray-300 overflow-x-auto">
-              <pre>{`import * as grpc from '@grpc/grpc-js';
+              <ExpandableCodeBlock code={`import * as grpc from '@grpc/grpc-js';
 import { UserService } from './generated/user';
 
 const server = new grpc.Server();
@@ -260,7 +261,7 @@ server.bindAsync(
   '0.0.0.0:50051',
   grpc.ServerCredentials.createInsecure(),
   () => server.start()
-);`}</pre>
+);`} />
             </div>
           </div>
         </div>
@@ -275,7 +276,7 @@ server.bindAsync(
                 <h4 className="text-lg font-bold text-white">Java gRPC Server</h4>
               </div>
               <div className="bg-slate-900/50 p-4 rounded-lg font-mono text-xs text-gray-300 overflow-x-auto">
-                <pre>{`import io.grpc.Server;
+                <ExpandableCodeBlock code={`import io.grpc.Server;
 import io.grpc.ServerBuilder;
 import user.v1.UserServiceGrpc;
 import user.v1.UserOuterClass.*;
@@ -336,7 +337,7 @@ public class Application {
             .build();
         server.start();
     }
-}`}</pre>
+}`} />
               </div>
             </div>
 
@@ -346,7 +347,7 @@ public class Application {
                 <h4 className="text-lg font-bold text-white">Java gRPC Client</h4>
               </div>
               <div className="bg-slate-900/50 p-4 rounded-lg font-mono text-xs text-gray-300 overflow-x-auto">
-                <pre>{`import io.grpc.ManagedChannel;
+                <ExpandableCodeBlock code={`import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import user.v1.UserServiceGrpc;
 import user.v1.UserOuterClass.*;
@@ -385,7 +386,7 @@ public class UserClientService {
                 users, Spliterator.ORDERED), false)
             .collect(Collectors.toList());
     }
-}`}</pre>
+}`} />
               </div>
             </div>
           </div>
@@ -443,7 +444,7 @@ public class UserClientService {
                 <h4 className="text-lg font-bold text-white">TypeScript/Node.js</h4>
               </div>
               <div className="bg-slate-900/50 p-4 rounded-lg font-mono text-xs text-gray-300 overflow-x-auto">
-                <pre>{`import { Kafka } from 'kafkajs';
+                <ExpandableCodeBlock code={`import { Kafka } from 'kafkajs';
 
 const kafka = new Kafka({
   clientId: 'order-service',
@@ -499,7 +500,7 @@ await consumer.run({
       }]
     });
   }
-});`}</pre>
+});`} />
               </div>
             </div>
 
@@ -509,7 +510,7 @@ await consumer.run({
                 <h4 className="text-lg font-bold text-white">Java Spring Boot</h4>
               </div>
               <div className="bg-slate-900/50 p-4 rounded-lg font-mono text-xs text-gray-300 overflow-x-auto">
-                <pre>{`import org.springframework.kafka.core.KafkaTemplate;
+                <ExpandableCodeBlock code={`import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.support.KafkaHeaders;
 import org.springframework.messaging.handler.annotation.Header;
@@ -593,7 +594,7 @@ public class KafkaConfig {
             StringSerializer.class);
         return new DefaultKafkaProducerFactory<>(config);
     }
-}`}</pre>
+}`} />
               </div>
             </div>
           </div>
@@ -606,7 +607,7 @@ public class KafkaConfig {
             <div>
               <h4 className="text-lg font-bold text-white mb-3">Dockerfile for Java Spring Boot</h4>
               <div className="bg-slate-900/50 p-4 rounded-lg font-mono text-xs text-gray-300 overflow-x-auto">
-                <pre>{`# Multi-stage build for Java
+                <ExpandableCodeBlock code={`# Multi-stage build for Java
 FROM maven:3.9-eclipse-temurin-17 AS build
 WORKDIR /app
 COPY pom.xml .
@@ -618,14 +619,14 @@ FROM eclipse-temurin:17-jre-alpine
 WORKDIR /app
 COPY --from=build /app/target/*.jar app.jar
 EXPOSE 8080
-ENTRYPOINT ["java", "-jar", "app.jar"]`}</pre>
+ENTRYPOINT ["java", "-jar", "app.jar"]`} />
               </div>
             </div>
 
             <div>
               <h4 className="text-lg font-bold text-white mb-3">Docker Compose for Microservices</h4>
               <div className="bg-slate-900/50 p-4 rounded-lg font-mono text-xs text-gray-300 overflow-x-auto">
-                <pre>{`version: '3.8'
+                <ExpandableCodeBlock code={`version: '3.8'
 
 services:
   java-api:
@@ -662,7 +663,7 @@ services:
     environment:
       POSTGRES_DB: myapp
       POSTGRES_USER: user
-      POSTGRES_PASSWORD: password`}</pre>
+      POSTGRES_PASSWORD: password`} />
               </div>
             </div>
           </div>
@@ -761,7 +762,7 @@ services:
         <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border border-slate-700">
           <h3 className="text-xl font-bold text-white mb-4">OpenTelemetry Implementation</h3>
           <div className="bg-slate-900/50 p-4 rounded-lg font-mono text-xs text-gray-300 overflow-x-auto">
-            <pre>{`import { trace } from '@opentelemetry/api';
+            <ExpandableCodeBlock code={`import { trace } from '@opentelemetry/api';
 import { NodeTracerProvider } from '@opentelemetry/sdk-trace-node';
 import { JaegerExporter } from '@opentelemetry/exporter-jaeger';
 
@@ -802,7 +803,7 @@ async function processOrder(orderId: string) {
   } finally {
     span.end();
   }
-}`}</pre>
+}`} />
           </div>
         </div>
       </section>

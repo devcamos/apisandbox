@@ -1,7 +1,12 @@
 import { NextRequest } from "next/server"
 import { getAuthenticatedUserFromToken } from "@/lib/services/auth/auth-service"
+import { issueAuthTokenForUser } from "@/lib/services/auth/auth-response-mapper"
 import { errorResponse, okResponse } from "@/lib/http/responses"
-import { readAuthToken, withRouteErrorHandling } from "@/lib/http/auth-route-helpers"
+import {
+  authSessionResponse,
+  readAuthToken,
+  withRouteErrorHandling,
+} from "@/lib/http/auth-route-helpers"
 
 export const GET = withRouteErrorHandling(async (request: NextRequest) => {
   const token = readAuthToken(request)
@@ -10,5 +15,13 @@ export const GET = withRouteErrorHandling(async (request: NextRequest) => {
   }
 
   const user = await getAuthenticatedUserFromToken(token)
-  return okResponse({ user })
+  const { token: refreshedToken, expiresIn } = issueAuthTokenForUser(user)
+  return authSessionResponse(
+    {
+      user,
+      token: refreshedToken,
+      expiresIn,
+    },
+    200,
+  )
 })

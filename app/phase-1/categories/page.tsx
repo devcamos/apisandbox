@@ -10,6 +10,7 @@ import ApiArchitecturePattern from "@/components/ApiArchitecturePattern";
 import { Brain, Network, GitBranch, Zap, RefreshCw, Database } from "lucide-react";
 import { useState } from "react";
 
+import { ExpandableCodeBlock } from "@/components/HighlightedCodeBlock"
 export default function Phase1Categories() {
   const [activeDemo, setActiveDemo] = useState<string | null>(null);
 
@@ -25,7 +26,7 @@ export default function Phase1Categories() {
         <div>
           <h5 className="font-semibold text-white mb-2">Request Example</h5>
           <div className="bg-slate-900 p-4 rounded-lg font-mono text-xs text-gray-300">
-            <pre>{`GET /api/users/123 HTTP/1.1
+            <ExpandableCodeBlock code={`GET /api/users/123 HTTP/1.1
 Host: api.example.com
 Authorization: Bearer eyJhbGc...
 Accept: application/json
@@ -36,7 +37,7 @@ Accept: application/json
   "name": "John Doe",
   "email": "john@example.com",
   "createdAt": "2024-01-15T10:30:00Z"
-}`}</pre>
+}`} />
           </div>
         </div>
 
@@ -220,7 +221,7 @@ Accept: application/json
         <div>
           <h5 className="font-semibold text-white mb-2">Proto Definition</h5>
           <div className="bg-slate-900 p-4 rounded-lg font-mono text-xs text-gray-300">
-            <pre>{`syntax = "proto3";
+            <ExpandableCodeBlock code={`syntax = "proto3";
 
 service UserService {
   rpc GetUser(UserId) 
@@ -238,14 +239,14 @@ message User {
   string id = 1;
   string name = 2;
   string email = 3;
-}`}</pre>
+}`} />
           </div>
         </div>
 
         <div>
           <h5 className="font-semibold text-white mb-2">Client Usage</h5>
           <div className="bg-slate-900 p-4 rounded-lg font-mono text-xs text-gray-300">
-            <pre>{`import { UserServiceClient } 
+            <ExpandableCodeBlock code={`import { UserServiceClient } 
   from './generated/user_grpc_pb';
 
 const client = new UserServiceClient(
@@ -260,7 +261,7 @@ const user = await client
 const stream = client.listUsers({});
 stream.on('data', (user) => {
   console.log(user);
-});`}</pre>
+});`} />
           </div>
         </div>
       </div>

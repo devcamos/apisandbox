@@ -175,6 +175,24 @@ function parseNetwork(message: string): LoginErrorInfo | null {
   return null
 }
 
+function parseServiceUnavailable(message: string): LoginErrorInfo | null {
+  const lower = message.toLowerCase()
+  if (
+    lower.includes("temporarily unavailable") ||
+    lower.includes("service unavailable") ||
+    lower.includes("configuration error")
+  ) {
+    return {
+      message: "Login service temporarily unavailable",
+      type: "unknown",
+      recoverable: true,
+      suggestion:
+        "The sign-in service is available locally but is not healthy in this environment right now. Check deployment configuration, database connectivity, and applied migrations, then try again.",
+    }
+  }
+  return null
+}
+
 const parsers: Array<(message: string) => LoginErrorInfo | null> = [
   parseAccountLockedPrefix,
   parsePasswordIncorrectPrefix,
@@ -185,6 +203,7 @@ const parsers: Array<(message: string) => LoginErrorInfo | null> = [
   parseLegacyLockout,
   parseRequiredFields,
   parseNetwork,
+  parseServiceUnavailable,
 ]
 
 export function parseLoginErrorMessage(errorMessage: string): LoginErrorInfo {

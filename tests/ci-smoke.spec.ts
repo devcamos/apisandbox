@@ -13,20 +13,16 @@ test.describe("CI smoke", () => {
     ).toBeVisible();
   });
 
-  test("phase-5 route responds", async ({ page }) => {
-    const response = await page.goto("/phase-5");
-    expect(response?.ok()).toBeTruthy();
+  test("phase-5 route redirects to login when signed out", async ({ page }) => {
+    await page.goto("/phase-5");
+    await expect(page).toHaveURL(/\/login/);
   });
 
-  test("architecture docs page loads (Mermaid + SVG sanitize path)", async ({
+  test("architecture docs route redirects to login when signed out", async ({
     page,
   }) => {
-    const response = await page.goto("/docs/architecture");
-    expect(response?.ok()).toBeTruthy();
-    await expect(
-      page.getByRole("heading", { name: "System Architecture", level: 1 }),
-    ).toBeVisible();
-    await expect(page.getByRole("heading", { name: "Deployment Architecture" })).toBeVisible();
+    await page.goto("/docs/architecture");
+    await expect(page).toHaveURL(/\/login/);
   });
 
   test("login page loads", async ({ page }) => {

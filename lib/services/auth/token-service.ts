@@ -20,10 +20,13 @@ function base64UrlDecode(value: string) {
 }
 
 function getJwtSecret() {
-  const secret = process.env.AUTH_JWT_SECRET
+  const secret =
+    process.env.AUTH_JWT_SECRET ||
+    process.env.AUTH_SECRET ||
+    process.env.NEXTAUTH_SECRET
   if (!secret) {
     throw new AppError(
-      "AUTH_JWT_SECRET is not configured",
+      "JWT secret is not configured",
       500,
       "configuration_error"
     )
@@ -107,4 +110,3 @@ export function verifyJwtToken(token: string): AuthPayload {
     email: payload.email,
   }
 }
-

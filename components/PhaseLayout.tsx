@@ -25,7 +25,7 @@ export default function PhaseLayout({
   // Default breadcrumbs if not provided
   const defaultBreadcrumbs = [
     { label: "Home", href: "/" },
-    { label: `Phase ${phaseNumber}`, href: `/phase-${phaseNumber}` },
+    { label: "Start", href: "/start" },
   ];
 
   const finalBreadcrumbs = breadcrumbs || defaultBreadcrumbs;
@@ -60,8 +60,7 @@ export default function PhaseLayout({
               <Icon className="w-10 h-10 text-white" />
             </div>
             <div>
-              <div className="text-white/80 font-semibold mb-1">Phase {phaseNumber}</div>
-              <h1 className="text-4xl font-bold text-white">{title}</h1>
+              <h1 className="text-4xl font-bold text-white">{`Phase ${phaseNumber}: ${title}`}</h1>
             </div>
           </div>
           <p className="text-xl text-white/90 max-w-3xl">{description}</p>
@@ -75,4 +74,3 @@ export default function PhaseLayout({
     </div>
   );
 }
-

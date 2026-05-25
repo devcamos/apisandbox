@@ -1,6 +1,7 @@
 import { Metadata } from 'next'
 import { Database, Shield, Zap, Users } from 'lucide-react'
 
+import { ExpandableCodeBlock } from "@/components/HighlightedCodeBlock"
 export const metadata: Metadata = {
   title: 'PostgreSQL + Prisma | API Integration Training',
   description: 'Learn PostgreSQL with Prisma ORM for type-safe database operations',
@@ -44,7 +45,7 @@ export default function PostgreSQLPage() {
               <section>
                 <h2 className="text-2xl font-bold text-gray-900 mb-4">Prisma Schema Example</h2>
                 <div className="bg-gray-900 rounded-lg p-6 text-green-400 font-mono text-sm overflow-x-auto">
-                  <pre>{`// prisma/schema.prisma
+                  <ExpandableCodeBlock code={`// prisma/schema.prisma
 generator client {
   provider = "prisma-client-js"
 }
@@ -69,14 +70,14 @@ model Post {
   published Boolean  @default(false)
   authorId  String
   author    User     @relation(fields: [authorId], references: [id])
-}`}</pre>
+}`} />
                 </div>
               </section>
 
               <section>
                 <h2 className="text-2xl font-bold text-gray-900 mb-4">Type-Safe Database Operations</h2>
                 <div className="bg-gray-900 rounded-lg p-6 text-blue-400 font-mono text-sm overflow-x-auto">
-                  <pre>{`// Auto-generated types and methods
+                  <ExpandableCodeBlock code={`// Auto-generated types and methods
 import { PrismaClient } from '@prisma/client'
 
 const prisma = new PrismaClient()
@@ -93,7 +94,7 @@ const user = await prisma.user.findUnique({
 })
 
 // TypeScript knows: user.posts is Post[]
-console.log(user.posts[0].title) // ✅ No runtime errors`}</pre>
+console.log(user.posts[0].title) // ✅ No runtime errors`} />
                 </div>
               </section>
 
@@ -141,13 +142,13 @@ console.log(user.posts[0].title) // ✅ No runtime errors`}</pre>
                       Store and query complex nested data structures
                     </p>
                     <div className="bg-gray-800 rounded p-3 text-green-400 font-mono text-xs">
-                      <pre>{`// Store flexible metadata
+                      <ExpandableCodeBlock code={`// Store flexible metadata
 {
   "preferences": {
     "theme": "dark",
     "notifications": true
   }
-}`}</pre>
+}`} />
                     </div>
                   </div>
 
@@ -157,9 +158,9 @@ console.log(user.posts[0].title) // ✅ No runtime errors`}</pre>
                       Powerful text search with ranking and highlighting
                     </p>
                     <div className="bg-gray-800 rounded p-3 text-blue-400 font-mono text-xs">
-                      <pre>{`// Search posts by content
+                      <ExpandableCodeBlock code={`// Search posts by content
 WHERE to_tsvector(content)
-@@ to_tsquery('database & query')`}</pre>
+@@ to_tsquery('database & query')`} />
                     </div>
                   </div>
 
@@ -169,9 +170,9 @@ WHERE to_tsvector(content)
                       Store and query arrays of data efficiently
                     </p>
                     <div className="bg-gray-800 rounded p-3 text-purple-400 font-mono text-xs">
-                      <pre>{`// Check array membership
+                      <ExpandableCodeBlock code={`// Check array membership
 WHERE 'javascript' = ANY(tags)
-WHERE tags && ARRAY['react', 'nextjs']`}</pre>
+WHERE tags && ARRAY['react', 'nextjs']`} />
                     </div>
                   </div>
 
@@ -181,13 +182,13 @@ WHERE tags && ARRAY['react', 'nextjs']`}</pre>
                       Automate data processing and validation
                     </p>
                     <div className="bg-gray-800 rounded p-3 text-yellow-400 font-mono text-xs">
-                      <pre>{`CREATE OR REPLACE FUNCTION
+                      <ExpandableCodeBlock code={`CREATE OR REPLACE FUNCTION
 update_updated_at() RETURNS TRIGGER AS $$
 BEGIN
   NEW.updated_at = NOW();
   RETURN NEW;
 END;
-$$ LANGUAGE plpgsql;`}</pre>
+$$ LANGUAGE plpgsql;`} />
                     </div>
                   </div>
                 </div>
