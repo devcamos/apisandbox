@@ -24,28 +24,33 @@ This app uses **Google Identity Services (one-tap / button)** with ID token veri
 
 ## 3. Environment variables
 
-The app uses **Google Identity Services** (same as life-world-os): the frontend shows the official “Sign in with Google” button (with the G logo), gets an ID token, and the server verifies it. You need:
+The app uses **Google Identity Services**: the frontend shows the official “Sign in with Google” button, gets an ID token, and the server verifies it.
 
-- **Server (verify token):** `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`
-- **Client (show button):** `NEXT_PUBLIC_GOOGLE_CLIENT_ID` (same value as `GOOGLE_CLIENT_ID`)
+| Variable | Required | Purpose |
+|----------|----------|---------|
+| `GOOGLE_CLIENT_ID` | **Yes** | Server verifies ID token; login/signup pages read this at **runtime** to render the GSI button |
+| `GOOGLE_CLIENT_SECRET` | Optional | NextAuth Google provider only (legacy redirect flow) |
+| `NEXT_PUBLIC_GOOGLE_CLIENT_ID` | Optional | Build-time alias; same value as `GOOGLE_CLIENT_ID` if you set it |
 
-Set in `.env.local` (local), `.env` (Docker staging), or your host (Vercel, etc.):
+**Production (Vercel):** setting **`GOOGLE_CLIENT_ID` alone is enough** for the button to work — you do not need a separate public var unless you prefer one.
+
+Set in `.env.local` (local), or Vercel → Settings → Environment Variables:
 
 ```env
 GOOGLE_CLIENT_ID="your-client-id.apps.googleusercontent.com"
 GOOGLE_CLIENT_SECRET="your-client-secret"
+# Optional — same as GOOGLE_CLIENT_ID:
 NEXT_PUBLIC_GOOGLE_CLIENT_ID="your-client-id.apps.googleusercontent.com"
 ```
 
 - **Local:** Copy `config/environments/local.env.example` to `.env.local` and add the variables.
-- **Staging (Docker):** Add the same variables to a `.env` file in the `apisandbox` directory. For the **Sign-in button** to work in the built app, set `NEXT_PUBLIC_GOOGLE_CLIENT_ID` (and optionally the others) **before** building the image, or ensure they are in `.env` when you run `docker-compose ... up -d --build`. See [GITFLOW.md](./GITFLOW.md).
-- **Production:** Set in Vercel (or your host) project settings; do not commit secrets.
+- **Production:** See `config/environments/prod.env.example` for `AUTH_SECRET`, `DATABASE_URL`, and Google vars.
 
 ## 4. Where it’s used
 
 - **Login:** “Sign in with Google” on `/login` uses `signIn("google", { callbackUrl })`.
 - **Signup:** “Sign up with Google” on `/signup` uses the same flow; new users get an account on first sign-in.
-- The Google provider is only registered when **both** `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` are set (see `lib/auth-config.ts`). If they are missing, the buttons still appear but the OAuth flow will not work until you add them.
+- The Google provider is only registered when **both** `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` are set (see `lib/auth-config.ts`). The **GSI button + `/api/auth/google`** flow only requires **`GOOGLE_CLIENT_ID`** on the server. If it is missing, the disabled “Continue with Google” placeholder appears.
 
 ## 5. Troubleshooting
 

@@ -1,8 +1,9 @@
 import { OAuth2Client } from "google-auth-library"
 import { AppError } from "@/lib/http/errors"
 import type { VerifiedGoogleIdentity } from "@/lib/auth/types"
+import { getGoogleClientId } from "@/lib/google-client-id"
 
-const googleClientId = process.env.GOOGLE_CLIENT_ID
+const googleClientId = getGoogleClientId()
 const oauthClient = googleClientId ? new OAuth2Client(googleClientId) : null
 
 function parseTestIdentity(idToken: string): VerifiedGoogleIdentity | null {
