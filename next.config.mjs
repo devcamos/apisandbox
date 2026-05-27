@@ -8,11 +8,7 @@ const nextConfig = {
   poweredByHeader: false,
   compress: true,
   // Prisma optimization for Vercel (Next.js 16+)
-  serverExternalPackages: [
-    '@prisma/client',
-    '@prisma/adapter-pg',
-    'pg',
-  ],
+  serverExternalPackages: ['@prisma/client'],
   // Required for Docker standalone run (staging/production container)
   output: 'standalone',
   // Next.js 16 file tracing can omit Prisma engine binaries; include them explicitly.

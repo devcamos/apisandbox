@@ -1,13 +1,11 @@
 /**
  * Prisma Client Singleton
  *
- * Uses the Prisma driver adapter (no Rust query-engine binary) so deploys work
- * on Vercel/Next.js 16 standalone without bundling libquery_engine.
+ * Uses the Rust query engine (binary) with pooled Neon/Vercel Postgres URLs.
+ * outputFileTracingIncludes in next.config.mjs ensures engines ship on Vercel.
  */
 
 import { PrismaClient } from "@prisma/client"
-import { PrismaPg } from "@prisma/adapter-pg"
-import pg from "pg"
 
 const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined
@@ -48,17 +46,11 @@ function resolveDatabaseUrl() {
 
 function createPrismaClient() {
   const connectionString = resolveDatabaseUrl()
-  if (!connectionString) {
-    throw new Error(
-      "DATABASE_URL (or POSTGRES_PRISMA_URL) must be set to a postgresql:// connection string",
-    )
+  if (connectionString) {
+    process.env.DATABASE_URL = connectionString
   }
 
-  const pool = new pg.Pool({ connectionString })
-  const adapter = new PrismaPg(pool)
-
   return new PrismaClient({
-    adapter,
     log: process.env.NODE_ENV === "development" ? ["query", "error", "warn"] : ["error"],
   })
 }
