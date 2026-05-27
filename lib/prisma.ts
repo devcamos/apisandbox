@@ -1,12 +1,13 @@
 /**
  * Prisma Client Singleton
  *
- * Uses the Neon HTTP driver adapter (no Rust query-engine binary).
- * Reliable on Vercel/Next.js 16 standalone without bundling libquery_engine.
+ * Uses the Prisma driver adapter (no Rust query-engine binary) so deploys work
+ * on Vercel/Next.js 16 standalone without bundling libquery_engine.
  */
 
 import { PrismaClient } from "@prisma/client"
-import { PrismaNeonHttp } from "@prisma/adapter-neon"
+import { PrismaPg } from "@prisma/adapter-pg"
+import pg from "pg"
 
 const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined
@@ -53,7 +54,8 @@ function createPrismaClient() {
     )
   }
 
-  const adapter = new PrismaNeonHttp(connectionString, {})
+  const pool = new pg.Pool({ connectionString })
+  const adapter = new PrismaPg(pool)
 
   return new PrismaClient({
     adapter,
