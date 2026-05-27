@@ -1,6 +1,7 @@
 import { Prisma } from "@prisma/client"
 import { prisma } from "@/lib/prisma"
 import { AppError } from "@/lib/http/errors"
+import { logger } from "@/lib/logger"
 import { composeDisplayName } from "@/lib/user-name"
 
 interface BootstrapInput {
@@ -13,39 +14,36 @@ interface BootstrapInput {
 }
 
 export async function createUserWithInitialData(input: BootstrapInput) {
+  if (input.forceBootstrapFailure) {
+    throw new AppError("Forced bootstrap failure", 500, "bootstrap_failure")
+  }
+
   try {
-    return await prisma.$transaction(async (tx) => {
-      const user = await tx.user.create({
-        data: {
-          email: input.email,
-          name: composeDisplayName(input.firstName, input.lastName),
-          image: input.avatarUrl ?? null,
-          passwordHash: input.passwordHash,
-          isActive: true,
-          loginAttempts: 0,
-          subscriptionTier: "FREE",
+    // Nested create avoids interactive transactions, which fail on Neon/PgBouncer poolers.
+    return await prisma.user.create({
+      data: {
+        email: input.email,
+        name: composeDisplayName(input.firstName, input.lastName),
+        image: input.avatarUrl ?? null,
+        passwordHash: input.passwordHash,
+        isActive: true,
+        loginAttempts: 0,
+        subscriptionTier: "FREE",
+        profile: {
+          create: {
+            firstName: input.firstName,
+            lastName: input.lastName,
+            avatarUrl: input.avatarUrl ?? null,
+          },
         },
-      })
-
-      await tx.userProfile.create({
-        data: {
-          userId: user.id,
-          firstName: input.firstName,
-          lastName: input.lastName,
-          avatarUrl: input.avatarUrl ?? null,
-        },
-      })
-
-      if (input.forceBootstrapFailure) {
-        throw new AppError("Forced bootstrap failure", 500, "bootstrap_failure")
-      }
-
-      return tx.user.findUniqueOrThrow({
-        where: { id: user.id },
-        include: { profile: true },
-      })
+      },
+      include: { profile: true },
     })
   } catch (error) {
+    if (error instanceof AppError) {
+      throw error
+    }
+
     if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002") {
       throw new AppError("An account with this email already exists", 400, "validation_error")
     }
@@ -68,6 +66,8 @@ export async function createUserWithInitialData(input: BootstrapInput) {
         "configuration_error"
       )
     }
+
+    logger.error({ err: error }, "User bootstrap failed")
 
     throw new AppError(
       "Failed to initialize account data",
