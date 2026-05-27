@@ -19,8 +19,8 @@ export async function createUserWithInitialData(input: BootstrapInput) {
   }
 
   try {
-    // Nested create avoids interactive transactions, which fail on Neon/PgBouncer poolers.
-    return await prisma.user.create({
+    // Sequential writes (no nested create / transaction) for Neon HTTP driver on Vercel.
+    const user = await prisma.user.create({
       data: {
         email: input.email,
         name: composeDisplayName(input.firstName, input.lastName),
@@ -29,14 +29,25 @@ export async function createUserWithInitialData(input: BootstrapInput) {
         isActive: true,
         loginAttempts: 0,
         subscriptionTier: "FREE",
-        profile: {
-          create: {
-            firstName: input.firstName,
-            lastName: input.lastName,
-            avatarUrl: input.avatarUrl ?? null,
-          },
-        },
       },
+    })
+
+    try {
+      await prisma.userProfile.create({
+        data: {
+          userId: user.id,
+          firstName: input.firstName,
+          lastName: input.lastName,
+          avatarUrl: input.avatarUrl ?? null,
+        },
+      })
+    } catch (profileError) {
+      await prisma.user.delete({ where: { id: user.id } }).catch(() => undefined)
+      throw profileError
+    }
+
+    return prisma.user.findUniqueOrThrow({
+      where: { id: user.id },
       include: { profile: true },
     })
   } catch (error) {

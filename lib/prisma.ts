@@ -1,19 +1,12 @@
 /**
  * Prisma Client Singleton
  *
- * MENTOR NOTE: Mono-Environment Framework
- * - Works with PostgreSQL in all environments (local, dev, prod)
- * - Local: Docker PostgreSQL or local installation
- * - Production: Vercel Postgres / Neon (pooled via POSTGRES_PRISMA_URL)
- * - Same code everywhere — only DATABASE_URL changes!
- *
- * MENTOR NOTE: Vercel + Neon
- * - Use engineType "binary" in schema (not "client" / driver-adapter mode)
- * - Normalize pooled URLs with ?pgbouncer=true for Prisma on PgBouncer
- * - Do not pass datasources override — it can mismatch the generated engine
+ * Uses the Neon HTTP driver adapter (no Rust query-engine binary).
+ * Reliable on Vercel/Next.js 16 standalone without bundling libquery_engine.
  */
 
 import { PrismaClient } from "@prisma/client"
+import { PrismaNeonHttp } from "@prisma/adapter-neon"
 
 const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined
@@ -24,13 +17,8 @@ function normalizePooledDatabaseUrl(url: string) {
     const parsed = new URL(url)
     const isPooler = parsed.hostname.includes("pooler")
 
-    if (isPooler) {
-      if (!parsed.searchParams.has("pgbouncer")) {
-        parsed.searchParams.set("pgbouncer", "true")
-      }
-      if (!parsed.searchParams.has("connection_limit")) {
-        parsed.searchParams.set("connection_limit", "1")
-      }
+    if (isPooler && !parsed.searchParams.has("pgbouncer")) {
+      parsed.searchParams.set("pgbouncer", "true")
     }
 
     return parsed.toString()
@@ -48,7 +36,6 @@ function resolveDatabaseUrl() {
 
   for (const raw of candidates) {
     if (!raw) continue
-    // Skip Prisma Accelerate URLs — use the direct Neon postgres URL instead.
     if (raw.startsWith("prisma://") || raw.startsWith("prisma+postgres://")) {
       continue
     }
@@ -59,12 +46,17 @@ function resolveDatabaseUrl() {
 }
 
 function createPrismaClient() {
-  const databaseUrl = resolveDatabaseUrl()
-  if (databaseUrl) {
-    process.env.DATABASE_URL = databaseUrl
+  const connectionString = resolveDatabaseUrl()
+  if (!connectionString) {
+    throw new Error(
+      "DATABASE_URL (or POSTGRES_PRISMA_URL) must be set to a postgresql:// connection string",
+    )
   }
 
+  const adapter = new PrismaNeonHttp(connectionString, {})
+
   return new PrismaClient({
+    adapter,
     log: process.env.NODE_ENV === "development" ? ["query", "error", "warn"] : ["error"],
   })
 }
