@@ -40,19 +40,22 @@ function normalizePooledDatabaseUrl(url: string) {
 }
 
 function resolveDatabaseUrl() {
-  const raw =
-    process.env.DATABASE_URL ||
-    process.env.POSTGRES_PRISMA_URL ||
-    process.env.POSTGRES_URL
+  const candidates = [
+    process.env.DATABASE_URL,
+    process.env.POSTGRES_PRISMA_URL,
+    process.env.POSTGRES_URL,
+  ]
 
-  if (!raw) return undefined
-
-  // Prisma Accelerate / Data Proxy URLs are not used by this app.
-  if (raw.startsWith("prisma://") || raw.startsWith("prisma+postgres://")) {
-    return undefined
+  for (const raw of candidates) {
+    if (!raw) continue
+    // Skip Prisma Accelerate URLs — use the direct Neon postgres URL instead.
+    if (raw.startsWith("prisma://") || raw.startsWith("prisma+postgres://")) {
+      continue
+    }
+    return normalizePooledDatabaseUrl(raw)
   }
 
-  return normalizePooledDatabaseUrl(raw)
+  return undefined
 }
 
 function createPrismaClient() {
