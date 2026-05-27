@@ -5,13 +5,11 @@
   "devCommand": "npm run dev",
   "outputDirectory": ".next",
   "env": {
-    "PRISMA_GENERATE_DATAPROXY": "false",
-    "PRISMA_CLIENT_ENGINE_TYPE": "binary"
+    "PRISMA_GENERATE_DATAPROXY": "false"
   },
   "build": {
     "env": {
-      "PRISMA_GENERATE_DATAPROXY": "false",
-      "PRISMA_CLIENT_ENGINE_TYPE": "binary"
+      "PRISMA_GENERATE_DATAPROXY": "false"
     }
   }
 }
