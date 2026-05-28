@@ -18,10 +18,10 @@ afterEach(() => {
 })
 
 describe("getGoogleClientId", () => {
-  it("prefers NEXT_PUBLIC_GOOGLE_CLIENT_ID when set", () => {
+  it("prefers GOOGLE_CLIENT_ID when both are set", () => {
     process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID = " public-client-id "
     process.env.GOOGLE_CLIENT_ID = "server-client-id"
-    expect(getGoogleClientId()).toBe("public-client-id")
+    expect(getGoogleClientId()).toBe("server-client-id")
   })
 
   it("falls back to GOOGLE_CLIENT_ID for runtime server config", () => {

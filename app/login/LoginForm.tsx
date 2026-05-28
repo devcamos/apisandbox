@@ -205,6 +205,7 @@ function LoginForm({ googleClientId }: Readonly<{ googleClientId: string }>) {
           err instanceof Error ? err.message : "Failed to sign in with Google. Please try again."
         )
         setError(errorInfo)
+      } finally {
         setIsLoading(false)
       }
     },
@@ -222,7 +223,7 @@ function LoginForm({ googleClientId }: Readonly<{ googleClientId: string }>) {
         callback: (response: { credential: string }) => {
           const cred = response.credential
           if (cred) {
-            handleGoogleCredential(cred).catch(() => {})
+            void handleGoogleCredential(cred)
           }
         },
       })
