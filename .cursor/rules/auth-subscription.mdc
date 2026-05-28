@@ -51,4 +51,4 @@ Test Google tokens (`test-google:...`) work in non-production only — see `goog
 
 ## Freemium reference
 
-Tier rules and paywall flags: `lib/subscription.ts`, `FREEMIUM_IMPLEMENTATION.md`, `config/featureFlags.ts`.
+Tier rules and paywall flags: `lib/subscription.ts`, `config/featureFlags.ts`.

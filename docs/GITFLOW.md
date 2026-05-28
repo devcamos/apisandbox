@@ -69,10 +69,9 @@ Examples:
 - `npm run verify:ci` locally
 - No secrets in diff; no `playwright-report/` / `test-results/` committed
 - Prisma migrations reviewed when schema changes
-- Update [PRODUCTION_CONFIG_SYNC.md](./PRODUCTION_CONFIG_SYNC.md) changelog when deploy/env contracts change
+- Update [DEPLOYMENT.md](./DEPLOYMENT.md) changelog when deploy/env contracts change
 
 ## Related docs
 
-- [ENGINEERING_PRINCIPLES.md](./ENGINEERING_PRINCIPLES.md)
-- [CI_CD_GITHUB_VERCEL.md](./CI_CD_GITHUB_VERCEL.md)
+- [DEPLOYMENT.md](./DEPLOYMENT.md)
 - [AGENT_PR_CHECKLIST.md](./AGENT_PR_CHECKLIST.md)
