@@ -21,6 +21,7 @@ Use this **before** `git push` and `gh pr create`. Do not mark work complete unt
 | ↳ `npm audit --audit-level=critical` | `dependency-review` | Approximates critical vuln gate |
 | ↳ postgres-ci + `db push` + smoke | `e2e-smoke` | Port **5436**, fresh DB like CI |
 | `npm run sonar:local` (if `SONAR_TOKEN` set) | `sonarcloud` | Optional; needs coverage from verify |
+| `npm run sonar:status` (after push, when CI done) | `sonarcloud` | Quality Gate summary via API; or `gh pr checks` |
 | — | **Preview approved (Vercel)** | **Human only** — not automatable |
 | — | **Vercel Preview deploy** | Hosted — smoke locally first |
 
