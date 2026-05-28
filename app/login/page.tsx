@@ -2,6 +2,8 @@ import { Suspense } from "react"
 import { getGoogleClientId } from "@/lib/google-client-id"
 import LoginForm from "./LoginForm"
 
+export const dynamic = "force-dynamic"
+
 export default function LoginPage() {
   const googleClientId = getGoogleClientId()
 

@@ -118,6 +118,7 @@ function SignupForm({ googleClientId }: Readonly<{ googleClientId: string }>) {
         router.refresh()
       } catch {
         setErrors(["Failed to sign up with Google. Please try again."])
+      } finally {
         setIsLoading(false)
       }
     },

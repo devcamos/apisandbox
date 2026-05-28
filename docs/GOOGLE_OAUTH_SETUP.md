@@ -16,10 +16,12 @@ This app uses **NextAuth.js** with the Google provider. Configure Google OAuth i
 
 This app uses **Google Identity Services (one-tap / button)** with ID token verification (like life-world-os), not the OAuth redirect flow. In Google Cloud Console → Credentials → your OAuth 2.0 Client ID:
 
-- **Authorized JavaScript origins:** add your app origins, e.g.  
-  `http://localhost:4000`,  
-  `https://your-staging-domain.com`,  
-  `https://your-production-domain.com`
+- **Authorized JavaScript origins:** add every host users open in the browser (scheme + host + port, no path), e.g.  
+  `http://localhost:4000`  
+  `https://apisandbox-coral.vercel.app` (production)  
+  `https://apisandbox-devonte-amos-projects.vercel.app`  
+  `https://apisandbox-git-main-devonte-amos-projects.vercel.app` (stable preview)  
+  Each **unique PR preview URL** (`https://apisandbox-<hash>-….vercel.app`) must be listed too, or sign-in will hang / fail silently in the Google popup.
 - You do **not** need to add redirect URIs for the ID-token flow (only if you also use the legacy NextAuth Google redirect provider).
 
 ## 3. Environment variables
@@ -48,12 +50,32 @@ NEXT_PUBLIC_GOOGLE_CLIENT_ID="your-client-id.apps.googleusercontent.com"
 
 ## 4. Where it’s used
 
-- **Login:** “Sign in with Google” on `/login` uses `signIn("google", { callbackUrl })`.
-- **Signup:** “Sign up with Google” on `/signup` uses the same flow; new users get an account on first sign-in.
+- **Login / signup:** Google Identity Services button → ID token → `POST /api/auth/google`.
+- New users are created via the same bootstrap path as email signup (`createUserWithInitialData`).
 - The Google provider is only registered when **both** `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` are set (see `lib/auth-config.ts`). The **GSI button + `/api/auth/google`** flow only requires **`GOOGLE_CLIENT_ID`** on the server. If it is missing, the disabled “Continue with Google” placeholder appears.
 
 ## 5. Troubleshooting
 
-- **Redirect URI mismatch:** The redirect URI in Google Cloud must match exactly (including scheme and port), e.g. `http://localhost:4000/api/auth/callback/google`.
+### Vercel preview / production
+
+1. **Check config on the live host** (no secrets returned):
+
+   ```bash
+   curl -sS "https://<your-host>/api/health/auth" | jq
+   curl -sS "https://<your-host>/api/health/db" | jq
+   ```
+
+   `authorizedJavaScriptOrigin` in the auth health response is the exact value to add in Google Cloud.
+
+2. **Env on Vercel:** set `GOOGLE_CLIENT_ID` for **Production and Preview**. Optionally mirror with `NEXT_PUBLIC_GOOGLE_CLIENT_ID` (same value).
+
+3. **“Stuck on Signing in…”** after clicking Google:
+   - Browser console: `origin_mismatch` / `idpiframe_initialization_failed` → add the origin from step 1.
+   - Network tab: `POST /api/auth/google` → `bootstrap_failure` → fix database (see `/api/health/db`).
+   - Network tab: no `/api/auth/google` request → GSI blocked or popup closed; check ad blockers and origins.
+
+### Other
+
+- **Redirect URI mismatch:** Only applies to the legacy NextAuth redirect flow (`/api/auth/callback/google`), not the GSI + ID token flow.
 - **Cookie/HTTPS:** In production, use HTTPS and ensure `NEXT_PUBLIC_APP_URL` matches the URL users see (for cookies and redirects).
-- **Staging:** If staging is on a different host/port, add that exact origin’s callback URL in Google Cloud and set `NEXT_PUBLIC_APP_URL` (and optionally `GOOGLE_*`) in the staging environment.
+- **Staging:** Add that host’s origin in Google Cloud and set `GOOGLE_CLIENT_ID` in the staging environment.
