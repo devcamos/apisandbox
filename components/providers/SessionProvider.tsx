@@ -1,6 +1,7 @@
 "use client"
 
 import { ReactNode, createContext, useContext, useEffect, useState } from "react"
+import type { AuthSubscriptionTier } from "@/lib/auth/types"
 import { getSafeClientRelativeRedirect } from "@/lib/safe-redirect"
 
 type SessionStatus = "loading" | "authenticated" | "unauthenticated"
@@ -14,6 +15,7 @@ interface SessionUser {
 
 interface SessionData {
   user: SessionUser
+  subscriptionTier: AuthSubscriptionTier
 }
 
 interface AuthContextValue {
@@ -28,6 +30,7 @@ interface AuthContextValue {
       firstName: string | null
       lastName: string | null
       avatarUrl: string | null
+      subscriptionTier?: AuthSubscriptionTier
     }
   }) => void
   clearSession: () => Promise<void>
@@ -43,6 +46,7 @@ function mapToSessionData(user: {
   firstName: string | null
   lastName: string | null
   avatarUrl: string | null
+  subscriptionTier?: AuthSubscriptionTier
 }): SessionData {
   const name = [user.firstName, user.lastName].filter(Boolean).join(" ").trim() || null
   return {
@@ -52,6 +56,7 @@ function mapToSessionData(user: {
       name,
       image: user.avatarUrl,
     },
+    subscriptionTier: user.subscriptionTier ?? "FREE",
   }
 }
 
@@ -70,6 +75,7 @@ async function fetchCurrentUser(token?: string) {
       firstName: string | null
       lastName: string | null
       avatarUrl: string | null
+      subscriptionTier: AuthSubscriptionTier
     }
     token?: string
   }

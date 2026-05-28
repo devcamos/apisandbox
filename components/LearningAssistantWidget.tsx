@@ -4,6 +4,8 @@ import { useEffect, useRef, useState } from "react"
 import { usePathname } from "next/navigation"
 import { useRouter } from "next/navigation"
 import { MessageCircle, X, Send, Sparkles } from "lucide-react"
+import { useSession } from "@/components/providers/SessionProvider"
+import { canAccessLearningAssistant } from "@/lib/assistant/access"
 
 type Msg = { id: string; role: "user" | "assistant"; content: string }
 type Redirect = { href: string; label: string; reason: string }
@@ -15,6 +17,13 @@ function uid() {
 export function LearningAssistantWidget() {
   const pathname = usePathname()
   const router = useRouter()
+  const { status, data: session } = useSession()
+  const subscriptionTier = session?.subscriptionTier
+  const allowed = canAccessLearningAssistant({
+    status,
+    subscriptionTier,
+    pathname: pathname ?? "/",
+  })
   const [open, setOpen] = useState(false)
   const [mode, setMode] = useState<"guided" | "expert">("guided")
   const [provider, setProvider] = useState<string | null>(null)
@@ -42,6 +51,16 @@ export function LearningAssistantWidget() {
     if (!open) return
     listRef.current?.scrollTo({ top: listRef.current.scrollHeight })
   }, [open, messages.length, loading])
+
+  useEffect(() => {
+    if (!allowed && open) {
+      setOpen(false)
+    }
+  }, [allowed, open])
+
+  if (!allowed) {
+    return null
+  }
 
   async function ask(text: string) {
     const trimmed = text.trim()
