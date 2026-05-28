@@ -37,7 +37,10 @@ DATABASE_URL="postgresql://user:password@host:5432/database?sslmode=require"
 | Variable | Value | Description | How to Generate |
 |----------|-------|-------------|-----------------|
 | `AUTH_SECRET` | `[32+ character string]` | NextAuth.js secret for JWT signing | `openssl rand -base64 32` |
+| `AUTH_JWT_SECRET` | `[32+ character string]` | JWT for `/api/auth/register`, login, Google | `openssl rand -base64 32` |
 | `NEXTAUTH_SECRET` | `[32+ character string]` | Alias for AUTH_SECRET (legacy support) | Same as `AUTH_SECRET` |
+
+**Preview deployments:** set `AUTH_JWT_SECRET` (or `AUTH_SECRET`) for **Preview** on all branches, not only Production. Without it, signup/Google return `JWT secret is not configured`.
 
 **Generate command**:
 ```bash
