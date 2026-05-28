@@ -28,7 +28,7 @@ Use this **before** `git push` and `gh pr create`. Do not mark work complete unt
 
 ## 1. Branch and diff hygiene
 
-- [ ] Branch from the correct base (`dev` for features per [GITFLOW](GITFLOW.md); hotfixes from `main`).
+- [ ] Branch from the correct base (`main` trunk per [GITFLOW](GITFLOW.md); `v1` only for 1.x release-line work; hotfixes from `main`).
 - [ ] Rebase or merge latest base branch if the PR has been open a while.
 - [ ] Diff is scoped to the task — no drive-by refactors.
 - [ ] **No secrets** in the diff (`.env`, `.env.local`, API keys, tokens).

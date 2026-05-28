@@ -12,19 +12,18 @@
 
 "use client"
 
-import { useState, useEffect, useRef, useCallback } from "react"
-import { useRouter } from "next/navigation"
+import { useState, useRef, useCallback } from "react"
 import Link from "next/link"
 import { ArrowRight, Mail, Lock, User, AlertCircle, CheckCircle } from "lucide-react"
 import { useAuthSessionWriter } from "@/components/providers/SessionProvider"
+import { useGoogleSignInButton } from "@/hooks/useGoogleSignInButton"
 import AuthPageShell from "@/components/auth/AuthPageShell"
 import AuthSocialSection from "@/components/auth/AuthSocialSection"
-import { authApiJsonInit, redirectAfterAuth } from "@/lib/auth/client-fetch"
-import { promptSavePasswordCredential } from "@/lib/browser-credentials"
+import { authApiPostJson } from "@/lib/auth/client-fetch"
+import { completeClientAuthSession, type ClientAuthSessionPayload } from "@/lib/auth/client-session"
 import { getPasswordRequirements } from "@/lib/password-validation"
 
 function SignupForm({ googleClientId }: Readonly<{ googleClientId: string }>) {
-  const router = useRouter()
   const { setSessionFromAuthResponse } = useAuthSessionWriter()
   const googleButtonRef = useRef<HTMLDivElement>(null)
   const [formData, setFormData] = useState({
@@ -67,30 +66,28 @@ function SignupForm({ googleClientId }: Readonly<{ googleClientId: string }>) {
     setIsLoading(true)
 
     try {
-      const response = await fetch(
-        "/api/auth/register",
-        authApiJsonInit({
-          email: formData.email,
-          password: formData.password,
-          name: formData.name || undefined,
-        }),
-      )
+      const { ok, payload } = await authApiPostJson<ClientAuthSessionPayload>("/api/auth/register", {
+        email: formData.email,
+        password: formData.password,
+        name: formData.name || undefined,
+      })
 
-      const data = await response.json()
-
-      if (!response.ok) {
-        const details = data?.error?.details
-        const message = data?.error?.message || "Signup failed"
+      if (!ok || !payload.data) {
+        const details = payload?.error?.details
+        const message = payload?.error?.message || "Signup failed"
         setErrors(Array.isArray(details) ? details : [message])
         setIsLoading(false)
         return
       }
 
-      setSessionFromAuthResponse(data.data)
-      await promptSavePasswordCredential(formData.email, formData.password)
-      redirectAfterAuth("/dashboard")
+      await completeClientAuthSession({
+        authData: payload.data,
+        redirectTo: "/dashboard",
+        setSession: setSessionFromAuthResponse,
+        savePassword: { email: formData.email, password: formData.password },
+      })
       return
-    } catch (err) {
+    } catch {
       setErrors(["An unexpected error occurred. Please try again."])
       setIsLoading(false)
     }
@@ -101,18 +98,19 @@ function SignupForm({ googleClientId }: Readonly<{ googleClientId: string }>) {
       setErrors([])
       setIsLoading(true)
       try {
-        const response = await fetch(
-          "/api/auth/google",
-          authApiJsonInit({ idToken: credential }),
-        )
-        const data = await response.json()
-        if (!response.ok) {
-          setErrors([data?.error?.message || "Google signup failed"])
+        const { ok, payload } = await authApiPostJson<ClientAuthSessionPayload>("/api/auth/google", {
+          idToken: credential,
+        })
+        if (!ok || !payload.data) {
+          setErrors([payload?.error?.message || "Google signup failed"])
           setIsLoading(false)
           return
         }
-        setSessionFromAuthResponse(data.data)
-        redirectAfterAuth("/dashboard")
+        await completeClientAuthSession({
+          authData: payload.data,
+          redirectTo: "/dashboard",
+          setSession: setSessionFromAuthResponse,
+        })
         return
       } catch {
         setErrors(["Failed to sign up with Google. Please try again."])
@@ -120,40 +118,17 @@ function SignupForm({ googleClientId }: Readonly<{ googleClientId: string }>) {
         setIsLoading(false)
       }
     },
-    [router, setSessionFromAuthResponse]
+    [setSessionFromAuthResponse]
   )
 
-  useEffect(() => {
-    if (!googleClientId || !googleButtonRef.current) return
-    const init = () => {
-      if (globalThis.window !== undefined && window.google?.accounts?.id && googleButtonRef.current) {
-        window.google.accounts.id.initialize({
-          client_id: googleClientId,
-          callback: (response: { credential: string }) => {
-            if (response.credential) handleGoogleCredential(response.credential)
-          },
-        })
-        window.google.accounts.id.renderButton(googleButtonRef.current, {
-          type: "standard",
-          theme: "outline",
-          size: "large",
-          text: "signup_with",
-          width: "400",
-        })
-      }
-    }
-    if (globalThis.window !== undefined && window.google?.accounts?.id) {
-      init()
-    } else {
-      const t = setInterval(() => {
-        if (globalThis.window !== undefined && window.google?.accounts?.id) {
-          clearInterval(t)
-          init()
-        }
-      }, 100)
-      setTimeout(() => clearInterval(t), 10000)
-    }
-  }, [googleClientId, handleGoogleCredential])
+  useGoogleSignInButton({
+    googleClientId,
+    buttonRef: googleButtonRef,
+    buttonText: "signup_with",
+    onCredential: (cred) => {
+      void handleGoogleCredential(cred)
+    },
+  })
 
   return (
     <AuthPageShell

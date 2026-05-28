@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server"
 import type { NextRequest } from "next/server"
+import { readSessionCookieToken } from "@/lib/auth/session-token"
 import { isSafeRelativeCallbackPath } from "@/lib/safe-redirect"
 
 const PREMIUM_PHASE_PATTERN = /^\/phase-([2-6])(\/|$)/
@@ -7,13 +8,12 @@ const PROTECTED_API_PATTERN = /^\/api\/(subscription|profile|phase-progress)/
 const PROTECTED_RESOURCE_PATTERN =
   /^\/(dashboard|observability|phase-\d+|cloud|ai|docs\/(architecture|java))(\/|$)/
 
-function getSessionToken(request: NextRequest): string | null {
-  return (
-    request.cookies.get("auth_token")?.value ??
-    request.cookies.get("next-auth.session-token")?.value ??
-    request.cookies.get("__Secure-next-auth.session-token")?.value ??
-    null
-  )
+function redirectToLogin(request: NextRequest, callbackPath: string) {
+  const loginUrl = new URL("/login", request.url)
+  if (isSafeRelativeCallbackPath(callbackPath)) {
+    loginUrl.searchParams.set("callbackUrl", callbackPath)
+  }
+  return NextResponse.redirect(loginUrl)
 }
 
 export function middleware(request: NextRequest) {
@@ -21,7 +21,7 @@ export function middleware(request: NextRequest) {
   const paywallEnabled =
     process.env.NEXT_PUBLIC_FF_PREMIUM_PAYWALL === "true"
   const callbackPath = `${pathname}${request.nextUrl.search}`
-  const token = getSessionToken(request)
+  const token = readSessionCookieToken(request)
 
   if (PROTECTED_API_PATTERN.test(pathname) && !token) {
     return NextResponse.json(
@@ -31,11 +31,7 @@ export function middleware(request: NextRequest) {
   }
 
   if (PROTECTED_RESOURCE_PATTERN.test(pathname) && !token) {
-    const loginUrl = new URL("/login", request.url)
-    if (isSafeRelativeCallbackPath(callbackPath)) {
-      loginUrl.searchParams.set("callbackUrl", callbackPath)
-    }
-    return NextResponse.redirect(loginUrl)
+    return redirectToLogin(request, callbackPath)
   }
 
   if (!paywallEnabled) {
@@ -43,11 +39,7 @@ export function middleware(request: NextRequest) {
   }
 
   if (PREMIUM_PHASE_PATTERN.test(pathname) && !token) {
-    const loginUrl = new URL("/login", request.url)
-    if (isSafeRelativeCallbackPath(callbackPath)) {
-      loginUrl.searchParams.set("callbackUrl", callbackPath)
-    }
-    return NextResponse.redirect(loginUrl)
+    return redirectToLogin(request, callbackPath)
   }
 
   const response = NextResponse.next()

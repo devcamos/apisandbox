@@ -108,7 +108,8 @@ When you change deploy/auth behaviour, add a row here and link the PR.
 |------|--------|-------------|
 | 2026-05-25 | Prisma: unset `PRISMA_GENERATE_DATAPROXY` on build; `DATABASE_URL=$POSTGRES_PRISMA_URL` on prod | `05088a4`, `5b801e8` |
 | 2026-05-25 | Google: runtime `GOOGLE_CLIENT_ID`, `/api/health/auth`, preview `AUTH_JWT_SECRET` | #15 |
-| 2026-05-25 | Login session: `credentials: "include"`, `redirectAfterAuth`, cookie E2E tests | `fix/prod-login-session-cookie` |
+| 2026-05-25 | Login session: `credentials: "include"`, `redirectAfterAuth`, cookie E2E tests | #17 |
+| 2026-05-27 | Trunk-based workflow; `v1` release line; auth client refactor (no behavior change) | `v1` / tag `v1.0.0` |
 
 ---
 

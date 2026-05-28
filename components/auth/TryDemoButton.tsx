@@ -3,7 +3,8 @@
 import { useState } from "react"
 import { Sparkles, Loader2 } from "lucide-react"
 import { useAuthSessionWriter } from "@/components/providers/SessionProvider"
-import { authApiFetchInit, redirectAfterAuth } from "@/lib/auth/client-fetch"
+import { authApiFetchInit } from "@/lib/auth/client-fetch"
+import { completeClientAuthSession } from "@/lib/auth/client-session"
 import { parseLoginErrorMessage } from "@/lib/login-error-parser"
 
 const demoEnabled = process.env.NEXT_PUBLIC_FF_DEMO_LOGIN === "true"
@@ -47,8 +48,11 @@ export function TryDemoButton({
         setLoading(false)
         return
       }
-      setSessionFromAuthResponse(body.data)
-      redirectAfterAuth(nextPath)
+      await completeClientAuthSession({
+        authData: body.data,
+        redirectTo: nextPath,
+        setSession: setSessionFromAuthResponse,
+      })
     } catch {
       setError("Network error. Try again.")
       setLoading(false)

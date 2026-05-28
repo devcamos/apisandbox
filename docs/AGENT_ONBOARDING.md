@@ -129,6 +129,7 @@ All backlog rules, statuses, and fields are in **[Feature and backlog management
 | **Pre-PR verification (agents)** | [AGENT_PR_CHECKLIST](AGENT_PR_CHECKLIST.md) |
 | Env vars (Vercel) | [VERCEL_ENV_VARIABLES](VERCEL_ENV_VARIABLES.md) |
 | **Prod config sync (changelog)** | [PRODUCTION_CONFIG_SYNC](PRODUCTION_CONFIG_SYNC.md) |
+| Branching (trunk + `v1`) | [GITFLOW](GITFLOW.md), [ENGINEERING_PRINCIPLES](ENGINEERING_PRINCIPLES.md) |
 | Sonar quality gate | [SONAR_QUALITY_GATE](SONAR_QUALITY_GATE.md) |
 | Demo login / test users | [TEST_USERS](TEST_USERS.md) |
 | Branching | [GITFLOW](GITFLOW.md) |
@@ -140,6 +141,7 @@ All backlog rules, statuses, and fields are in **[Feature and backlog management
 
 | Date | Change |
 |------|--------|
+| 2026-05-27 | Trunk-based [GITFLOW](GITFLOW.md); `v1` release line + git tags; [ENGINEERING_PRINCIPLES](ENGINEERING_PRINCIPLES.md). |
 | 2026-05-25 | [PRODUCTION_CONFIG_SYNC](PRODUCTION_CONFIG_SYNC.md): Vercel/Prisma/auth/Google sync + changelog for deploy PRs. |
 | 2026-05-25 | Local-first CI parity: `npm run verify:ci` mirrors all blocking GitHub jobs (`scripts/verify-ci-local.sh`). |
 | 2026-05-25 | Cursor rules for green builds and auth/subscription conventions; stronger verify-before-ship guidance. |

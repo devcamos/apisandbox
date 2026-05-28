@@ -3,9 +3,8 @@ import type { z } from "zod"
 import { errorResponse, handleRouteError, okResponse } from "@/lib/http/responses"
 
 /**
- * Extract a bearer token from the `Authorization` header, falling back to the
- * `auth_token` cookie. Shared by API routes and middleware so token discovery
- * stays consistent.
+ * Bearer token for API routes, with `auth_token` cookie fallback.
+ * Page middleware uses `readSessionCookieToken` in `lib/auth/session-token.ts` (legacy NextAuth cookies).
  */
 export function readAuthToken(request: NextRequest): string | null {
   const authHeader = request.headers.get("authorization")

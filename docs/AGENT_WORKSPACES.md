@@ -13,7 +13,7 @@ This file is the **canonical URL and integration map** for humans and automated 
 | Repository | `https://github.com/devcamos/apisandbox` |
 | Default branch | `main` (confirm in repo settings if unsure) |
 
-Further reading: [CI/CD and Vercel](CI_CD_GITHUB_VERCEL.md), [Gitflow](GITFLOW.md).
+Further reading: [CI/CD and Vercel](CI_CD_GITHUB_VERCEL.md), [Trunk + v1 branching](GITFLOW.md), [Engineering principles](ENGINEERING_PRINCIPLES.md).
 
 ---
 
