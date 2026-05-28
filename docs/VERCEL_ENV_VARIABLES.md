@@ -199,8 +199,29 @@ After setting variables:
 
 ---
 
+## 🔄 Production config sync (agents)
+
+For post-incident env/build/auth alignment (health URLs, Prisma build flags, preview `AUTH_JWT_SECRET`, Google origins, E2E against prod), see **[PRODUCTION_CONFIG_SYNC.md](./PRODUCTION_CONFIG_SYNC.md)**. Update its **changelog** table when you change deploy contracts in a PR.
+
+### Prisma on Vercel (required knowledge)
+
+- Set `DATABASE_URL` to **`$POSTGRES_PRISMA_URL`** (not a pasted URL).
+- Do **not** enable `PRISMA_GENERATE_DATAPROXY` for this project. `package.json` runs `env -u PRISMA_GENERATE_DATAPROXY prisma generate` so the runtime uses a **binary** engine with `postgresql://` URLs.
+- Verify after deploy: `GET /api/health/db` → success.
+
+### Post-deploy smoke
+
+```bash
+curl -sS "https://apisandbox-coral.vercel.app/api/health/db"
+curl -sS "https://apisandbox-coral.vercel.app/api/health/auth"
+PLAYWRIGHT_PROD_URL=https://apisandbox-coral.vercel.app npm run test:prod
+```
+
+---
+
 ## 📚 Related Documentation
 
+- [Production config sync](./PRODUCTION_CONFIG_SYNC.md) — canonical sync + changelog
 - [Vercel Deployment Guide](./VERCEL_DEPLOYMENT.md)
+- [Google OAuth setup](./GOOGLE_OAUTH_SETUP.md)
 - [Mono-Environment Framework](./MONO_ENVIRONMENT.md)
-- [Database Comparison](./DATABASE_COMPARISON.md)

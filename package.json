@@ -25,6 +25,7 @@
     "verify:pr": "npm run verify:ci",
     "test:all": "playwright test --reporter=list",
     "test:staging": "STAGING_TEST=1 playwright test tests/staging.spec.ts --project=staging",
+    "test:prod": "playwright test tests/prod-deployment-auth.spec.ts --project=chromium",
     "coverage:check": "node scripts/check-coverage.js",
     "validate:compose": "bash scripts/validate-compose.sh",
     "pr:close-stale-codex": "bash ./scripts/gh-close-codex-prs.sh",

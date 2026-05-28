@@ -104,6 +104,8 @@ All backlog rules, statuses, and fields are in **[Feature and backlog management
 | Area | Command |
 |------|---------|
 | Auth / subscriptions | `CI=1 npx playwright test tests/unified-auth.spec.ts --project=chromium` |
+| Auth cookie / login redirect | `CI= npx playwright test tests/auth-login-cookie.spec.ts --project=chromium` |
+| Production URL smoke (optional) | `PLAYWRIGHT_PROD_URL=https://apisandbox-coral.vercel.app npm run test:prod` |
 | Full E2E | `CI=1 npm run test:ci:chromium` |
 
 ---
@@ -126,6 +128,7 @@ All backlog rules, statuses, and fields are in **[Feature and backlog management
 | CI / Vercel / GitHub | [CI_CD_GITHUB_VERCEL](CI_CD_GITHUB_VERCEL.md) |
 | **Pre-PR verification (agents)** | [AGENT_PR_CHECKLIST](AGENT_PR_CHECKLIST.md) |
 | Env vars (Vercel) | [VERCEL_ENV_VARIABLES](VERCEL_ENV_VARIABLES.md) |
+| **Prod config sync (changelog)** | [PRODUCTION_CONFIG_SYNC](PRODUCTION_CONFIG_SYNC.md) |
 | Sonar quality gate | [SONAR_QUALITY_GATE](SONAR_QUALITY_GATE.md) |
 | Demo login / test users | [TEST_USERS](TEST_USERS.md) |
 | Branching | [GITFLOW](GITFLOW.md) |
@@ -137,6 +140,7 @@ All backlog rules, statuses, and fields are in **[Feature and backlog management
 
 | Date | Change |
 |------|--------|
+| 2026-05-25 | [PRODUCTION_CONFIG_SYNC](PRODUCTION_CONFIG_SYNC.md): Vercel/Prisma/auth/Google sync + changelog for deploy PRs. |
 | 2026-05-25 | Local-first CI parity: `npm run verify:ci` mirrors all blocking GitHub jobs (`scripts/verify-ci-local.sh`). |
 | 2026-05-25 | Cursor rules for green builds and auth/subscription conventions; stronger verify-before-ship guidance. |
 | 2026-05-07 | Initial agent onboarding (story, setup order, verification, Notion, conventions). |

@@ -57,7 +57,8 @@ Step-by-step checklist for deploying to Vercel. Use this to ensure nothing is mi
 - [ ] Variables applied to **Preview** (optional, for PR previews)
 - [ ] Variables applied to **Development** (optional, for Vercel CLI)
 
-**📖 See [VERCEL_ENV_VARIABLES.md](./VERCEL_ENV_VARIABLES.md) for complete reference**
+**📖 See [VERCEL_ENV_VARIABLES.md](./VERCEL_ENV_VARIABLES.md) for complete reference**  
+**📖 See [PRODUCTION_CONFIG_SYNC.md](./PRODUCTION_CONFIG_SYNC.md) for prod/preview sync, health checks, and config changelog**
 
 ---
 

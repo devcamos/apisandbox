@@ -19,6 +19,7 @@ import Link from "next/link"
 import { ArrowRight, Mail, Lock, AlertCircle, CheckCircle, XCircle, Loader2 } from "lucide-react"
 import { useAuthSessionWriter } from "@/components/providers/SessionProvider"
 import { parseLoginErrorMessage, type LoginErrorInfo } from "@/lib/login-error-parser"
+import { authApiFetchInit, authApiJsonInit, redirectAfterAuth } from "@/lib/auth/client-fetch"
 import { promptSavePasswordCredential } from "@/lib/browser-credentials"
 import AuthPageShell from "@/components/auth/AuthPageShell"
 import AuthSocialSection from "@/components/auth/AuthSocialSection"
@@ -140,14 +141,13 @@ function LoginForm({ googleClientId }: Readonly<{ googleClientId: string }>) {
     setIsLoading(true)
 
     try {
-      const response = await fetch("/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
+      const response = await fetch(
+        "/api/auth/login",
+        authApiJsonInit({
           email: email.trim().toLowerCase(),
           password,
         }),
-      })
+      )
       const payload = await response.json()
       if (!response.ok) {
         const errorInfo = parseLoginErrorMessage(payload?.error?.message ?? "Login failed")
@@ -157,9 +157,8 @@ function LoginForm({ googleClientId }: Readonly<{ googleClientId: string }>) {
       }
       setSessionFromAuthResponse(payload.data)
       await promptSavePasswordCredential(email, password)
-
-      router.push(callbackUrl)
-      router.refresh()
+      redirectAfterAuth(callbackUrl)
+      return
     } catch (err) {
       // Handle timeout and network errors
       let errorMessage = "An unexpected error occurred. Please try again."
@@ -185,11 +184,10 @@ function LoginForm({ googleClientId }: Readonly<{ googleClientId: string }>) {
       setError(null)
       setIsLoading(true)
       try {
-        const response = await fetch("/api/auth/google", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ idToken: credential }),
-        })
+        const response = await fetch(
+          "/api/auth/google",
+          authApiJsonInit({ idToken: credential }),
+        )
         const payload = await response.json()
         if (!response.ok) {
           const errorInfo = parseLoginErrorMessage(payload?.error?.message ?? "Google sign-in failed")
@@ -198,8 +196,8 @@ function LoginForm({ googleClientId }: Readonly<{ googleClientId: string }>) {
           return
         }
         setSessionFromAuthResponse(payload.data)
-        router.push(callbackUrl)
-        router.refresh()
+        redirectAfterAuth(callbackUrl)
+        return
       } catch (err) {
         const errorInfo = parseLoginErrorMessage(
           err instanceof Error ? err.message : "Failed to sign in with Google. Please try again."

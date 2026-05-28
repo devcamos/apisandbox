@@ -19,6 +19,7 @@ import { ArrowRight, Mail, Lock, User, AlertCircle, CheckCircle } from "lucide-r
 import { useAuthSessionWriter } from "@/components/providers/SessionProvider"
 import AuthPageShell from "@/components/auth/AuthPageShell"
 import AuthSocialSection from "@/components/auth/AuthSocialSection"
+import { authApiJsonInit, redirectAfterAuth } from "@/lib/auth/client-fetch"
 import { promptSavePasswordCredential } from "@/lib/browser-credentials"
 import { getPasswordRequirements } from "@/lib/password-validation"
 
@@ -66,15 +67,14 @@ function SignupForm({ googleClientId }: Readonly<{ googleClientId: string }>) {
     setIsLoading(true)
 
     try {
-      const response = await fetch("/api/auth/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
+      const response = await fetch(
+        "/api/auth/register",
+        authApiJsonInit({
           email: formData.email,
           password: formData.password,
           name: formData.name || undefined,
         }),
-      })
+      )
 
       const data = await response.json()
 
@@ -88,9 +88,8 @@ function SignupForm({ googleClientId }: Readonly<{ googleClientId: string }>) {
 
       setSessionFromAuthResponse(data.data)
       await promptSavePasswordCredential(formData.email, formData.password)
-
-      router.push("/dashboard")
-      router.refresh()
+      redirectAfterAuth("/dashboard")
+      return
     } catch (err) {
       setErrors(["An unexpected error occurred. Please try again."])
       setIsLoading(false)
@@ -102,11 +101,10 @@ function SignupForm({ googleClientId }: Readonly<{ googleClientId: string }>) {
       setErrors([])
       setIsLoading(true)
       try {
-        const response = await fetch("/api/auth/google", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ idToken: credential }),
-        })
+        const response = await fetch(
+          "/api/auth/google",
+          authApiJsonInit({ idToken: credential }),
+        )
         const data = await response.json()
         if (!response.ok) {
           setErrors([data?.error?.message || "Google signup failed"])
@@ -114,8 +112,8 @@ function SignupForm({ googleClientId }: Readonly<{ googleClientId: string }>) {
           return
         }
         setSessionFromAuthResponse(data.data)
-        router.push("/dashboard")
-        router.refresh()
+        redirectAfterAuth("/dashboard")
+        return
       } catch {
         setErrors(["Failed to sign up with Google. Please try again."])
       } finally {

@@ -1,6 +1,7 @@
 "use client"
 
 import { ReactNode, createContext, useContext, useEffect, useState } from "react"
+import { authApiFetchInit } from "@/lib/auth/client-fetch"
 import { getSafeClientRelativeRedirect } from "@/lib/safe-redirect"
 
 type SessionStatus = "loading" | "authenticated" | "unauthenticated"
@@ -57,6 +58,7 @@ function mapToSessionData(user: {
 
 async function fetchCurrentUser(token?: string) {
   const res = await fetch("/api/auth/me", {
+    ...authApiFetchInit,
     headers: token ? { Authorization: `Bearer ${token}` } : undefined,
   })
   if (!res.ok) {
@@ -136,7 +138,7 @@ export function SessionProvider({ children }: Readonly<{ children: ReactNode }>)
     setData(null)
     setStatus("unauthenticated")
     try {
-      await fetch("/api/auth/logout", { method: "POST" })
+      await fetch("/api/auth/logout", { method: "POST", ...authApiFetchInit })
     } catch {
       // no-op
     }
@@ -166,7 +168,7 @@ export async function signOut(options?: { callbackUrl?: string }) {
   if (globalThis.window !== undefined) {
     localStorage.removeItem(STORAGE_KEY)
     try {
-      await fetch("/api/auth/logout", { method: "POST" })
+      await fetch("/api/auth/logout", { method: "POST", ...authApiFetchInit })
     } catch {
       // no-op
     }
