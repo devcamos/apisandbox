@@ -34,6 +34,7 @@ Use this **before** `git push` and `gh pr create`. Do not mark work complete unt
 - [ ] **No secrets** in the diff (`.env`, `.env.local`, API keys, tokens).
 - [ ] **Do not commit** generated artifacts: `playwright-report/`, `test-results/`, `coverage/` (unless task requires).
 - [ ] Env templates use placeholders only (`*.example`, `config/environments/*.env.example`).
+- [ ] Deploy/auth PRs: update [PRODUCTION_CONFIG_SYNC](PRODUCTION_CONFIG_SYNC.md) changelog if env/build/auth contract changed.
 - [ ] Lockfile in sync: if you changed `package.json`, run `npm install` and commit `package-lock.json`.
 
 ---
