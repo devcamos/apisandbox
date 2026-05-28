@@ -1,107 +1,77 @@
-# Git Branching Strategy (Gitflow: `dev` = staging)
+# Trunk-based development (with `v1` release line)
 
-This repo uses a practical Gitflow model:
-- `main` is production
-- `dev` is staging/integration
-- all work ships through short-lived feature branches
+This repo uses **trunk-based workflow**: `main` is the integration trunk. All work merges to `main` via short-lived branches and PRs.
 
-## Branch Roles
+## Branch roles
 
-| Branch | Purpose | Deployment |
-|---|---|---|
-| `main` | Production-ready, release history | Production |
-| `dev` | Integration branch for accepted features | Staging |
-| `feature/*` or `codex/*` | Day-to-day implementation work | None (PR into `dev`) |
-| `release/*` | Stabilize release candidate from `dev` | Optional pre-prod |
-| `hotfix/*` | Emergency fix from `main` | Production patch |
+| Branch / ref | Purpose | Deployment |
+|--------------|---------|------------|
+| **`main`** | Trunk — always deployable | Vercel **Production** |
+| **`v1`** | Release line for 1.x (patches, docs, refactors) | Same as `main` when merged; tag releases on `v1` |
+| **`feature/*`**, **`fix/*`**, **`codex/*`** | Short-lived work | Vercel **Preview** on PR |
 
-## Branch Rules
+Legacy `dev` is **deprecated** — do not open new PRs targeting `dev`.
 
-1. Never commit directly to `main`.
-2. Do not commit directly to `dev` unless it is a controlled release merge.
-3. Open PRs from feature branches into `dev`.
-4. Promote `dev` to `main` only via release PR.
-5. Hotfixes branch from `main`, then merge into both `main` and `dev`.
+## Git tags
 
-## Naming Convention
+Releases are marked with **annotated tags** on the release line:
 
-- Feature: `feature/<scope>-<short-description>`
-- Agent/automation work: `codex/<scope>-<short-description>`
-- Release: `release/<version-or-date>`
-- Hotfix: `hotfix/<incident-or-ticket>`
+```bash
+git checkout v1
+git pull
+git tag -a v1.0.0 -m "Release 1.0.0 — trunk baseline + principle refactor"
+git push origin v1.0.0
+```
 
-Examples:
-- `feature/auth-jwt-session`
-- `codex/phase4-lesson-tracker`
-- `release/2026-04-15`
-- `hotfix/login-timeout-500`
+Tag format: `v1.0.0`, `v1.0.1`, … (semver on the `v1` line).
 
-## Daily Workflow
+List tags: `git tag -l 'v1.*'`
 
-1. Sync and branch from `dev`:
-   ```bash
-   git checkout dev
-   git pull
-   git checkout -b feature/your-change
-   ```
-2. Commit small, reviewable chunks:
-   ```bash
-   git add <files>
-   git commit -m "feat(auth): unify jwt login flow"
-   ```
-3. Push and open PR to `dev`:
-   ```bash
-   git push -u origin feature/your-change
-   ```
-4. After PR approval + checks, merge into `dev`.
+## Daily workflow
 
-## Release Workflow
-
-1. Create release branch from `dev`:
-   ```bash
-   git checkout dev
-   git pull
-   git checkout -b release/<version>
-   ```
-2. Run final validation (tests, migrations, smoke checks).
-3. PR `release/*` -> `main`.
-4. After merge, back-merge `main` into `dev`.
-
-## Hotfix Workflow
-
-1. Branch from `main`:
+1. Sync trunk:
    ```bash
    git checkout main
-   git pull
-   git checkout -b hotfix/<issue>
+   git pull origin main
    ```
-2. Ship fix via PR to `main`.
-3. Merge the same fix back into `dev`.
+2. Branch for work (from `main` or `v1` if maintaining the 1.x line):
+   ```bash
+   git checkout -b fix/short-description
+   ```
+3. Commit in small chunks; run `npm run verify:ci` before push.
+4. Open PR → **`main`** (default) or **`v1`** when explicitly doing 1.x release work.
+5. After merge, delete the feature branch.
 
-## Required PR Checks
+## Hotfix workflow
 
-- Type-check: `npx tsc --noEmit`
-- Tests relevant to changed area
-- Prisma migration review when schema changes
-- No test artifacts in commits (`test-results`, generated reports)
+1. Branch from `main` (or `v1` if patching a tagged 1.x release):
+   ```bash
+   git checkout main && git pull
+   git checkout -b hotfix/issue-summary
+   ```
+2. PR to `main`; cherry-pick or merge to `v1` if the release line needs the same fix.
+3. Tag patch on `v1` when applicable: `v1.0.1`.
 
-## Local Staging (Docker)
+## Naming convention
 
-Create a `.env` file in the repo root (Compose loads it automatically) with at least **`AUTH_SECRET`** (32+ random characters). Staging Postgres and the app listen on **127.0.0.1** only (`5434` and `4000`).
+- Feature/fix: `feature/<scope>-<description>` or `fix/<scope>-<description>`
+- Agent work: `codex/<scope>-<description>`
+- Release line: branch `v1`, tags `v1.x.y`
 
-```bash
-docker-compose -f docker-compose.yml -f docker-compose.staging.yml up -d
-```
+Examples:
 
-- App: `http://localhost:4000`
-- Postgres: `localhost:5434` (`apisandbox_staging`)
+- `fix/auth-session-cookie`
+- `feature/phase-5-quiz`
+- Tag: `v1.0.0`
 
-Stop:
-```bash
-docker-compose -f docker-compose.yml -f docker-compose.staging.yml down
-```
+## Required PR checks
 
-Run staging smoke tests:
-```bash
-npm run test:staging
-```
+- `npm run verify:ci` locally
+- No secrets in diff; no `playwright-report/` / `test-results/` committed
+- Prisma migrations reviewed when schema changes
+- Update [DEPLOYMENT.md](./DEPLOYMENT.md) changelog when deploy/env contracts change
+
+## Related docs
+
+- [DEPLOYMENT.md](./DEPLOYMENT.md)
+- [AGENT_PR_CHECKLIST.md](./AGENT_PR_CHECKLIST.md)

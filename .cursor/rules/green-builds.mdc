@@ -31,12 +31,25 @@ CI=1 npx playwright test tests/unified-auth.spec.ts --project=chromium
 
 Conventions: `.cursor/rules/auth-subscription.mdc`
 
+## After each commit (Sonar)
+
+1. Push the branch, then wait for CI **`SonarQube Cloud`** (needs `lint-and-build` + `unit-tests` first).
+2. Review the gate:
+   ```bash
+   gh pr checks --watch          # GitHub check name: SonarQube Cloud
+   npm run sonar:status          # requires SONAR_TOKEN in .env.local
+   SONAR_PR=18 npm run sonar:status   # optional: explicit PR number
+   ```
+3. Dashboard: https://sonarcloud.io/project/overview?id=devcamos_apisandbox
+
+Before push, optional local parity: `npm run sonar:local:full` (Docker + `SONAR_TOKEN` + coverage).
+
 ## Before `gh pr create`
 
 1. `npm run verify:ci` green
 2. No secrets or generated artifacts in diff
 3. **Push the full branch** — every commit, including `.github/workflows/` changes. If HTTPS push rejects workflow files (OAuth `workflow` scope), use SSH: `git push git@github.com:ORG/REPO.git HEAD:BRANCH`
-4. `gh pr checks --watch` should confirm (not discover) green CI
+4. `gh pr checks --watch` should confirm (not discover) green CI, including **SonarQube Cloud**
 5. PR body: Summary + Test plan with `verify:ci` checked
 
 ## New logic in `lib/` (Sonar coverage)

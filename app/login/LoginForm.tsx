@@ -14,32 +14,20 @@
 "use client"
 
 import { useState, useEffect, useRef, useCallback } from "react"
-import { useRouter, useSearchParams } from "next/navigation"
+import { useSearchParams } from "next/navigation"
 import Link from "next/link"
 import { ArrowRight, Mail, Lock, AlertCircle, CheckCircle, XCircle, Loader2 } from "lucide-react"
 import { useAuthSessionWriter } from "@/components/providers/SessionProvider"
+import { useGoogleSignInButton } from "@/hooks/useGoogleSignInButton"
 import { parseLoginErrorMessage, type LoginErrorInfo } from "@/lib/login-error-parser"
-import { authApiFetchInit, authApiJsonInit, redirectAfterAuth } from "@/lib/auth/client-fetch"
-import { promptSavePasswordCredential } from "@/lib/browser-credentials"
+import { authApiPostJson } from "@/lib/auth/client-fetch"
+import { completeClientAuthSession, type ClientAuthSessionPayload } from "@/lib/auth/client-session"
+import { validateEmailFormat } from "@/lib/validation/email"
 import AuthPageShell from "@/components/auth/AuthPageShell"
 import AuthSocialSection from "@/components/auth/AuthSocialSection"
 import { TryDemoButton } from "@/components/auth/TryDemoButton"
 
-declare global {
-  interface Window {
-    google?: {
-      accounts: {
-        id: {
-          initialize: (config: { client_id: string; callback: (res: { credential: string }) => void }) => void
-          renderButton: (el: HTMLElement, options: { type?: string; theme?: string; size?: string; text?: string; width?: string | number }) => void
-        }
-      }
-    }
-  }
-}
-
 function LoginForm({ googleClientId }: Readonly<{ googleClientId: string }>) {
-  const router = useRouter()
   const searchParams = useSearchParams()
   const { setSessionFromAuthResponse } = useAuthSessionWriter()
   const [email, setEmail] = useState("")
@@ -70,17 +58,7 @@ function LoginForm({ googleClientId }: Readonly<{ googleClientId: string }>) {
     }
   }, [searchParams])
 
-  // Client-side email validation
-  const validateEmail = (emailValue: string): string => {
-    if (!emailValue) {
-      return "Email is required"
-    }
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-    if (!emailRegex.test(emailValue)) {
-      return "Please enter a valid email address"
-    }
-    return ""
-  }
+  const validateEmail = (emailValue: string) => validateEmailFormat(emailValue)
 
   // Client-side password validation
   const validatePassword = (passwordValue: string): string => {
@@ -141,23 +119,22 @@ function LoginForm({ googleClientId }: Readonly<{ googleClientId: string }>) {
     setIsLoading(true)
 
     try {
-      const response = await fetch(
-        "/api/auth/login",
-        authApiJsonInit({
-          email: email.trim().toLowerCase(),
-          password,
-        }),
-      )
-      const payload = await response.json()
-      if (!response.ok) {
+      const { ok, payload } = await authApiPostJson<ClientAuthSessionPayload>("/api/auth/login", {
+        email: email.trim().toLowerCase(),
+        password,
+      })
+      if (!ok || !payload.data) {
         const errorInfo = parseLoginErrorMessage(payload?.error?.message ?? "Login failed")
         setError(errorInfo)
         setIsLoading(false)
         return
       }
-      setSessionFromAuthResponse(payload.data)
-      await promptSavePasswordCredential(email, password)
-      redirectAfterAuth(callbackUrl)
+      await completeClientAuthSession({
+        authData: payload.data,
+        redirectTo: callbackUrl,
+        setSession: setSessionFromAuthResponse,
+        savePassword: { email, password },
+      })
       return
     } catch (err) {
       // Handle timeout and network errors
@@ -184,19 +161,20 @@ function LoginForm({ googleClientId }: Readonly<{ googleClientId: string }>) {
       setError(null)
       setIsLoading(true)
       try {
-        const response = await fetch(
-          "/api/auth/google",
-          authApiJsonInit({ idToken: credential }),
-        )
-        const payload = await response.json()
-        if (!response.ok) {
+        const { ok, payload } = await authApiPostJson<ClientAuthSessionPayload>("/api/auth/google", {
+          idToken: credential,
+        })
+        if (!ok || !payload.data) {
           const errorInfo = parseLoginErrorMessage(payload?.error?.message ?? "Google sign-in failed")
           setError(errorInfo)
           setIsLoading(false)
           return
         }
-        setSessionFromAuthResponse(payload.data)
-        redirectAfterAuth(callbackUrl)
+        await completeClientAuthSession({
+          authData: payload.data,
+          redirectTo: callbackUrl,
+          setSession: setSessionFromAuthResponse,
+        })
         return
       } catch (err) {
         const errorInfo = parseLoginErrorMessage(
@@ -207,44 +185,17 @@ function LoginForm({ googleClientId }: Readonly<{ googleClientId: string }>) {
         setIsLoading(false)
       }
     },
-    [callbackUrl, router, setSessionFromAuthResponse]
+    [callbackUrl, setSessionFromAuthResponse]
   )
 
-  useEffect(() => {
-    if (!googleClientId || !googleButtonRef.current) return
-    const init = () => {
-      const gsi = globalThis.window?.google?.accounts?.id
-      const el = googleButtonRef.current
-      if (!gsi || !el) return
-      gsi.initialize({
-        client_id: googleClientId,
-        callback: (response: { credential: string }) => {
-          const cred = response.credential
-          if (cred) {
-            void handleGoogleCredential(cred)
-          }
-        },
-      })
-      gsi.renderButton(el, {
-        type: "standard",
-        theme: "outline",
-        size: "large",
-        text: "signin_with",
-        width: "400",
-      })
-    }
-    if (globalThis.window?.google?.accounts?.id) {
-      init()
-    } else {
-      const t = setInterval(() => {
-        if (globalThis.window?.google?.accounts?.id) {
-          clearInterval(t)
-          init()
-        }
-      }, 100)
-      setTimeout(() => clearInterval(t), 10000)
-    }
-  }, [googleClientId, handleGoogleCredential])
+  useGoogleSignInButton({
+    googleClientId,
+    buttonRef: googleButtonRef,
+    buttonText: "signin_with",
+    onCredential: (cred) => {
+      void handleGoogleCredential(cred)
+    },
+  })
 
   return (
     <AuthPageShell

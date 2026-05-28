@@ -1,0 +1,13 @@
+# Developer documentation
+
+Essential docs for onboarding and shipping changes. Product learning content lives in the app (`/phase-*`, `/docs/java`, `/docs/architecture`).
+
+| Doc | Use when |
+|-----|----------|
+| [AGENT_ONBOARDING.md](./AGENT_ONBOARDING.md) | **Start here** — setup, URLs, verify, conventions |
+| [GITFLOW.md](./GITFLOW.md) | Branching (`main` trunk, `v1` release line, tags) |
+| [AGENT_PR_CHECKLIST.md](./AGENT_PR_CHECKLIST.md) | Before every PR (`npm run verify:ci`) |
+| [TEST_USERS.md](./TEST_USERS.md) | Local / demo login credentials |
+| [DEPLOYMENT.md](./DEPLOYMENT.md) | Vercel env, Prisma on deploy, Google OAuth origins |
+
+**Templates (not prose):** `config/environments/*.env.example`, `.env.example`, `sonar-project.properties`

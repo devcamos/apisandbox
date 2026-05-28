@@ -14,7 +14,7 @@ import { Brain, Lock, Sparkles, Target } from "lucide-react"
 import { useEffect, useState } from "react"
 import { signupRequiredForPremium } from "@/config/featureFlags"
 import PhaseProgressOverview from "@/components/PhaseProgressOverview"
-import QuickStartGuide from "@/components/home/QuickStartGuide"
+import AppGuide from "@/components/home/AppGuide"
 import CloudSectionCard from "@/components/home/CloudSectionCard"
 import { getLearningPhases } from "@/lib/learning/dashboard-phase-catalog"
 
@@ -98,55 +98,6 @@ export default function DashboardPage() {
       </section>
 
             <PhaseProgressOverview />
-
-            {/* Pareto Methodology Section */}
-            <section className="container mx-auto px-6 py-8">
-              <div className="bg-gradient-to-br from-yellow-500/10 via-orange-500/10 to-red-500/10 border-2 border-yellow-500/30 rounded-2xl p-8 mb-12">
-                <div className="max-w-4xl mx-auto">
-                  <div className="flex items-center gap-4 mb-6">
-                    <div className="p-3 bg-yellow-500/20 rounded-lg">
-                      <span className="text-3xl">📊</span>
-                    </div>
-                    <div>
-                      <h2 className="text-2xl md:text-3xl font-bold text-white mb-2">
-                        Training Powered by the Pareto Principle
-                      </h2>
-                      <p className="text-gray-300">
-                        Every concept is selected using the 80/20 rule, then deep-dived for mastery
-                      </p>
-                    </div>
-                  </div>
-                  
-                  <div className="grid md:grid-cols-2 gap-6">
-                    <div className="bg-slate-800/50 rounded-xl p-6 border border-slate-700">
-                      <h3 className="text-lg font-bold text-yellow-400 mb-3">🎯 Content Selection</h3>
-                      <p className="text-gray-300 text-sm mb-3">
-                        We identify the <strong className="text-white">20% of concepts</strong> that solve <strong className="text-white">80% of real-world API integration challenges</strong>. No fluff, only high-impact knowledge.
-                      </p>
-                      <div className="text-xs text-gray-400">
-                        Example: Callbacks appear in 80% of OAuth flows → Deep dive into callbacks
-                      </div>
-                    </div>
-                    
-                    <div className="bg-slate-800/50 rounded-xl p-6 border border-slate-700">
-                      <h3 className="text-lg font-bold text-orange-400 mb-3">🚀 Deep Dive for Growth</h3>
-                      <p className="text-gray-300 text-sm mb-3">
-                        Once selected, each concept gets a <strong className="text-white">comprehensive deep dive</strong> with documentation, examples, and interactive demos to ensure true mastery.
-                      </p>
-                      <div className="text-xs text-gray-400">
-                        Example: HTTP fundamentals → Full documentation + REST API examples + Real-world use cases
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div className="mt-6 bg-gradient-to-r from-blue-500/10 to-purple-500/10 rounded-xl p-4 border border-blue-500/20">
-                    <p className="text-sm text-gray-300 text-center">
-                      <strong className="text-white">Result:</strong> You master the vital 20% that unlocks 80% of API integration scenarios, then deep dive to ensure you can apply it confidently in production.
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </section>
 
             {/* Learning Path Section */}
             <section id="phases" className="container mx-auto px-6 py-8">
@@ -338,7 +289,7 @@ export default function DashboardPage() {
         </Link>
       </section>
 
-      <QuickStartGuide />
+      <AppGuide />
     </div>
   )
 }

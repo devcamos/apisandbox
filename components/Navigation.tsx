@@ -31,14 +31,6 @@ export default function Navigation() {
 
   const protectedNavItems = [
     { name: "Dashboard", href: "/dashboard" },
-    { name: "Phase 0", href: "/phase-0" },
-    { name: "Phase 1", href: "/phase-1" },
-    { name: "Phase 2", href: "/phase-2" },
-    { name: "Phase 3", href: "/phase-3" },
-    { name: "Phase 4", href: "/phase-4" },
-    { name: "Phase 5", href: "/phase-5" },
-    { name: "Cloud", href: "/cloud" },
-    { name: "AI", href: "/ai" },
     { name: "Security", href: "/cloud/security" },
     { name: "Architecture", href: "/docs/architecture" },
   ];
@@ -201,30 +193,19 @@ export default function Navigation() {
               Story
             </Link>
 
-            {navItems.map((item) => {
-              // Keep Phase 5 directly visible in top nav; other phase/cloud/ai links stay in Explore.
-              const hideInTopNav =
-                session &&
-                ((item.name.startsWith("Phase") && item.name !== "Phase 5") ||
-                  item.name === "Cloud" ||
-                  item.name === "AI")
-              if (hideInTopNav) {
-                return null;
-              }
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className={`px-4 py-2 rounded-lg transition-all ${
-                    pathname === item.href
-                      ? "bg-blue-500/10 text-blue-400 font-semibold"
-                      : "text-gray-300 hover:text-white hover:bg-slate-800"
-                  }`}
-                >
-                  {item.name}
-                </Link>
-              );
-            })}
+            {navItems.map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={`px-4 py-2 rounded-lg transition-all ${
+                  pathname === item.href
+                    ? "bg-blue-500/10 text-blue-400 font-semibold"
+                    : "text-gray-300 hover:text-white hover:bg-slate-800"
+                }`}
+              >
+                {item.name}
+              </Link>
+            ))}
 
             {/* Search */}
             {session && (
@@ -420,31 +401,20 @@ export default function Navigation() {
               </div>
             )}
 
-            {navItems.map((item) => {
-              // Keep Phase 5 directly visible in mobile nav; other phase/cloud/ai links stay in Explore.
-              const hideInMobileNav =
-                session &&
-                ((item.name.startsWith("Phase") && item.name !== "Phase 5") ||
-                  item.name === "Cloud" ||
-                  item.name === "AI")
-              if (hideInMobileNav) {
-                return null;
-              }
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  onClick={() => setIsOpen(false)}
-                  className={`block px-4 py-2 rounded-lg transition-all ${
-                    pathname === item.href
-                      ? "bg-blue-500/10 text-blue-400 font-semibold"
-                      : "text-gray-300 hover:text-white hover:bg-slate-800"
-                  }`}
-                >
-                  {item.name}
-                </Link>
-              );
-            })}
+            {navItems.map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                onClick={() => setIsOpen(false)}
+                className={`block px-4 py-2 rounded-lg transition-all ${
+                  pathname === item.href
+                    ? "bg-blue-500/10 text-blue-400 font-semibold"
+                    : "text-gray-300 hover:text-white hover:bg-slate-800"
+                }`}
+              >
+                {item.name}
+              </Link>
+            ))}
             
             {/* Mobile Auth Buttons */}
             {status === "loading" ? (
