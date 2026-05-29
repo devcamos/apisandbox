@@ -38,7 +38,7 @@ export async function expectDbHealthReady(response: APIResponse) {
   expect(body.data.ok).toBe(true);
 }
 
-type SaasCheck = { id: string; status: "ok" | "warn" | "fail" };
+type SaasCheck = { id: string; status: "ok" | "warn" | "fail"; detail?: string };
 
 /** GET /api/health/saas — no blocking misconfig (JWT, DB URL, Stripe when enabled, etc.). */
 export async function expectSaasReadinessReady(
