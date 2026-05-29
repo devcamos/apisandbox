@@ -3,7 +3,9 @@ import { NextRequest, NextResponse } from "next/server"
 import { GoogleGenAI } from "@google/genai"
 import { inferAssistantRedirect } from "@/lib/assistant/redirect"
 import { requirePremiumUser } from "@/lib/auth/jwt-auth-middleware"
+import { applyRateLimit, attachRateLimitHeaders } from "@/lib/http/apply-rate-limit"
 import { handleRouteError } from "@/lib/http/responses"
+import { assistantLimiter } from "@/lib/rate-limit"
 
 type AssistantRequest = {
   message: string
@@ -77,108 +79,119 @@ function formatConversation({
 
 export async function POST(request: NextRequest) {
   try {
-    await requirePremiumUser(request)
-  } catch (error) {
-    return handleRouteError(error)
-  }
+    const user = await requirePremiumUser(request)
 
-  const body = (await request.json().catch(() => null)) as AssistantRequest | null
+    const rate = await applyRateLimit(
+      request,
+      assistantLimiter,
+      `assistant:${user.id}`,
+    )
+    if (rate.blocked) return rate.blocked
 
-  if (!body || typeof body.message !== "string") {
-    return NextResponse.json({ error: "Invalid request" }, { status: 400 })
-  }
+    const body = (await request.json().catch(() => null)) as AssistantRequest | null
 
-  const pathname = body.pathname ?? "/"
-  const mode = body.mode ?? "guided"
-  const redirect = inferAssistantRedirect({ message: body.message, pathname })
+    if (!body || typeof body.message !== "string") {
+      return NextResponse.json({ error: "Invalid request" }, { status: 400 })
+    }
 
-  const history = Array.isArray(body.history) ? body.history.slice(-12) : []
+    const pathname = body.pathname ?? "/"
+    const mode = body.mode ?? "guided"
+    const redirect = inferAssistantRedirect({ message: body.message, pathname })
 
-  const provider =
-    (process.env.ASSISTANT_PROVIDER as "openai" | "gemini" | undefined) ||
-    (process.env.GEMINI_API_KEY ? "gemini" : "openai")
+    const history = Array.isArray(body.history) ? body.history.slice(-12) : []
 
-  if (provider === "gemini") {
-    const apiKey = process.env.GEMINI_API_KEY
+    const provider =
+      (process.env.ASSISTANT_PROVIDER as "openai" | "gemini" | undefined) ||
+      (process.env.GEMINI_API_KEY ? "gemini" : "openai")
+
+    if (provider === "gemini") {
+      const apiKey = process.env.GEMINI_API_KEY
+      if (!apiKey) {
+        return NextResponse.json(
+          {
+            error:
+              "Missing GEMINI_API_KEY. Set it in your environment (e.g. .env.local) to enable Gemini responses.",
+          },
+          { status: 500 },
+        )
+      }
+
+      const model = process.env.GEMINI_MODEL || "gemini-2.5-flash"
+      const ai = new GoogleGenAI({ apiKey })
+
+      const prompt = [
+        buildInstructions({ pathname, mode }),
+        "",
+        "Conversation:",
+        formatConversation({ history, message: body.message }),
+      ].join("\n")
+
+      const result = await ai.models.generateContent({
+        model,
+        contents: prompt,
+      })
+
+      const reply =
+        (typeof result.text === "string" ? result.text : "")?.trim() ||
+        "I didn’t produce any text output. Try asking again."
+
+      return attachRateLimitHeaders(
+        NextResponse.json({
+          reply,
+          provider: "gemini",
+          model,
+          redirect,
+          suggestions: ["Explain idempotency", "Cookies vs tokens", "Show a retry policy example"],
+        }),
+        rate.result,
+      )
+    }
+
+    const apiKey = process.env.OPENAI_API_KEY
     if (!apiKey) {
       return NextResponse.json(
         {
           error:
-            "Missing GEMINI_API_KEY. Set it in your environment (e.g. .env.local) to enable Gemini responses.",
+            "Missing OPENAI_API_KEY. Set it in your environment (e.g. .env.local) to enable OpenAI responses, or set ASSISTANT_PROVIDER=gemini with GEMINI_API_KEY.",
         },
         { status: 500 },
       )
     }
 
-    // Default to a generally-available fast model; allow override via env.
-    const model = process.env.GEMINI_MODEL || "gemini-2.5-flash"
-    const ai = new GoogleGenAI({ apiKey })
+    const client = new OpenAI({ apiKey })
+    const model = process.env.OPENAI_MODEL || "gpt-4.1-mini"
 
-    const prompt = [
-      buildInstructions({ pathname, mode }),
-      "",
-      "Conversation:",
-      formatConversation({ history, message: body.message }),
-    ].join("\n")
+    const input = [
+      ...history.map((m) => ({
+        role: m.role,
+        content: m.content,
+      })),
+      { role: "user" as const, content: body.message },
+    ]
 
-    const result = await ai.models.generateContent({
+    const response = await client.responses.create({
       model,
-      contents: prompt,
+      instructions: buildInstructions({ pathname, mode }),
+      input,
     })
 
-    const reply =
-      (typeof result.text === "string" ? result.text : "")?.trim() ||
-      "I didn’t produce any text output. Try asking again."
+    const reply = response.output_text?.trim() || "I didn’t produce any text output. Try asking again."
 
-    return NextResponse.json({
-      reply,
-      provider: "gemini",
-      model,
-      redirect,
-      suggestions: ["Explain idempotency", "Cookies vs tokens", "Show a retry policy example"],
-    })
-  }
-
-  // Default: OpenAI
-  const apiKey = process.env.OPENAI_API_KEY
-  if (!apiKey) {
-    return NextResponse.json(
-      {
-        error:
-          "Missing OPENAI_API_KEY. Set it in your environment (e.g. .env.local) to enable OpenAI responses, or set ASSISTANT_PROVIDER=gemini with GEMINI_API_KEY.",
-      },
-      { status: 500 },
+    return attachRateLimitHeaders(
+      NextResponse.json({
+        reply,
+        provider: "openai",
+        model: response.model ?? model,
+        redirect,
+        suggestions: [
+          "Explain idempotency",
+          "Cookies vs tokens",
+          "Show a retry policy example",
+        ],
+      }),
+      rate.result,
     )
+  } catch (error) {
+    return handleRouteError(error)
   }
-
-  const client = new OpenAI({ apiKey })
-  const model = process.env.OPENAI_MODEL || "gpt-4.1-mini"
-
-  const input = [
-    ...history.map((m) => ({
-      role: m.role,
-      content: m.content,
-    })),
-    { role: "user" as const, content: body.message },
-  ]
-
-  const response = await client.responses.create({
-    model,
-    instructions: buildInstructions({ pathname, mode }),
-    input,
-  })
-
-  const reply = response.output_text?.trim() || "I didn’t produce any text output. Try asking again."
-
-  return NextResponse.json({
-    reply,
-    provider: "openai",
-    model: response.model ?? model,
-    redirect,
-    suggestions: [
-      "Explain idempotency",
-      "Cookies vs tokens",
-      "Show a retry policy example",
-    ],
-  })
 }

@@ -18,13 +18,22 @@ import { NextRequest, NextResponse } from "next/server"
 import { requireAuthenticatedUser } from "@/lib/auth/jwt-auth-middleware"
 import { upgradeToPremium } from "@/lib/subscription"
 import { handleRouteError } from "@/lib/http/responses"
+import { isInstantPremiumUpgradeAllowed } from "@/lib/saas/config"
 
 export async function POST(request: NextRequest) {
   try {
+    if (!isInstantPremiumUpgradeAllowed()) {
+      return NextResponse.json(
+        {
+          error:
+            "Use Stripe checkout to upgrade. Instant upgrade is only available in local demo mode.",
+        },
+        { status: 403 },
+      )
+    }
+
     const user = await requireAuthenticatedUser(request)
 
-    // MENTOR NOTE: In production, verify payment here
-    // For demo, we'll upgrade immediately
     await upgradeToPremium(user.id)
 
     return NextResponse.json({

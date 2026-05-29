@@ -31,6 +31,8 @@ export const signupLimiter = createLimiter(3, "1 h", "signup")
 export const apiLimiter = createLimiter(100, "15 m", "api")
 export const webhookLimiter = createLimiter(50, "1 m", "webhook")
 export const demoLoginLimiter = createLimiter(20, "1 h", "demo-login")
+/** Per-user cap on AI assistant calls (cost control). */
+export const assistantLimiter = createLimiter(30, "1 h", "assistant")
 
 export interface RateLimitResult {
   allowed: boolean

@@ -67,8 +67,11 @@ curl -sS "https://<your-host>/api/health/auth" | jq .data.authorizedJavaScriptOr
 ```bash
 curl -sS "https://apisandbox-coral.vercel.app/api/health/db" | jq .
 curl -sS "https://apisandbox-coral.vercel.app/api/health/auth" | jq .
+curl -sS "https://apisandbox-coral.vercel.app/api/health/saas" | jq .
 PLAYWRIGHT_PROD_URL=https://apisandbox-coral.vercel.app npm run test:prod
 ```
+
+SaaS billing and feature-flag checklist: [SAAS.md](./SAAS.md).
 
 ---
 

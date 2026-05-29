@@ -4,6 +4,8 @@ import { registerWithPassword } from "@/lib/services/auth/auth-service"
 import { AppError } from "@/lib/http/errors"
 import { setAuthCookie } from "@/lib/http/auth-route-helpers"
 import { splitFullName } from "@/lib/user-name"
+import { applyRateLimit, attachRateLimitHeaders } from "@/lib/http/apply-rate-limit"
+import { signupLimiter } from "@/lib/rate-limit"
 
 const schema = z.object({
   email: z.string().email(),
@@ -14,6 +16,9 @@ const schema = z.object({
 
 export async function POST(request: NextRequest) {
   try {
+    const rate = await applyRateLimit(request, signupLimiter)
+    if (rate.blocked) return rate.blocked
+
     const body = await request.json()
     const parsed = schema.safeParse(body)
     if (!parsed.success) {
@@ -42,10 +47,13 @@ export async function POST(request: NextRequest) {
       },
       { status: 201 }
     )
-    return setAuthCookie(response, {
-      token: authResponse.token,
-      maxAge: authResponse.expiresIn,
-    })
+    return attachRateLimitHeaders(
+      setAuthCookie(response, {
+        token: authResponse.token,
+        maxAge: authResponse.expiresIn,
+      }),
+      rate.result,
+    )
   } catch (error) {
     if (error instanceof AppError) {
       const payload: { error: string; details?: unknown } = { error: error.message }
