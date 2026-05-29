@@ -358,6 +358,8 @@ jobs:
         run: |
           echo "Preview environment approved for PR #${{ github.event.pull_request.number }}"
           echo "Merge to main only after verifying the Vercel Preview URL from the Vercel bot comment on this PR."
+          echo "Before approving login: curl <preview-host>/api/health/auth → jwtSecretConfigured must be true."
+          echo "If false, set AUTH_JWT_SECRET on Vercel Preview (all branches or this PR branch) and redeploy — see docs/DEPLOYMENT.md."
 
   dependency-review:
     if: github.event_name == 'pull_request'
