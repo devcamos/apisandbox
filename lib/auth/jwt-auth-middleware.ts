@@ -22,3 +22,21 @@ export async function requireAuthenticatedUser(request: NextRequest) {
 
   return user
 }
+
+export async function requirePremiumUser(request: NextRequest) {
+  const user = await requireAuthenticatedUser(request)
+  const record = await prisma.user.findUnique({
+    where: { id: user.id },
+    select: { subscriptionTier: true },
+  })
+
+  if (record?.subscriptionTier !== "PREMIUM") {
+    throw new AppError(
+      "Learning Assistant is available for Premium subscribers only",
+      403,
+      "auth_failure",
+    )
+  }
+
+  return user
+}

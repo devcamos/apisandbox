@@ -1,7 +1,9 @@
 import OpenAI from "openai"
-import { NextResponse } from "next/server"
+import { NextRequest, NextResponse } from "next/server"
 import { GoogleGenAI } from "@google/genai"
 import { inferAssistantRedirect } from "@/lib/assistant/redirect"
+import { requirePremiumUser } from "@/lib/auth/jwt-auth-middleware"
+import { handleRouteError } from "@/lib/http/responses"
 
 type AssistantRequest = {
   message: string
@@ -73,7 +75,13 @@ function formatConversation({
   return lines.join("\n")
 }
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
+  try {
+    await requirePremiumUser(request)
+  } catch (error) {
+    return handleRouteError(error)
+  }
+
   const body = (await request.json().catch(() => null)) as AssistantRequest | null
 
   if (!body || typeof body.message !== "string") {

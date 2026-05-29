@@ -1,6 +1,7 @@
 "use client"
 
 import { ReactNode, createContext, useContext, useEffect, useState } from "react"
+import type { AuthSubscriptionTier } from "@/lib/auth/types"
 import { authApiFetchInit } from "@/lib/auth/client-fetch"
 import { getSafeClientRelativeRedirect } from "@/lib/safe-redirect"
 
@@ -9,12 +10,14 @@ type SessionStatus = "loading" | "authenticated" | "unauthenticated"
 interface SessionUser {
   id: string
   email: string
+  firstName?: string | null
   name?: string | null
   image?: string | null
 }
 
 interface SessionData {
   user: SessionUser
+  subscriptionTier: AuthSubscriptionTier
 }
 
 interface AuthContextValue {
@@ -29,6 +32,7 @@ interface AuthContextValue {
       firstName: string | null
       lastName: string | null
       avatarUrl: string | null
+      subscriptionTier?: AuthSubscriptionTier
     }
   }) => void
   clearSession: () => Promise<void>
@@ -44,16 +48,26 @@ function mapToSessionData(user: {
   firstName: string | null
   lastName: string | null
   avatarUrl: string | null
+  subscriptionTier?: AuthSubscriptionTier
 }): SessionData {
   const name = [user.firstName, user.lastName].filter(Boolean).join(" ").trim() || null
   return {
     user: {
       id: user.id,
       email: user.email,
+      firstName: user.firstName,
       name,
       image: user.avatarUrl,
     },
+    subscriptionTier: user.subscriptionTier ?? "FREE",
   }
+}
+
+export function welcomeFirstName(user: SessionUser): string {
+  if (user.firstName?.trim()) return user.firstName.trim()
+  if (user.name?.trim()) return user.name.trim().split(/\s+/)[0] ?? user.name.trim()
+  if (user.email) return user.email.split("@")[0] ?? "there"
+  return "there"
 }
 
 async function fetchCurrentUser(token?: string) {
@@ -72,6 +86,7 @@ async function fetchCurrentUser(token?: string) {
       firstName: string | null
       lastName: string | null
       avatarUrl: string | null
+      subscriptionTier: AuthSubscriptionTier
     }
     token?: string
   }
