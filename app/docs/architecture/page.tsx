@@ -239,7 +239,7 @@ export default function ArchitecturePage() {
           <h1 className="text-4xl font-bold text-white mb-4">System Architecture</h1>
           <p className="text-gray-300 text-lg">
             Visual documentation of the API Integration Training Platform architecture.
-            See <a href="/docs/ARCHITECTURE.md" className="text-blue-400 hover:underline">ARCHITECTURE.md</a> for detailed documentation.
+            Diagrams are rendered on this page; edit source in <code className="text-blue-300">app/docs/architecture/page.tsx</code>.
           </p>
         </div>
 
@@ -260,16 +260,10 @@ export default function ArchitecturePage() {
         </div>
 
         <div className="mt-12 bg-blue-500/10 border border-blue-500/20 rounded-xl p-6">
-          <h2 className="text-xl font-bold text-white mb-4">📚 Full Documentation</h2>
-          <p className="text-gray-300 mb-4">
-            For complete architecture documentation including request flows, component structures, and technology decisions, see:
+          <h2 className="text-xl font-bold text-white mb-4">Developer setup</h2>
+          <p className="text-gray-300">
+            Local setup and deployment: see the repo <code className="text-blue-300">docs/AGENT_ONBOARDING.md</code> and <code className="text-blue-300">docs/DEPLOYMENT.md</code>.
           </p>
-          <a 
-            href="/docs/ARCHITECTURE.md" 
-            className="inline-block bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors"
-          >
-            View Full Architecture Docs
-          </a>
         </div>
       </div>
     </div>

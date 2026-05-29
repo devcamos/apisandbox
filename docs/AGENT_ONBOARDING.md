@@ -1,144 +1,88 @@
 # Agent onboarding — API Sandbox
 
-**User story:** As a development agent, I want to onboard quickly so I can run the app, know where work and URLs live, follow repo conventions, and verify changes before shipping.
+**For:** Human developers and coding agents (Cursor, Codex, etc.).
 
-This page is for **any** automated or human developer working in this repository (Cursor Agent, Codex, Copilot, contractors, etc.). Read it once per engagement; use the linked docs for depth.
-
----
-
-## Read first (order)
-
-| Step | Document | Why |
-|------|----------|-----|
-| 1 | **This file** | Fast path: setup, verification, behaviour. |
-| 2 | **`.cursor/rules/`** | Persistent agent rules (auto-loaded in Cursor): green builds, auth/subscription conventions. |
-| 3 | **[PR checklist](AGENT_PR_CHECKLIST.md)** | Pre-PR verification: local gates, CI parity, post-push checks, PR template. |
-| 4 | [Agent workspace map](AGENT_WORKSPACES.md) | GitHub, Vercel, SonarCloud, **Notion page URLs**, app routes, Notion `?v=` rules for MCP. |
-| 5 | [Feature and backlog management](FEATURE_MANAGEMENT.md) | Hub vs tracker, status workflow, Notion fields, process. |
+**API Sandbox** is a **Next.js (App Router)** learning app: phases, auth, Stripe subscriptions, PostgreSQL via **Prisma**. Code: `app/`, `lib/`, `components/`, `config/`.
 
 ---
 
-## Repository in one sentence
+## Read first
 
-**API Sandbox** is a **Next.js (App Router)** app for interactive API learning: phases, demos, auth, subscriptions (Stripe), and PostgreSQL via **Prisma**. Primary code: `app/`, `lib/`, `components/`, `config/`.
+1. This file — setup and verification  
+2. `.cursor/rules/` — green builds, auth/subscription conventions  
+3. [AGENT_PR_CHECKLIST.md](./AGENT_PR_CHECKLIST.md) — before every PR  
+4. [DEPLOYMENT.md](./DEPLOYMENT.md) — only if you touch auth, env, or deploy  
 
 ---
 
 ## Quick setup (local)
 
-Do these in order unless you already have Postgres and `.env.local`.
+```bash
+git clone https://github.com/devcamos/apisandbox.git
+cd apisandbox
+npm install
+npm run env:local          # → .env.local
+npm run dev:db:up
+npm run db:migrate         # or: npx prisma db push if migrate lock issues
+npm run db:ensure-test-users
+npm run dev                # http://localhost:4000
+```
 
-1. **Clone and install**
+**One shot:** `npm run local-lite`
 
-   ```bash
-   git clone https://github.com/devcamos/apisandbox.git
-   cd apisandbox
-   npm install
-   ```
+**Test users:** [TEST_USERS.md](./TEST_USERS.md)
 
-   `postinstall` runs `prisma generate`.
+### Local gotchas
 
-2. **Environment file**
-
-   ```bash
-   npm run env:local
-   ```
-
-   Edit **`.env.local`**: at minimum **`DATABASE_URL`** must point at a running Postgres instance. The template defaults to Docker on **`localhost:5435`** (see `config/environments/local.env.example`).
-
-3. **Database (Docker — recommended)**
-
-   ```bash
-   npm run dev:db:up
-   npm run db:migrate
-   npm run db:ensure-test-users
-   ```
-
-   Default local test users are documented in [Test users](TEST_USERS.md).
-
-4. **Run the app**
-
-   ```bash
-   npm run dev
-   ```
-
-   Open **`http://localhost:4000`**.
-
-**One-shot alternative:** `npm run local-lite` orchestrates env, Docker (when configured), migrations, test users, and dev server — see script comments if it fails on your machine.
+- **Prisma:** If `migrate deploy` fails (lock provider mismatch), use `npx prisma db push` for dev only.
+- **Env:** Source `.env.local` before CLI: `set -a && source .env.local && set +a`
+- **Port:** App uses **4000**; stop other dev servers before `npm run verify:ci`
+- **Feature flags:** Stripe, Redis, email, analytics off by default in `.env.local` — app runs without them
+- **Architecture diagrams:** Browser only → `http://localhost:4000/docs/architecture` (not a repo markdown file)
 
 ---
 
-## Where work is tracked
+## Project links
 
-All backlog rules, statuses, and fields are in **[Feature and backlog management](FEATURE_MANAGEMENT.md)** (hub vs tracker, workflow, what to avoid duplicating).
+| System | URL / key |
+|--------|-----------|
+| GitHub | https://github.com/devcamos/apisandbox |
+| Vercel | https://vercel.com/dashboard (project linked to repo) |
+| SonarCloud | https://sonarcloud.io/project/overview?id=devcamos_apisandbox (`devcamos_apisandbox`) |
+| Production app | https://apisandbox-coral.vercel.app |
 
-**MCP / Codex:** database tools need Notion **view** URLs with **`?v=`** — see [Agent workspace map](AGENT_WORKSPACES.md).
-
----
-
-## How to verify a change
-
-**Principle:** Only surprises should come from GitHub (human preview approval, Vercel deploy). Run **`npm run verify:ci`** before every PR — it mirrors blocking CI jobs locally.
-
-- **Command:** `npm run verify:ci` (alias: `verify:pr`) — see `scripts/verify-ci-local.sh`
-- **Checklist:** [AGENT_PR_CHECKLIST.md](AGENT_PR_CHECKLIST.md)
-- **Cursor rule:** `.cursor/rules/green-builds.mdc`
-
-**Prerequisites:** Docker running, port 4000 free, `npm ci` if lockfile changed.
-
-| What verify:ci covers | GitHub job |
-|-----------------------|------------|
-| lint + build | `lint-and-build` |
-| vitest with coverage | `unit-tests` |
-| compose validation | `docker-compose-validate` |
-| npm audit (critical) | `dependency-review` (approx.) |
-| postgres-ci + smoke tests | `e2e-smoke` |
-| sonar (if `SONAR_TOKEN` set) | `sonarcloud` |
-
-**Not local (GitHub-only):** Preview approved (Vercel), Vercel Preview URL.
-
-**After push:** `gh pr checks --watch` should confirm green CI, not discover failures.
-
-**Area-specific** (in addition to verify:ci when relevant):
-
-| Area | Command |
-|------|---------|
-| Auth / subscriptions | `CI=1 npx playwright test tests/unified-auth.spec.ts --project=chromium` |
-| Full E2E | `CI=1 npm run test:ci:chromium` |
+**Backlog / specs:** Notion (team workspace — ask for hub + work tracker links).
 
 ---
 
-## Conventions (stay merge-ready)
+## Verify before PR
 
-- **Scope:** Change only what the task requires; match existing patterns (imports, naming, file layout).
-- **Secrets:** Never commit `.env.local` or real tokens. Use `*.example` files and Vercel/GitHub secrets for production.
-- **Auth / billing:** Sensitive flows live under `app/api/`, `lib/services/`, and middleware — read neighbouring routes before editing. **New users:** always via `createUserWithInitialData` with explicit `subscriptionTier: "FREE"`; see `.cursor/rules/auth-subscription.mdc`.
-- **Docs:** Prefer updating this onboarding or [AGENT_WORKSPACES](AGENT_WORKSPACES.md) when you add a new external system agents must know about.
+```bash
+npm run verify:ci
+```
 
----
+Mirrors CI: lint, build, unit tests + coverage, compose validate, audit (critical), e2e smoke (Docker Postgres on **5436**).
 
-## Deeper reference (as needed)
+| Area | Extra command |
+|------|----------------|
+| Auth | `CI=1 npx playwright test tests/unified-auth.spec.ts --project=chromium` |
+| Login cookie | `CI= npx playwright test tests/auth-login-cookie.spec.ts --project=chromium` |
 
-| Topic | Doc |
-|-------|-----|
-| Dev workflows, diagrams | [DEV_SETUP](DEV_SETUP.md) |
-| Architecture | [ARCHITECTURE](ARCHITECTURE.md), `/docs/architecture` in app |
-| CI / Vercel / GitHub | [CI_CD_GITHUB_VERCEL](CI_CD_GITHUB_VERCEL.md) |
-| **Pre-PR verification (agents)** | [AGENT_PR_CHECKLIST](AGENT_PR_CHECKLIST.md) |
-| Env vars (Vercel) | [VERCEL_ENV_VARIABLES](VERCEL_ENV_VARIABLES.md) |
-| Sonar quality gate | [SONAR_QUALITY_GATE](SONAR_QUALITY_GATE.md) |
-| Demo login / test users | [TEST_USERS](TEST_USERS.md) |
-| Branching | [GITFLOW](GITFLOW.md) |
-| Backlog, status review, Notion workflow | [Feature and backlog management](FEATURE_MANAGEMENT.md) |
+After push: `gh pr checks --watch` (includes **SonarQube Cloud**). Optional: `npm run sonar:status` with `SONAR_TOKEN` in `.env.local`.
+
+**Branching:** [GITFLOW.md](./GITFLOW.md) — trunk is `main`; short-lived feature branches; tag releases on `v1` line.
 
 ---
 
-## Changelog
+## Conventions
 
-| Date | Change |
-|------|--------|
-| 2026-05-25 | Local-first CI parity: `npm run verify:ci` mirrors all blocking GitHub jobs (`scripts/verify-ci-local.sh`). |
-| 2026-05-25 | Cursor rules for green builds and auth/subscription conventions; stronger verify-before-ship guidance. |
-| 2026-05-07 | Initial agent onboarding (story, setup order, verification, Notion, conventions). |
-| 2026-05-07 | “Where work is tracked” defers to FEATURE_MANAGEMENT for backlog/workflow. |
-| 2026-05-07 | Deeper reference row for backlog / status review doc. |
+- Minimal diffs; match existing patterns.
+- Never commit `.env.local` or secrets.
+- New users: `createUserWithInitialData` with `subscriptionTier: "FREE"` (see `.cursor/rules/auth-subscription.mdc`).
+- Deploy/env changes: update [DEPLOYMENT.md](./DEPLOYMENT.md) changelog.
+
+---
+
+## Doc index
+
+See [docs/README.md](./README.md).

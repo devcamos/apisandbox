@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation"
 import { MessageCircle, X, Send, Sparkles } from "lucide-react"
 import { useSession } from "@/components/providers/SessionProvider"
 import { canAccessLearningAssistant } from "@/lib/assistant/access"
+import { authApiFetchInit } from "@/lib/auth/client-fetch"
 
 type Msg = { id: string; role: "user" | "assistant"; content: string }
 type Redirect = { href: string; label: string; reason: string }
@@ -75,6 +76,7 @@ export function LearningAssistantWidget() {
 
     try {
       const res = await fetch("/api/assistant", {
+        ...authApiFetchInit,
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

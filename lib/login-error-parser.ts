@@ -175,6 +175,19 @@ function parseNetwork(message: string): LoginErrorInfo | null {
   return null
 }
 
+function parseJwtSecretNotConfigured(message: string): LoginErrorInfo | null {
+  if (message.toLowerCase().includes("jwt secret is not configured")) {
+    return {
+      message: "Sign-in is not configured on this deployment",
+      type: "unknown",
+      recoverable: false,
+      suggestion:
+        "This preview is missing AUTH_JWT_SECRET or AUTH_SECRET in Vercel environment variables. Add one (32+ characters) under Settings → Environment Variables → Preview, then redeploy.",
+    }
+  }
+  return null
+}
+
 function parseServiceUnavailable(message: string): LoginErrorInfo | null {
   const lower = message.toLowerCase()
   if (
@@ -203,6 +216,7 @@ const parsers: Array<(message: string) => LoginErrorInfo | null> = [
   parseLegacyLockout,
   parseRequiredFields,
   parseNetwork,
+  parseJwtSecretNotConfigured,
   parseServiceUnavailable,
 ]
 

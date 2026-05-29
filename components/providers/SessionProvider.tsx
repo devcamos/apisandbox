@@ -2,6 +2,7 @@
 
 import { ReactNode, createContext, useContext, useEffect, useState } from "react"
 import type { AuthSubscriptionTier } from "@/lib/auth/types"
+import { authApiFetchInit } from "@/lib/auth/client-fetch"
 import { getSafeClientRelativeRedirect } from "@/lib/safe-redirect"
 
 type SessionStatus = "loading" | "authenticated" | "unauthenticated"
@@ -9,6 +10,7 @@ type SessionStatus = "loading" | "authenticated" | "unauthenticated"
 interface SessionUser {
   id: string
   email: string
+  firstName?: string | null
   name?: string | null
   image?: string | null
 }
@@ -53,6 +55,7 @@ function mapToSessionData(user: {
     user: {
       id: user.id,
       email: user.email,
+      firstName: user.firstName,
       name,
       image: user.avatarUrl,
     },
@@ -60,8 +63,16 @@ function mapToSessionData(user: {
   }
 }
 
+export function welcomeFirstName(user: SessionUser): string {
+  if (user.firstName?.trim()) return user.firstName.trim()
+  if (user.name?.trim()) return user.name.trim().split(/\s+/)[0] ?? user.name.trim()
+  if (user.email) return user.email.split("@")[0] ?? "there"
+  return "there"
+}
+
 async function fetchCurrentUser(token?: string) {
   const res = await fetch("/api/auth/me", {
+    ...authApiFetchInit,
     headers: token ? { Authorization: `Bearer ${token}` } : undefined,
   })
   if (!res.ok) {
@@ -142,7 +153,7 @@ export function SessionProvider({ children }: Readonly<{ children: ReactNode }>)
     setData(null)
     setStatus("unauthenticated")
     try {
-      await fetch("/api/auth/logout", { method: "POST" })
+      await fetch("/api/auth/logout", { method: "POST", ...authApiFetchInit })
     } catch {
       // no-op
     }
@@ -172,7 +183,7 @@ export async function signOut(options?: { callbackUrl?: string }) {
   if (globalThis.window !== undefined) {
     localStorage.removeItem(STORAGE_KEY)
     try {
-      await fetch("/api/auth/logout", { method: "POST" })
+      await fetch("/api/auth/logout", { method: "POST", ...authApiFetchInit })
     } catch {
       // no-op
     }

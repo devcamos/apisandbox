@@ -1,9 +1,10 @@
 "use client"
 
 import { useState } from "react"
-import { useRouter } from "next/navigation"
 import { Sparkles, Loader2 } from "lucide-react"
 import { useAuthSessionWriter } from "@/components/providers/SessionProvider"
+import { authApiFetchInit } from "@/lib/auth/client-fetch"
+import { completeClientAuthSession } from "@/lib/auth/client-session"
 import { parseLoginErrorMessage } from "@/lib/login-error-parser"
 
 const demoEnabled = process.env.NEXT_PUBLIC_FF_DEMO_LOGIN === "true"
@@ -19,7 +20,6 @@ export function TryDemoButton({
   className,
   children,
 }: Readonly<TryDemoButtonProps>) {
-  const router = useRouter()
   const { setSessionFromAuthResponse } = useAuthSessionWriter()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -32,7 +32,7 @@ export function TryDemoButton({
     setError(null)
     setLoading(true)
     try {
-      const res = await fetch("/api/auth/demo", { method: "POST" })
+      const res = await fetch("/api/auth/demo", { method: "POST", ...authApiFetchInit })
       const body = await res.json().catch(() => ({}))
       if (!res.ok) {
         const msg =
@@ -48,9 +48,11 @@ export function TryDemoButton({
         setLoading(false)
         return
       }
-      setSessionFromAuthResponse(body.data)
-      router.push(nextPath)
-      router.refresh()
+      await completeClientAuthSession({
+        authData: body.data,
+        redirectTo: nextPath,
+        setSession: setSessionFromAuthResponse,
+      })
     } catch {
       setError("Network error. Try again.")
       setLoading(false)

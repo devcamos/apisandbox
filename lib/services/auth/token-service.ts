@@ -1,4 +1,5 @@
 import crypto from "node:crypto"
+import { resolveJwtSecret } from "@/lib/auth/jwt-secret"
 import { AppError } from "@/lib/http/errors"
 import type { AuthPayload } from "@/lib/auth/types"
 
@@ -20,15 +21,15 @@ function base64UrlDecode(value: string) {
 }
 
 function getJwtSecret() {
-  const secret =
-    process.env.AUTH_JWT_SECRET ||
-    process.env.AUTH_SECRET ||
-    process.env.NEXTAUTH_SECRET
+  const secret = resolveJwtSecret()
   if (!secret) {
     throw new AppError(
       "JWT secret is not configured",
-      500,
-      "configuration_error"
+      503,
+      "configuration_error",
+      {
+        hint: "Set AUTH_JWT_SECRET or AUTH_SECRET on Vercel Preview and Production (32+ chars).",
+      },
     )
   }
   return secret
