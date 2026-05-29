@@ -1,4 +1,5 @@
 import { isFeatureEnabled } from "@/config/featureFlags"
+import { isDemoLoginAllowedInCurrentEnvironment } from "@/lib/saas/config"
 
 const DEFAULT_DEMO_EMAIL = "demo@apisandbox.demo"
 
@@ -16,7 +17,9 @@ export function getDemoUserPassword(): string | null {
 
 /** True when the demo login API should accept requests. */
 export function isDemoLoginRouteEnabled(): boolean {
-  return isFeatureEnabled("DEMO_LOGIN") && Boolean(getDemoUserPassword())
+  return (
+    isDemoLoginAllowedInCurrentEnvironment() && Boolean(getDemoUserPassword())
+  )
 }
 
 /**

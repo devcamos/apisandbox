@@ -17,13 +17,20 @@ Preview hosts change per PR (`https://apisandbox-<hash>-….vercel.app`). Each h
 
 ## Required Vercel variables
 
-**Settings → Environment Variables** (Production **and** Preview, all branches for `AUTH_JWT_SECRET`).
+**Settings → Environment Variables** (Production **and** Preview).
 
 | Variable | Value |
 |----------|--------|
 | `DATABASE_URL` | `$POSTGRES_PRISMA_URL` |
 | `AUTH_SECRET` | `openssl rand -base64 32` |
 | `AUTH_JWT_SECRET` | same generator (required on Preview) |
+
+**Preview pitfall:** If `AUTH_JWT_SECRET` is scoped to a single Git branch (e.g. `fix/foo` only), other PR previews will show *Sign-in is not configured*. Prefer **Preview → all branches**, or add the secret per branch. After changing env vars, **redeploy** the preview (Vercel → Deployments → Redeploy).
+
+```bash
+curl -sS "https://<preview-host>/api/health/auth" | jq '.data.jwtSecretConfigured'
+# expect: true
+```
 | `NEXTAUTH_SECRET` | same as `AUTH_SECRET` (optional) |
 | `GOOGLE_CLIENT_ID` | Google OAuth Web client ID |
 | `NEXT_PUBLIC_APP_URL` | canonical site URL |
@@ -67,8 +74,11 @@ curl -sS "https://<your-host>/api/health/auth" | jq .data.authorizedJavaScriptOr
 ```bash
 curl -sS "https://apisandbox-coral.vercel.app/api/health/db" | jq .
 curl -sS "https://apisandbox-coral.vercel.app/api/health/auth" | jq .
+curl -sS "https://apisandbox-coral.vercel.app/api/health/saas" | jq .
 PLAYWRIGHT_PROD_URL=https://apisandbox-coral.vercel.app npm run test:prod
 ```
+
+SaaS billing and feature-flag checklist: [SAAS.md](./SAAS.md).
 
 ---
 

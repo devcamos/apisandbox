@@ -1,6 +1,11 @@
 import { randomUUID } from "node:crypto";
 import { test, expect } from "@playwright/test";
 import {
+  expectAuthHealthReady,
+  expectDbHealthReady,
+  expectSaasReadinessReady,
+} from "./helpers/readiness-helpers";
+import {
   blockSmokeThirdPartyRequests,
   dismissCookieBanner,
 } from "./helpers/smoke-helpers";
@@ -11,6 +16,38 @@ import {
  */
 test.describe("CI smoke", () => {
   test.describe.configure({ mode: "parallel" });
+
+  test.describe("App readiness (pre-login)", () => {
+    test("GET /api/health/auth reports JWT configured", async ({ request }) => {
+      await expectAuthHealthReady(await request.get("/api/health/auth"));
+    });
+
+    test("GET /api/health/db reaches the database", async ({ request }) => {
+      await expectDbHealthReady(await request.get("/api/health/db"));
+    });
+
+    test("GET /api/health/saas has no blocking failures", async ({ request }) => {
+      await expectSaasReadinessReady(await request.get("/api/health/saas"));
+    });
+
+    test("GET /api/auth/me without session returns 401", async ({ request }) => {
+      const response = await request.get("/api/auth/me");
+      expect(response.status()).toBe(401);
+      const body = await response.json();
+      expect(body.success).toBe(false);
+      expect(body.error?.category).toBe("auth_failure");
+    });
+
+    test("POST /api/assistant without session is rejected", async ({ request }) => {
+      const response = await request.post("/api/assistant", {
+        data: { message: "smoke probe", pathname: "/" },
+      });
+      expect(response.status()).toBe(401);
+      const body = await response.json();
+      expect(body.success).toBe(false);
+      expect(body.error?.category).toBe("auth_failure");
+    });
+  });
 
   test.beforeEach(async ({ page }) => {
     await blockSmokeThirdPartyRequests(page);

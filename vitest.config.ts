@@ -22,6 +22,8 @@ export default defineConfig({
         "lib/auth/session-token.ts",
         "lib/browser-credentials.ts",
         "lib/demo-login.ts",
+        "lib/saas/config.ts",
+        "lib/auth/jwt-secret.ts",
         "lib/google-client-id.ts",
         "lib/learning/app-guide.ts",
         "lib/login-error-parser.ts",

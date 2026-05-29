@@ -1,6 +1,7 @@
 "use client"
 
 import { isAllowedStripeCheckoutRedirectUrl } from "@/lib/safe-redirect"
+import { isFeatureEnabled } from "@/config/featureFlags"
 import { useSession } from "@/components/providers/SessionProvider"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
@@ -35,13 +36,21 @@ export default function UpgradePage() {
         }
       }
 
-      const fallback = await fetch("/api/subscription/upgrade", { method: "POST" })
-      if (fallback.ok) {
-        router.push("/phase-2")
-        router.refresh()
-      } else {
-        setError("Upgrade failed. Please try again.")
+      if (!isFeatureEnabled("STRIPE_CHECKOUT")) {
+        const fallback = await fetch("/api/subscription/upgrade", { method: "POST" })
+        if (fallback.ok) {
+          router.push("/phase-2")
+          router.refresh()
+          return
+        }
       }
+
+      const errBody = await response.json().catch(() => ({}))
+      setError(
+        typeof errBody.error === "string"
+          ? errBody.error
+          : "Checkout is unavailable. Confirm billing is configured or try again later.",
+      )
     } catch {
       setError("An error occurred. Please try again.")
     } finally {

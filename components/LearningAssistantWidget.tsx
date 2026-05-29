@@ -101,7 +101,10 @@ export function LearningAssistantWidget() {
         | null
 
       if (!res.ok) {
-        const msg = data?.error || "Assistant request failed."
+        const msg =
+          res.status === 401
+            ? "Sign in with a Premium account to use the Learning Assistant."
+            : data?.error || "Assistant request failed."
         throw new Error(msg)
       }
 
