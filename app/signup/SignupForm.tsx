@@ -133,28 +133,12 @@ function SignupForm({ googleClientId }: Readonly<{ googleClientId: string }>) {
   return (
     <AuthPageShell
       title="Create Account"
-      subtitle="Start your API integration learning journey"
+      subtitle="Free access to Phases 0 & 1 — upgrade anytime for full access"
     >
-          <div className="mb-6 rounded-xl border border-slate-700/70 bg-slate-900/40 p-4" data-testid="auth-methods-intro">
-            <h2 className="text-sm font-semibold text-white">Create one account, use either method</h2>
-            <p className="mt-1 text-sm text-gray-400">
-              Start with Google or Gmail, or create a local email and password account.
-            </p>
-            <p className="mt-2 text-xs text-gray-500">
-              New accounts start on the free plan (Phases 0 &amp; 1). Upgrade anytime for full access.
-            </p>
-            <p className="mt-2 text-xs text-gray-500">
-              If you later use Google with the same email, the app links it to this account.
-            </p>
-          </div>
-
           <AuthSocialSection
             googleClientId={googleClientId}
             googleButtonRef={googleButtonRef}
             fallbackLabel="Continue with Google"
-            dividerLabel="Or create an account with email and password"
-            heading="Google or Gmail"
-            description="Use your Google account for a faster setup. Gmail addresses work here."
           >
           <form onSubmit={handleSubmit} method="post" className="space-y-6">
             {/* Name Field */}

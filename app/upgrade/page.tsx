@@ -6,10 +6,12 @@ import { useSession } from "@/components/providers/SessionProvider"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
 import Link from "next/link"
-import { Check, Sparkles, Lock, ArrowRight, Zap, Brain, BarChart3 } from "lucide-react"
+import { Check, Sparkles, Lock, ArrowRight } from "lucide-react"
+import { PremiumCatalogPreview } from "@/components/premium/PremiumCatalogPreview"
+import { authApiFetchInit } from "@/lib/auth/client-fetch"
 
 export default function UpgradePage() {
-  const { data: session } = useSession()
+  const { data: session, refresh } = useSession()
   const router = useRouter()
   const [isUpgrading, setIsUpgrading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -24,7 +26,10 @@ export default function UpgradePage() {
     setError(null)
 
     try {
-      const response = await fetch("/api/checkout", { method: "POST" })
+      const response = await fetch("/api/checkout", {
+        method: "POST",
+        ...authApiFetchInit,
+      })
 
       if (response.ok) {
         const { url } = await response.json()
@@ -37,10 +42,13 @@ export default function UpgradePage() {
       }
 
       if (!isFeatureEnabled("STRIPE_CHECKOUT")) {
-        const fallback = await fetch("/api/subscription/upgrade", { method: "POST" })
+        const fallback = await fetch("/api/subscription/upgrade", {
+          method: "POST",
+          ...authApiFetchInit,
+        })
         if (fallback.ok) {
-          router.push("/phase-2")
-          router.refresh()
+          await refresh()
+          router.push("/upgrade/success")
           return
         }
       }
@@ -62,7 +70,7 @@ export default function UpgradePage() {
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
       <div className="container mx-auto px-6 py-16">
         <div className="text-center mb-12">
-          <h1 className="text-5xl font-bold mb-4 bg-gradient-to-r from-violet-400 via-fuchsia-400 to-pink-400 text-transparent bg-clip-text">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-violet-400 via-fuchsia-400 to-pink-400 text-transparent bg-clip-text">
             Unlock Full Access
           </h1>
           <p className="text-xl text-gray-300 max-w-2xl mx-auto">
@@ -71,12 +79,11 @@ export default function UpgradePage() {
         </div>
 
         <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto mb-16">
-          {/* Free Tier */}
           <div className="bg-slate-800/50 backdrop-blur-sm rounded-2xl p-8 border border-slate-700">
             <div className="text-center mb-6">
               <h3 className="text-2xl font-bold text-white mb-2">Free</h3>
               <div className="text-4xl font-bold text-white mb-1">£0</div>
-              <p className="text-gray-400">No account required</p>
+              <p className="text-gray-400">Account recommended</p>
             </div>
             <ul className="space-y-3 mb-6">
               <li className="flex items-center gap-2 text-gray-300">
@@ -89,19 +96,15 @@ export default function UpgradePage() {
               </li>
               <li className="flex items-center gap-2 text-gray-300">
                 <Check className="w-5 h-5 text-green-400 shrink-0" />
-                Phase 7: Monetisation Paths
-              </li>
-              <li className="flex items-center gap-2 text-gray-300">
-                <Check className="w-5 h-5 text-green-400 shrink-0" />
-                Phase 8: Data Science in Production
+                Observability &amp; docs (architecture, Java)
               </li>
               <li className="flex items-center gap-2 text-gray-500">
                 <Lock className="w-5 h-5 shrink-0" />
-                <span className="line-through">Interactive visualisers</span>
+                <span className="line-through">Phases 2–9, Cloud &amp; AI</span>
               </li>
               <li className="flex items-center gap-2 text-gray-500">
                 <Lock className="w-5 h-5 shrink-0" />
-                <span className="line-through">Exercises & progress tracking</span>
+                <span className="line-through">Interactive visualisers &amp; full progress</span>
               </li>
             </ul>
             <Link
@@ -112,7 +115,6 @@ export default function UpgradePage() {
             </Link>
           </div>
 
-          {/* Premium Tier */}
           <div className="bg-gradient-to-br from-violet-500/20 via-fuchsia-500/20 to-pink-500/20 backdrop-blur-sm rounded-2xl p-8 border-2 border-violet-500/50 relative">
             <div className="absolute top-4 right-4 bg-violet-600 text-white text-xs font-semibold px-3 py-1 rounded-full">
               FULL ACCESS
@@ -125,7 +127,11 @@ export default function UpgradePage() {
             <ul className="space-y-3 mb-6">
               <li className="flex items-center gap-2 text-white">
                 <Check className="w-5 h-5 text-green-400 shrink-0" />
-                <strong>All 9 learning phases</strong>
+                <strong>All learning phases (2–9)</strong>
+              </li>
+              <li className="flex items-center gap-2 text-white">
+                <Check className="w-5 h-5 text-green-400 shrink-0" />
+                Cloud &amp; AI sections
               </li>
               <li className="flex items-center gap-2 text-white">
                 <Check className="w-5 h-5 text-green-400 shrink-0" />
@@ -133,19 +139,11 @@ export default function UpgradePage() {
               </li>
               <li className="flex items-center gap-2 text-white">
                 <Check className="w-5 h-5 text-green-400 shrink-0" />
-                Shinobi progress board & XP
+                Shinobi progress board &amp; XP
               </li>
               <li className="flex items-center gap-2 text-white">
                 <Check className="w-5 h-5 text-green-400 shrink-0" />
-                Guided exercises per algorithm
-              </li>
-              <li className="flex items-center gap-2 text-white">
-                <Check className="w-5 h-5 text-green-400 shrink-0" />
-                Architecture pattern library
-              </li>
-              <li className="flex items-center gap-2 text-white">
-                <Check className="w-5 h-5 text-green-400 shrink-0" />
-                Concept side quests
+                Learning assistant on premium routes
               </li>
             </ul>
             <button
@@ -186,49 +184,11 @@ export default function UpgradePage() {
           </div>
         </div>
 
-        {/* What's included */}
-        <div className="max-w-4xl mx-auto">
-          <h2 className="text-3xl font-bold text-white mb-8 text-center">
-            What Premium Unlocks
-          </h2>
-
-          <div className="grid md:grid-cols-3 gap-6">
-            <div className="bg-slate-800/50 rounded-xl p-6 border border-slate-700">
-              <div className="p-2 bg-violet-500/20 rounded-lg w-fit mb-3">
-                <Brain className="w-6 h-6 text-violet-400" />
-              </div>
-              <h3 className="text-lg font-bold text-white mb-2">Deep Learning Phases</h3>
-              <p className="text-gray-400 text-sm">
-                OAuth2, microservices, distributed systems, principal-level architecture,
-                and algorithm mastery.
-              </p>
-            </div>
-
-            <div className="bg-slate-800/50 rounded-xl p-6 border border-slate-700">
-              <div className="p-2 bg-fuchsia-500/20 rounded-lg w-fit mb-3">
-                <Zap className="w-6 h-6 text-fuchsia-400" />
-              </div>
-              <h3 className="text-lg font-bold text-white mb-2">Interactive Visualisers</h3>
-              <p className="text-gray-400 text-sm">
-                Watch sorting, searching, and graph algorithms run step-by-step
-                with Framer Motion, GSAP, and Three.js animations.
-              </p>
-            </div>
-
-            <div className="bg-slate-800/50 rounded-xl p-6 border border-slate-700">
-              <div className="p-2 bg-emerald-500/20 rounded-lg w-fit mb-3">
-                <BarChart3 className="w-6 h-6 text-emerald-400" />
-              </div>
-              <h3 className="text-lg font-bold text-white mb-2">Progress Tracking</h3>
-              <p className="text-gray-400 text-sm">
-                Earn XP, track difficulty tiers, and see your growth
-                on the Shinobi learning board.
-              </p>
-            </div>
-          </div>
+        <div className="max-w-5xl mx-auto mb-16">
+          <h2 className="text-3xl font-bold text-white mb-8 text-center">What you unlock</h2>
+          <PremiumCatalogPreview />
         </div>
 
-        {/* Trust */}
         <div className="mt-12 text-center">
           <p className="text-gray-400 mb-4">
             <strong className="text-white">7-day refund guarantee</strong> · Cancel anytime · Secure payment via Stripe
@@ -236,8 +196,8 @@ export default function UpgradePage() {
           <div className="flex items-center justify-center gap-6 text-sm text-gray-500">
             <Link href="/terms" className="hover:text-gray-300 transition-colors">Terms</Link>
             <Link href="/privacy" className="hover:text-gray-300 transition-colors">Privacy</Link>
-            <Link href="/phase-0" className="text-violet-400 hover:text-violet-300 transition-colors">
-              ← Explore free content
+            <Link href="/phase-1" className="text-violet-400 hover:text-violet-300 transition-colors">
+              ← Back to free content
             </Link>
           </div>
         </div>

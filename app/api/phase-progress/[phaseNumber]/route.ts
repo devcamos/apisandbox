@@ -6,7 +6,7 @@ import { gradePhaseQuiz, getPhaseQuiz, getSanitizedPhaseQuiz } from "@/lib/learn
 import { prisma } from "@/lib/prisma"
 
 const submitSchema = z.object({
-  answers: z.record(z.string(), z.number().int().min(0)),
+  answers: z.record(z.string(), z.string().min(1)),
 })
 
 function parsePhaseNumber(value: string) {
@@ -61,6 +61,14 @@ export async function POST(request: NextRequest, context: { params: Promise<{ ph
     const grading = gradePhaseQuiz(phaseNumber, parsed.data.answers)
     if (!grading) {
       return errorResponse(404, "not_found", "Quiz not found for this phase")
+    }
+
+    const quiz = getPhaseQuiz(phaseNumber)!
+    const unanswered = quiz.questions.filter((question) => !parsed.data.answers[question.id]?.trim())
+    if (unanswered.length > 0) {
+      return errorResponse(400, "validation_error", "Answer every question before submitting", {
+        missingQuestionIds: unanswered.map((question) => question.id),
+      })
     }
 
     const existing = await prisma.userPhaseProgress.findUnique({

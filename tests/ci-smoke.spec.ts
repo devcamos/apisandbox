@@ -79,23 +79,21 @@ test.describe("CI smoke", () => {
     await expect(
       page.getByText(/Sign in to continue your API integration journey/i),
     ).toBeVisible();
-    await expect(page.getByTestId("auth-methods-intro")).toContainText(/choose a sign-in method/i);
-    await expect(page.getByTestId("google-auth-section")).toContainText(/google or gmail/i);
-    await expect(
-      page.getByText(/or sign in with email and password/i),
-    ).toBeVisible();
+    // GSI script is blocked in smoke — container is attached before the button renders.
+    await expect(page.getByTestId("google-auth-section")).toBeAttached();
+    await expect(page.getByLabel(/email address/i)).toBeVisible();
+    await expect(page.getByRole("button", { name: /sign in/i })).toBeVisible();
   });
 
   test("signup page presents Google and local account creation", async ({ page }) => {
     const response = await page.goto("/signup", { waitUntil: "domcontentloaded" });
     expect(response?.ok()).toBeTruthy();
-    await expect(page.getByTestId("auth-methods-intro")).toContainText(
-      /create one account, use either method/i,
-    );
-    await expect(page.getByTestId("google-auth-section")).toContainText(/google or gmail/i);
     await expect(
-      page.getByText(/or create an account with email and password/i),
+      page.getByText(/Free access to Phases 0 & 1/i),
     ).toBeVisible();
+    await expect(page.getByTestId("google-auth-section")).toBeAttached();
+    await expect(page.getByLabel(/email address/i)).toBeVisible();
+    await expect(page.getByRole("button", { name: /create account/i })).toBeVisible();
   });
 
   test("password login works end to end", async ({ page, request }) => {

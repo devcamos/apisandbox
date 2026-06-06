@@ -130,7 +130,7 @@ export default function RetryDemo({ title, description }: RetryDemoProps) {
       </div>
 
       {/* Configuration */}
-      <div className="grid grid-cols-2 gap-3 mb-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
         <div>
           <label className="text-xs text-gray-400 mb-1 block">Max Retries:</label>
           <select

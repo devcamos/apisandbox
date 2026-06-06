@@ -61,7 +61,7 @@ export default function PatternArchitectureAnimator({ lessonId, title }: Readonl
         </div>
       </div>
 
-      <div className="grid grid-cols-4 gap-3 mb-4">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
         {palette.labels.map((label, index) => (
           <motion.div
             key={label}

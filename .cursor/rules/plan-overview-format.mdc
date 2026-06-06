@@ -1,0 +1,29 @@
+---
+description: Require a structured Overview breakdown at the top of every implementation plan
+alwaysApply: true
+---
+
+# Plan overview format
+
+When creating or updating an implementation plan (CreatePlan tool or `.plan.md` files), always include a scannable **Overview** section immediately after the title.
+
+## Required Overview structure
+
+1. **Summary table** — Goal, Approach, Files touched (estimate), CI/deploy impact (if any)
+2. **Workstreams table** — Numbered rows: `# | Workstream | Files | What changes`
+3. **In scope / out of scope** — Bullet lists; call out explicit exclusions
+4. **Success criteria** — 3–5 measurable outcomes
+
+Keep the YAML frontmatter `overview` field to one sentence summarizing workstream count and scope.
+
+## Principles
+
+- Overview first, details below — reader should understand the whole plan in 30 seconds
+- Group by workstream, not by file alphabetically
+- Name concrete paths in the workstreams table, not vague areas
+- Separate "what we will not do" from implementation steps
+
+## Do not
+
+- Start plans with implementation steps before the Overview
+- Use markdown tables in CreatePlan tool output (they break in some UIs) — use them in saved `.plan.md` files only

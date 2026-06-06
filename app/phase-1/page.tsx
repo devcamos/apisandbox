@@ -7,6 +7,7 @@ import { LessonTracker } from "@/components/LessonTracker";
 import { Brain, Network, GitBranch, Zap, RefreshCw, Database } from "lucide-react";
 
 import { ExpandableCodeBlock } from "@/components/HighlightedCodeBlock"
+import { FullAccessPrompt } from "@/components/premium/FullAccessPrompt"
 export default function Phase1() {
   return (
     <PhaseLayout
@@ -948,6 +949,8 @@ Any service can consume this JSON message, regardless of language`} />
       </section>
 
       <PhaseQuiz phaseNumber={1} accentClass="from-blue-500 to-cyan-500" />
+
+      <FullAccessPrompt />
     </PhaseLayout>
   );
 }

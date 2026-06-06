@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import PhaseLayout from "@/components/PhaseLayout";
+import { SubscriptionGate } from "@/components/SubscriptionGate";
 import { DollarSign, ArrowRight, Clock, Flame, TrendingUp } from "lucide-react";
 import { monetisationPaths, type MonetisationPath } from "@/lib/learning/monetisation-paths";
 import SelectableLearningCard from "@/components/learning/SelectableLearningCard";
@@ -208,6 +209,7 @@ export default function Phase7() {
   const activePath = monetisationPaths.find((p) => p.id === selectedPath);
 
   return (
+    <SubscriptionGate phaseNumber={7} lockedContentName="Phase 7: Monetisation Paths">
     <PhaseLayout
       phaseNumber={7}
       title="Monetisation"
@@ -310,5 +312,6 @@ export default function Phase7() {
         </div>
       </div>
     </PhaseLayout>
+    </SubscriptionGate>
   );
 }

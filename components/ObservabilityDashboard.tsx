@@ -45,10 +45,10 @@ export default function ObservabilityDashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-900 p-6">
+    <div className="min-h-screen bg-slate-900 p-4 sm:p-6">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-8">
           <div>
             <h1 className="text-3xl font-bold text-white mb-2">📊 Observability Dashboard</h1>
             <p className="text-gray-400">Real-time metrics from your API integration demos</p>

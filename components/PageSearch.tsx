@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import { Search, ArrowRight, BookOpen, Cloud, Brain, Database, Zap, Code, Shield, CreditCard, Mail, Folder } from 'lucide-react';
+import { Search, ArrowRight, BookOpen, Cloud, Brain, Database, Zap, Code, CreditCard, Mail, Folder } from 'lucide-react';
 
 interface SearchResult {
   title: string;
@@ -272,16 +272,6 @@ const searchData: SearchResult[] = [
     keywords: ["vercel", "supabase", "prisma", "deployment", "serverless", "database", "orm", "connection pooling"]
   },
 
-  // Security Section
-  {
-    title: "Security",
-    description: "Essential security practices for API integrations",
-    href: "/cloud/security",
-    category: "Security",
-    icon: Shield,
-    keywords: ["security", "encryption", "authentication", "authorization", "owasp", "headers", "https", "tls", "secrets"]
-  },
-
   // Payment Integration
   {
     title: "Stripe Payments",
@@ -422,7 +412,7 @@ export function PageSearch() {
             setIsOpen(true);
           }}
           onFocus={() => setIsOpen(true)}
-          className="w-80 pl-10 pr-4 py-2 bg-slate-800/50 border border-slate-700 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          className="w-full max-w-sm pl-10 pr-4 py-2 bg-slate-800/50 border border-slate-700 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
         />
         {query && (
           <button

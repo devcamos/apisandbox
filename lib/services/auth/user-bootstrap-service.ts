@@ -80,10 +80,22 @@ export async function createUserWithInitialData(input: BootstrapInput) {
 
     logger.error({ err: error }, "User bootstrap failed")
 
+    const devDetails =
+      process.env.NODE_ENV !== "production" && error instanceof Error
+        ? {
+            prismaCode:
+              error instanceof Prisma.PrismaClientKnownRequestError
+                ? error.code
+                : undefined,
+            message: error.message,
+          }
+        : undefined
+
     throw new AppError(
       "Failed to initialize account data",
       500,
-      "bootstrap_failure"
+      "bootstrap_failure",
+      devDetails
     )
   }
 }

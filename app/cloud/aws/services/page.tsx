@@ -379,8 +379,8 @@ export default function AwsServicesPage() {
         {/* Service Selection Guide */}
         <section>
           <h2 className="text-3xl font-bold text-white mb-6">When to Use What?</h2>
-          <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-8 border border-slate-700">
-            <table className="w-full text-left">
+          <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-8 border border-slate-700 overflow-x-auto">
+            <table className="w-full text-left min-w-[32rem]">
               <thead>
                 <tr className="border-b border-slate-600">
                   <th className="pb-4 text-white font-semibold">Use Case</th>

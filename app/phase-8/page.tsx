@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import PhaseLayout from "@/components/PhaseLayout";
+import { SubscriptionGate } from "@/components/SubscriptionGate";
 import { Database, ArrowRight, Flame, ExternalLink, AlertTriangle } from "lucide-react";
 import { dsCategories, type DSCategory } from "@/lib/learning/data-science-production";
 import SelectableLearningCard from "@/components/learning/SelectableLearningCard";
@@ -163,6 +164,7 @@ export default function Phase8() {
   const activeCat = dsCategories.find((c) => c.id === selectedCat);
 
   return (
+    <SubscriptionGate phaseNumber={8} lockedContentName="Phase 8: Data Science in Production">
     <PhaseLayout
       phaseNumber={8}
       title="Data Science in Production"
@@ -241,5 +243,6 @@ export default function Phase8() {
         </div>
       </div>
     </PhaseLayout>
+    </SubscriptionGate>
   );
 }

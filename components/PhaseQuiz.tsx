@@ -3,6 +3,7 @@
 import Link from "next/link"
 import { useCallback, useEffect, useMemo, useState } from "react"
 import { CheckCircle2, AlertCircle, Lock, Route, Target, TrendingUp } from "lucide-react"
+import { authApiRequestInit } from "@/lib/auth/client-fetch"
 import { useSession } from "@/components/providers/SessionProvider"
 import { masteryLabel, masterySummary, recommendedRedirects } from "@/lib/learning/phase-quiz-insights"
 
@@ -36,6 +37,11 @@ const phaseNextSteps: Record<number, { href: string; cta: string; note: string }
     href: "/phase-5",
     cta: "Continue to Phase 5",
     note: "Phase 5 moves from architectural judgement into production-grade problem solving and execution.",
+  },
+  8: {
+    href: "/phase-9",
+    cta: "Continue to Phase 9",
+    note: "Phase 9 grounds your API work in database fundamentals — transactions, indexes, and replicas.",
   },
 }
 
@@ -76,7 +82,7 @@ function QuizOptionRow(props: Readonly<{
   isSelected: boolean
   showCorrect: boolean
   showIncorrectSelection: boolean
-  onSelect: (questionId: string, optionIndex: number) => void
+  onSelect: (questionId: string, option: string) => void
 }>) {
   const { option, optionIndex, questionId, isSelected, showCorrect, showIncorrectSelection, onSelect } = props
   return (
@@ -91,7 +97,7 @@ function QuizOptionRow(props: Readonly<{
         type="radio"
         name={questionId}
         checked={isSelected}
-        onChange={() => onSelect(questionId, optionIndex)}
+        onChange={() => onSelect(questionId, option)}
         className="w-4 h-4"
       />
       <span className="text-gray-200">{option}</span>
@@ -102,9 +108,9 @@ function QuizOptionRow(props: Readonly<{
 function QuizQuestionBlock(props: Readonly<{
   question: QuizQuestion
   index: number
-  answers: Record<string, number>
+  answers: Record<string, string>
   result: SubmissionResult | null
-  onSelectOption: (questionId: string, optionIndex: number) => void
+  onSelectOption: (questionId: string, option: string) => void
 }>) {
   const { question, index, answers, result, onSelectOption } = props
   const questionResult = result?.details.find((item) => item.questionId === question.id)
@@ -116,8 +122,8 @@ function QuizQuestionBlock(props: Readonly<{
       </h3>
       <div className="space-y-3">
         {question.options.map((option, optionIndex) => {
-          const isSelected = answers[question.id] === optionIndex
-          const isCorrect = questionResult?.correctIndex === optionIndex
+          const isSelected = answers[question.id] === option
+          const isCorrect = questionResult?.correctAnswer === option
           const showCorrect = Boolean(questionResult) && isCorrect
           const showIncorrectSelection = Boolean(questionResult) && isSelected && !isCorrect
 
@@ -158,8 +164,8 @@ interface SubmissionResult {
   xpEarned: number
   details: Array<{
     questionId: string
-    selectedIndex: number | null
-    correctIndex: number
+    selectedAnswer: string | null
+    correctAnswer: string
     isCorrect: boolean
     explanation: string
     concept: string
@@ -174,7 +180,7 @@ export default function PhaseQuiz({ phaseNumber, accentClass }: PhaseQuizProps) 
   const { status } = useSession()
   const [quiz, setQuiz] = useState<QuizPayload | null>(null)
   const [progress, setProgress] = useState<ProgressPayload | null>(null)
-  const [answers, setAnswers] = useState<Record<string, number>>({})
+  const [answers, setAnswers] = useState<Record<string, string>>({})
   const [loading, setLoading] = useState(true)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -192,7 +198,7 @@ export default function PhaseQuiz({ phaseNumber, accentClass }: PhaseQuizProps) 
       try {
         setLoading(true)
         setError(null)
-        const res = await fetch(`/api/phase-progress/${phaseNumber}`)
+        const res = await fetch(`/api/phase-progress/${phaseNumber}`, authApiRequestInit())
 
         if (!res.ok) {
           throw new Error("Failed to load quiz")
@@ -231,8 +237,8 @@ export default function PhaseQuiz({ phaseNumber, accentClass }: PhaseQuizProps) 
   }, [result])
   const nextStep = phaseNextSteps[phaseNumber] ?? null
 
-  const selectQuizOption = useCallback((questionId: string, optionIndex: number) => {
-    setAnswers((prev) => ({ ...prev, [questionId]: optionIndex }))
+  const selectQuizOption = useCallback((questionId: string, option: string) => {
+    setAnswers((prev) => ({ ...prev, [questionId]: option }))
   }, [])
 
   async function submitQuiz() {
@@ -241,23 +247,28 @@ export default function PhaseQuiz({ phaseNumber, accentClass }: PhaseQuizProps) 
     try {
       setSubmitting(true)
       setError(null)
-      const res = await fetch(`/api/phase-progress/${phaseNumber}`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ answers }),
-      })
+      const res = await fetch(
+        `/api/phase-progress/${phaseNumber}`,
+        authApiRequestInit({
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ answers }),
+        }),
+      )
+
+      const payload = await res.json().catch(() => ({}))
 
       if (!res.ok) {
-        throw new Error("Failed to submit quiz")
+        const message =
+          payload?.error?.message ??
+          (res.status === 401 ? "Session expired — sign in again." : "Failed to submit quiz")
+        throw new Error(message)
       }
 
-      const payload = await res.json()
       setResult(payload.data.result)
       setProgress(payload.data.progress)
-    } catch {
-      setError("Quiz submission failed. Try again.")
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Quiz submission failed. Try again.")
     } finally {
       setSubmitting(false)
     }

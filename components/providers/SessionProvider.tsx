@@ -2,7 +2,7 @@
 
 import { ReactNode, createContext, useContext, useEffect, useState } from "react"
 import type { AuthSubscriptionTier } from "@/lib/auth/types"
-import { authApiFetchInit } from "@/lib/auth/client-fetch"
+import { authApiFetchInit, authApiRequestInit, AUTH_JWT_STORAGE_KEY } from "@/lib/auth/client-fetch"
 import { getSafeClientRelativeRedirect } from "@/lib/safe-redirect"
 
 type SessionStatus = "loading" | "authenticated" | "unauthenticated"
@@ -38,7 +38,7 @@ interface AuthContextValue {
   clearSession: () => Promise<void>
 }
 
-const STORAGE_KEY = "auth_jwt"
+const STORAGE_KEY = AUTH_JWT_STORAGE_KEY
 
 const AuthContext = createContext<AuthContextValue | null>(null)
 
@@ -70,11 +70,8 @@ export function welcomeFirstName(user: SessionUser): string {
   return "there"
 }
 
-async function fetchCurrentUser(token?: string) {
-  const res = await fetch("/api/auth/me", {
-    ...authApiFetchInit,
-    headers: token ? { Authorization: `Bearer ${token}` } : undefined,
-  })
+async function fetchCurrentUser() {
+  const res = await fetch("/api/auth/me", authApiRequestInit())
   if (!res.ok) {
     throw new Error("Not authenticated")
   }
@@ -99,7 +96,7 @@ export function SessionProvider({ children }: Readonly<{ children: ReactNode }>)
   const refresh = async () => {
     const token = globalThis.window === undefined ? null : localStorage.getItem(STORAGE_KEY)
     try {
-      const session = await fetchCurrentUser(token ?? undefined)
+      const session = await fetchCurrentUser()
       if (session.token && globalThis.window !== undefined) {
         localStorage.setItem(STORAGE_KEY, session.token)
       }

@@ -28,9 +28,8 @@ test.describe('Subscription Gate', () => {
     // Try to access Phase 2
     await page.goto('/phase-2');
     
-    // Should show upgrade prompt
-    await expect(page.getByText(/phase 2.*requires premium/i)).toBeVisible();
-    await expect(page.getByRole('link', { name: /upgrade to premium/i })).toBeVisible();
+    await expect(page.getByText(/premium preview/i)).toBeVisible();
+    await expect(page.getByRole('link', { name: /unlock full access/i })).toBeVisible();
   });
 
   test('should show upgrade prompt for free users on Phase 3', async ({ page, request }) => {
@@ -49,7 +48,7 @@ test.describe('Subscription Gate', () => {
     await page.waitForURL(/\/dashboard/);
 
     await page.goto('/phase-3');
-    await expect(page.getByText(/phase 3.*requires premium/i)).toBeVisible();
+    await expect(page.getByText(/premium preview/i)).toBeVisible();
   });
 
   test('should show upgrade prompt for free users on Phase 4', async ({ page, request }) => {
@@ -68,7 +67,7 @@ test.describe('Subscription Gate', () => {
     await page.waitForURL(/\/dashboard/);
 
     await page.goto('/phase-4');
-    await expect(page.getByText(/phase 4.*requires premium/i)).toBeVisible();
+    await expect(page.getByText(/premium preview/i)).toBeVisible();
   });
 
   test('should show upgrade prompt for free users on Phase 5', async ({ page, request }) => {
@@ -87,7 +86,7 @@ test.describe('Subscription Gate', () => {
     await page.waitForURL(/\/dashboard/);
 
     await page.goto('/phase-5');
-    await expect(page.getByText(/phase 5.*requires premium/i)).toBeVisible();
+    await expect(page.getByText(/premium preview/i)).toBeVisible();
   });
 
   test('should show upgrade prompt for free users on Cloud section', async ({ page, request }) => {
@@ -106,7 +105,7 @@ test.describe('Subscription Gate', () => {
     await page.waitForURL(/\/dashboard/);
 
     await page.goto('/cloud/aws/services');
-    await expect(page.getByText(/aws cloud services.*requires premium/i)).toBeVisible();
+    await expect(page.getByText(/premium preview/i)).toBeVisible();
   });
 
   test('should allow free users to access Phase 1', async ({ page, request }) => {
