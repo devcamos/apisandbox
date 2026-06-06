@@ -16,7 +16,7 @@
 
 import { NextRequest, NextResponse } from "next/server"
 import { requireAuthenticatedUser } from "@/lib/auth/jwt-auth-middleware"
-import { upgradeToPremium } from "@/lib/subscription"
+import { applyPremiumSubscription } from "@/lib/subscription-provision"
 import { handleRouteError } from "@/lib/http/responses"
 import { isInstantPremiumUpgradeAllowed } from "@/lib/saas/config"
 
@@ -34,7 +34,7 @@ export async function POST(request: NextRequest) {
 
     const user = await requireAuthenticatedUser(request)
 
-    await upgradeToPremium(user.id)
+    await applyPremiumSubscription(user.id)
 
     return NextResponse.json({
       success: true,

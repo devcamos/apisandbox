@@ -6,6 +6,7 @@ import { useSession, signOut } from "@/components/providers/SessionProvider";
 import { Menu, X, LogOut, User, ChevronDown, BookOpen, Cloud, Brain, Compass, Settings, CreditCard, Sparkles, Lock, Shield, Heart } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import { PageSearch } from "./PageSearch";
+import { ManageSubscriptionButton } from "@/components/premium/ManageSubscriptionButton";
 
 function mobileExploreBadgeClass(badge: string | undefined) {
   if (badge === "Free") return "bg-green-500/20 text-green-400";
@@ -29,11 +30,7 @@ export default function Navigation() {
     { name: "Home", href: "/" },
   ];
 
-  const protectedNavItems = [
-    { name: "Dashboard", href: "/dashboard" },
-    { name: "Security", href: "/cloud/security" },
-    { name: "Architecture", href: "/docs/architecture" },
-  ];
+  const protectedNavItems = [{ name: "Dashboard", href: "/dashboard" }];
 
   const navItems = session ? protectedNavItems : [...publicNavItems, { name: "Upgrade", href: "/upgrade" }];
 
@@ -46,6 +43,21 @@ export default function Navigation() {
         .catch(() => setSubscription({ tier: "FREE", isExpired: false }));
     }
   }, [session]);
+
+  useEffect(() => {
+    setIsOpen(false);
+    setExploreOpen(false);
+    setProfileOpen(false);
+  }, [pathname]);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [isOpen]);
 
   // Close explore dropdown when clicking outside
   useEffect(() => {
@@ -84,9 +96,10 @@ export default function Navigation() {
       icon: Sparkles,
       items: [
         { name: "Phase 5: API Algorithms", href: "/phase-5", badge: "Premium" },
-        { name: "Phase 6: Algorithm Visualizer", href: "/phase-6", badge: "Free" },
-        { name: "Phase 7: Monetisation", href: "/phase-7", badge: "Free" },
-        { name: "Phase 8: Data Science", href: "/phase-8", badge: "Free" },
+        { name: "Phase 6: Algorithm Visualizer", href: "/phase-6", badge: "Premium" },
+        { name: "Phase 7: Monetisation", href: "/phase-7", badge: "Premium" },
+        { name: "Phase 8: Data Science", href: "/phase-8", badge: "Premium" },
+        { name: "Phase 9: Database Fundamentals", href: "/phase-9", badge: "Premium" },
       ],
     },
     {
@@ -95,8 +108,6 @@ export default function Navigation() {
       items: [
         { name: "Cloud Migration", href: "/cloud", badge: "Premium" },
         { name: "AI Learning", href: "/ai", badge: "Premium" },
-        { name: "Security", href: "/cloud/security", badge: "Premium" },
-        { name: "Architecture", href: "/docs/architecture", badge: "Docs" },
         { name: "Java Track", href: "/docs/java", badge: "Docs" },
       ],
     },
@@ -285,16 +296,20 @@ export default function Navigation() {
                           <User className="w-4 h-4" />
                           <span className="text-sm">Dashboard</span>
                         </Link>
-                        <Link
-                          href="/upgrade"
-                          onClick={() => setProfileOpen(false)}
-                          className="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-300 hover:text-white hover:bg-slate-700 transition-all"
-                        >
-                          <CreditCard className="w-4 h-4" />
-                          <span className="text-sm">
-                            {subscription?.tier === "PREMIUM" ? "Manage Subscription" : "Upgrade to Premium"}
-                          </span>
-                        </Link>
+                        {subscription?.tier === "PREMIUM" ? (
+                          <ManageSubscriptionButton
+                            onNavigate={() => setProfileOpen(false)}
+                          />
+                        ) : (
+                          <Link
+                            href="/upgrade"
+                            onClick={() => setProfileOpen(false)}
+                            className="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-300 hover:text-white hover:bg-slate-700 transition-all"
+                          >
+                            <CreditCard className="w-4 h-4" />
+                            <span className="text-sm">Upgrade to Premium</span>
+                          </Link>
+                        )}
                         <div className="border-t border-slate-700 my-2"></div>
                         <button
                           onClick={() => {
@@ -333,6 +348,9 @@ export default function Navigation() {
           <button
             onClick={() => setIsOpen(!isOpen)}
             className="md:hidden text-gray-300 hover:text-white"
+            aria-label={isOpen ? "Close navigation menu" : "Open navigation menu"}
+            aria-expanded={isOpen}
+            aria-controls="mobile-navigation-menu"
           >
             {isOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
@@ -340,7 +358,7 @@ export default function Navigation() {
 
         {/* Mobile Navigation */}
         {isOpen && (
-          <div className="md:hidden py-4 space-y-2">
+          <div id="mobile-navigation-menu" className="md:hidden py-4 space-y-2">
             <div className="px-4 py-2">
               <Link
                 href="/story"
@@ -462,13 +480,22 @@ export default function Navigation() {
                 >
                   Dashboard
                 </Link>
-                <Link
-                  href="/upgrade"
-                  onClick={() => setIsOpen(false)}
-                  className="block px-4 py-2 rounded-lg text-gray-300 hover:text-white hover:bg-slate-800 transition-all text-center"
-                >
-                  {subscription?.tier === "PREMIUM" ? "Manage Subscription" : "Upgrade to Premium"}
-                </Link>
+                {subscription?.tier === "PREMIUM" ? (
+                  <div className="px-4">
+                    <ManageSubscriptionButton
+                      onNavigate={() => setIsOpen(false)}
+                      className="w-full justify-center px-4 py-2 rounded-lg text-gray-300 hover:text-white hover:bg-slate-800"
+                    />
+                  </div>
+                ) : (
+                  <Link
+                    href="/upgrade"
+                    onClick={() => setIsOpen(false)}
+                    className="block px-4 py-2 rounded-lg text-gray-300 hover:text-white hover:bg-slate-800 transition-all text-center"
+                  >
+                    Upgrade to Premium
+                  </Link>
+                )}
                 <button
                   onClick={() => {
                     setIsOpen(false)

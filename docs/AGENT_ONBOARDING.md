@@ -13,6 +13,7 @@
 3. [AGENT_PR_CHECKLIST.md](./AGENT_PR_CHECKLIST.md) — before every PR  
 4. [DEPLOYMENT.md](./DEPLOYMENT.md) — only if you touch auth, env, or deploy  
 5. [SAAS.md](./SAAS.md) — production billing flags, Stripe, rate limits  
+6. [STRIPE_LOCAL.md](./STRIPE_LOCAL.md) — real Checkout + webhooks on localhost  
 
 ---
 
@@ -40,6 +41,7 @@ npm run dev                # http://localhost:4000
 - **Port:** App uses **4000**; stop other dev servers before `npm run verify:ci`
 - **Feature flags:** Stripe, Redis, email, analytics off by default in `.env.local` — app runs without them
 - **Architecture diagrams:** Browser only → `http://localhost:4000/docs/architecture` (not a repo markdown file)
+- **Mobile layout tests (optional):** `npx playwright test tests/mobile-layout.spec.ts --project="Mobile Chrome"` — not in `verify:ci`
 
 ---
 

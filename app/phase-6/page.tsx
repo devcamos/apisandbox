@@ -20,6 +20,7 @@ import {
 import Link from "next/link"
 import dynamic from "next/dynamic"
 import PhaseLayout from "@/components/PhaseLayout"
+import { SubscriptionGate } from "@/components/SubscriptionGate"
 import FramerMotionDemo, { type SortAlgorithm } from "@/components/phase-6/FramerMotionDemo"
 import GsapDemo, { type SearchAlgorithm } from "@/components/phase-6/GsapDemo"
 import SearchDecisionChecklist from "@/components/phase-6/SearchDecisionChecklist"
@@ -161,6 +162,7 @@ export default function Phase6Page() {
   }
 
   return (
+    <SubscriptionGate phaseNumber={6} lockedContentName="Phase 6: Algorithm Visualizer">
     <PhaseLayout
       phaseNumber={6}
       title="Algorithm Visualizer"
@@ -285,6 +287,7 @@ export default function Phase6Page() {
         </div>
       )}
     </PhaseLayout>
+    </SubscriptionGate>
   )
 }
 

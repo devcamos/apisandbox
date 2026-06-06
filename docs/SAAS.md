@@ -53,10 +53,14 @@ curl -sS "https://<your-host>/api/health/db" | jq .
 | Auth routes | Login/signup rate limited (when `RATE_LIMITING` on) |
 | Legal | `/terms`, `/privacy` |
 
-## Local dev (no Stripe)
+## Local dev
+
+**Demo billing (default):** instant upgrade, no Stripe keys — see `config/environments/local.env.example`.
+
+**Real Stripe Checkout locally:** [STRIPE_LOCAL.md](./STRIPE_LOCAL.md) (Test mode + Stripe CLI webhooks).
 
 ```bash
-# .env.local — learning mode
+# .env.local — learning mode (no Stripe)
 NEXT_PUBLIC_FF_PREMIUM_PAYWALL=false   # optional: explore all phases
 NEXT_PUBLIC_FF_STRIPE_CHECKOUT=false   # instant upgrade API works locally
 NEXT_PUBLIC_FF_RATE_LIMITING=false

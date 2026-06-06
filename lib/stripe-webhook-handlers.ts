@@ -2,6 +2,11 @@ import type Stripe from "stripe"
 import { prisma } from "@/lib/prisma"
 import { logger } from "@/lib/logger"
 import { sendSubscriptionConfirmation, sendSubscriptionCancelled } from "@/lib/email"
+import {
+  applyPremiumSubscription,
+  downgradeToFreeSubscription,
+  findUserIdByStripeCustomerId,
+} from "@/lib/subscription-provision"
 
 export function currentPeriodEndUnix(subscription: Stripe.Subscription): number | null {
   const raw = (subscription as unknown as { current_period_end?: unknown }).current_period_end
@@ -16,13 +21,8 @@ export async function handleCheckoutSessionCompleted(event: Stripe.Event): Promi
   const subscriptionId =
     typeof session.subscription === "string" ? session.subscription : session.subscription?.id
 
-  await prisma.user.update({
-    where: { id: userId },
-    data: {
-      subscriptionTier: "PREMIUM",
-      stripeSubscriptionId: subscriptionId ?? null,
-      subscriptionExpiresAt: null,
-    },
+  await applyPremiumSubscription(userId, {
+    stripeSubscriptionId: subscriptionId ?? null,
   })
 
   const user = await prisma.user.findUnique({
@@ -40,9 +40,19 @@ export async function handleInvoicePaymentFailed(event: Stripe.Event): Promise<v
   const invoice = event.data.object as Stripe.Invoice
   const customerId = typeof invoice.customer === "string" ? invoice.customer : invoice.customer?.id
 
-  if (customerId) {
-    logger.warn({ customerId }, "Payment failed — grace period started")
+  if (!customerId) {
+    logger.warn("Payment failed — no customer id on invoice")
+    return
   }
+
+  const userId = await findUserIdByStripeCustomerId(customerId)
+  if (!userId) {
+    logger.warn({ customerId }, "Payment failed — no user for Stripe customer")
+    return
+  }
+
+  await downgradeToFreeSubscription(userId)
+  logger.warn({ userId, customerId }, "Payment failed — user downgraded to FREE")
 }
 
 export async function handleCustomerSubscriptionDeleted(event: Stripe.Event): Promise<void> {
@@ -50,14 +60,7 @@ export async function handleCustomerSubscriptionDeleted(event: Stripe.Event): Pr
   const userId = subscription.metadata?.userId
   if (!userId) return
 
-  await prisma.user.update({
-    where: { id: userId },
-    data: {
-      subscriptionTier: "FREE",
-      stripeSubscriptionId: null,
-      subscriptionExpiresAt: null,
-    },
-  })
+  await downgradeToFreeSubscription(userId)
 
   const user = await prisma.user.findUnique({
     where: { id: userId },

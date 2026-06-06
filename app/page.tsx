@@ -46,7 +46,7 @@ export default function Home() {
         <div className="absolute inset-0 bg-grid-pattern opacity-10"></div>
         <div className="container mx-auto px-6 py-24 relative z-10">
           <div className="text-center max-w-4xl mx-auto">
-            <h1 className="text-6xl font-bold mb-2 bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 text-transparent bg-clip-text">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-2 bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 text-transparent bg-clip-text">
               API Integration Training
             </h1>
             <h2 className="text-3xl font-semibold mb-6 text-gray-300">

@@ -1,17 +1,7 @@
 /**
  * Subscription Gate Component
- * 
- * MENTOR NOTE: Access Control Pattern
- * 
- * This component:
- * 1. Checks user's subscription tier
- * 2. Shows upgrade prompt if access denied
- * 3. Renders content if access granted
- * 
- * Usage:
- * <SubscriptionGate phaseNumber={2}>
- *   <Phase2Content />
- * </SubscriptionGate>
+ *
+ * Checks subscription tier and renders premium children or a free preview + upgrade CTA.
  */
 
 "use client"
@@ -20,18 +10,45 @@ import { useSession } from "@/components/providers/SessionProvider"
 import { useEffect, useState } from "react"
 import { UpgradePrompt } from "./UpgradePrompt"
 import { signupRequiredForPremium } from "@/config/featureFlags"
+import { PhaseRoutePreview } from "@/components/premium/PhaseRoutePreview"
+import { SectionRoutePreview } from "@/components/premium/SectionRoutePreview"
 
 interface SubscriptionGateProps {
   children: React.ReactNode
   phaseNumber: number | "cloud" | "ai"
   lockedContentName: string
+  freePreview?: React.ReactNode
 }
 
-export function SubscriptionGate({ 
-  children, 
-  phaseNumber, 
-  lockedContentName 
-}: SubscriptionGateProps) {
+function defaultFreePreview(
+  phaseNumber: number | "cloud" | "ai",
+  lockedContentName: string,
+) {
+  if (phaseNumber === "cloud" || phaseNumber === "ai") {
+    return (
+      <SectionRoutePreview
+        sectionId={phaseNumber}
+        lockedContentName={lockedContentName}
+      />
+    )
+  }
+  if (typeof phaseNumber === "number") {
+    return (
+      <PhaseRoutePreview
+        phaseNumber={phaseNumber}
+        lockedContentName={lockedContentName}
+      />
+    )
+  }
+  return null
+}
+
+export function SubscriptionGate({
+  children,
+  phaseNumber,
+  lockedContentName,
+  freePreview,
+}: Readonly<SubscriptionGateProps>) {
   const { data: session, status } = useSession()
   const [accessCheck, setAccessCheck] = useState<{
     hasAccess: boolean
@@ -43,7 +60,6 @@ export function SubscriptionGate({
   useEffect(() => {
     if (status === "loading") return
 
-    // No session: when signup not required, unlock all for navigation; else free-only
     if (!session?.user?.id) {
       const isFreePhase = phaseNumber === 0 || phaseNumber === 1
       const unlockAll = !signupRequiredForPremium
@@ -56,15 +72,15 @@ export function SubscriptionGate({
       return
     }
 
-    // Signed-in: when signup not required, unlock all; else use API
     if (!signupRequiredForPremium) {
       setAccessCheck({ hasAccess: true, tier: "FREE", upgradeRequired: false })
       setIsLoading(false)
       return
     }
+
     fetch(`/api/subscription/check?phase=${phaseNumber}`)
-      .then(res => res.json())
-      .then(data => {
+      .then((res) => res.json())
+      .then((data) => {
         setAccessCheck(data)
         setIsLoading(false)
       })
@@ -85,25 +101,27 @@ export function SubscriptionGate({
     return null
   }
 
-  // Phase 0 and Phase 1 are always accessible (FREE tier)
   if (phaseNumber === 0 || phaseNumber === 1) {
     return <>{children}</>
   }
 
-  // Show upgrade prompt if access denied
   if (!accessCheck.hasAccess || accessCheck.upgradeRequired) {
+    const preview =
+      freePreview ?? defaultFreePreview(phaseNumber, lockedContentName)
+
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
         <div className="container mx-auto px-6 py-12">
-          <UpgradePrompt 
-            lockedContent={lockedContentName}
-            currentTier={accessCheck.tier}
-          />
+          {preview ?? (
+            <UpgradePrompt
+              lockedContent={lockedContentName}
+              currentTier={accessCheck.tier}
+            />
+          )}
         </div>
       </div>
     )
   }
 
-  // User has access, render content
   return <>{children}</>
 }

@@ -10,5 +10,6 @@ Essential docs for onboarding and shipping changes. Product learning content liv
 | [TEST_USERS.md](./TEST_USERS.md) | Local / demo login credentials |
 | [DEPLOYMENT.md](./DEPLOYMENT.md) | Vercel env, Prisma on deploy, Google OAuth origins |
 | [SAAS.md](./SAAS.md) | Production SaaS flags, Stripe, rate limits, health probe |
+| [STRIPE_LOCAL.md](./STRIPE_LOCAL.md) | Real Stripe Checkout in Test mode + webhook forwarding |
 
 **Templates (not prose):** `config/environments/*.env.example`, `.env.example`, `sonar-project.properties`

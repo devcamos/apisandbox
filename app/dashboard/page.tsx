@@ -17,6 +17,7 @@ import PhaseProgressOverview from "@/components/PhaseProgressOverview"
 import AppGuide from "@/components/home/AppGuide"
 import CloudSectionCard from "@/components/home/CloudSectionCard"
 import { getLearningPhases } from "@/lib/learning/dashboard-phase-catalog"
+import { getPremiumCatalogPhases } from "@/lib/learning/premium-catalog"
 
 const isPremiumPhase = (phaseId: number) => phaseId > 1
 
@@ -50,7 +51,10 @@ export default function DashboardPage() {
     )
   }
 
-  const phases = getLearningPhases(true)
+  const phases = [
+    ...getLearningPhases(true).filter((p) => p.id <= 1),
+    ...getPremiumCatalogPhases(),
+  ]
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
@@ -59,7 +63,7 @@ export default function DashboardPage() {
               <div className="absolute inset-0 bg-grid-pattern opacity-10"></div>
               <div className="container mx-auto px-6 py-12 relative z-10">
                 <div className="text-center max-w-4xl mx-auto">
-                  <h1 className="text-5xl font-bold mb-4 bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 text-transparent bg-clip-text">
+                  <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 text-transparent bg-clip-text">
                     {session ? `Welcome back, ${session.user?.name || session.user?.email}!` : "Explore your learning path"}
                   </h1>
                   <p className="text-xl text-gray-300 mb-4">
@@ -119,7 +123,7 @@ export default function DashboardPage() {
             const LevelIcon = phase.levelIcon
             const premiumOnly = isPremiumPhase(phase.id)
             const canOpen = !premiumOnly || isPremium
-            const href = canOpen ? phase.href : "/upgrade"
+            const href = phase.href
             return (
               <Link key={phase.id} href={href}>
                 <div className="group bg-slate-800/50 backdrop-blur-sm rounded-2xl p-8 border border-slate-700 hover:border-slate-600 transition-all hover:shadow-2xl hover:scale-105 cursor-pointer relative overflow-hidden">
@@ -182,7 +186,7 @@ export default function DashboardPage() {
                         ⏱️ {phase.estimatedTime}
                       </div>
                       <div className={`font-semibold flex items-center group-hover:gap-2 transition-all ${canOpen ? "text-blue-400" : "text-yellow-400"}`}>
-                        {canOpen ? "Start Learning" : "Upgrade to unlock"}
+                        {canOpen ? "Start Learning" : "View preview"}
                         <span className="ml-2 group-hover:translate-x-1 transition-transform">→</span>
                       </div>
                     </div>

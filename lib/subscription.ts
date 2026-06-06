@@ -20,6 +20,7 @@
  */
 
 import { prisma } from "@/lib/prisma"
+import { applyPremiumSubscription } from "@/lib/subscription-provision"
 
 export type SubscriptionTier = "FREE" | "PREMIUM"
 
@@ -75,12 +76,14 @@ export async function checkPhaseAccess(
   let hasAccess = false
   let upgradeRequired = false
 
-  if (phaseNumber === 0 || phaseNumber === 1 || phaseNumber === 7 || phaseNumber === 8) {
+  if (phaseNumber === 0 || phaseNumber === 1) {
     hasAccess = true
   } else if (
     phaseNumber === "cloud" ||
     phaseNumber === "ai" ||
-    (typeof phaseNumber === "number" && phaseNumber >= 2 && phaseNumber <= 5)
+    (typeof phaseNumber === "number" &&
+      phaseNumber >= 2 &&
+      phaseNumber <= 9)
   ) {
     hasAccess = effectiveTier === "PREMIUM"
     upgradeRequired = !hasAccess
@@ -132,15 +135,15 @@ export async function getUserSubscription(userId: string) {
  */
 export async function upgradeToPremium(
   userId: string,
-  expiresAt?: Date
+  expiresAt?: Date,
 ): Promise<void> {
-  await prisma.user.update({
-    where: { id: userId },
-    data: {
-      subscriptionTier: "PREMIUM",
-      subscriptionExpiresAt: expiresAt || null, // null = lifetime
-    },
-  })
+  await applyPremiumSubscription(userId)
+  if (expiresAt) {
+    await prisma.user.update({
+      where: { id: userId },
+      data: { subscriptionExpiresAt: expiresAt },
+    })
+  }
 }
 
 /**
@@ -149,7 +152,7 @@ export async function upgradeToPremium(
 export function getTierFeatures(tier: SubscriptionTier) {
   if (tier === "PREMIUM") {
     return {
-      phases: [0, 1, 2, 3, 4, 5],
+      phases: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
       cloud: true,
       ai: true,
       observability: true,
@@ -158,10 +161,10 @@ export function getTierFeatures(tier: SubscriptionTier) {
   }
 
   return {
-    phases: [0, 1], // Phase 0 and Phase 1 are free
+    phases: [0, 1],
     cloud: false,
     ai: false,
-    observability: false,
+    observability: true,
     demos: false,
   }
 }

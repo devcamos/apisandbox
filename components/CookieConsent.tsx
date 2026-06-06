@@ -27,7 +27,7 @@ export function CookieConsent() {
   if (!visible) return null
 
   return (
-    <div className="fixed bottom-0 inset-x-0 z-50 p-4">
+    <div className="fixed bottom-0 inset-x-0 z-50 p-4 fixed-bottom-safe">
       <div className="max-w-xl mx-auto bg-slate-800 border border-slate-700 rounded-xl shadow-2xl p-5">
         <p className="text-sm text-gray-300 mb-4">
           We use essential cookies to keep you signed in and optional analytics cookies
@@ -36,7 +36,7 @@ export function CookieConsent() {
             Learn more
           </a>
         </p>
-        <div className="flex items-center gap-3">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3">
           <button
             onClick={accept}
             className="px-4 py-2 rounded-lg bg-violet-600 hover:bg-violet-500 text-white text-sm font-medium transition-colors"

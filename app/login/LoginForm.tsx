@@ -202,23 +202,10 @@ function LoginForm({ googleClientId }: Readonly<{ googleClientId: string }>) {
       title="Welcome Back"
       subtitle="Sign in to continue your API integration journey"
     >
-          <div className="mb-6 rounded-xl border border-slate-700/70 bg-slate-900/40 p-4" data-testid="auth-methods-intro">
-            <h2 className="text-sm font-semibold text-white">Choose a sign-in method</h2>
-            <p className="mt-1 text-sm text-gray-400">
-              Use your Google or Gmail account for a faster sign-in, or use your local email and password.
-            </p>
-            <p className="mt-2 text-xs text-gray-500">
-              If the same email exists in both methods, the app links them to one account.
-            </p>
-          </div>
-
           <AuthSocialSection
             googleClientId={googleClientId}
             googleButtonRef={googleButtonRef}
             fallbackLabel="Continue with Google"
-            dividerLabel="Or sign in with email and password"
-            heading="Google or Gmail"
-            description="Use your Google account for quick access. Gmail addresses work here."
           >
           <form onSubmit={handleSubmit} method="post" className="space-y-6">
             {/* Email Field */}

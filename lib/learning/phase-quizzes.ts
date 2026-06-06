@@ -555,11 +555,99 @@ export const phaseQuizzes: Record<number, PhaseQuizDefinition> = {
         redirect: { href: "/phase-8", label: "Review training-serving consistency" },
       }
     ]
-  }
+  },
+  9: {
+    phaseNumber: 9,
+    title: "Phase 9 Checkpoint",
+    description: "Validate database fundamentals before you scale data-heavy APIs.",
+    xpPerCorrect: 20,
+    questions: [
+      {
+        id: "sql-vs-nosql",
+        prompt: "When is a relational database usually the better default for an API backend?",
+        options: [
+          "When you only need ephemeral cache keys",
+          "When you need transactions across related entities with enforced constraints",
+          "When you never need joins",
+          "When schema flexibility matters more than consistency"
+        ],
+        correctIndex: 1,
+        explanation: "Relational stores excel at ACID transactions, foreign keys, and joins across normalized entities — typical for accounts, billing, and entitlements.",
+        concept: "Relational vs NoSQL",
+        redirect: { href: "/phase-9", label: "Review SQL vs NoSQL" },
+      },
+      {
+        id: "acid-use",
+        prompt: "Which flow most clearly needs ACID guarantees?",
+        options: [
+          "Serving a public blog post list from a CDN",
+          "Upgrading subscription tier and writing an audit log row together",
+          "Caching weather data for 10 minutes",
+          "Streaming analytics events to a warehouse"
+        ],
+        correctIndex: 1,
+        explanation: "Billing and entitlement updates should commit atomically — partial success corrupts user state.",
+        concept: "ACID / transactions",
+        redirect: { href: "/phase-9", label: "Review ACID and transactions" },
+      },
+      {
+        id: "indexes",
+        prompt: "What is the main purpose of a database index?",
+        options: [
+          "To encrypt data at rest",
+          "To speed up reads by avoiding full table scans on filtered columns",
+          "To replace migrations",
+          "To disable replication lag"
+        ],
+        correctIndex: 1,
+        explanation: "Indexes trade a bit of write overhead for faster lookups on indexed columns used in WHERE and JOIN clauses.",
+        concept: "Indexes",
+        redirect: { href: "/phase-9", label: "Review indexes" },
+      },
+      {
+        id: "connection-pool",
+        prompt: "Why do API servers use connection pooling?",
+        options: [
+          "To store JWT secrets",
+          "To reuse open database connections and reduce per-request connection overhead",
+          "To shard data automatically",
+          "To replace EXPLAIN ANALYZE"
+        ],
+        correctIndex: 1,
+        explanation: "Opening connections is expensive; pools lend warm connections to concurrent requests within safe limits.",
+        concept: "Connection pooling",
+        redirect: { href: "/phase-9", label: "Review connection pooling" },
+      },
+      {
+        id: "read-replicas",
+        prompt: "When routing API reads to a read replica, what must you account for?",
+        options: [
+          "Replicas always return the latest write immediately",
+          "Asynchronous replication lag — reads may be slightly stale",
+          "Replicas handle writes faster than the primary",
+          "Replicas eliminate the need for indexes"
+        ],
+        correctIndex: 1,
+        explanation: "Replicas often lag the primary; session-critical reads (auth, own profile) should usually hit the primary.",
+        concept: "Read replicas",
+        redirect: { href: "/phase-9", label: "Review read replicas" },
+      },
+    ],
+  },
 }
 
 export function getPhaseQuiz(phaseNumber: number) {
   return phaseQuizzes[phaseNumber] ?? null
+}
+
+/** Fisher–Yates shuffle (mutates a copy). */
+export function shuffleOptions<T>(items: readonly T[]): T[] {
+  const shuffled = [...items]
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1))
+    ;[shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
+  }
+  return shuffled
 }
 
 export function getSanitizedPhaseQuiz(phaseNumber: number) {
@@ -575,7 +663,7 @@ export function getSanitizedPhaseQuiz(phaseNumber: number) {
     questions: quiz.questions.map(({ id, prompt, options, concept }) => ({
       id,
       prompt,
-      options,
+      options: shuffleOptions(options),
       concept,
     })),
   }
@@ -583,19 +671,20 @@ export function getSanitizedPhaseQuiz(phaseNumber: number) {
 
 export function gradePhaseQuiz(
   phaseNumber: number,
-  answers: Record<string, number>
+  answers: Record<string, string>,
 ) {
   const quiz = getPhaseQuiz(phaseNumber)
   if (!quiz) return null
 
   const details = quiz.questions.map((question) => {
-    const selectedIndex = answers[question.id]
-    const isCorrect = selectedIndex === question.correctIndex
+    const selectedAnswer = answers[question.id]?.trim()
+    const correctAnswer = question.options[question.correctIndex]
+    const isCorrect = selectedAnswer === correctAnswer
 
     return {
       questionId: question.id,
-      selectedIndex: typeof selectedIndex === "number" ? selectedIndex : null,
-      correctIndex: question.correctIndex,
+      selectedAnswer: selectedAnswer ?? null,
+      correctAnswer,
       isCorrect,
       explanation: question.explanation,
       concept: question.concept,

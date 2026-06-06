@@ -4,6 +4,7 @@ const prismaMock = vi.hoisted(() => ({
   user: {
     update: vi.fn(),
     findUnique: vi.fn(),
+    findFirst: vi.fn(),
   },
 }))
 
@@ -35,6 +36,7 @@ beforeEach(() => {
   vi.clearAllMocks()
   prismaMock.user.update.mockResolvedValue({})
   prismaMock.user.findUnique.mockResolvedValue(null)
+  prismaMock.user.findFirst.mockResolvedValue(null)
   sendSubscriptionConfirmationMock.mockResolvedValue(null)
   sendSubscriptionCancelledMock.mockResolvedValue(null)
 })
@@ -109,12 +111,22 @@ describe("handleCheckoutSessionCompleted", () => {
 })
 
 describe("handleInvoicePaymentFailed", () => {
-  it("logs warning when customer id is present", async () => {
+  it("downgrades user to FREE when customer maps to a user", async () => {
+    prismaMock.user.findFirst.mockResolvedValue({ id: "user_pay_fail" })
+
     await handleInvoicePaymentFailed({
       type: "invoice.payment_failed",
       data: { object: { customer: "cus_777" } },
     } as any)
 
+    expect(prismaMock.user.update).toHaveBeenCalledWith({
+      where: { id: "user_pay_fail" },
+      data: {
+        subscriptionTier: "FREE",
+        stripeSubscriptionId: null,
+        subscriptionExpiresAt: null,
+      },
+    })
     expect(loggerMock.warn).toHaveBeenCalled()
   })
 })

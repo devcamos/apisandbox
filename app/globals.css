@@ -17,6 +17,11 @@ body {
     )
     rgb(var(--background-start-rgb));
   min-height: 100vh;
+  overflow-x: hidden;
+}
+
+.fixed-bottom-safe {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 
 @layer utilities {

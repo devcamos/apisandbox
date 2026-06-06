@@ -1,21 +1,46 @@
 /** Shared fetch options for auth API routes (session cookie + JSON body). */
+export const AUTH_JWT_STORAGE_KEY = "auth_jwt"
+
 export const authApiFetchInit = {
   credentials: "include" as RequestCredentials,
 }
 
-export function authApiJsonInit(body: unknown): RequestInit {
+/** Cookie + optional Bearer from localStorage (fixes API calls when httpOnly cookie is missing). */
+export function authApiRequestInit(init: RequestInit = {}): RequestInit {
+  const headers = new Headers(init.headers)
+
+  if (!headers.has("Authorization") && globalThis.window !== undefined) {
+    const token = localStorage.getItem(AUTH_JWT_STORAGE_KEY)
+    if (token) {
+      headers.set("Authorization", `Bearer ${token}`)
+    }
+  }
+
   return {
     ...authApiFetchInit,
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(body),
+    ...init,
+    headers,
   }
+}
+
+export function authApiJsonInit(body: unknown, init: RequestInit = {}): RequestInit {
+  const headers = new Headers(init.headers)
+  if (!headers.has("Content-Type")) {
+    headers.set("Content-Type", "application/json")
+  }
+
+  return authApiRequestInit({
+    ...init,
+    method: init.method ?? "POST",
+    headers,
+    body: JSON.stringify(body),
+  })
 }
 
 export type AuthApiEnvelope<TData = unknown> = {
   success?: boolean
   data?: TData
-  error?: { message?: string; details?: unknown }
+  error?: { message?: string; details?: unknown; category?: string }
 }
 
 /** POST JSON to an auth API route and parse the standard envelope. */

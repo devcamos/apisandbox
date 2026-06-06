@@ -7,9 +7,7 @@ interface AuthSocialSectionProps {
   googleClientId: string
   googleButtonRef: React.RefObject<HTMLDivElement | null>
   fallbackLabel: string
-  dividerLabel: string
-  heading?: string
-  description?: string
+  dividerLabel?: string
   children: ReactNode
 }
 
@@ -17,33 +15,18 @@ export default function AuthSocialSection({
   googleClientId,
   googleButtonRef,
   fallbackLabel,
-  dividerLabel,
-  heading,
-  description,
+  dividerLabel = "or",
   children,
 }: Readonly<AuthSocialSectionProps>) {
   return (
     <>
-      {(heading || description) && (
-        <div className="mb-4 space-y-1" data-testid="google-auth-section">
-          {heading ? <h2 className="text-sm font-semibold text-white">{heading}</h2> : null}
-          {description ? <p className="text-sm text-gray-400">{description}</p> : null}
-        </div>
-      )}
-      <div className="relative my-6">
-        <div className="absolute inset-0 flex items-center">
-          <div className="w-full border-t border-slate-700" />
-        </div>
-        <div className="relative flex justify-center text-sm">
-          <span className="px-2 bg-slate-800/50 text-gray-400">{dividerLabel}</span>
-        </div>
-      </div>
       {googleClientId ? (
         <>
           <Script src="https://accounts.google.com/gsi/client" strategy="afterInteractive" />
           <div
             ref={googleButtonRef}
             className="w-full flex justify-center [&_.g_id_signin]:!w-full [&_.g_id_signin]>div:!w-full"
+            data-testid="google-auth-section"
           />
         </>
       ) : (
@@ -52,6 +35,7 @@ export default function AuthSocialSection({
           disabled
           className="w-full py-3 bg-slate-900/50 border border-slate-700 text-gray-500 rounded-lg font-semibold flex items-center justify-center gap-3 cursor-not-allowed"
           aria-label={fallbackLabel}
+          data-testid="google-auth-section"
         >
           <svg className="w-5 h-5" viewBox="0 0 24 24" aria-hidden>
             <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
@@ -62,6 +46,16 @@ export default function AuthSocialSection({
           {fallbackLabel}
         </button>
       )}
+
+      <div className="relative my-6">
+        <div className="absolute inset-0 flex items-center">
+          <div className="w-full border-t border-slate-700" />
+        </div>
+        <div className="relative flex justify-center text-sm">
+          <span className="px-2 bg-slate-800/50 text-gray-400">{dividerLabel}</span>
+        </div>
+      </div>
+
       {children}
     </>
   )
