@@ -8,6 +8,8 @@ import { monetisationPaths, type MonetisationPath } from "@/lib/learning/monetis
 import SelectableLearningCard from "@/components/learning/SelectableLearningCard";
 import DetailTabsShell from "@/components/learning/DetailTabsShell";
 import ParetoInsightCard from "@/components/learning/ParetoInsightCard";
+import { LessonTracker } from "@/components/LessonTracker";
+import PhaseQuiz from "@/components/PhaseQuiz";
 
 function EffortBadge({ level }: Readonly<{ level: MonetisationPath["effortLevel"] }>) {
   const styles = {
@@ -311,6 +313,9 @@ export default function Phase7() {
           </table>
         </div>
       </div>
+
+      <LessonTracker phase={7} />
+      <PhaseQuiz phaseNumber={7} accentClass="from-amber-500 to-orange-500" />
     </PhaseLayout>
     </SubscriptionGate>
   );

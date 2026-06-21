@@ -4,6 +4,7 @@ import PhaseLayout from "@/components/PhaseLayout";
 import ConceptCard from "@/components/ConceptCard";
 import PhaseQuiz from "@/components/PhaseQuiz";
 import { LessonTracker } from "@/components/LessonTracker";
+import { LearnSeeDoShell } from "@/components/LearnSeeDoShell";
 import { Brain, Network, GitBranch, Zap, RefreshCw, Database } from "lucide-react";
 
 import { ExpandableCodeBlock } from "@/components/HighlightedCodeBlock"
@@ -26,8 +27,10 @@ export default function Phase1() {
         </p>
       </div>
 
-      <LessonTracker phase={1} />
-
+      <LearnSeeDoShell
+        accentClass="from-blue-500 to-cyan-500"
+        learn={
+          <>
       {/* Pareto Principle Summary */}
       <div className="bg-gradient-to-br from-yellow-500/10 to-orange-500/10 border-2 border-yellow-500/30 rounded-xl p-6 mb-12">
         <div className="flex items-start gap-4 mb-4">
@@ -459,7 +462,10 @@ Any service can consume this JSON message, regardless of language`} />
           </div>
         </div>
       </section>
-
+          </>
+        }
+        see={
+          <>
       {/* API Categories */}
       <section className="mb-12">
         <h2 className="text-3xl font-bold text-white mb-6">API Categories</h2>
@@ -947,8 +953,15 @@ Any service can consume this JSON message, regardless of language`} />
           </table>
         </div>
       </section>
-
+          </>
+        }
+        do={
+          <>
+      <LessonTracker phase={1} />
       <PhaseQuiz phaseNumber={1} accentClass="from-blue-500 to-cyan-500" />
+          </>
+        }
+      />
 
       <FullAccessPrompt />
     </PhaseLayout>

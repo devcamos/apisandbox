@@ -45,8 +45,16 @@ export default function DashboardPage() {
 
   if (status === "loading") {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center">
-        <div className="text-white text-xl">Loading...</div>
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+        <div className="container mx-auto px-6 py-16 animate-pulse space-y-8">
+          <div className="h-12 max-w-lg mx-auto rounded-xl bg-slate-800/80" />
+          <div className="h-6 max-w-2xl mx-auto rounded-lg bg-slate-800/60" />
+          <div className="grid md:grid-cols-2 gap-8">
+            {[1, 2, 3, 4].map((i) => (
+              <div key={i} className="h-64 rounded-2xl bg-slate-800/50 border border-slate-700/50" />
+            ))}
+          </div>
+        </div>
       </div>
     )
   }
@@ -108,7 +116,7 @@ export default function DashboardPage() {
               <div className="text-center mb-12">
                 <h2 className="text-4xl font-bold text-white mb-4">Choose Your Learning Path</h2>
                 <p className="text-xl text-gray-300 max-w-3xl mx-auto mb-6">
-                  Our training is organized into <strong className="text-white">6 progressive phases</strong> (Phase 0-5) that take you from fundamentals to architecture-level theory mastery. <strong className="text-green-400">Phase 0 and Phase 1 are free</strong> - start your learning journey today!
+                  Our curriculum spans <strong className="text-white">10 learning phases</strong> (Phase 0–9) plus Cloud and AI tracks — from fundamentals through algorithms, monetisation, and production data systems. <strong className="text-green-400">Phase 0 and Phase 1 are free</strong> — start your journey today!
                 </p>
           <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-4 max-w-2xl mx-auto">
             <p className="text-blue-200 text-sm">

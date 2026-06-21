@@ -118,9 +118,12 @@ export default function Navigation() {
       <div className="container mx-auto px-6">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link href="/" className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-lg"></div>
-            <span className="font-bold text-white text-xl">API Training</span>
+          <Link href="/" className="flex items-center space-x-2 group">
+            <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-lg shadow-lg shadow-blue-500/20 group-hover:shadow-blue-500/40 transition-shadow" />
+            <div className="flex flex-col leading-tight">
+              <span className="font-bold text-white text-lg sm:text-xl">API Sandbox</span>
+              <span className="hidden sm:block text-[10px] uppercase tracking-wider text-gray-500">Learn · Build · Ship</span>
+            </div>
           </Link>
 
           {/* Desktop Navigation */}
