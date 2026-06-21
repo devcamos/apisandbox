@@ -9,6 +9,8 @@ import SelectableLearningCard from "@/components/learning/SelectableLearningCard
 import DetailTabsShell from "@/components/learning/DetailTabsShell";
 import ParetoInsightCard from "@/components/learning/ParetoInsightCard";
 import { ExpandableCodeBlock } from "@/components/HighlightedCodeBlock";
+import { LessonTracker } from "@/components/LessonTracker";
+import PhaseQuiz from "@/components/PhaseQuiz";
 
 function CategoryCard({ cat, isSelected, onSelect }: Readonly<{ cat: DSCategory; isSelected: boolean; onSelect: () => void }>) {
   return (
@@ -242,6 +244,9 @@ export default function Phase8() {
           ))}
         </div>
       </div>
+
+      <LessonTracker phase={8} />
+      <PhaseQuiz phaseNumber={8} accentClass="from-purple-500 to-violet-500" />
     </PhaseLayout>
     </SubscriptionGate>
   );

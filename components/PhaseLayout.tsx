@@ -2,6 +2,7 @@ import { ReactNode } from "react";
 import { LucideIcon } from "lucide-react";
 import Link from "next/link";
 import { ChevronRight, Home } from "lucide-react";
+import { LearnSeeDoShell } from "@/components/LearnSeeDoShell";
 
 interface PhaseLayoutProps {
   phaseNumber: number;
@@ -11,6 +12,13 @@ interface PhaseLayoutProps {
   color: string;
   children: ReactNode;
   breadcrumbs?: { label: string; href: string }[];
+  /** When set, renders the Learn → See → Do shell instead of raw children */
+  learnSeeDo?: {
+    learn: ReactNode;
+    see: ReactNode;
+    do: ReactNode;
+    defaultSection?: "learn" | "see" | "do";
+  };
 }
 
 export default function PhaseLayout({
@@ -21,6 +29,7 @@ export default function PhaseLayout({
   color,
   children,
   breadcrumbs,
+  learnSeeDo,
 }: PhaseLayoutProps) {
   // Default breadcrumbs if not provided
   const defaultBreadcrumbs = [
@@ -71,7 +80,17 @@ export default function PhaseLayout({
 
       {/* Content */}
       <div className="container mx-auto px-4 sm:px-6 py-8 sm:py-12">
-        {children}
+        {learnSeeDo ? (
+          <LearnSeeDoShell
+            learn={learnSeeDo.learn}
+            see={learnSeeDo.see}
+            do={learnSeeDo.do}
+            defaultSection={learnSeeDo.defaultSection}
+            accentClass={color}
+          />
+        ) : (
+          children
+        )}
       </div>
     </div>
   );

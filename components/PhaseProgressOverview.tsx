@@ -5,14 +5,7 @@ import Link from "next/link"
 import { Trophy, BarChart3, Target, TrendingUp } from "lucide-react"
 import { useSession } from "@/components/providers/SessionProvider"
 import { masteryLabel } from "@/lib/learning/phase-quiz-insights"
-
-const phaseMeta = [
-  { phaseNumber: 0, title: "Getting Started", href: "/phase-0", color: "from-green-500 to-emerald-500" },
-  { phaseNumber: 1, title: "Integration Mindset", href: "/phase-1", color: "from-blue-500 to-cyan-500" },
-  { phaseNumber: 2, title: "Third-Party Integrations", href: "/phase-2", color: "from-purple-500 to-pink-500" },
-  { phaseNumber: 3, title: "Inter-Service Communication", href: "/phase-3", color: "from-orange-500 to-red-500" },
-  { phaseNumber: 4, title: "Principal-Level Architecture", href: "/phase-4", color: "from-emerald-500 to-cyan-500" },
-]
+import { phaseProgressMeta } from "@/lib/learning/phase-progress-meta"
 
 interface PhaseProgress {
   phaseNumber: number
@@ -113,8 +106,8 @@ export default function PhaseProgressOverview() {
           </div>
         </div>
 
-        <div className="grid md:grid-cols-2 xl:grid-cols-5 gap-4">
-          {phaseMeta.map((phase) => {
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
+          {phaseProgressMeta.map((phase) => {
             const item = progressByPhase.get(phase.phaseNumber)
             const label = item ? masteryLabel(item.correctAnswers, item.totalQuestions) : "Not attempted yet"
             return (

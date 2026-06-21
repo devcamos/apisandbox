@@ -40,6 +40,7 @@ import {
 } from "@/lib/phase-6/algorithm-layer-tabs"
 import { useShinobiProgress } from "@/hooks/useShinobiProgress"
 import ShinobiLearningBoard from "@/components/phase-6/ShinobiLearningBoard"
+import Phase6ProgressNote from "@/components/phase-6/Phase6ProgressNote"
 import AnimatedTabPanel from "@/components/phase-6/AnimatedTabPanel"
 
 const LAYER_TAB_ICONS: Record<LayerTab, LucideIcon> = {
@@ -170,6 +171,8 @@ export default function Phase6Page() {
       icon={Sparkles}
       color="from-fuchsia-500 to-violet-600"
     >
+      <Phase6ProgressNote />
+
       {/* Hero */}
       <section className="mb-10">
         <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mb-4 text-sm">
