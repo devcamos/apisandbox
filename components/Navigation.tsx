@@ -299,6 +299,14 @@ export default function Navigation() {
                           <User className="w-4 h-4" />
                           <span className="text-sm">Dashboard</span>
                         </Link>
+                        <Link
+                          href="/settings"
+                          onClick={() => setProfileOpen(false)}
+                          className="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-300 hover:text-white hover:bg-slate-700 transition-all"
+                        >
+                          <Settings className="w-4 h-4" />
+                          <span className="text-sm">Settings</span>
+                        </Link>
                         {subscription?.tier === "PREMIUM" ? (
                           <ManageSubscriptionButton
                             onNavigate={() => setProfileOpen(false)}
@@ -482,6 +490,14 @@ export default function Navigation() {
                   className="block px-4 py-2 rounded-lg text-gray-300 hover:text-white hover:bg-slate-800 transition-all text-center"
                 >
                   Dashboard
+                </Link>
+                <Link
+                  href="/settings"
+                  onClick={() => setIsOpen(false)}
+                  className="flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-gray-300 hover:text-white hover:bg-slate-800 transition-all"
+                >
+                  <Settings className="w-4 h-4" />
+                  Settings
                 </Link>
                 {subscription?.tier === "PREMIUM" ? (
                   <div className="px-4">

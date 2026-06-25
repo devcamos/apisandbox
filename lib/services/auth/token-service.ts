@@ -5,6 +5,7 @@ import type { AuthPayload } from "@/lib/auth/types"
 
 const JWT_ALG = "HS256"
 const DEFAULT_EXPIRY_SECONDS = 60 * 60 * 24 * 7 // 7 days
+const DEFAULT_IDLE_EXPIRY_SECONDS = 60 * 30 // 30 minutes
 
 function base64UrlEncode(value: string | Buffer) {
   return Buffer.from(value)
@@ -42,9 +43,17 @@ export function getJwtExpirySeconds() {
   return Number.isFinite(parsed) && parsed > 0 ? parsed : DEFAULT_EXPIRY_SECONDS
 }
 
+export function getJwtIdleExpirySeconds() {
+  const raw = process.env.AUTH_IDLE_EXPIRES_IN_SECONDS
+  if (!raw) return DEFAULT_IDLE_EXPIRY_SECONDS
+  const parsed = Number(raw)
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : DEFAULT_IDLE_EXPIRY_SECONDS
+}
+
 export function issueJwtToken(payload: AuthPayload) {
   const secret = getJwtSecret()
   const expiresIn = getJwtExpirySeconds()
+  const idleExpiresIn = getJwtIdleExpirySeconds()
   const now = Math.floor(Date.now() / 1000)
 
   const header = {
@@ -56,6 +65,7 @@ export function issueJwtToken(payload: AuthPayload) {
     ...payload,
     iat: now,
     exp: now + expiresIn,
+    idleExp: now + idleExpiresIn,
   }
 
   const encodedHeader = base64UrlEncode(JSON.stringify(header))
@@ -97,13 +107,21 @@ export function verifyJwtToken(token: string): AuthPayload {
     throw new AppError("Unsupported token algorithm", 401, "auth_failure")
   }
 
-  const payload = JSON.parse(base64UrlDecode(encodedBody)) as AuthPayload & { exp?: number }
+  const payload = JSON.parse(base64UrlDecode(encodedBody)) as AuthPayload
   if (!payload.sub || !payload.email) {
     throw new AppError("Invalid token payload", 401, "auth_failure")
   }
 
-  if (!payload.exp || payload.exp < Math.floor(Date.now() / 1000)) {
+  const now = Math.floor(Date.now() / 1000)
+  if (!payload.exp || payload.exp < now) {
     throw new AppError("Token has expired", 401, "auth_failure")
+  }
+
+  const idleExpiresAt = payload.idleExp ?? (
+    payload.iat ? payload.iat + getJwtIdleExpirySeconds() : null
+  )
+  if (!idleExpiresAt || idleExpiresAt < now) {
+    throw new AppError("Session has expired due to inactivity", 401, "auth_failure")
   }
 
   return {

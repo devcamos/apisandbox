@@ -14,6 +14,9 @@ export interface AuthUser {
 export interface AuthPayload {
   sub: string
   email: string
+  iat?: number
+  exp?: number
+  idleExp?: number
 }
 
 export interface AuthResponse {
@@ -29,4 +32,3 @@ export interface VerifiedGoogleIdentity {
   lastName: string | null
   avatarUrl: string | null
 }
-

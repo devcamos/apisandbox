@@ -82,6 +82,44 @@ model User {
   profile UserProfile?
   phaseProgress UserPhaseProgress[]
   appGuide UserAppGuide?
+  apiTokens ApiToken[]
+  apiTokenAuditEvents ApiTokenAuditEvent[]
+}
+
+model ApiToken {
+  id          String    @id @default(cuid())
+  userId      String
+  name        String
+  tokenHash   String    @unique
+  tokenPrefix String
+  scopes      String[]
+  expiresAt   DateTime?
+  lastUsedAt  DateTime?
+  revokedAt   DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  user        User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  auditEvents ApiTokenAuditEvent[]
+
+  @@index([userId])
+  @@index([tokenPrefix])
+}
+
+model ApiTokenAuditEvent {
+  id        String   @id @default(cuid())
+  userId    String
+  tokenId   String?
+  event     String
+  ipAddress String?
+  userAgent String?
+  createdAt DateTime @default(now())
+
+  user  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  token ApiToken? @relation(fields: [tokenId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([tokenId])
 }
 
 model UserAppGuide {

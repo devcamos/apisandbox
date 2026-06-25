@@ -17,6 +17,7 @@ export default defineConfig({
       include: [
         "lib/assistant/access.ts",
         "lib/assistant/redirect.ts",
+        "lib/api-tokens/token-policy.ts",
         "lib/auth-authorize-helpers.ts",
         "lib/auth/client-fetch.ts",
         "lib/auth/session-token.ts",
