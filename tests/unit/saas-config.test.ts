@@ -9,7 +9,7 @@ function stubProductionSaasEnv(overrides: Record<string, string> = {}) {
   vi.stubEnv("NEXT_PUBLIC_APP_URL", "https://app.example.com")
   vi.stubEnv("NEXT_PUBLIC_FF_PREMIUM_PAYWALL", "true")
   vi.stubEnv("NEXT_PUBLIC_FF_STRIPE_CHECKOUT", "true")
-  vi.stubEnv("STRIPE_SECRET_KEY", "sk_test_x")
+  vi.stubEnv("STRIPE_SECRET_KEY", "sk_live_x")
   vi.stubEnv("STRIPE_WEBHOOK_SECRET", "whsec_x")
   vi.stubEnv("STRIPE_PRICE_ID", "price_x")
   vi.stubEnv("NEXT_PUBLIC_FF_RATE_LIMITING", "true")
@@ -123,6 +123,28 @@ describe("saas config", () => {
 
       expect(checkById(checks, "stripe").status).toBe("fail")
       expect(checkById(checks, "stripe").detail).toContain("STRIPE_CHECKOUT is on")
+    })
+
+    it("fails stripe in production when live checkout uses a test secret key", async () => {
+      stubProductionSaasEnv({ STRIPE_SECRET_KEY: "sk_test_x" })
+      const { evaluateSaasReadiness } = await import("@/lib/saas/config")
+      const checks = evaluateSaasReadiness()
+
+      expect(checkById(checks, "stripe").status).toBe("fail")
+      expect(checkById(checks, "stripe").detail).toContain("live secret key")
+    })
+
+    it("fails stripe when configured values have unexpected prefixes", async () => {
+      stubProductionSaasEnv({
+        STRIPE_SECRET_KEY: "not-a-secret",
+        STRIPE_WEBHOOK_SECRET: "not-a-webhook-secret",
+        STRIPE_PRICE_ID: "not-a-price",
+      })
+      const { evaluateSaasReadiness } = await import("@/lib/saas/config")
+      const checks = evaluateSaasReadiness()
+
+      expect(checkById(checks, "stripe").status).toBe("fail")
+      expect(checkById(checks, "stripe").detail).toContain("unexpected prefix")
     })
 
     it("warns when Stripe checkout is disabled in development", async () => {

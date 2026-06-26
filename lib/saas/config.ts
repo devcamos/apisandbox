@@ -15,6 +15,11 @@ function envSet(key: string): boolean {
   return typeof v === "string" && v.trim().length > 0
 }
 
+function envStartsWith(key: string, prefix: string): boolean {
+  const v = process.env[key]
+  return typeof v === "string" && v.trim().startsWith(prefix)
+}
+
 /** True when running a production Node deployment (Vercel prod). */
 export function isProductionDeploy(): boolean {
   return process.env.NODE_ENV === "production" || process.env.VERCEL_ENV === "production"
@@ -74,8 +79,20 @@ function appUrlCheck(): SaasReadinessCheck {
 
 function stripeCheck(): SaasReadinessCheck {
   const stripeCheckout = isFeatureEnabled("STRIPE_CHECKOUT")
+  const stripeMissing = [
+    "STRIPE_SECRET_KEY",
+    "STRIPE_WEBHOOK_SECRET",
+    "STRIPE_PRICE_ID",
+  ].filter((key) => !envSet(key))
+  const stripeMalformed = [
+    ["STRIPE_SECRET_KEY", "sk_"],
+    ["STRIPE_WEBHOOK_SECRET", "whsec_"],
+    ["STRIPE_PRICE_ID", "price_"],
+  ].filter(([key, prefix]) => envSet(key) && !envStartsWith(key, prefix))
+  const productionUsingStripeTestKey =
+    isProductionDeploy() && envStartsWith("STRIPE_SECRET_KEY", "sk_test_")
   const stripeConfigured =
-    envSet("STRIPE_SECRET_KEY") && envSet("STRIPE_WEBHOOK_SECRET") && envSet("STRIPE_PRICE_ID")
+    stripeMissing.length === 0 && stripeMalformed.length === 0 && !productionUsingStripeTestKey
 
   if (!stripeCheckout) {
     return {

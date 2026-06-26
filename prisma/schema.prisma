@@ -84,6 +84,8 @@ model User {
   appGuide UserAppGuide?
   apiTokens ApiToken[]
   apiTokenAuditEvents ApiTokenAuditEvent[]
+  learningEnrollments LearningEnrollment[]
+  learningCheckpointProgress LearningCheckpointProgress[]
 }
 
 model ApiToken {
@@ -150,6 +152,51 @@ model UserPhaseProgress {
 
   @@unique([userId, phaseNumber])
   @@index([userId])
+}
+
+model LearningEnrollment {
+  id             String    @id @default(cuid())
+  userId         String
+  courseId       String
+  status         String    @default("in_progress")
+  startedAt      DateTime  @default(now())
+  completedAt    DateTime?
+  lastActivityAt DateTime  @default(now())
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, courseId])
+  @@index([userId])
+  @@index([courseId])
+}
+
+model LearningCheckpointProgress {
+  id               String    @id @default(cuid())
+  userId           String
+  courseId         String
+  moduleId         String
+  checkpointId     String
+  status           String    @default("not_started")
+  answer           String    @default("")
+  evidence         String    @default("")
+  serviceName      String    @default("")
+  endpointName     String    @default("")
+  criticalPathStep String    @default("")
+  auditEvidence    String    @default("")
+  retrievalStep    Int       @default(0)
+  retrievalDueAt   DateTime?
+  completedAt      DateTime?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, courseId, moduleId, checkpointId])
+  @@index([userId])
+  @@index([courseId])
+  @@index([moduleId])
 }
 
 model UserProfile {
