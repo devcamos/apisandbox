@@ -1,5 +1,17 @@
 # Known errors
 
+Use `gh pr checks` to identify the failing job before applying a recovery. The same symptom can have different causes in GitHub Actions and Vercel.
+
+| Failing check or stage | Common cause | Recovery |
+|------------------------|--------------|----------|
+| Install dependencies | `package.json` and `package-lock.json` are out of sync | [Repair the lockfile](#npm-ci-rejects-the-lockfile) |
+| `lint-and-build` | lint, type, environment validation, or Prisma generation error | [Reproduce the production build](#lint-and-build-fails) |
+| `unit-tests` | failed assertion, missing mock, or coverage collection error | [Run unit CI locally](#unit-tests-or-coverage-fail) |
+| `e2e-smoke` | schema, PostgreSQL, standalone server, or browser failure | [Run the full smoke environment](#e2e-smoke-fails) |
+| `SonarQube Cloud` | new-code coverage, duplication, reliability, or security gate | [Inspect the quality gate](#sonarqube-cloud-quality-gate-fails) |
+| Vercel | Neon preview-branch capacity is exhausted | [Check provisioning](#vercel-preview-fails-before-build-neon-branch-limit) |
+| Architecture review | OpenAI configuration or PR comment permission | [Inspect review generation](#pr-architecture-intelligence-fails) |
+
 ## Vercel preview fails before build: Neon branch limit
 
 ### Symptoms
@@ -48,3 +60,145 @@ gh pr checks --watch
 ```
 
 Do not delete branches directly unless their source Git branch or PR is confirmed closed or merged. Neon branch deletion removes that preview branch's isolated data.
+
+## `npm ci` rejects the lockfile
+
+### Symptoms
+
+- Multiple jobs fail during **Install dependencies** before lint, tests, or build run.
+- The log contains `EUSAGE`, `Missing ... from lock file`, or says the lockfile is not in sync.
+
+### Recovery
+
+Regenerate the lockfile with the repository's npm version, review the dependency changes, and commit both manifests when both changed:
+
+```bash
+npm install
+npm ci
+git diff -- package.json package-lock.json
+```
+
+Do not hand-edit `package-lock.json`. If only scripts changed in `package.json`, a lockfile change is normally unnecessary.
+
+## `lint-and-build` fails
+
+### Symptoms
+
+- ESLint reports a file and rule, TypeScript reports an incompatible type, or Next.js fails while collecting/building routes.
+- Prisma reports a missing datasource URL, incompatible engine, or client generation failure.
+- The build imports a module that validates an absent environment variable.
+
+### Recovery
+
+Run the exact local parity command first:
+
+```bash
+npm run verify:ci
+```
+
+For a focused reproduction:
+
+```bash
+npm run lint
+npm run build
+```
+
+Preserve the repository build contract: the build and postinstall commands unset `PRISMA_GENERATE_DATAPROXY` before `prisma generate`. Do not commit real credentials to make a build pass; add a non-secret CI placeholder only when the module validates configuration at build time.
+
+## Unit tests or coverage fail
+
+### Symptoms
+
+- `unit-tests` reports a failed Vitest assertion, unhandled rejection, or module/mock error.
+- Tests pass locally without coverage but fail while producing `coverage/lcov.info`.
+- Sonar later reports insufficient coverage on new code.
+
+### Recovery
+
+Use the same coverage mode as CI:
+
+```bash
+npm run test:unit:ci
+```
+
+Run one affected test while iterating, then rerun the full command before pushing:
+
+```bash
+npm run test:unit -- tests/unit/<affected-test>.test.ts
+npm run test:unit:ci
+```
+
+Add focused tests for changed modules already included by `vitest.config.ts`. Do not hide production files from coverage solely to clear the quality gate.
+
+## E2E smoke fails
+
+### Symptoms
+
+- `e2e-smoke` fails during `prisma db push`, standalone-server preparation, login, or a Playwright assertion.
+- The uploaded `playwright-smoke-report-json` or `playwright-report` contains the failing request or page state.
+
+### Recovery
+
+Run the full parity command; it creates the same disposable PostgreSQL service on port 5436 and prepares the standalone Next.js server:
+
+```bash
+npm run verify:ci
+```
+
+Before retrying, ensure Docker is running and port 4000 is free. Do not point smoke tests at a developer or production database. If schema synchronization fails, inspect `prisma/schema.prisma` and the PR migration together rather than bypassing the database step.
+
+## SonarQube Cloud quality gate fails
+
+### Symptoms
+
+- Build and unit tests pass, but `SonarQube Cloud` fails after the scan.
+- The gate reports new-code coverage, duplicated lines, reliability, maintainability, or security findings.
+
+### Recovery
+
+Generate coverage and run the optional local scan when `SONAR_TOKEN` is available:
+
+```bash
+npm run test:unit:ci
+npm run sonar:local
+```
+
+After the GitHub scan completes, inspect its exact conditions:
+
+```bash
+npm run sonar:status
+```
+
+Fix the reported code or add meaningful tests. Do not lower the quality gate or broaden exclusions as the first response. An invalid or unauthorized Sonar token is intentionally skipped by the workflow and should not be confused with a failed quality gate.
+
+## PR Architecture Intelligence fails
+
+### OpenAI request or secret
+
+If `OPENAI_API_KEY` is absent, the workflow posts a deterministic fallback report instead of failing. If the key exists but OpenAI rejects the request, `Generate architecture review` fails and `pr-review.md` records the API error.
+
+Verify the repository Actions secret is named exactly `OPENAI_API_KEY`. The optional repository variable `OPENAI_REVIEW_MODEL` selects the model; otherwise the script uses its default.
+
+### Sticky comment permission
+
+If **Post sticky pull request comment** reports `Resource not accessible by integration`, keep this workflow permission:
+
+```yaml
+permissions:
+  contents: read
+  pull-requests: write
+```
+
+Fork pull requests intentionally skip comment posting because their token and secret access are restricted. Do not switch the workflow to `pull_request_target` to expose secrets to untrusted PR code.
+
+## Local push rejects a workflow file
+
+### Symptom
+
+GitHub rejects a push with `refusing to allow an OAuth App to create or update workflow ... without workflow scope`.
+
+### Recovery
+
+Use the repository's configured SSH remote, or refresh the GitHub CLI authentication with the `workflow` scope. This is a publishing credential failure, not a failure in the workflow YAML or application build.
+
+Never remove the workflow file merely to bypass the credential check.
