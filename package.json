@@ -30,6 +30,7 @@
     "coverage:check": "node scripts/check-coverage.js",
     "validate:compose": "bash scripts/validate-compose.sh",
     "pr:close-stale-codex": "bash ./scripts/gh-close-codex-prs.sh",
+    "neon:branches:cleanup": "node scripts/cleanup-neon-branches.mjs --max 5",
     "sonar:local": "bash scripts/sonar-local.sh",
     "sonar:local:full": "npm run test:unit -- --coverage && bash scripts/sonar-local.sh",
     "sonar:status": "bash scripts/sonar-status.sh",

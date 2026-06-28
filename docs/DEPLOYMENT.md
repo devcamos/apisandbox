@@ -88,12 +88,17 @@ SaaS billing and feature-flag checklist: [SAAS.md](./SAAS.md).
 - Vercel deploys from Git integration; production on merge to `main`.
 - Optional human gate: GitHub Environment `preview` for PR approval (see workflow `preview-deploy-gate`).
 
+### Neon preview branch capacity
+
+Vercel previews provision a Neon `preview/<git-branch>` before the application build. If Neon reaches its branch limit, Vercel fails immediately with `Resource provisioning failed` and no build logs. See [KNOWN_ERRORS.md](./KNOWN_ERRORS.md#vercel-preview-fails-before-build-neon-branch-limit) and run `npm run neon:branches:cleanup` to review an obsolete-branch cleanup plan. The repository policy retains no more than five total Neon branches.
+
 ---
 
 ## Config changelog (update when deploy contract changes)
 
 | Date | Change |
 |------|--------|
+| 2026-06-28 | Documented Neon preview branch capacity and added safe cleanup command (maximum five branches) |
 | 2026-05-27 | Trunk workflow; consolidated deployment doc |
 | 2026-05-25 | Prisma binary engine on Vercel; `DATABASE_URL=$POSTGRES_PRISMA_URL` |
 | 2026-05-25 | Auth session cookie + `redirectAfterAuth` for middleware |
