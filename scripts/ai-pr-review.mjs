@@ -29,10 +29,11 @@ async function diagnostic(name) {
   return { output, exitCode: normalizedExitCode };
 }
 
-function statusLabel(exitCode) {
-  if (exitCode === "0") return "pass";
-  if (exitCode === "unknown") return "not collected";
-  return `failed (exit ${exitCode})`;
+function statusLabel(result) {
+  if (/\bskipped\b/i.test(result.output)) return "skipped";
+  if (result.exitCode === "0") return "pass";
+  if (result.exitCode === "unknown") return "not collected";
+  return `failed (exit ${result.exitCode})`;
 }
 
 function diagnosticsTable(diagnostics) {
@@ -44,7 +45,7 @@ function diagnosticsTable(diagnostics) {
     dependencyCruiser: "dependency-cruiser",
   };
   return Object.entries(diagnostics)
-    .map(([name, result]) => `| ${labels[name]} | ${statusLabel(result.exitCode)} |`)
+    .map(([name, result]) => `| ${labels[name]} | ${statusLabel(result)} |`)
     .join("\n");
 }
 
