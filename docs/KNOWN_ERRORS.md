@@ -173,6 +173,8 @@ Fix the reported code or add meaningful tests. Do not lower the quality gate or 
 
 ## PR Architecture Intelligence fails
 
+The workflow runs for PR `opened`, `synchronize`, and `reopened` events. A push to an open PR triggers `synchronize`. It also runs directly on pushes to `main`, `master`, `develop`, and `dev`, matching the CI/Sonar branch policy; push runs upload an artifact but do not post a PR comment.
+
 ### OpenAI request or secret
 
 `Generate architecture review` fails when the required `OPENAI_API_KEY` is absent or OpenAI rejects the request. The workflow still uploads `pr-review.md` and updates the sticky PR comment. It also writes a safe error annotation and job summary with the recovery action. API keys and recognizable key fragments are redacted from those outputs.

@@ -105,6 +105,10 @@ function diagnosticsTable(diagnostics) {
 }
 
 function fallbackReview(reason, recovery, metadata, diagnostics) {
+  const context = metadata.number
+    ? `- **PR:** #${metadata.number} — ${metadata.title || "Untitled"}\n- **Branches:** \`${metadata.headRef || "unknown"}\` → \`${metadata.baseRef || "unknown"}\``
+    : `- **Event:** ${metadata.eventName || "unknown"}\n- **Ref:** \`${metadata.headRef || "unknown"}\`\n- **Commit:** ${metadata.commitUrl ? `[\`${metadata.commitSha?.slice(0, 12) || "unknown"}\`](${metadata.commitUrl})` : `\`${metadata.commitSha?.slice(0, 12) || "unknown"}\``}`;
+
   return `# PR Architecture Intelligence
 
 > Automated AI analysis was unavailable: ${reason}
@@ -113,10 +117,9 @@ function fallbackReview(reason, recovery, metadata, diagnostics) {
 
 ${recovery}
 
-## Pull request
+## Review context
 
-- **PR:** ${metadata.number ? `#${metadata.number}` : "unknown"} — ${metadata.title || "Untitled"}
-- **Branches:** \`${metadata.headRef || "unknown"}\` → \`${metadata.baseRef || "unknown"}\`
+${context}
 
 ## Diagnostic summary
 
@@ -160,6 +163,9 @@ async function main() {
     author: process.env.PR_AUTHOR,
     baseRef: process.env.BASE_REF,
     headRef: process.env.HEAD_REF,
+    eventName: process.env.EVENT_NAME,
+    commitSha: process.env.COMMIT_SHA,
+    commitUrl: process.env.COMMIT_URL,
   };
 
   let inputs;
@@ -211,9 +217,9 @@ async function main() {
     return;
   }
 
-  const prompt = `Review this pull request against the repository architecture rules.
+  const prompt = `Review these repository changes against the repository architecture rules.
 
-Pull request metadata:
+Review context:
 ${JSON.stringify(metadata, null, 2)}
 
 Architecture rules:
