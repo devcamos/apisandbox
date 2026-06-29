@@ -20,10 +20,13 @@ Preview hosts change per PR (`https://apisandbox-<hash>-….vercel.app`). Each h
 **Settings → Environment Variables** (Production **and** Preview).
 
 | Variable | Value |
-|----------|--------|
+|----------|-------|
 | `DATABASE_URL` | `$POSTGRES_PRISMA_URL` |
 | `AUTH_SECRET` | `openssl rand -base64 32` |
 | `AUTH_JWT_SECRET` | same generator (required on Preview) |
+| `NEXTAUTH_SECRET` | same as `AUTH_SECRET` (optional) |
+| `GOOGLE_CLIENT_ID` | Google OAuth Web client ID |
+| `NEXT_PUBLIC_APP_URL` | canonical site URL |
 
 **Preview pitfall:** If `AUTH_JWT_SECRET` is scoped to a single Git branch (e.g. `fix/foo` only), other PR previews will show *Sign-in is not configured*. Prefer **Preview → all branches**, or add the secret per branch. After changing env vars, **redeploy** the preview (Vercel → Deployments → Redeploy).
 
@@ -31,11 +34,29 @@ Preview hosts change per PR (`https://apisandbox-<hash>-….vercel.app`). Each h
 curl -sS "https://<preview-host>/api/health/auth" | jq '.data.jwtSecretConfigured'
 # expect: true
 ```
-| `NEXTAUTH_SECRET` | same as `AUTH_SECRET` (optional) |
-| `GOOGLE_CLIENT_ID` | Google OAuth Web client ID |
-| `NEXT_PUBLIC_APP_URL` | canonical site URL |
 
 Optional: `GOOGLE_CLIENT_SECRET`, Stripe, Resend, Upstash, OpenAI/Gemini — see `config/environments/prod.env.example`.
+
+### OpenAI API key
+
+There are two separate consumers with separate secret stores:
+
+| Consumer | Secret location |
+|----------|-----------------|
+| PR Architecture Intelligence workflow | GitHub repository **Settings → Secrets and variables → Actions → Repository secrets** |
+| Deployed app assistant | Vercel project **Settings → Environment Variables** |
+
+For the app in Preview, add `OPENAI_API_KEY` in the `apisandbox` Vercel project, select **Preview** for the environment, and apply it to all preview branches unless branch isolation is intentional. Keep it server-only: never name it `NEXT_PUBLIC_OPENAI_API_KEY`.
+
+The equivalent interactive command is:
+
+```bash
+npx vercel env add OPENAI_API_KEY preview --sensitive --scope devonte-amos-projects
+```
+
+Enter the key only at the secure prompt. After adding or changing it, redeploy the Preview deployment; existing deployments do not receive new environment-variable values.
+
+The GitHub Actions secret does not populate Vercel, and a Vercel environment variable does not populate GitHub Actions. Configure Production and Development separately if those environments also need the assistant.
 
 **Do not set** `PRISMA_GENERATE_DATAPROXY=true`. Builds use `env -u PRISMA_GENERATE_DATAPROXY prisma generate` (binary engine + `postgresql://`).
 
@@ -98,6 +119,7 @@ Vercel previews provision a Neon `preview/<git-branch>` before the application b
 
 | Date | Change |
 |------|--------|
+| 2026-06-29 | Documented environment-specific test users and separate OpenAI secret locations for GitHub Actions and Vercel Preview |
 | 2026-06-28 | Documented Neon preview branch capacity and added safe cleanup command (maximum five branches) |
 | 2026-05-27 | Trunk workflow; consolidated deployment doc |
 | 2026-05-25 | Prisma binary engine on Vercel; `DATABASE_URL=$POSTGRES_PRISMA_URL` |
