@@ -13,6 +13,7 @@ Next.js app for learning API integrations — phases, demos, auth, and subscript
 | [docs/AGENT_PR_CHECKLIST.md](docs/AGENT_PR_CHECKLIST.md) | Pre-PR checks |
 | [docs/TEST_USERS.md](docs/TEST_USERS.md) | Local test credentials |
 | [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) | Vercel, env, OAuth |
+| [infra/self-hosted-ai-runner/README.md](infra/self-hosted-ai-runner/README.md) | Provision the isolated Linux AI runner |
 
 ## Quick start
 

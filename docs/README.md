@@ -13,5 +13,6 @@ Essential docs for onboarding and shipping changes. Product learning content liv
 | [SAAS.md](./SAAS.md) | Production SaaS flags, Stripe, rate limits, health probe |
 | [STRIPE_LOCAL.md](./STRIPE_LOCAL.md) | Real Stripe Checkout in Test mode + webhook forwarding |
 | [EDUCATION_SYSTEM.md](./EDUCATION_SYSTEM.md) | Learning progress domain, premium model boundary, dependency integration map |
+| [Self-hosted AI runner](../infra/self-hosted-ai-runner/README.md) | Linux host requirements, provisioning, registration, security, and operations |
 
 **Templates (not prose):** `config/environments/*.env.example`, `.env.example`, `sonar-project.properties`
