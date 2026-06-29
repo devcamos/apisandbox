@@ -181,6 +181,8 @@ The workflow runs for PR `opened`, `synchronize`, and `reopened` events. A push 
 
 Successful responses use a constrained JSON schema and are rendered into compact Markdown tables. This keeps comments deterministic and prevents verbose model prose from dominating the PR conversation.
 
+The review is intentionally lightweight: it uses a three-line diff context, caps model input, lists only top-level dependencies, and limits output to the highest-value findings. Tests, build, audit, and dependency-cruiser still run when available; their full logs remain in the workflow artifact for seven days.
+
 Verify the repository Actions secret is named exactly `GEMINI_API_KEY`. The optional repository variable `GEMINI_REVIEW_MODEL` selects the model; otherwise the script uses `gemini-2.5-flash`.
 
 | Reported error | Recovery |

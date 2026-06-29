@@ -21,7 +21,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  NODE_OPTIONS: --max-old-space-size=6144
+  NODE_OPTIONS: --max-old-space-size=4096
   NEXT_TELEMETRY_DISABLED: "1"
   AUTH_SECRET: github-actions-ci-placeholder-secret-min-32-chars
   NEXTAUTH_SECRET: github-actions-ci-placeholder-secret-min-32-chars
@@ -48,7 +48,7 @@ jobs:
           cache: npm
 
       - name: Install dependencies
-        run: npm ci
+        run: npm ci --no-audit --fund=false
 
       - name: Collect changed files and diff
         env:
@@ -64,7 +64,7 @@ jobs:
           fi
 
           git diff --name-status "$BASE_SHA" "$HEAD_SHA" > .pr-architecture/changed-files.txt
-          git diff --no-color --no-ext-diff --unified=40 "$BASE_SHA" "$HEAD_SHA" > .pr-architecture/diff.patch
+          git diff --no-color --no-ext-diff --unified=3 "$BASE_SHA" "$HEAD_SHA" > .pr-architecture/diff.patch
 
       - name: Run repository diagnostics
         shell: bash
@@ -79,10 +79,10 @@ jobs:
           }
 
           run_check npm-audit npm audit --json
-          run_check npm-ls npm ls --all
+          run_check npm-ls npm ls --depth=0 --json
 
           if npm pkg get scripts.test:unit | grep -qv '^{}$'; then
-            run_check tests npm run test:unit
+            run_check tests npm run test:unit -- --reporter=dot
           elif npm pkg get scripts.test | grep -qv '^{}$'; then
             run_check tests npm test
           else
@@ -130,7 +130,7 @@ jobs:
             pr-review.md
             .pr-architecture/
           if-no-files-found: warn
-          retention-days: 14
+          retention-days: 7
 
       - name: Post sticky pull request comment
         if: always() && github.event_name == 'pull_request' && github.event.pull_request.head.repo.fork == false

@@ -85,4 +85,27 @@ describe("PR architecture review failures", () => {
       "invalid structured review",
     )
   })
+
+  it("caps rendered sections to the lightweight report limits", () => {
+    const item = (index: number) => ({
+      area: `Area ${index}`,
+      status: "pass",
+      evidence: `Evidence ${index}`,
+    })
+    const review = {
+      risk: "low",
+      summary: "No material risks.",
+      areas: Array.from({ length: 8 }, (_, index) => item(index + 1)),
+      findings: [],
+      dependencies: [],
+      followUps: Array.from({ length: 5 }, (_, index) => `Follow-up ${index + 1}`),
+    }
+
+    const markdown = renderStructuredReview(review, {}, {})
+
+    expect(markdown).toContain("Area 6")
+    expect(markdown).not.toContain("Area 7")
+    expect(markdown).toContain("Follow-up 3")
+    expect(markdown).not.toContain("Follow-up 4")
+  })
 })
