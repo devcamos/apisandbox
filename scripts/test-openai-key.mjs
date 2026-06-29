@@ -17,9 +17,26 @@ export function classifyResult(status, code) {
   return "The result was inconclusive; check network access and API project configuration.";
 }
 
+export function parseOptions(args) {
+  const options = { useEnvironment: false, showHelp: false };
+  for (const argument of args) {
+    if (argument === "--env") options.useEnvironment = true;
+    else if (argument === "--help" || argument === "-h") options.showHelp = true;
+    else throw new Error(`Unknown option: ${argument}`);
+  }
+  return options;
+}
+
+function usage() {
+  return `Usage:
+  npm run openai:key:test          Prompt to paste a key (input is hidden)
+  npm run openai:key:test -- --env Use OPENAI_API_KEY from the environment
+`;
+}
+
 function promptForKey() {
   if (!process.stdin.isTTY || !process.stdout.isTTY) {
-    throw new Error("OPENAI_API_KEY is not set and a secure interactive prompt is unavailable.");
+    throw new Error("A secure interactive prompt is unavailable. Use --env for automation.");
   }
 
   return new Promise((resolve) => {
@@ -36,7 +53,7 @@ function promptForKey() {
       terminal: true,
     });
 
-    terminal.question("OpenAI API key: ", (value) => {
+    terminal.question("Paste OpenAI API key, then press Enter (input hidden): ", (value) => {
       muted = false;
       terminal.close();
       process.stdout.write("\n");
@@ -47,10 +64,29 @@ function promptForKey() {
 }
 
 async function main() {
-  let apiKey = process.env.OPENAI_API_KEY?.trim();
+  let options;
+  try {
+    options = parseOptions(process.argv.slice(2));
+  } catch (error) {
+    process.stderr.write(`${error.message}\n\n${usage()}`);
+    process.exitCode = 2;
+    return;
+  }
+
+  if (options.showHelp) {
+    process.stdout.write(usage());
+    return;
+  }
+
+  let apiKey;
 
   try {
-    if (!apiKey) apiKey = await promptForKey();
+    if (options.useEnvironment) {
+      apiKey = process.env.OPENAI_API_KEY?.trim();
+      if (!apiKey) throw new Error("OPENAI_API_KEY is not set.");
+    } else {
+      apiKey = await promptForKey();
+    }
   } catch (error) {
     process.stderr.write(`${error.message}\n`);
     process.exitCode = 2;

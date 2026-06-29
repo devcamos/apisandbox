@@ -46,9 +46,15 @@ Run the project tool:
 npm run openai:key:test
 ```
 
-Paste the key at the hidden prompt. The tool calls OpenAI's read-only model-list endpoint, prints only the HTTP result category, removes the key from the process environment, and never writes it to disk.
+Paste the key at the hidden prompt and press Enter. Pasted characters are intentionally not displayed. The tool calls OpenAI's read-only model-list endpoint, prints only the HTTP result category, removes the key from the process environment, and never writes it to disk.
 
-If `OPENAI_API_KEY` is already supplied by the shell, CI secret store, or deployment environment, the same command uses it automatically without prompting.
+The normal command always prompts, even if `OPENAI_API_KEY` already exists. For CI or another automated environment, explicitly select the environment variable:
+
+```bash
+npm run openai:key:test -- --env
+```
+
+Use `npm run openai:key:test -- --help` to print the available modes.
 
 Results:
 
