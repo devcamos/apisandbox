@@ -187,7 +187,7 @@ Verify the repository Actions secret is named exactly `GEMINI_API_KEY`. The opti
 | HTTP 403 permission failure | Confirm the Google AI project and key can use the configured model. |
 | HTTP 404 model unavailable | Correct or remove `GEMINI_REVIEW_MODEL`; removing it uses `gemini-3.5-flash`. |
 | HTTP 429 quota or rate limit | Check active limits in Google AI Studio, wait for reset, and rerun. |
-| HTTP 5xx service error | Retry, then check Google AI service status if it persists. |
+| HTTP 5xx service error | The script retries three times; rerun later and check Google AI service status if all attempts fail. |
 
 The PR metadata variables are supplied by GitHub and are not secret configuration. `GEMINI_REVIEW_MODEL` is optional, so do not add it to a required-variable check.
 

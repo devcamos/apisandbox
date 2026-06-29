@@ -1,6 +1,10 @@
 import { describe, expect, it } from "vitest"
 
-import { describeGeminiError, redactSecrets } from "../../scripts/ai-pr-review.mjs"
+import {
+  describeGeminiError,
+  isRetryableGeminiError,
+  redactSecrets,
+} from "../../scripts/ai-pr-review.mjs"
 
 describe("PR architecture review failures", () => {
   it("redacts exact and recognizable Gemini API keys", () => {
@@ -35,5 +39,11 @@ describe("PR architecture review failures", () => {
 
     expect(result.reason).toContain("free-tier quota")
     expect(result.recovery).toContain("Google AI Studio")
+  })
+
+  it("retries server failures but not configuration or quota failures", () => {
+    expect(isRetryableGeminiError({ status: 503 })).toBe(true)
+    expect(isRetryableGeminiError({ status: 429 })).toBe(false)
+    expect(isRetryableGeminiError({ status: 403 })).toBe(false)
   })
 })
