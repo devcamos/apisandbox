@@ -9,7 +9,7 @@ const inputDirectory = path.resolve(".pr-architecture");
 const outputPath = path.resolve("pr-review.md");
 const maxDiffCharacters = 80_000;
 const maxDiagnosticCharacters = 16_000;
-const defaultModel = "gemini-3.5-flash";
+const defaultModel = "gemini-2.5-flash";
 
 export function redactSecrets(value, apiKey = process.env.GEMINI_API_KEY) {
   let result = String(value || "Unknown error");

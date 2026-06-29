@@ -179,13 +179,13 @@ The workflow runs for PR `opened`, `synchronize`, and `reopened` events. A push 
 
 `Generate architecture review` fails when the required `GEMINI_API_KEY` is absent or Gemini rejects the request. The workflow still uploads `pr-review.md` and updates the sticky PR comment. It also writes a safe error annotation and job summary with the recovery action. API keys and recognizable key fragments are redacted from those outputs.
 
-Verify the repository Actions secret is named exactly `GEMINI_API_KEY`. The optional repository variable `GEMINI_REVIEW_MODEL` selects the model; otherwise the script uses `gemini-3.5-flash`.
+Verify the repository Actions secret is named exactly `GEMINI_API_KEY`. The optional repository variable `GEMINI_REVIEW_MODEL` selects the model; otherwise the script uses `gemini-2.5-flash`.
 
 | Reported error | Recovery |
 |----------------|----------|
 | HTTP 400/401 authentication failure | Replace `GEMINI_API_KEY` with a valid Google AI Studio key. |
 | HTTP 403 permission failure | Confirm the Google AI project and key can use the configured model. |
-| HTTP 404 model unavailable | Correct or remove `GEMINI_REVIEW_MODEL`; removing it uses `gemini-3.5-flash`. |
+| HTTP 404 model unavailable | Correct or remove `GEMINI_REVIEW_MODEL`; removing it uses `gemini-2.5-flash`. |
 | HTTP 429 quota or rate limit | Check active limits in Google AI Studio, wait for reset, and rerun. |
 | HTTP 5xx service error | The script retries three times; rerun later and check Google AI service status if all attempts fail. |
 

@@ -46,7 +46,7 @@ There are two separate consumers with separate secret stores:
 | PR Architecture Intelligence workflow | GitHub repository secret `GEMINI_API_KEY` |
 | Deployed app assistant | Vercel environment variable for its configured provider |
 
-The PR reviewer uses the Gemini Developer API free tier with `gemini-3.5-flash` by default. Create a key in Google AI Studio, then add it under repository **Settings → Secrets and variables → Actions → Repository secrets** as `GEMINI_API_KEY`. The optional repository variable `GEMINI_REVIEW_MODEL` overrides the model.
+The PR reviewer uses the Gemini Developer API free tier with `gemini-2.5-flash` by default. Create a key in Google AI Studio, then add it under repository **Settings → Secrets and variables → Actions → Repository secrets** as `GEMINI_API_KEY`. The optional repository variable `GEMINI_REVIEW_MODEL` overrides the model.
 
 The Gemini free tier has project-level limits and may use submitted content to improve Google's products. The workflow sends repository diffs and diagnostic output, so it must never collect or transmit credentials or private runtime data.
 
