@@ -175,9 +175,20 @@ Fix the reported code or add meaningful tests. Do not lower the quality gate or 
 
 ### OpenAI request or secret
 
-If `OPENAI_API_KEY` is absent, the workflow posts a deterministic fallback report instead of failing. If the key exists but OpenAI rejects the request, `Generate architecture review` fails and `pr-review.md` records the API error.
+`Generate architecture review` fails when the required `OPENAI_API_KEY` is absent or OpenAI rejects the request. The workflow still uploads `pr-review.md` and updates the sticky PR comment. It also writes a safe error annotation and job summary with the recovery action. API keys and recognizable key fragments are redacted from those outputs.
 
 Verify the repository Actions secret is named exactly `OPENAI_API_KEY`. The optional repository variable `OPENAI_REVIEW_MODEL` selects the model; otherwise the script uses its default.
+
+| Reported error | Recovery |
+|----------------|----------|
+| HTTP 401 authentication failure | Replace `OPENAI_API_KEY` with a valid repository Actions secret. |
+| HTTP 403 permission failure | Confirm the API project and key can use the configured model. |
+| HTTP 404 model unavailable | Correct or remove `OPENAI_REVIEW_MODEL`; removing it uses `gpt-4.1-mini`. |
+| HTTP 429 insufficient quota | Check API billing and project limits. |
+| HTTP 429 rate limit | Wait for the limit window to reset and rerun the job. |
+| HTTP 5xx service error | Retry, then check OpenAI service status if it persists. |
+
+The PR metadata variables are supplied by GitHub and are not secret configuration. `OPENAI_REVIEW_MODEL` is optional, so do not add it to a required-variable check.
 
 ### Sticky comment permission
 
