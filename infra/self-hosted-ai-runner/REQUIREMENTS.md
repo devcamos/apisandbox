@@ -41,7 +41,7 @@ These requirements apply to the isolated Linux host intended to run trusted Arch
 | Node.js 22 | `actions/setup-node` in the workflow | Project scripts, tests and build |
 | Ollama | Official Ollama Linux installer | Local inference server |
 | `qwen2.5-coder:7b` | Ollama model registry | Architecture review model |
-| OpenAI JavaScript SDK | Repository npm dependency | OpenAI-compatible client for local Ollama |
+| Ollama provider adapter | Future repository integration | OpenAI-compatible client for local Ollama |
 
 Docker and a live PostgreSQL database are not requirements for the Architecture Intelligence job. Keep the full Docker/PostgreSQL smoke suite on GitHub-hosted runners.
 

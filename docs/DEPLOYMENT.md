@@ -37,14 +37,18 @@ curl -sS "https://<preview-host>/api/health/auth" | jq '.data.jwtSecretConfigure
 
 Optional: `GOOGLE_CLIENT_SECRET`, Stripe, Resend, Upstash, OpenAI/Gemini — see `config/environments/prod.env.example`.
 
-### OpenAI API key
+### AI API keys
 
 There are two separate consumers with separate secret stores:
 
 | Consumer | Secret location |
 |----------|-----------------|
-| PR Architecture Intelligence workflow | GitHub repository **Settings → Secrets and variables → Actions → Repository secrets** |
-| Deployed app assistant | Vercel project **Settings → Environment Variables** |
+| PR Architecture Intelligence workflow | GitHub repository secret `GEMINI_API_KEY` |
+| Deployed app assistant | Vercel environment variable for its configured provider |
+
+The PR reviewer uses the Gemini Developer API free tier with `gemini-3.5-flash` by default. Create a key in Google AI Studio, then add it under repository **Settings → Secrets and variables → Actions → Repository secrets** as `GEMINI_API_KEY`. The optional repository variable `GEMINI_REVIEW_MODEL` overrides the model.
+
+The Gemini free tier has project-level limits and may use submitted content to improve Google's products. The workflow sends repository diffs and diagnostic output, so it must never collect or transmit credentials or private runtime data.
 
 For the app in Preview, add `OPENAI_API_KEY` in the `apisandbox` Vercel project, select **Preview** for the environment, and apply it to all preview branches unless branch isolation is intentional. Keep it server-only: never name it `NEXT_PUBLIC_OPENAI_API_KEY`.
 
@@ -56,7 +60,7 @@ npx vercel env add OPENAI_API_KEY preview --sensitive --scope devonte-amos-proje
 
 Enter the key only at the secure prompt. After adding or changing it, redeploy the Preview deployment; existing deployments do not receive new environment-variable values.
 
-The GitHub Actions secret does not populate Vercel, and a Vercel environment variable does not populate GitHub Actions. Configure Production and Development separately if those environments also need the assistant.
+The GitHub `GEMINI_API_KEY` secret does not populate Vercel, and a Vercel environment variable does not populate GitHub Actions. Configure Production and Development separately if those environments also need the assistant.
 
 **Do not set** `PRISMA_GENERATE_DATAPROXY=true`. Builds use `env -u PRISMA_GENERATE_DATAPROXY prisma generate` (binary engine + `postgresql://`).
 
@@ -119,6 +123,7 @@ Vercel previews provision a Neon `preview/<git-branch>` before the application b
 
 | Date | Change |
 |------|--------|
+| 2026-06-29 | Switched PR Architecture Intelligence from OpenAI to the Gemini Developer API free tier |
 | 2026-06-29 | Documented environment-specific test users and separate OpenAI secret locations for GitHub Actions and Vercel Preview |
 | 2026-06-28 | Documented Neon preview branch capacity and added safe cleanup command (maximum five branches) |
 | 2026-05-27 | Trunk workflow; consolidated deployment doc |

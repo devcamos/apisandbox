@@ -10,7 +10,7 @@ Use `gh pr checks` to identify the failing job before applying a recovery. The s
 | `e2e-smoke` | schema, PostgreSQL, standalone server, or browser failure | [Run the full smoke environment](#e2e-smoke-fails) |
 | `SonarQube Cloud` | new-code coverage, duplication, reliability, or security gate | [Inspect the quality gate](#sonarqube-cloud-quality-gate-fails) |
 | Vercel | Neon preview-branch capacity is exhausted | [Check provisioning](#vercel-preview-fails-before-build-neon-branch-limit) |
-| Architecture review | OpenAI configuration or PR comment permission | [Inspect review generation](#pr-architecture-intelligence-fails) |
+| Architecture review | Gemini configuration, quota, or PR comment permission | [Inspect review generation](#pr-architecture-intelligence-fails) |
 
 ## Vercel preview fails before build: Neon branch limit
 
@@ -175,22 +175,21 @@ Fix the reported code or add meaningful tests. Do not lower the quality gate or 
 
 The workflow runs for PR `opened`, `synchronize`, and `reopened` events. A push to an open PR triggers `synchronize`. It also runs directly on pushes to `main`, `master`, `develop`, and `dev`, matching the CI/Sonar branch policy; push runs upload an artifact but do not post a PR comment.
 
-### OpenAI request or secret
+### Gemini request or secret
 
-`Generate architecture review` fails when the required `OPENAI_API_KEY` is absent or OpenAI rejects the request. The workflow still uploads `pr-review.md` and updates the sticky PR comment. It also writes a safe error annotation and job summary with the recovery action. API keys and recognizable key fragments are redacted from those outputs.
+`Generate architecture review` fails when the required `GEMINI_API_KEY` is absent or Gemini rejects the request. The workflow still uploads `pr-review.md` and updates the sticky PR comment. It also writes a safe error annotation and job summary with the recovery action. API keys and recognizable key fragments are redacted from those outputs.
 
-Verify the repository Actions secret is named exactly `OPENAI_API_KEY`. The optional repository variable `OPENAI_REVIEW_MODEL` selects the model; otherwise the script uses its default.
+Verify the repository Actions secret is named exactly `GEMINI_API_KEY`. The optional repository variable `GEMINI_REVIEW_MODEL` selects the model; otherwise the script uses `gemini-3.5-flash`.
 
 | Reported error | Recovery |
 |----------------|----------|
-| HTTP 401 authentication failure | Replace `OPENAI_API_KEY` with a valid repository Actions secret. |
-| HTTP 403 permission failure | Confirm the API project and key can use the configured model. |
-| HTTP 404 model unavailable | Correct or remove `OPENAI_REVIEW_MODEL`; removing it uses `gpt-4.1-mini`. |
-| HTTP 429 insufficient quota | Check API billing and project limits. |
-| HTTP 429 rate limit | Wait for the limit window to reset and rerun the job. |
-| HTTP 5xx service error | Retry, then check OpenAI service status if it persists. |
+| HTTP 400/401 authentication failure | Replace `GEMINI_API_KEY` with a valid Google AI Studio key. |
+| HTTP 403 permission failure | Confirm the Google AI project and key can use the configured model. |
+| HTTP 404 model unavailable | Correct or remove `GEMINI_REVIEW_MODEL`; removing it uses `gemini-3.5-flash`. |
+| HTTP 429 quota or rate limit | Check active limits in Google AI Studio, wait for reset, and rerun. |
+| HTTP 5xx service error | Retry, then check Google AI service status if it persists. |
 
-The PR metadata variables are supplied by GitHub and are not secret configuration. `OPENAI_REVIEW_MODEL` is optional, so do not add it to a required-variable check.
+The PR metadata variables are supplied by GitHub and are not secret configuration. `GEMINI_REVIEW_MODEL` is optional, so do not add it to a required-variable check.
 
 ### Sticky comment permission
 

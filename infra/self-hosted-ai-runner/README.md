@@ -121,7 +121,7 @@ In GitHub, run the trusted workflow manually and verify:
 
 - the job selects `apisandbox-ai-01`;
 - the Ollama health check passes;
-- no `OPENAI_API_KEY` is required;
+- no hosted-provider API key is required after Ollama provider support is enabled;
 - `pr-review.md` is uploaded;
 - the workspace is cleaned after the job.
 
