@@ -140,7 +140,7 @@ function SignupForm({ googleClientId }: Readonly<{ googleClientId: string }>) {
             googleButtonRef={googleButtonRef}
             fallbackLabel="Continue with Google"
           >
-          <form onSubmit={handleSubmit} method="post" className="space-y-6">
+          <form onSubmit={handleSubmit} method="post" autoComplete="on" className="space-y-6">
             {/* Name Field */}
             <div>
               <label htmlFor="name" className="block text-sm font-medium text-gray-300 mb-2">
