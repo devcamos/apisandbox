@@ -36,6 +36,28 @@ Open [http://localhost:4000](http://localhost:4000). Or: `npm run local-lite`.
 | `npm run verify:ci` | Local CI parity before PR |
 | `npm run test:unit` | Vitest unit tests |
 | `npm run lint` | ESLint |
+| `npm run openai:key:test` | Safely validate an OpenAI API key |
+
+## Test an OpenAI API key
+
+Run the project tool:
+
+```bash
+npm run openai:key:test
+```
+
+Paste the key at the hidden prompt. The tool calls OpenAI's read-only model-list endpoint, prints only the HTTP result category, removes the key from the process environment, and never writes it to disk.
+
+If `OPENAI_API_KEY` is already supplied by the shell, CI secret store, or deployment environment, the same command uses it automatically without prompting.
+
+Results:
+
+- `HTTP 200`: accepted;
+- `HTTP 401`: invalid, revoked, or malformed;
+- `HTTP 403`: recognized but missing permission;
+- `HTTP 429`: recognized but rate-limited or out of quota.
+
+Do not put a literal key in the command, source code, `.env` files committed to Git, screenshots, chat, or logs. A key that has been exposed must be revoked and replaced.
 
 ## In-app content
 
