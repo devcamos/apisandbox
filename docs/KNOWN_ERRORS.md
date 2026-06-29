@@ -179,6 +179,8 @@ The workflow runs for PR `opened`, `synchronize`, and `reopened` events. A push 
 
 `Generate architecture review` fails when the required `GEMINI_API_KEY` is absent or Gemini rejects the request. The workflow still uploads `pr-review.md` and updates the sticky PR comment. It also writes a safe error annotation and job summary with the recovery action. API keys and recognizable key fragments are redacted from those outputs.
 
+Successful responses use a constrained JSON schema and are rendered into compact Markdown tables. This keeps comments deterministic and prevents verbose model prose from dominating the PR conversation.
+
 Verify the repository Actions secret is named exactly `GEMINI_API_KEY`. The optional repository variable `GEMINI_REVIEW_MODEL` selects the model; otherwise the script uses `gemini-2.5-flash`.
 
 | Reported error | Recovery |

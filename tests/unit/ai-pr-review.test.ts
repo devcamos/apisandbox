@@ -3,7 +3,9 @@ import { describe, expect, it } from "vitest"
 import {
   describeGeminiError,
   isRetryableGeminiError,
+  parseStructuredReview,
   redactSecrets,
+  renderStructuredReview,
 } from "../../scripts/ai-pr-review.mjs"
 
 describe("PR architecture review failures", () => {
@@ -45,5 +47,42 @@ describe("PR architecture review failures", () => {
     expect(isRetryableGeminiError({ status: 503 })).toBe(true)
     expect(isRetryableGeminiError({ status: 429 })).toBe(false)
     expect(isRetryableGeminiError({ status: 403 })).toBe(false)
+  })
+
+  it("renders structured findings as concise tables", () => {
+    const review = parseStructuredReview(
+      JSON.stringify({
+        risk: "high",
+        summary: "Dependency updates are required before merge.",
+        areas: [{ area: "Dependencies", status: "warn", evidence: "npm audit failed" }],
+        findings: [],
+        dependencies: [
+          {
+            severity: "high",
+            package: "next",
+            issue: "Known security advisories",
+            recommendation: "Upgrade to the patched release",
+          },
+        ],
+        followUps: ["Upgrade Next.js"],
+      }),
+    )
+    const markdown = renderStructuredReview(
+      review,
+      { url: "https://github.com/example/repo/pull/1" },
+      { tests: { output: "pass", exitCode: "0" } },
+    )
+
+    expect(markdown).toContain("| **HIGH** | Dependency updates are required before merge. |")
+    expect(markdown).toContain("| Dependencies | ⚠️ Warn | npm audit failed |")
+    expect(markdown).toContain("| — | — | — | No material architecture findings. |")
+    expect(markdown).toContain("| high | next | Known security advisories |")
+    expect(markdown).toContain("- [ ] Upgrade Next.js")
+  })
+
+  it("rejects invalid structured responses", () => {
+    expect(() => parseStructuredReview('{"risk":"unknown"}')).toThrow(
+      "invalid structured review",
+    )
   })
 })
