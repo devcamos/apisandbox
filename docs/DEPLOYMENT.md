@@ -94,6 +94,7 @@ SaaS billing and feature-flag checklist: [SAAS.md](./SAAS.md). Flag reference: [
 
 | Date | Change |
 |------|--------|
+| 2026-06-29 | Stripe production hardening: live-key validation, webhook idempotency ledger, status-driven entitlement reconciliation, and duplicate-subscription prevention |
 | 2026-05-27 | Trunk workflow; consolidated deployment doc |
 | 2026-05-25 | Prisma binary engine on Vercel; `DATABASE_URL=$POSTGRES_PRISMA_URL` |
 | 2026-05-25 | Auth session cookie + `redirectAfterAuth` for middleware |

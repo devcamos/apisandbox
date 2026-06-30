@@ -3,6 +3,11 @@ import type Stripe from "stripe"
 import { getStripeClient } from "@/lib/stripe"
 import { logger } from "@/lib/logger"
 import { dispatchStripeWebhookEvent } from "@/lib/stripe-webhook-handlers"
+import {
+  claimStripeWebhookEvent,
+  completeStripeWebhookEvent,
+  failStripeWebhookEvent,
+} from "@/lib/stripe-webhook-idempotency"
 
 export async function POST(request: NextRequest) {
   const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET?.trim()
@@ -34,9 +39,25 @@ export async function POST(request: NextRequest) {
 
   logger.info({ type: event.type, id: event.id }, "Stripe webhook received")
 
+  let claimed: boolean
+  try {
+    claimed = await claimStripeWebhookEvent(event.id, event.type)
+  } catch (err) {
+    logger.error({ err, eventId: event.id }, "Could not claim Stripe webhook event")
+    return NextResponse.json({ error: "Webhook handler unavailable" }, { status: 500 })
+  }
+  if (!claimed) {
+    logger.info({ type: event.type, id: event.id }, "Stripe webhook already processed")
+    return NextResponse.json({ received: true, duplicate: true })
+  }
+
   try {
     await dispatchStripeWebhookEvent(event)
+    await completeStripeWebhookEvent(event.id)
   } catch (err) {
+    await failStripeWebhookEvent(event.id, err).catch((recordError) => {
+      logger.error({ err: recordError, eventId: event.id }, "Could not record Stripe webhook failure")
+    })
     logger.error({ err, eventType: event.type }, "Error processing webhook")
     return NextResponse.json({ error: "Webhook handler failed" }, { status: 500 })
   }

@@ -3,25 +3,40 @@ import { prisma } from "@/lib/prisma"
 /** Same DB shape as Stripe `checkout.session.completed` provisioning. */
 export async function applyPremiumSubscription(
   userId: string,
-  options?: { stripeSubscriptionId?: string | null },
+  options?: {
+    stripeSubscriptionId?: string | null
+    stripeSubscriptionStatus?: string | null
+    stripeCurrentPeriodEnd?: Date | null
+    subscriptionExpiresAt?: Date | null
+  },
 ): Promise<void> {
   await prisma.user.update({
     where: { id: userId },
     data: {
       subscriptionTier: "PREMIUM",
       stripeSubscriptionId: options?.stripeSubscriptionId ?? null,
-      subscriptionExpiresAt: null,
+      stripeSubscriptionStatus: options?.stripeSubscriptionStatus ?? null,
+      stripeCurrentPeriodEnd: options?.stripeCurrentPeriodEnd ?? null,
+      subscriptionExpiresAt: options?.subscriptionExpiresAt ?? null,
     },
   })
 }
 
 /** Same DB shape as subscription deleted / payment failed downgrade. */
-export async function downgradeToFreeSubscription(userId: string): Promise<void> {
+export async function downgradeToFreeSubscription(
+  userId: string,
+  options?: {
+    stripeSubscriptionStatus?: string | null
+    stripeCurrentPeriodEnd?: Date | null
+  },
+): Promise<void> {
   await prisma.user.update({
     where: { id: userId },
     data: {
       subscriptionTier: "FREE",
       stripeSubscriptionId: null,
+      stripeSubscriptionStatus: options?.stripeSubscriptionStatus ?? null,
+      stripeCurrentPeriodEnd: options?.stripeCurrentPeriodEnd ?? null,
       subscriptionExpiresAt: null,
     },
   })

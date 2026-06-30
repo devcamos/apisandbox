@@ -33,11 +33,29 @@ See [DEPLOYMENT.md](./DEPLOYMENT.md) plus:
 
 ## Stripe setup
 
-1. Create **Product** + recurring **Price** in Stripe Dashboard.
-2. Set `STRIPE_PRICE_ID` on Vercel.
-3. Webhook endpoint: `https://<your-host>/api/webhooks/stripe`  
-   Events: `checkout.session.completed`, `customer.subscription.updated`, `customer.subscription.deleted`, `invoice.payment_failed`
-4. Enable **Customer Portal** in Stripe for self-service cancel (`NEXT_PUBLIC_FF_BILLING_PORTAL=true` in the app).
+1. Create a **Product** and recurring **Price** in Stripe **Live mode**.
+2. Apply database migrations before enabling the webhook: `npx prisma migrate deploy`.
+3. Set the live `STRIPE_SECRET_KEY`, live `STRIPE_PRICE_ID`, and production `NEXT_PUBLIC_APP_URL` on Vercel.
+4. Set `NEXT_PUBLIC_FF_STRIPE_CHECKOUT=true` and `NEXT_PUBLIC_FF_BILLING_PORTAL=true` (see [FEATURE_FLAGS.md](./FEATURE_FLAGS.md)).
+5. Add `https://<your-host>/api/webhooks/stripe` as a Stripe webhook and subscribe to the events below. Set its signing secret as `STRIPE_WEBHOOK_SECRET`.
+6. Enable the **Customer Portal** in Stripe Dashboard for payment-method changes and cancellation.
+
+| Webhook event | Application behavior |
+|---------------|----------------------|
+| `checkout.session.completed` | Provisions access only after confirmed payment |
+| `checkout.session.async_payment_succeeded` | Provisions delayed-payment checkouts |
+| `customer.subscription.created` / `updated` | Reconciles tier, status, period end, and scheduled cancellation |
+| `customer.subscription.deleted` | Revokes premium access |
+| `invoice.payment_failed` | Records the failure; retains access during Stripe recovery |
+
+Webhook event IDs are stored in `StripeWebhookEvent`, so duplicate deliveries do not repeat provisioning or email side effects. Failed and stale deliveries can be retried safely.
+
+| Stripe status | Access |
+|---------------|--------|
+| `active`, `trialing`, `past_due` | PREMIUM |
+| `unpaid`, `canceled`, `paused`, incomplete states | FREE |
+
+`past_due` intentionally retains access while Stripe retries payment. Access is revoked when Stripe transitions the subscription to `unpaid`, `canceled`, or another non-entitled state.
 
 ## Verify after deploy
 
@@ -47,6 +65,18 @@ curl -sS "https://<your-host>/api/health/db" | jq .
 ```
 
 `ready: true` means no blocking failures. Warnings (e.g. assistant key) may still need attention.
+
+The production readiness check rejects missing Stripe values, malformed prefixes, non-HTTPS public URLs, and `sk_test_...` keys in production. It never returns secret values.
+
+## Production smoke test
+
+Run this in Stripe **Test mode** against a preview deployment before switching production to live keys:
+
+1. Complete Checkout with Stripe test card `4242 4242 4242 4242`.
+2. Confirm the user becomes PREMIUM and `/api/subscription/status` reports `active`.
+3. Replay the same webhook event and confirm it returns success without sending a second email.
+4. Schedule cancellation in the Customer Portal; confirm access remains until period end.
+5. Send an `unpaid` or deleted subscription event; confirm premium access is revoked.
 
 ## What the app enforces
 

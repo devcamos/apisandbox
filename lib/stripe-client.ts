@@ -9,7 +9,12 @@ export function getStripeClient(): Stripe | null {
   if (!key) {
     return null
   }
-  return new Stripe(key, { typescript: true })
+  return new Stripe(key, {
+    apiVersion: "2026-04-22.dahlia",
+    maxNetworkRetries: 2,
+    timeout: 20_000,
+    typescript: true,
+  })
 }
 
 export function requireStripeClient(): Stripe {

@@ -68,10 +68,14 @@ Copy the **`whsec_…`** signing secret the CLI prints into `STRIPE_WEBHOOK_SECR
 
 | Event | Effect |
 |-------|--------|
-| `checkout.session.completed` | Upgrade user to PREMIUM |
-| `customer.subscription.updated` | Cancel-at-period-end / expiry metadata |
+| `checkout.session.completed` | Upgrade after confirmed payment |
+| `checkout.session.async_payment_succeeded` | Upgrade after a delayed payment succeeds |
+| `customer.subscription.created` | Reconcile initial subscription status |
+| `customer.subscription.updated` | Reconcile access, status, period end, and cancellation |
 | `customer.subscription.deleted` | Downgrade to FREE |
-| `invoice.payment_failed` | Immediate downgrade to FREE |
+| `invoice.payment_failed` | Log payment recovery; keep access while `past_due` |
+
+The handler deduplicates events by Stripe event ID. A subscription retains access while `active`, `trialing`, or `past_due`, and loses access when it becomes `unpaid`, `canceled`, `paused`, or incomplete.
 
 You can also register these on a Dashboard webhook when testing against a preview URL; for localhost, the CLI is simplest.
 
@@ -105,6 +109,7 @@ Expected with Stripe enabled:
 | Checkout works but stuck on “Activating…” | Webhook not reaching app — run `stripe listen`, fix `STRIPE_WEBHOOK_SECRET`, restart dev |
 | `Invalid signature` in server logs | `STRIPE_WEBHOOK_SECRET` does not match the CLI session (re-copy after `stripe listen`) |
 | Portal button fails | `NEXT_PUBLIC_FF_BILLING_PORTAL=false`, Customer portal not enabled in Dashboard, or no `stripeCustomerId` after checkout |
+| Database error from webhook | Run `npx prisma migrate deploy`; the webhook event ledger migration must exist before enabling Stripe |
 
 ## Production / preview
 

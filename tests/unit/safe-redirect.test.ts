@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest"
 import {
   getSafeClientRelativeRedirect,
+  isAllowedStripeBillingPortalRedirectUrl,
   isAllowedStripeCheckoutRedirectUrl,
   isSafeRelativeCallbackPath,
 } from "@/lib/safe-redirect"
@@ -16,6 +17,16 @@ describe("isSafeRelativeCallbackPath", () => {
     expect(isSafeRelativeCallbackPath("https://evil.com")).toBe(false)
     expect(isSafeRelativeCallbackPath(String.raw`/\evil`)).toBe(false)
     expect(isSafeRelativeCallbackPath("relative")).toBe(false)
+  })
+})
+
+describe("isAllowedStripeBillingPortalRedirectUrl", () => {
+  it("only allows Stripe billing portal HTTPS URLs", () => {
+    expect(
+      isAllowedStripeBillingPortalRedirectUrl("https://billing.stripe.com/p/session/test_123"),
+    ).toBe(true)
+    expect(isAllowedStripeBillingPortalRedirectUrl("https://checkout.stripe.com/pay")).toBe(false)
+    expect(isAllowedStripeBillingPortalRedirectUrl("https://billing.stripe.com.evil.test/")).toBe(false)
   })
 })
 

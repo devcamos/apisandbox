@@ -34,6 +34,8 @@ export default defineConfig({
         "lib/safe-redirect.ts",
         "lib/services/user-app-guide-service.ts",
         "lib/stripe-webhook-handlers.ts",
+        "lib/stripe-webhook-idempotency.ts",
+        "lib/stripe-subscriptions.ts",
         "lib/subscription-provision.ts",
         "lib/stripe-client.ts",
         "lib/user-name.ts",

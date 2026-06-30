@@ -9,6 +9,7 @@ const prismaMock = vi.hoisted(() => ({
 }))
 
 const loggerMock = vi.hoisted(() => ({
+  debug: vi.fn(),
   info: vi.fn(),
   warn: vi.fn(),
 }))
@@ -30,6 +31,7 @@ import {
   handleCustomerSubscriptionDeleted,
   handleCustomerSubscriptionUpdated,
   handleInvoicePaymentFailed,
+  subscriptionStatusGrantsAccess,
 } from "@/lib/stripe-webhook-handlers"
 
 beforeEach(() => {
@@ -41,34 +43,61 @@ beforeEach(() => {
   sendSubscriptionCancelledMock.mockResolvedValue(null)
 })
 
-describe("currentPeriodEndUnix", () => {
-  it("returns number when current_period_end is a number", () => {
+describe("subscription status helpers", () => {
+  it("reads the legacy current period end field safely", () => {
     expect(currentPeriodEndUnix({ current_period_end: 123 } as any)).toBe(123)
-  })
-
-  it("returns null when current_period_end is missing or not a number", () => {
     expect(currentPeriodEndUnix({} as any)).toBeNull()
     expect(currentPeriodEndUnix({ current_period_end: "123" } as any)).toBeNull()
+  })
+
+  it("reads current period end from subscription items on the pinned Stripe API", () => {
+    expect(
+      currentPeriodEndUnix({
+        items: { data: [{ current_period_end: 100 }, { current_period_end: 200 }] },
+      } as any),
+    ).toBe(200)
+  })
+
+  it.each([
+    ["active", true],
+    ["trialing", true],
+    ["past_due", true],
+    ["unpaid", false],
+    ["canceled", false],
+    ["paused", false],
+  ] as const)("maps %s access to %s", (status, expected) => {
+    expect(subscriptionStatusGrantsAccess(status)).toBe(expected)
   })
 })
 
 describe("handleCheckoutSessionCompleted", () => {
-  it("returns early when userId metadata is missing", async () => {
+  it("does not provision access before payment succeeds", async () => {
     await handleCheckoutSessionCompleted({
       type: "checkout.session.completed",
-      data: { object: { metadata: {} } },
+      data: { object: { id: "cs_1", payment_status: "unpaid", metadata: { userId: "user_1" } } },
     } as any)
 
     expect(prismaMock.user.update).not.toHaveBeenCalled()
   })
 
-  it("updates user to PREMIUM and sends confirmation email when email is present", async () => {
+  it("returns early when the paid session has no mapped user", async () => {
+    await handleCheckoutSessionCompleted({
+      type: "checkout.session.completed",
+      data: { object: { id: "cs_2", payment_status: "paid", metadata: {} } },
+    } as any)
+
+    expect(prismaMock.user.update).not.toHaveBeenCalled()
+  })
+
+  it("provisions premium and sends confirmation after payment", async () => {
     prismaMock.user.findUnique.mockResolvedValue({ email: "user@example.com" })
 
     await handleCheckoutSessionCompleted({
       type: "checkout.session.completed",
       data: {
         object: {
+          id: "cs_3",
+          payment_status: "paid",
           metadata: { userId: "user_1" },
           subscription: "sub_123",
         },
@@ -80,21 +109,22 @@ describe("handleCheckoutSessionCompleted", () => {
       data: {
         subscriptionTier: "PREMIUM",
         stripeSubscriptionId: "sub_123",
+        stripeSubscriptionStatus: "active",
+        stripeCurrentPeriodEnd: null,
         subscriptionExpiresAt: null,
       },
     })
     expect(sendSubscriptionConfirmationMock).toHaveBeenCalledWith("user@example.com")
-    expect(loggerMock.info).toHaveBeenCalled()
   })
 
-  it("handles subscription object form and skips email when user lookup has no email", async () => {
-    prismaMock.user.findUnique.mockResolvedValue(null)
-
+  it("uses client_reference_id and supports expanded subscription objects", async () => {
     await handleCheckoutSessionCompleted({
       type: "checkout.session.completed",
       data: {
         object: {
-          metadata: { userId: "user_2" },
+          id: "cs_4",
+          payment_status: "no_payment_required",
+          client_reference_id: "user_2",
           subscription: { id: "sub_obj" },
         },
       },
@@ -106,38 +136,37 @@ describe("handleCheckoutSessionCompleted", () => {
         data: expect.objectContaining({ stripeSubscriptionId: "sub_obj" }),
       }),
     )
-    expect(sendSubscriptionConfirmationMock).not.toHaveBeenCalled()
   })
 })
 
 describe("handleInvoicePaymentFailed", () => {
-  it("downgrades user to FREE when customer maps to a user", async () => {
+  it("logs the failure without revoking access during Stripe recovery", async () => {
     prismaMock.user.findFirst.mockResolvedValue({ id: "user_pay_fail" })
 
     await handleInvoicePaymentFailed({
       type: "invoice.payment_failed",
-      data: { object: { customer: "cus_777" } },
+      data: { object: { id: "in_1", customer: "cus_777" } },
     } as any)
 
-    expect(prismaMock.user.update).toHaveBeenCalledWith({
-      where: { id: "user_pay_fail" },
-      data: {
-        subscriptionTier: "FREE",
-        stripeSubscriptionId: null,
-        subscriptionExpiresAt: null,
-      },
-    })
+    expect(prismaMock.user.update).not.toHaveBeenCalled()
     expect(loggerMock.warn).toHaveBeenCalled()
   })
 })
 
-describe("handleCustomerSubscriptionDeleted", () => {
-  it("downgrades user to FREE and sends cancellation email when email is present", async () => {
+describe("subscription reconciliation", () => {
+  it("downgrades a deleted subscription and sends cancellation email", async () => {
     prismaMock.user.findUnique.mockResolvedValue({ email: "user@example.com" })
 
     await handleCustomerSubscriptionDeleted({
       type: "customer.subscription.deleted",
-      data: { object: { metadata: { userId: "user_3" } } },
+      data: {
+        object: {
+          id: "sub_deleted",
+          status: "canceled",
+          customer: "cus_1",
+          metadata: { userId: "user_3" },
+        },
+      },
     } as any)
 
     expect(prismaMock.user.update).toHaveBeenCalledWith({
@@ -145,31 +174,22 @@ describe("handleCustomerSubscriptionDeleted", () => {
       data: {
         subscriptionTier: "FREE",
         stripeSubscriptionId: null,
+        stripeSubscriptionStatus: "canceled",
+        stripeCurrentPeriodEnd: null,
         subscriptionExpiresAt: null,
       },
     })
-    expect(sendSubscriptionCancelledMock).toHaveBeenCalledWith(
-      "user@example.com",
-      expect.any(Date),
-    )
-    expect(loggerMock.info).toHaveBeenCalled()
-  })
-})
-
-describe("handleCustomerSubscriptionUpdated", () => {
-  it("returns early when userId metadata is missing", async () => {
-    await handleCustomerSubscriptionUpdated({
-      type: "customer.subscription.updated",
-      data: { object: { metadata: {} } },
-    } as any)
-    expect(prismaMock.user.update).not.toHaveBeenCalled()
+    expect(sendSubscriptionCancelledMock).toHaveBeenCalledWith("user@example.com", expect.any(Date))
   })
 
-  it("sets subscriptionExpiresAt when cancelling at period end and period end is numeric", async () => {
+  it("retains premium while cancellation is pending", async () => {
     await handleCustomerSubscriptionUpdated({
       type: "customer.subscription.updated",
       data: {
         object: {
+          id: "sub_4",
+          status: "active",
+          customer: "cus_4",
           metadata: { userId: "user_4" },
           cancel_at_period_end: true,
           current_period_end: 2_000_000_000,
@@ -177,74 +197,117 @@ describe("handleCustomerSubscriptionUpdated", () => {
       },
     } as any)
 
-    const updateArg = prismaMock.user.update.mock.calls[0]?.[0]
-    expect(updateArg.where).toEqual({ id: "user_4" })
-    expect(updateArg.data.subscriptionExpiresAt).toBeInstanceOf(Date)
-    expect(loggerMock.info).toHaveBeenCalled()
-  })
-
-  it("does nothing when cancelling at period end but period end is not a number", async () => {
-    await handleCustomerSubscriptionUpdated({
-      type: "customer.subscription.updated",
+    const end = new Date(2_000_000_000 * 1000)
+    expect(prismaMock.user.update).toHaveBeenCalledWith({
+      where: { id: "user_4" },
       data: {
-        object: {
-          metadata: { userId: "user_5" },
-          cancel_at_period_end: true,
-          current_period_end: "not-a-number",
-        },
+        subscriptionTier: "PREMIUM",
+        stripeSubscriptionId: "sub_4",
+        stripeSubscriptionStatus: "active",
+        stripeCurrentPeriodEnd: end,
+        subscriptionExpiresAt: end,
       },
-    } as any)
-
-    expect(prismaMock.user.update).not.toHaveBeenCalled()
+    })
   })
 
-  it("clears subscriptionExpiresAt when not cancelling at period end", async () => {
+  it("keeps premium with a null period when Stripe omits the legacy period field", async () => {
     await handleCustomerSubscriptionUpdated({
       type: "customer.subscription.updated",
       data: {
         object: {
-          metadata: { userId: "user_6" },
+          id: "sub_5",
+          status: "past_due",
+          customer: "cus_5",
+          metadata: { userId: "user_5" },
           cancel_at_period_end: false,
         },
       },
     } as any)
 
     expect(prismaMock.user.update).toHaveBeenCalledWith({
-      where: { id: "user_6" },
-      data: { subscriptionExpiresAt: null },
+      where: { id: "user_5" },
+      data: expect.objectContaining({
+        subscriptionTier: "PREMIUM",
+        stripeSubscriptionStatus: "past_due",
+        stripeCurrentPeriodEnd: null,
+        subscriptionExpiresAt: null,
+      }),
     })
   })
-})
 
-describe("dispatchStripeWebhookEvent", () => {
-  it("dispatches supported event types (smoke)", async () => {
-    prismaMock.user.findUnique.mockResolvedValue({ email: "user@example.com" })
-
-    await dispatchStripeWebhookEvent({
-      type: "checkout.session.completed",
-      data: { object: { metadata: { userId: "user_7" }, subscription: "sub_777" } },
-    } as any)
-
-    await dispatchStripeWebhookEvent({
-      type: "invoice.payment_failed",
-      data: { object: { customer: "cus_777" } },
-    } as any)
-
-    await dispatchStripeWebhookEvent({
-      type: "customer.subscription.deleted",
-      data: { object: { metadata: { userId: "user_7" } } },
-    } as any)
-
-    await dispatchStripeWebhookEvent({
+  it("revokes access when the subscription becomes unpaid", async () => {
+    await handleCustomerSubscriptionUpdated({
       type: "customer.subscription.updated",
       data: {
         object: {
-          metadata: { userId: "user_7" },
+          id: "sub_6",
+          status: "unpaid",
+          customer: "cus_6",
+          metadata: { userId: "user_6" },
+        },
+      },
+    } as any)
+
+    expect(prismaMock.user.update).toHaveBeenCalledWith({
+      where: { id: "user_6" },
+      data: expect.objectContaining({
+        subscriptionTier: "FREE",
+        stripeSubscriptionId: null,
+        stripeSubscriptionStatus: "unpaid",
+      }),
+    })
+  })
+
+  it("falls back to the Stripe customer mapping", async () => {
+    prismaMock.user.findFirst.mockResolvedValue({ id: "user_customer" })
+
+    await handleCustomerSubscriptionUpdated({
+      type: "customer.subscription.updated",
+      data: {
+        object: {
+          id: "sub_7",
+          status: "active",
+          customer: "cus_7",
+          metadata: {},
           cancel_at_period_end: false,
         },
       },
     } as any)
 
+    expect(prismaMock.user.update).toHaveBeenCalledWith(
+      expect.objectContaining({ where: { id: "user_customer" } }),
+    )
+  })
+})
+
+describe("dispatchStripeWebhookEvent", () => {
+  it("dispatches supported event types", async () => {
+    await dispatchStripeWebhookEvent({
+      type: "checkout.session.async_payment_succeeded",
+      data: {
+        object: {
+          id: "cs_7",
+          payment_status: "paid",
+          metadata: { userId: "user_7" },
+          subscription: "sub_777",
+        },
+      },
+    } as any)
+    await dispatchStripeWebhookEvent({
+      type: "customer.subscription.created",
+      data: {
+        object: {
+          id: "sub_777",
+          status: "active",
+          customer: "cus_777",
+          metadata: { userId: "user_7" },
+          cancel_at_period_end: false,
+        },
+      },
+    } as any)
+    await dispatchStripeWebhookEvent({ type: "unknown.event", data: { object: {} } } as any)
+
     expect(prismaMock.user.update).toHaveBeenCalled()
+    expect(loggerMock.debug).toHaveBeenCalled()
   })
 })

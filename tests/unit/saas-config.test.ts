@@ -10,7 +10,7 @@ function stubProductionSaasEnv(overrides: Record<string, string> = {}) {
   vi.stubEnv("NEXT_PUBLIC_FF_PREMIUM_PAYWALL", "true")
   vi.stubEnv("NEXT_PUBLIC_FF_STRIPE_CHECKOUT", "true")
   vi.stubEnv("NEXT_PUBLIC_FF_BILLING_PORTAL", "true")
-  vi.stubEnv("STRIPE_SECRET_KEY", "sk_test_x")
+  vi.stubEnv("STRIPE_SECRET_KEY", "sk_live_x")
   vi.stubEnv("STRIPE_WEBHOOK_SECRET", "whsec_x")
   vi.stubEnv("STRIPE_PRICE_ID", "price_x")
   vi.stubEnv("NEXT_PUBLIC_FF_RATE_LIMITING", "true")
@@ -134,6 +134,44 @@ describe("saas config", () => {
 
       expect(checkById(checks, "billing_portal").status).toBe("warn")
       expect(checkById(checks, "billing_portal").detail).toContain("BILLING_PORTAL")
+    })
+
+    it("fails production readiness when Stripe uses a test key", async () => {
+      stubProductionSaasEnv({ STRIPE_SECRET_KEY: "sk_test_x" })
+      const { evaluateSaasReadiness } = await import("@/lib/saas/config")
+
+      const stripe = checkById(evaluateSaasReadiness(), "stripe")
+      expect(stripe.status).toBe("fail")
+      expect(stripe.detail).toContain("live secret key")
+    })
+
+    it("fails production readiness when the public URL is not HTTPS", async () => {
+      stubProductionSaasEnv({ NEXT_PUBLIC_APP_URL: "http://app.example.com" })
+      const { evaluateSaasReadiness } = await import("@/lib/saas/config")
+
+      expect(checkById(evaluateSaasReadiness(), "app_url").status).toBe("fail")
+    })
+
+    it("allows an HTTP loopback URL only for local CI smoke tests", async () => {
+      stubProductionSaasEnv({
+        CI: "true",
+        VERCEL_ENV: "preview",
+        NEXT_PUBLIC_APP_URL: "http://127.0.0.1:4000",
+      })
+      const { evaluateSaasReadiness } = await import("@/lib/saas/config")
+
+      expect(checkById(evaluateSaasReadiness(), "app_url").status).toBe("ok")
+    })
+
+    it("does not allow the CI exemption on Vercel production", async () => {
+      stubProductionSaasEnv({
+        CI: "true",
+        VERCEL_ENV: "production",
+        NEXT_PUBLIC_APP_URL: "http://127.0.0.1:4000",
+      })
+      const { evaluateSaasReadiness } = await import("@/lib/saas/config")
+
+      expect(checkById(evaluateSaasReadiness(), "app_url").status).toBe("fail")
     })
 
     it("warns when Stripe checkout is disabled in development", async () => {
