@@ -77,6 +77,23 @@ function appUrlCheck(): SaasReadinessCheck {
   }
 }
 
+function stripeFailureDetail(
+  stripeMissing: string[],
+  productionUsingStripeTestKey: boolean,
+  stripeMalformed: string[][],
+): string {
+  if (stripeMissing.length > 0) {
+    return `STRIPE_CHECKOUT is on but required Stripe env vars are missing: ${stripeMissing.join(", ")}`
+  }
+  if (productionUsingStripeTestKey) {
+    return "Production Stripe checkout must use a live secret key (sk_live_...)"
+  }
+  if (stripeMalformed.length > 0) {
+    return `Stripe env value has an unexpected prefix: ${stripeMalformed.map(([key]) => key).join(", ")}`
+  }
+  return "Stripe configuration is invalid"
+}
+
 function stripeCheck(): SaasReadinessCheck {
   const stripeCheckout = isFeatureEnabled("STRIPE_CHECKOUT")
   const stripeMissing = [
@@ -116,8 +133,7 @@ function stripeCheck(): SaasReadinessCheck {
     id: "stripe",
     label: "Stripe billing",
     status: "fail",
-    detail:
-      "STRIPE_CHECKOUT is on but STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET, or STRIPE_PRICE_ID missing",
+    detail: stripeFailureDetail(stripeMissing, productionUsingStripeTestKey, stripeMalformed),
   }
 }
 
