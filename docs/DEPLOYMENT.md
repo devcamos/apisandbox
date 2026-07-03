@@ -17,23 +17,13 @@ Preview hosts change per PR (`https://apisandbox-<hash>-….vercel.app`). Each h
 
 ## Required Vercel variables
 
-Set variables per **environment scope** in Vercel → Settings → Environment Variables:
-
-| Scope | Template |
-|-------|----------|
-| **Preview** (all branches) | [`config/environments/preview.env.example`](../config/environments/preview.env.example) |
-| **Production** | [`config/environments/prod.env.example`](../config/environments/prod.env.example) |
-
-### Shared minimum (Preview and Production)
+**Settings → Environment Variables** (Production **and** Preview).
 
 | Variable | Value |
-|----------|-------|
+|----------|--------|
 | `DATABASE_URL` | `$POSTGRES_PRISMA_URL` |
 | `AUTH_SECRET` | `openssl rand -base64 32` |
-| `AUTH_JWT_SECRET` | same generator (**required on Preview — all branches**) |
-| `NEXTAUTH_SECRET` | same as `AUTH_SECRET` (optional) |
-| `GOOGLE_CLIENT_ID` | Google OAuth Web client ID |
-| `NEXT_PUBLIC_APP_URL` | canonical URL for that environment |
+| `AUTH_JWT_SECRET` | same generator (required on Preview) |
 
 **Preview pitfall:** If `AUTH_JWT_SECRET` is scoped to a single Git branch (e.g. `fix/foo` only), other PR previews will show *Sign-in is not configured*. Prefer **Preview → all branches**, or add the secret per branch. After changing env vars, **redeploy** the preview (Vercel → Deployments → Redeploy).
 
@@ -41,28 +31,11 @@ Set variables per **environment scope** in Vercel → Settings → Environment V
 curl -sS "https://<preview-host>/api/health/auth" | jq '.data.jwtSecretConfigured'
 # expect: true
 ```
+| `NEXTAUTH_SECRET` | same as `AUTH_SECRET` (optional) |
+| `GOOGLE_CLIENT_ID` | Google OAuth Web client ID |
+| `NEXT_PUBLIC_APP_URL` | canonical site URL |
 
-Optional: `GOOGLE_CLIENT_SECRET`, Stripe, Resend, Upstash, OpenAI/Gemini — see the scoped templates above.
-
-### Preview vs Production differences
-
-| Concern | Preview | Production |
-|---------|---------|------------|
-| Stripe keys | `sk_test_...` (Test mode) | `sk_live_...` (Live mode) |
-| Feature flags | Start conservative — see `preview.env.example` | Full SaaS — see `prod.env.example` |
-| Test users | Sign up on preview or demo flow — [TEST_USERS.md](./TEST_USERS.md) | Real accounts only |
-| `NEXT_PUBLIC_APP_URL` | Per-preview host (changes each deployment) | Stable production domain |
-
-### AI API keys (separate stores)
-
-| Consumer | Secret location |
-|----------|-----------------|
-| PR Architecture Intelligence workflow | GitHub repository secret `GEMINI_API_KEY` |
-| Deployed app assistant | Vercel env var (`OPENAI_API_KEY` or `GEMINI_API_KEY`) — **Preview** or **Production** scope |
-
-For the app assistant on Preview, add `OPENAI_API_KEY` under Vercel **Preview** → all branches. Keep it server-only (never `NEXT_PUBLIC_*`). Redeploy after changing env vars.
-
-GitHub `GEMINI_API_KEY` does **not** populate Vercel, and Vercel vars do **not** populate GitHub Actions.
+Optional: `GOOGLE_CLIENT_SECRET`, Stripe, Resend, Upstash, OpenAI/Gemini — see `config/environments/prod.env.example`.
 
 **Do not set** `PRISMA_GENERATE_DATAPROXY=true`. Builds use `env -u PRISMA_GENERATE_DATAPROXY prisma generate` (binary engine + `postgresql://`).
 
@@ -121,7 +94,6 @@ SaaS billing and feature-flag checklist: [SAAS.md](./SAAS.md). Flag reference: [
 
 | Date | Change |
 |------|--------|
-| 2026-07-03 | Preview/production env split: `preview.env.example`, scoped DEPLOYMENT + TEST_USERS docs |
 | 2026-06-29 | Stripe production hardening: live-key validation, webhook idempotency ledger, status-driven entitlement reconciliation, and duplicate-subscription prevention |
 | 2026-05-27 | Trunk workflow; consolidated deployment doc |
 | 2026-05-25 | Prisma binary engine on Vercel; `DATABASE_URL=$POSTGRES_PRISMA_URL` |
