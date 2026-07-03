@@ -7,6 +7,7 @@ import { Menu, X, LogOut, User, ChevronDown, BookOpen, Compass, Settings, Credit
 import { useState, useRef, useEffect } from "react";
 import { PageSearch } from "./PageSearch";
 import { ManageSubscriptionButton } from "@/components/premium/ManageSubscriptionButton";
+import { isBillingPortalEnabled } from "@/config/featureFlags";
 
 function mobileExploreBadgeClass(badge: string | undefined) {
   if (badge === "Free") return "bg-green-500/20 text-green-400";
@@ -307,11 +308,11 @@ export default function Navigation() {
                           <Settings className="w-4 h-4" />
                           <span className="text-sm">Settings</span>
                         </Link>
-                        {subscription?.tier === "PREMIUM" ? (
+                        {subscription?.tier === "PREMIUM" && isBillingPortalEnabled() ? (
                           <ManageSubscriptionButton
                             onNavigate={() => setProfileOpen(false)}
                           />
-                        ) : (
+                        ) : subscription?.tier !== "PREMIUM" ? (
                           <Link
                             href="/upgrade"
                             onClick={() => setProfileOpen(false)}
@@ -320,7 +321,7 @@ export default function Navigation() {
                             <CreditCard className="w-4 h-4" />
                             <span className="text-sm">Upgrade to Premium</span>
                           </Link>
-                        )}
+                        ) : null}
                         <div className="border-t border-slate-700 my-2"></div>
                         <button
                           onClick={() => {
@@ -499,14 +500,14 @@ export default function Navigation() {
                   <Settings className="w-4 h-4" />
                   Settings
                 </Link>
-                {subscription?.tier === "PREMIUM" ? (
+                {subscription?.tier === "PREMIUM" && isBillingPortalEnabled() ? (
                   <div className="px-4">
                     <ManageSubscriptionButton
                       onNavigate={() => setIsOpen(false)}
                       className="w-full justify-center px-4 py-2 rounded-lg text-gray-300 hover:text-white hover:bg-slate-800"
                     />
                   </div>
-                ) : (
+                ) : subscription?.tier !== "PREMIUM" ? (
                   <Link
                     href="/upgrade"
                     onClick={() => setIsOpen(false)}
@@ -514,7 +515,7 @@ export default function Navigation() {
                   >
                     Upgrade to Premium
                   </Link>
-                )}
+                ) : null}
                 <button
                   onClick={() => {
                     setIsOpen(false)

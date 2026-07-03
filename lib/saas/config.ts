@@ -1,4 +1,4 @@
-import { isFeatureEnabled } from "@/config/featureFlags"
+import { isFeatureEnabled, isBillingPortalEnabled } from "@/config/featureFlags"
 import { isJwtSecretConfigured, jwtSecretSource } from "@/lib/auth/jwt-secret"
 
 export type SaasCheckStatus = "ok" | "warn" | "fail"
@@ -171,6 +171,36 @@ function instantUpgradeCheck(): SaasReadinessCheck {
   }
 }
 
+function billingPortalCheck(): SaasReadinessCheck {
+  const stripeCheckout = isFeatureEnabled("STRIPE_CHECKOUT")
+  const portalEnabled = isBillingPortalEnabled()
+
+  if (!stripeCheckout) {
+    return {
+      id: "billing_portal",
+      label: "Billing portal",
+      status: "warn",
+      detail: "Stripe checkout disabled — billing portal not applicable",
+    }
+  }
+
+  if (portalEnabled) {
+    return {
+      id: "billing_portal",
+      label: "Billing portal",
+      status: "ok",
+      detail: "Customer portal enabled (NEXT_PUBLIC_FF_BILLING_PORTAL=true)",
+    }
+  }
+
+  return {
+    id: "billing_portal",
+    label: "Billing portal",
+    status: "warn",
+    detail: "Set NEXT_PUBLIC_FF_BILLING_PORTAL=true and enable portal in Stripe Dashboard",
+  }
+}
+
 function assistantCheck(): SaasReadinessCheck {
   const aiKey = envSet("OPENAI_API_KEY") || envSet("GEMINI_API_KEY")
   return {
@@ -189,6 +219,7 @@ export function evaluateSaasReadiness(): SaasReadinessCheck[] {
     authCheck(),
     appUrlCheck(),
     stripeCheck(),
+    billingPortalCheck(),
     paywallCheck(),
     rateLimitCheck(),
     demoLoginCheck(),

@@ -78,7 +78,7 @@ curl -sS "https://apisandbox-coral.vercel.app/api/health/saas" | jq .
 PLAYWRIGHT_PROD_URL=https://apisandbox-coral.vercel.app npm run test:prod
 ```
 
-SaaS billing and feature-flag checklist: [SAAS.md](./SAAS.md).
+SaaS billing and feature-flag checklist: [SAAS.md](./SAAS.md). Flag reference: [FEATURE_FLAGS.md](./FEATURE_FLAGS.md).
 
 ---
 
