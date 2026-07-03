@@ -2,12 +2,17 @@
 
 API Sandbox is **single-tenant per user** (no org/workspace model). Billing is **Stripe subscriptions** on the `User` record.
 
+Feature flag reference: [FEATURE_FLAGS.md](./FEATURE_FLAGS.md).
+
 ## Production feature flags (Vercel)
+
+Full reference: [FEATURE_FLAGS.md](./FEATURE_FLAGS.md).
 
 | Variable | Prod value | Purpose |
 |----------|------------|---------|
 | `NEXT_PUBLIC_FF_PREMIUM_PAYWALL` | `true` | Gate premium phases behind subscription |
-| `NEXT_PUBLIC_FF_STRIPE_CHECKOUT` | `true` | Real Checkout + Customer Portal |
+| `NEXT_PUBLIC_FF_STRIPE_CHECKOUT` | `true` | Real Checkout + webhooks |
+| `NEXT_PUBLIC_FF_BILLING_PORTAL` | `true` | Stripe Customer Portal (manage/cancel) |
 | `NEXT_PUBLIC_FF_RATE_LIMITING` | `true` | Upstash limits on auth + assistant |
 | `NEXT_PUBLIC_FF_DEMO_LOGIN` | `false` | Hide demo sign-in |
 | `NEXT_PUBLIC_FF_ANALYTICS` | `true` | Optional |
@@ -32,7 +37,7 @@ See [DEPLOYMENT.md](./DEPLOYMENT.md) plus:
 2. Set `STRIPE_PRICE_ID` on Vercel.
 3. Webhook endpoint: `https://<your-host>/api/webhooks/stripe`  
    Events: `checkout.session.completed`, `customer.subscription.updated`, `customer.subscription.deleted`, `invoice.payment_failed`
-4. Enable **Customer Portal** in Stripe for self-service cancel.
+4. Enable **Customer Portal** in Stripe for self-service cancel (`NEXT_PUBLIC_FF_BILLING_PORTAL=true` in the app).
 
 ## Verify after deploy
 

@@ -9,6 +9,7 @@ function stubProductionSaasEnv(overrides: Record<string, string> = {}) {
   vi.stubEnv("NEXT_PUBLIC_APP_URL", "https://app.example.com")
   vi.stubEnv("NEXT_PUBLIC_FF_PREMIUM_PAYWALL", "true")
   vi.stubEnv("NEXT_PUBLIC_FF_STRIPE_CHECKOUT", "true")
+  vi.stubEnv("NEXT_PUBLIC_FF_BILLING_PORTAL", "true")
   vi.stubEnv("STRIPE_SECRET_KEY", "sk_test_x")
   vi.stubEnv("STRIPE_WEBHOOK_SECRET", "whsec_x")
   vi.stubEnv("STRIPE_PRICE_ID", "price_x")
@@ -89,6 +90,7 @@ describe("saas config", () => {
       expect(checkById(checks, "auth").status).toBe("ok")
       expect(checkById(checks, "app_url").status).toBe("ok")
       expect(checkById(checks, "stripe").status).toBe("ok")
+      expect(checkById(checks, "billing_portal").status).toBe("ok")
       expect(checkById(checks, "rate_limit").status).toBe("ok")
       expect(checkById(checks, "demo_login").status).toBe("ok")
       expect(checkById(checks, "instant_upgrade").status).toBe("ok")
@@ -123,6 +125,15 @@ describe("saas config", () => {
 
       expect(checkById(checks, "stripe").status).toBe("fail")
       expect(checkById(checks, "stripe").detail).toContain("STRIPE_CHECKOUT is on")
+    })
+
+    it("warns when Stripe checkout is on but billing portal flag is off", async () => {
+      stubProductionSaasEnv({ NEXT_PUBLIC_FF_BILLING_PORTAL: "" })
+      const { evaluateSaasReadiness } = await import("@/lib/saas/config")
+      const checks = evaluateSaasReadiness()
+
+      expect(checkById(checks, "billing_portal").status).toBe("warn")
+      expect(checkById(checks, "billing_portal").detail).toContain("BILLING_PORTAL")
     })
 
     it("warns when Stripe checkout is disabled in development", async () => {

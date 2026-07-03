@@ -20,6 +20,7 @@ Sign up: [dashboard.stripe.com/register](https://dashboard.stripe.com/register).
 |------|------|-------------------------|
 | **Demo** (default) | `NEXT_PUBLIC_FF_STRIPE_CHECKOUT=false` | `POST /api/subscription/upgrade` → instant PREMIUM → `/upgrade/success` |
 | **Real Stripe** | `NEXT_PUBLIC_FF_STRIPE_CHECKOUT=true` + keys | `POST /api/checkout` → redirect to Stripe → webhook → PREMIUM |
+| **Customer portal** | above + `NEXT_PUBLIC_FF_BILLING_PORTAL=true` | Nav **Manage subscription** → Stripe portal |
 
 If you saw “Welcome to Premium” with no payment page, you were in **demo mode**.
 
@@ -42,6 +43,7 @@ If you saw “Welcome to Premium” with no payment page, you were in **demo mod
 # Paywall + real checkout (override defaults from npm run env:local)
 NEXT_PUBLIC_FF_PREMIUM_PAYWALL=true
 NEXT_PUBLIC_FF_STRIPE_CHECKOUT=true
+NEXT_PUBLIC_FF_BILLING_PORTAL=true
 NEXT_PUBLIC_APP_URL=http://localhost:4000
 
 STRIPE_SECRET_KEY=sk_test_...
@@ -102,7 +104,7 @@ Expected with Stripe enabled:
 | “Billing is not configured” on upgrade | Missing `STRIPE_SECRET_KEY`, `STRIPE_PRICE_ID`, or `NEXT_PUBLIC_APP_URL` |
 | Checkout works but stuck on “Activating…” | Webhook not reaching app — run `stripe listen`, fix `STRIPE_WEBHOOK_SECRET`, restart dev |
 | `Invalid signature` in server logs | `STRIPE_WEBHOOK_SECRET` does not match the CLI session (re-copy after `stripe listen`) |
-| Portal button fails | Customer portal not enabled in Dashboard, or checkout flag off |
+| Portal button fails | `NEXT_PUBLIC_FF_BILLING_PORTAL=false`, Customer portal not enabled in Dashboard, or no `stripeCustomerId` after checkout |
 
 ## Production / preview
 

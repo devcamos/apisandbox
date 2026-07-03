@@ -3,11 +3,11 @@ import { requireAuthenticatedUser } from "@/lib/auth/jwt-auth-middleware"
 import { handleRouteError } from "@/lib/http/responses"
 import { requireStripeClient } from "@/lib/stripe"
 import { prisma } from "@/lib/prisma"
-import { isFeatureEnabled } from "@/config/featureFlags"
+import { isBillingPortalEnabled } from "@/config/featureFlags"
 
 export async function POST(request: NextRequest) {
   try {
-    if (!isFeatureEnabled("STRIPE_CHECKOUT")) {
+    if (!isBillingPortalEnabled()) {
       return NextResponse.json(
         { error: "Billing portal is not enabled" },
         { status: 503 }
