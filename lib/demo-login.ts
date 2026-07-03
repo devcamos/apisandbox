@@ -1,4 +1,3 @@
-import { isFeatureEnabled } from "@/config/featureFlags"
 import { isDemoLoginAllowedInCurrentEnvironment } from "@/lib/saas/config"
 
 const DEFAULT_DEMO_EMAIL = "demo@apisandbox.demo"

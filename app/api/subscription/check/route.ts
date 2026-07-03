@@ -30,8 +30,8 @@ export async function GET(request: NextRequest) {
     if (phaseParam === "cloud" || phaseParam === "ai") {
       phaseNumber = phaseParam
     } else {
-      phaseNumber = parseInt(phaseParam, 10)
-      if (isNaN(phaseNumber)) {
+      phaseNumber = Number.parseInt(phaseParam, 10)
+      if (Number.isNaN(phaseNumber)) {
         return NextResponse.json(
           { error: "Invalid phase parameter" },
           { status: 400 }

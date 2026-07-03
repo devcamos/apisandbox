@@ -4,6 +4,7 @@ import { dismissCookieBanner } from "./helpers/smoke-helpers"
 
 const prodBaseUrl = process.env.PLAYWRIGHT_PROD_URL?.replace(/\/$/, "")
 
+// Opt-in production smoke: skipped in CI unless PLAYWRIGHT_PROD_URL targets live Vercel.
 test.describe("Production deployment auth", () => {
   test.skip(!prodBaseUrl, "Set PLAYWRIGHT_PROD_URL to run against Vercel production")
 

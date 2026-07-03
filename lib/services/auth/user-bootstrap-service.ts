@@ -13,6 +13,56 @@ interface BootstrapInput {
   forceBootstrapFailure?: boolean
 }
 
+const MISSING_SCHEMA_MESSAGE =
+  "Database schema is missing required tables. Run prisma migrations before signing up."
+
+function missingSchemaError(): AppError {
+  return new AppError(MISSING_SCHEMA_MESSAGE, 500, "configuration_error")
+}
+
+function duplicateEmailError(): AppError {
+  return new AppError("An account with this email already exists", 400, "validation_error")
+}
+
+function isMissingSchemaError(error: unknown): boolean {
+  if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2021") {
+    return true
+  }
+
+  return (
+    error instanceof Error &&
+    (error.message.includes("does not exist") || error.message.includes("no such table"))
+  )
+}
+
+function mapKnownBootstrapError(error: unknown): AppError | null {
+  if (error instanceof AppError) {
+    return error
+  }
+
+  if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002") {
+    return duplicateEmailError()
+  }
+
+  if (isMissingSchemaError(error)) {
+    return missingSchemaError()
+  }
+
+  return null
+}
+
+function bootstrapDevDetails(error: unknown): Record<string, unknown> | undefined {
+  if (process.env.NODE_ENV === "production" || !(error instanceof Error)) {
+    return undefined
+  }
+
+  return {
+    prismaCode:
+      error instanceof Prisma.PrismaClientKnownRequestError ? error.code : undefined,
+    message: error.message,
+  }
+}
+
 export async function createUserWithInitialData(input: BootstrapInput) {
   if (input.forceBootstrapFailure) {
     throw new AppError("Forced bootstrap failure", 500, "bootstrap_failure")
@@ -51,51 +101,18 @@ export async function createUserWithInitialData(input: BootstrapInput) {
       include: { profile: true },
     })
   } catch (error) {
-    if (error instanceof AppError) {
-      throw error
-    }
-
-    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002") {
-      throw new AppError("An account with this email already exists", 400, "validation_error")
-    }
-
-    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2021") {
-      throw new AppError(
-        "Database schema is missing required tables. Run prisma migrations before signing up.",
-        500,
-        "configuration_error"
-      )
-    }
-
-    if (
-      error instanceof Error &&
-      (error.message.includes("does not exist") || error.message.includes("no such table"))
-    ) {
-      throw new AppError(
-        "Database schema is missing required tables. Run prisma migrations before signing up.",
-        500,
-        "configuration_error"
-      )
+    const known = mapKnownBootstrapError(error)
+    if (known) {
+      throw known
     }
 
     logger.error({ err: error }, "User bootstrap failed")
-
-    const devDetails =
-      process.env.NODE_ENV !== "production" && error instanceof Error
-        ? {
-            prismaCode:
-              error instanceof Prisma.PrismaClientKnownRequestError
-                ? error.code
-                : undefined,
-            message: error.message,
-          }
-        : undefined
 
     throw new AppError(
       "Failed to initialize account data",
       500,
       "bootstrap_failure",
-      devDetails
+      bootstrapDevDetails(error),
     )
   }
 }

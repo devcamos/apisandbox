@@ -61,7 +61,6 @@ export async function updateGuideStep(
     understood: patch.understood ?? current.understood,
   }
 
-  const understandingPercent = computeGuideUnderstandingPercent(steps)
   const allUnderstood = APP_GUIDE_STEP_IDS.every((id) => steps[id].understood)
 
   return prisma.userAppGuide.update({

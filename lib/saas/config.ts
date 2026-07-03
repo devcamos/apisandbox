@@ -38,103 +38,163 @@ export function isAssistantAuthRequired(): boolean {
   return isProductionDeploy() || process.env.ASSISTANT_REQUIRE_AUTH === "true"
 }
 
-export function evaluateSaasReadiness(): SaasReadinessCheck[] {
-  const checks: SaasReadinessCheck[] = []
-
-  checks.push({
+function databaseCheck(): SaasReadinessCheck {
+  const configured = envSet("DATABASE_URL")
+  return {
     id: "database",
     label: "Database",
-    status: envSet("DATABASE_URL") ? "ok" : "fail",
-    detail: envSet("DATABASE_URL") ? "DATABASE_URL is set" : "DATABASE_URL is required",
-  })
+    status: configured ? "ok" : "fail",
+    detail: configured ? "DATABASE_URL is set" : "DATABASE_URL is required",
+  }
+}
 
+function authCheck(): SaasReadinessCheck {
   const jwtOk = isJwtSecretConfigured()
-  checks.push({
+  return {
     id: "auth",
     label: "Auth / JWT secret",
     status: jwtOk ? "ok" : "fail",
     detail: jwtOk
       ? `JWT signing uses ${jwtSecretSource() ?? "env"}`
       : "Set AUTH_JWT_SECRET or AUTH_SECRET (32+ chars) on Preview and Production",
-  })
+  }
+}
 
-  checks.push({
+function appUrlCheck(): SaasReadinessCheck {
+  const configured = envSet("NEXT_PUBLIC_APP_URL")
+  return {
     id: "app_url",
     label: "Public app URL",
-    status: envSet("NEXT_PUBLIC_APP_URL") ? "ok" : "fail",
-    detail: envSet("NEXT_PUBLIC_APP_URL")
+    status: configured ? "ok" : "fail",
+    detail: configured
       ? `NEXT_PUBLIC_APP_URL=${process.env.NEXT_PUBLIC_APP_URL}`
       : "NEXT_PUBLIC_APP_URL required for checkout redirects",
-  })
+  }
+}
 
+function stripeCheck(): SaasReadinessCheck {
   const stripeCheckout = isFeatureEnabled("STRIPE_CHECKOUT")
   const stripeConfigured =
     envSet("STRIPE_SECRET_KEY") && envSet("STRIPE_WEBHOOK_SECRET") && envSet("STRIPE_PRICE_ID")
 
-  checks.push({
+  if (!stripeCheckout) {
+    return {
+      id: "stripe",
+      label: "Stripe billing",
+      status: "warn",
+      detail: "Stripe checkout disabled (demo instant-upgrade allowed in non-prod)",
+    }
+  }
+
+  if (stripeConfigured) {
+    return {
+      id: "stripe",
+      label: "Stripe billing",
+      status: "ok",
+      detail: "Stripe checkout enabled and keys configured",
+    }
+  }
+
+  return {
     id: "stripe",
     label: "Stripe billing",
-    status: stripeCheckout ? (stripeConfigured ? "ok" : "fail") : "warn",
-    detail: stripeCheckout
-      ? stripeConfigured
-        ? "Stripe checkout enabled and keys configured"
-        : "STRIPE_CHECKOUT is on but STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET, or STRIPE_PRICE_ID missing"
-      : "Stripe checkout disabled (demo instant-upgrade allowed in non-prod)",
-  })
+    status: "fail",
+    detail:
+      "STRIPE_CHECKOUT is on but STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET, or STRIPE_PRICE_ID missing",
+  }
+}
 
-  checks.push({
+function paywallCheck(): SaasReadinessCheck {
+  const enabled = isFeatureEnabled("PREMIUM_PAYWALL")
+  return {
     id: "paywall",
     label: "Premium paywall",
-    status: isFeatureEnabled("PREMIUM_PAYWALL") ? "ok" : "warn",
-    detail: isFeatureEnabled("PREMIUM_PAYWALL")
+    status: enabled ? "ok" : "warn",
+    detail: enabled
       ? "PREMIUM_PAYWALL enabled"
       : "All content unlocked without subscription (not recommended for SaaS prod)",
-  })
+  }
+}
 
+function rateLimitCheck(): SaasReadinessCheck {
   const rateLimiting = isFeatureEnabled("RATE_LIMITING")
   const redisConfigured =
     envSet("UPSTASH_REDIS_REST_URL") && envSet("UPSTASH_REDIS_REST_TOKEN")
 
-  checks.push({
+  if (!rateLimiting) {
+    return {
+      id: "rate_limit",
+      label: "Rate limiting",
+      status: "warn",
+      detail: "Rate limiting disabled",
+    }
+  }
+
+  if (redisConfigured) {
+    return {
+      id: "rate_limit",
+      label: "Rate limiting",
+      status: "ok",
+      detail: "Rate limiting enabled with Upstash Redis",
+    }
+  }
+
+  return {
     id: "rate_limit",
     label: "Rate limiting",
-    status: rateLimiting ? (redisConfigured ? "ok" : "fail") : "warn",
-    detail: rateLimiting
-      ? redisConfigured
-        ? "Rate limiting enabled with Upstash Redis"
-        : "RATE_LIMITING on but Upstash env vars missing"
-      : "Rate limiting disabled",
-  })
+    status: "fail",
+    detail: "RATE_LIMITING on but Upstash env vars missing",
+  }
+}
 
-  checks.push({
+function demoLoginCheck(): SaasReadinessCheck {
+  const enabled = isDemoLoginAllowedInCurrentEnvironment()
+  return {
     id: "demo_login",
     label: "Demo login",
-    status: isDemoLoginAllowedInCurrentEnvironment() ? "warn" : "ok",
-    detail: isDemoLoginAllowedInCurrentEnvironment()
+    status: enabled ? "warn" : "ok",
+    detail: enabled
       ? "Demo login is enabled (disable for public SaaS prod)"
       : "Demo login disabled or blocked in production",
-  })
+  }
+}
 
-  checks.push({
+function instantUpgradeCheck(): SaasReadinessCheck {
+  const allowed = isInstantPremiumUpgradeAllowed()
+  return {
     id: "instant_upgrade",
     label: "Instant premium upgrade API",
-    status: isInstantPremiumUpgradeAllowed() ? "warn" : "ok",
-    detail: isInstantPremiumUpgradeAllowed()
+    status: allowed ? "warn" : "ok",
+    detail: allowed
       ? "POST /api/subscription/upgrade grants premium without payment (dev only)"
       : "Instant upgrade blocked — use Stripe checkout + webhooks",
-  })
+  }
+}
 
+function assistantCheck(): SaasReadinessCheck {
   const aiKey = envSet("OPENAI_API_KEY") || envSet("GEMINI_API_KEY")
-  checks.push({
+  return {
     id: "assistant",
     label: "Learning assistant",
     status: aiKey ? "ok" : "warn",
     detail: aiKey
       ? `Assistant provider configured; auth required in prod: ${isAssistantAuthRequired()}`
       : "No OPENAI_API_KEY or GEMINI_API_KEY — assistant will error",
-  })
+  }
+}
 
-  return checks
+export function evaluateSaasReadiness(): SaasReadinessCheck[] {
+  return [
+    databaseCheck(),
+    authCheck(),
+    appUrlCheck(),
+    stripeCheck(),
+    paywallCheck(),
+    rateLimitCheck(),
+    demoLoginCheck(),
+    instantUpgradeCheck(),
+    assistantCheck(),
+  ]
 }
 
 export function saasReadinessSummary(checks: SaasReadinessCheck[]): {

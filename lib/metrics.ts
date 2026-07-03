@@ -41,7 +41,7 @@ export interface ErrorMetric {
 
 class MetricsCollector {
   private metrics: Metric[] = [];
-  private listeners: ((metrics: Metric[]) => void)[] = [];
+  private readonly listeners: ((metrics: Metric[]) => void)[] = [];
   private metricCounter = 0;
 
   constructor() {

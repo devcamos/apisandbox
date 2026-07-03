@@ -43,7 +43,6 @@ export function getConfig(): AppConfig {
   // Detect environment from NODE_ENV or DATABASE_URL
   const nodeEnv = process.env.NODE_ENV || 'development'
   const isProduction = nodeEnv === 'production'
-  const isVercel = !!process.env.VERCEL
   
   // Database URL - supports both local PostgreSQL and Vercel Postgres
   const databaseUrl = 
@@ -72,7 +71,7 @@ export function getConfig(): AppConfig {
   }
 
   // Port
-  const port = parseInt(process.env.PORT || '4000')
+  const port = Number.parseInt(process.env.PORT || '4000', 10)
 
   return {
     database: {
