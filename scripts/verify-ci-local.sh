@@ -33,9 +33,10 @@ fi
 
 log "lint-and-build (job: lint-and-build)"
 export DATABASE_URL="$BUILD_DATABASE_URL"
+npm run typecheck
 npm run lint
 npm run build
-ok "lint + build"
+ok "typecheck + lint + build"
 
 log "unit-tests with coverage (job: unit-tests)"
 mkdir -p reports

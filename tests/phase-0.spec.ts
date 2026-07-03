@@ -19,7 +19,7 @@ async function createAuthenticatedSession(request: APIRequestContext) {
   }
 }
 
-async function applySession(page: Parameters<typeof test>[0]["page"], token: string) {
+async function applySession(page: import("@playwright/test").Page, token: string) {
   await page.context().addCookies([
     {
       name: "auth_token",

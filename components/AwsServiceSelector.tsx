@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Server, Database, Zap, Network, BarChart3, Shield } from "lucide-react";
+import { Server, Database, Zap, Network, BarChart3 } from "lucide-react";
 
 interface AwsService {
   id: string;

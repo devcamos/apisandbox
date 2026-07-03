@@ -110,6 +110,17 @@ export default defineConfig({
           },
         ]
       : []),
+    ...(process.env.PLAYWRIGHT_PROD_URL
+      ? [
+          {
+            name: 'prod-deployment',
+            testMatch: '**/prod-deployment-auth.spec.ts',
+            use: {
+              baseURL: process.env.PLAYWRIGHT_PROD_URL.replace(/\/$/, ''),
+            },
+          },
+        ]
+      : []),
   ],
 
   /* Run your local dev server before starting the tests (skip when running staging tests) */

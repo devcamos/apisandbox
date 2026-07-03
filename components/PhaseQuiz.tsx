@@ -77,14 +77,13 @@ function quizOptionRowClass(showCorrect: boolean, showIncorrectSelection: boolea
 
 function QuizOptionRow(props: Readonly<{
   option: string
-  optionIndex: number
   questionId: string
   isSelected: boolean
   showCorrect: boolean
   showIncorrectSelection: boolean
   onSelect: (questionId: string, option: string) => void
 }>) {
-  const { option, optionIndex, questionId, isSelected, showCorrect, showIncorrectSelection, onSelect } = props
+  const { option, questionId, isSelected, showCorrect, showIncorrectSelection, onSelect } = props
   return (
     <label
       className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-all ${quizOptionRowClass(
@@ -121,7 +120,7 @@ function QuizQuestionBlock(props: Readonly<{
         {index + 1}. {question.prompt}
       </h3>
       <div className="space-y-3">
-        {question.options.map((option, optionIndex) => {
+        {question.options.map((option) => {
           const isSelected = answers[question.id] === option
           const isCorrect = questionResult?.correctAnswer === option
           const showCorrect = Boolean(questionResult) && isCorrect
@@ -131,7 +130,6 @@ function QuizQuestionBlock(props: Readonly<{
             <QuizOptionRow
               key={option}
               option={option}
-              optionIndex={optionIndex}
               questionId={question.id}
               isSelected={isSelected}
               showCorrect={showCorrect}

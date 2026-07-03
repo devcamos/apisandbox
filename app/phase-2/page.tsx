@@ -6,7 +6,7 @@ import PhaseQuiz from "@/components/PhaseQuiz";
 import ProjectCard from "@/components/ProjectCard";
 import { SubscriptionGate } from "@/components/SubscriptionGate";
 import { LessonTracker } from "@/components/LessonTracker";
-import { Plug, Key, Shield, RefreshCw, Zap, Database, CreditCard, Mail, Folder } from "lucide-react";
+import { Plug, Key, Shield, RefreshCw, Zap, Database } from "lucide-react";
 
 import { ExpandableCodeBlock } from "@/components/HighlightedCodeBlock"
 export default function Phase2() {

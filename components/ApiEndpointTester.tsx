@@ -17,7 +17,6 @@ export default function ApiEndpointTester({
   path,
   description,
   defaultBody,
-  color = "blue"
 }: ApiEndpointTesterProps) {
   const [loading, setLoading] = useState(false);
   const [response, setResponse] = useState<any>(null);

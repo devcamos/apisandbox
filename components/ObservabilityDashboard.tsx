@@ -7,7 +7,7 @@ import { Activity, AlertTriangle, Clock, TrendingUp, Zap, RefreshCw } from "luci
 export default function ObservabilityDashboard() {
   const [metrics, setMetrics] = useState<Metric[]>([]);
   const [stats, setStats] = useState(metricsCollector.getStats());
-  const [isLive, setIsLive] = useState(true);
+  const [isLive] = useState(true);
 
   useEffect(() => {
     // Initial load

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Cloud, Server, Database, Zap, Shield, DollarSign, ArrowRight, BookOpen, Play, Network } from "lucide-react";
+import { Cloud, Server, Database, Zap, Shield, ArrowRight, BookOpen, Play, Network } from "lucide-react";
 
 export default function CloudPage() {
   const cloudTopics = [

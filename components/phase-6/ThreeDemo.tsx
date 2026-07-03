@@ -191,7 +191,7 @@ export default function ThreeDemo({ algorithm = "bfs" }: Readonly<{ algorithm?: 
   const meta = traversalMeta[algorithm]
   const [visitIndex, setVisitIndex] = useState(-1)
   const [isPlaying, setIsPlaying] = useState(false)
-  const [hoveredNode, setHoveredNode] = useState<number | null>(null)
+  const [, setHoveredNode] = useState<number | null>(null)
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const order = useMemo(() => traversalGenerators[algorithm](tree), [algorithm, tree])

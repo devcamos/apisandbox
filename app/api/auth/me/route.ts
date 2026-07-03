@@ -1,7 +1,7 @@
 import { NextRequest } from "next/server"
 import { getAuthenticatedUserFromToken } from "@/lib/services/auth/auth-service"
 import { issueAuthTokenForUser } from "@/lib/services/auth/auth-response-mapper"
-import { errorResponse, okResponse } from "@/lib/http/responses"
+import { errorResponse } from "@/lib/http/responses"
 import {
   authSessionResponse,
   readAuthToken,

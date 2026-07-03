@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useSession, signOut } from "@/components/providers/SessionProvider";
-import { Menu, X, LogOut, User, ChevronDown, BookOpen, Cloud, Brain, Compass, Settings, CreditCard, Sparkles, Lock, Shield, Heart } from "lucide-react";
+import { Menu, X, LogOut, User, ChevronDown, BookOpen, Compass, Settings, CreditCard, Sparkles, Lock, Heart } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import { PageSearch } from "./PageSearch";
 import { ManageSubscriptionButton } from "@/components/premium/ManageSubscriptionButton";

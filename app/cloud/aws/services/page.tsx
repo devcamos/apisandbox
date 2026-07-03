@@ -3,7 +3,7 @@
 import ConceptCard from "@/components/ConceptCard";
 import { SubscriptionGate } from "@/components/SubscriptionGate";
 import Link from "next/link";
-import { Server, Database, Zap, Shield, Network, BarChart3, Home } from "lucide-react";
+import { Server, Database, Zap, Network, BarChart3, Home } from "lucide-react";
 
 import { ExpandableCodeBlock } from "@/components/HighlightedCodeBlock"
 export default function AwsServicesPage() {

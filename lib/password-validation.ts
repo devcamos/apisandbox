@@ -16,7 +16,7 @@ function hasLowercase(password: string) {
 }
 
 function hasDigit(password: string) {
-  return /[0-9]/.test(password)
+  return /\d/.test(password)
 }
 
 function hasSpecialCharacter(password: string) {

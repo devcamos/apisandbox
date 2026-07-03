@@ -9,6 +9,7 @@
     "build": "rm -rf node_modules/.prisma && env -u PRISMA_GENERATE_DATAPROXY prisma generate && next build --webpack",
     "start": "next start",
     "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
     "test": "playwright test",
     "test:unit": "vitest run",
     "test:unit:ci": "vitest run --coverage",
@@ -103,11 +104,14 @@
     "dotenv": "^17.2.3",
     "eslint": "^9.39.2",
     "eslint-config-next": "16.2.4",
+    "eslint-plugin-sonarjs": "^4.1.0",
+    "eslint-plugin-unicorn": "^56.0.1",
     "jsdom": "^29.1.1",
     "postcss": "^8",
     "prisma": "^6.19.3",
     "tailwindcss": "^3.4.19",
     "typescript": "^5",
+    "typescript-eslint": "^8.62.1",
     "vitest": "^4.1.5"
   }
 }

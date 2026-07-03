@@ -8,12 +8,9 @@ import WebSocketTester from "@/components/WebSocketTester";
 import EventDrivenTester from "@/components/EventDrivenTester";
 import ApiArchitecturePattern from "@/components/ApiArchitecturePattern";
 import { Brain, Network, GitBranch, Zap, RefreshCw, Database } from "lucide-react";
-import { useState } from "react";
 
 import { ExpandableCodeBlock } from "@/components/HighlightedCodeBlock"
 export default function Phase1Categories() {
-  const [activeDemo, setActiveDemo] = useState<string | null>(null);
-
   // REST Demo Content
   const restDemo = (
     <div className="space-y-4">

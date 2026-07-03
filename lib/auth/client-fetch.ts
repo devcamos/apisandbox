@@ -58,5 +58,5 @@ export async function authApiPostJson<TData = unknown>(
  * cookie on the first protected request (client navigations can race Set-Cookie).
  */
 export function redirectAfterAuth(callbackUrl: string) {
-  window.location.assign(callbackUrl)
+  globalThis.location?.assign(callbackUrl)
 }

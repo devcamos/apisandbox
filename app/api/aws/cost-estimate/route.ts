@@ -1,5 +1,10 @@
 import { NextResponse } from "next/server";
 
+function invalidBodyResponse(error: unknown) {
+  const detail = error instanceof Error ? error.message : "Invalid request body";
+  return NextResponse.json({ error: detail }, { status: 400 });
+}
+
 export async function POST(request: Request) {
   try {
     const body = await request.json();
@@ -36,10 +41,6 @@ export async function POST(request: Request) {
       note: "This is an estimate. Actual costs may vary based on usage patterns and AWS pricing."
     });
   } catch (error) {
-    return NextResponse.json(
-      { error: "Invalid request body" },
-      { status: 400 }
-    );
+    return invalidBodyResponse(error);
   }
 }
-

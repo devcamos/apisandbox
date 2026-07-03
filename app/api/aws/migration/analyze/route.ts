@@ -1,9 +1,14 @@
 import { NextResponse } from "next/server";
 
+function invalidBodyResponse(error: unknown) {
+  const detail = error instanceof Error ? error.message : "Invalid request body";
+  return NextResponse.json({ error: detail }, { status: 400 });
+}
+
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { appType, complexity, currentInfrastructure } = body;
+    const { appType, complexity } = body;
 
     // Mock analysis logic
     let recommendedStrategy = "lift-shift";
@@ -43,10 +48,6 @@ export async function POST(request: Request) {
 
     return NextResponse.json(analysis);
   } catch (error) {
-    return NextResponse.json(
-      { error: "Invalid request body" },
-      { status: 400 }
-    );
+    return invalidBodyResponse(error);
   }
 }
-

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Cloud, Calculator, CheckCircle, Server, Database, Zap } from "lucide-react";
+import { Calculator, CheckCircle } from "lucide-react";
 
 interface MigrationChecklistItem {
   id: number;

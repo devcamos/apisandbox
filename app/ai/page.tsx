@@ -172,7 +172,7 @@ export default function AIPage() {
             </div>
 
             <div className="grid md:grid-cols-2 gap-6 mb-8">
-              {coreComponents.map((component, index) => {
+              {coreComponents.map((component) => {
                 const Icon = component.icon;
                 return (
                   <div
