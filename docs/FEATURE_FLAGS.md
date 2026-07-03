@@ -18,7 +18,7 @@ Boolean toggles control SaaS billing, auth, rate limits, and analytics without c
 
 Only the literal string `"true"` enables a flag (`"yes"`, `"1"`, etc. are treated as off).
 
-Templates: [`local.env.example`](../config/environments/local.env.example), [`preview.env.example`](../config/environments/preview.env.example), [`prod.env.example`](../config/environments/prod.env.example).
+Templates: [`config/environments/local.env.example`](../config/environments/local.env.example), [`config/environments/prod.env.example`](../config/environments/prod.env.example).
 
 ## Usage in code
 
@@ -80,7 +80,7 @@ See [STRIPE_LOCAL.md](./STRIPE_LOCAL.md) for local test mode.
 1. Add the name to the `FeatureFlag` union in `config/featureFlags.ts`.
 2. Add a `flags` entry with `NEXT_PUBLIC_FF_<NAME>` (or a server-only env if never needed in the browser).
 3. Gate behavior with `isFeatureEnabled("YOUR_FLAG")` in API routes, middleware, or UI.
-4. Document the env var in `local.env.example`, `preview.env.example`, `prod.env.example`, and this file.
+4. Document the env var in `local.env.example`, `prod.env.example`, and this file.
 5. Add tests in `tests/unit/feature-flags.test.ts`.
 6. If the flag affects production readiness, add a check in `lib/saas/config.ts`.
 
