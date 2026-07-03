@@ -30,7 +30,7 @@ See **[SONAR_LINT_MAP.md](./SONAR_LINT_MAP.md)** for the full Sonar rule ID → 
 | Cognitive complexity | **Lint** | `sonarjs/cognitive-complexity` (threshold 15) |
 | `parseInt` / `isNaN` | **Lint** | `unicorn/prefer-number-properties` |
 | `globalThis` vs `window` | **Lint** | `unicorn/prefer-global-this` |
-| Multiple `.push()` | **Lint** | `unicorn/prefer-single-call` |
+| Multiple `.push()` | **Sonar** | S7778 — no ESLint 9–compatible rule |
 | `readonly` members | **Lint** | `@typescript-eslint/prefer-readonly` |
 | Ignored catch blocks | **Lint** | `sonarjs/no-ignored-exceptions` |
 | Skipped tests | **Lint** | `sonarjs/no-skipped-tests` |

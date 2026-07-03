@@ -17,8 +17,8 @@ Source of truth for SonarJS ↔ ESLint parity: [SonarJS rules README](https://gi
 | **S3776** | Cognitive complexity ≤ 15 | `npm run lint` | `sonarjs/cognitive-complexity` | `["error", 15]` |
 | **S6353** | Use `\d` not `[0-9]` | `npm run lint` | `sonarjs/concise-regex` | `eslint.config.mjs` |
 | **S7764** | Prefer `globalThis` over `window` | `npm run lint` | `unicorn/prefer-global-this` | per [SonarJS delegated rules](https://github.com/SonarSource/SonarJS/blob/master/packages/jsts/src/rules/README.md) |
-| **S7773** | Prefer `Number.parseInt` / `Number.isNaN` | `npm run lint` | `unicorn/prefer-number-properties` | replaces ad-hoc `no-restricted-globals` |
-| **S7778** | Do not call `Array#push()` multiple times | `npm run lint` | `unicorn/prefer-single-call` | `eslint.config.mjs` |
+| **S7773** | Prefer `Number.parseInt` / `Number.isNaN` | `npm run lint` | `unicorn/prefer-number-properties` | `eslint-plugin-unicorn@56` (ESLint 9 compatible) |
+| **S7778** | Do not call `Array#push()` multiple times | **Sonar only** | — | No `unicorn/prefer-single-call` on ESLint 9 (unicorn 70+ requires ESLint 10) |
 | **S2933** | Mark unreassigned members `readonly` | `npm run lint` | `@typescript-eslint/prefer-readonly` | requires `projectService` in ESLint |
 | **S1607** | Skipped test needs reason | `npm run lint` | `sonarjs/no-skipped-tests` | `tests/**`; prod smoke gated via Playwright `prod-deployment` project |
 

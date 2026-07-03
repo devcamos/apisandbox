@@ -39,8 +39,6 @@ const sonarParityRules = {
   "unicorn/prefer-global-this": "error",
   // S7773
   "unicorn/prefer-number-properties": "error",
-  // S7778
-  "unicorn/prefer-single-call": "error",
 };
 
 export default [

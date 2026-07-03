@@ -62,7 +62,7 @@ export function emptyProgress(): ShinobiProgressState {
 }
 
 export function loadShinobiProgress(): ShinobiProgressState {
-  if (typeof window === "undefined") return emptyProgress()
+  if (globalThis.window === undefined) return emptyProgress()
   try {
     const raw = localStorage.getItem(SHINOBI_STORAGE_KEY)
     if (!raw) return emptyProgress()
@@ -85,7 +85,7 @@ export function loadShinobiProgress(): ShinobiProgressState {
 }
 
 export function saveShinobiProgress(state: ShinobiProgressState): void {
-  if (typeof window === "undefined") return
+  if (globalThis.window === undefined) return
   try {
     localStorage.setItem(SHINOBI_STORAGE_KEY, JSON.stringify(state))
   } catch {
