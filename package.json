@@ -104,6 +104,8 @@
     "dotenv": "^17.2.3",
     "eslint": "^9.39.2",
     "eslint-config-next": "16.2.4",
+    "eslint-plugin-sonarjs": "^4.1.0",
+    "eslint-plugin-unicorn": "^70.0.0",
     "jsdom": "^29.1.1",
     "postcss": "^8",
     "prisma": "^6.19.3",

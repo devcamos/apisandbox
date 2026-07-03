@@ -2,14 +2,11 @@ import { test, expect } from "@playwright/test"
 import { randomUUID } from "node:crypto"
 import { dismissCookieBanner } from "./helpers/smoke-helpers"
 
-const prodBaseUrl = process.env.PLAYWRIGHT_PROD_URL?.replace(/\/$/, "")
-
-// Opt-in production smoke: skipped in CI unless PLAYWRIGHT_PROD_URL targets live Vercel.
+/**
+ * Opt-in production smoke — only runs when PLAYWRIGHT_PROD_URL is set.
+ * Playwright project `prod-deployment` in playwright.config.ts gates this file.
+ */
 test.describe("Production deployment auth", () => {
-  test.skip(!prodBaseUrl, "Set PLAYWRIGHT_PROD_URL to run against Vercel production")
-
-  test.use({ baseURL: prodBaseUrl })
-
   test("register, login, and open dashboard on production", async ({ page, request }) => {
     const email = `prod-e2e-${Date.now()}-${randomUUID()}@example.com`
     const password = "Test1234!@#$"

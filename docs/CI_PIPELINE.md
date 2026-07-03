@@ -7,7 +7,7 @@ Every blocking GitHub Actions job on a pull request has a local equivalent. Run 
 | GitHub job | Local command | What it catches |
 |------------|---------------|-----------------|
 | **lint-and-build** → Typecheck | `npm run typecheck` | Unused locals/parameters, type errors (`tsc --noEmit`) |
-| **lint-and-build** → Lint | `npm run lint` | Unused imports/vars, `readonly` class fields, `Number.parseInt` / `Number.isNaN` (see ESLint rules in `eslint.config.mjs`) |
+| **lint-and-build** → Lint | `npm run lint` | Sonar parity rules — see [SONAR_LINT_MAP.md](./SONAR_LINT_MAP.md) |
 | **lint-and-build** → Build | `npm run build` | Next.js production compile + Prisma generate |
 | **unit-tests** | `npm run test:unit:ci` | Vitest unit tests + LCOV coverage for Sonar |
 | **docker-compose-validate** | `npm run validate:compose` | Staging compose secrets / interpolation |
@@ -20,19 +20,26 @@ Every blocking GitHub Actions job on a pull request has a local equivalent. Run 
 
 ## What should fail in CI vs Sonar
 
-| Issue class | Caught by | Examples |
-|-------------|-----------|----------|
-| Unused imports | **Lint** (`@typescript-eslint/no-unused-vars`) | `isFeatureEnabled` imported but unused |
-| Useless assignments | **Typecheck** (`noUnusedLocals`) | `const isVercel = …` never read |
-| `parseInt` / `isNaN` | **Lint** (`no-restricted-globals`) | Prefer `Number.parseInt`, `Number.isNaN` |
-| Unreassigned class fields | **Sonar** | `private listeners` → `private readonly listeners` |
-| High cognitive complexity | **Sonar** | Large functions needing refactor |
-| Nested ternaries / duplication | **Sonar** | Structural maintainability |
+See **[SONAR_LINT_MAP.md](./SONAR_LINT_MAP.md)** for the full Sonar rule ID → ESLint rule table.
+
+| Issue class | Caught by | ESLint / TS rule (examples) |
+|-------------|-----------|----------------------------|
+| Unused imports | **Lint** | `sonarjs/unused-import`, `@typescript-eslint/no-unused-vars` |
+| Useless assignments | **Lint** + **Typecheck** | `sonarjs/no-dead-store`, `noUnusedLocals` |
+| Nested ternaries | **Lint** | `sonarjs/no-nested-conditional` |
+| Cognitive complexity | **Lint** | `sonarjs/cognitive-complexity` (threshold 15) |
+| `parseInt` / `isNaN` | **Lint** | `unicorn/prefer-number-properties` |
+| `globalThis` vs `window` | **Lint** | `unicorn/prefer-global-this` |
+| Multiple `.push()` | **Lint** | `unicorn/prefer-single-call` |
+| `readonly` members | **Lint** | `@typescript-eslint/prefer-readonly` |
+| Ignored catch blocks | **Lint** | `sonarjs/no-ignored-exceptions` |
+| Skipped tests | **Lint** | `sonarjs/no-skipped-tests` |
+| Duplication on new code | **Sonar** | CPD engine only |
 | New dependency CVEs (critical) | **dependency-review** + `npm audit` | Lockfile vulnerabilities |
 | Auth / signup regressions | **e2e-smoke** | Login flow, protected routes |
 | Business logic regressions | **unit-tests** | `lib/**` unit coverage |
 
-Sonar is for maintainability and security analysis that ESLint does not model. **Quick wins should never reach Sonar** — they should fail `npm run lint` or `npm run typecheck` on the PR.
+Sonar is for duplication, security hotspots, and coverage gates that ESLint does not model. **All mapped Sonar code smells should fail `npm run lint` or `npm run typecheck` on the PR** — see [SONAR_LINT_MAP.md](./SONAR_LINT_MAP.md).
 
 ## Area-specific integration tests (not in default CI)
 
