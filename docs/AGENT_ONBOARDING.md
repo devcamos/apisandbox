@@ -12,7 +12,7 @@
 2. [CI_PIPELINE.md](./CI_PIPELINE.md) — PR job ↔ local command map  
 3. `.cursor/rules/` — green builds, auth/subscription conventions  
 3. [AGENT_PR_CHECKLIST.md](./AGENT_PR_CHECKLIST.md) — before every PR  
-4. [DEPLOYMENT.md](./DEPLOYMENT.md) — only if you touch auth, env, or deploy  
+4. [DEPLOYMENT.md](./DEPLOYMENT.md) — only if you touch auth, env, or deploy (Preview vs Production: `config/environments/`)  
 5. [SAAS.md](./SAAS.md) — production billing flags, Stripe, rate limits  
 6. [STRIPE_LOCAL.md](./STRIPE_LOCAL.md) — real Checkout + webhooks on localhost  
 
@@ -62,7 +62,7 @@ npm run dev                # http://localhost:4000
 ## Verify before PR
 
 ```bash
-npm run verify:ci
+npm run verify:ci:strict
 ```
 
 Mirrors CI: lint, build, unit tests + coverage, compose validate, audit (critical), e2e smoke (Docker Postgres on **5436**).
