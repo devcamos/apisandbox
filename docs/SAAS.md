@@ -33,6 +33,14 @@ See [DEPLOYMENT.md](./DEPLOYMENT.md) plus:
 
 ## Stripe setup
 
+**Deploy order (no user impact until flags + webhooks are live):**
+
+1. Run `npx prisma migrate deploy` on the target database **before** deploying app code that includes the Stripe hardening migration.
+2. Deploy the application build.
+3. Set `NEXT_PUBLIC_FF_STRIPE_CHECKOUT` and `NEXT_PUBLIC_FF_BILLING_PORTAL` only when Stripe Dashboard + keys are ready.
+
+Until step 3, existing users keep the current experience: demo instant-upgrade remains available in non-production when `STRIPE_CHECKOUT` is off; production users are unchanged if flags stay off.
+
 1. Create a **Product** and recurring **Price** in Stripe **Live mode**.
 2. Apply database migrations before enabling the webhook: `npx prisma migrate deploy`.
 3. Set the live `STRIPE_SECRET_KEY`, live `STRIPE_PRICE_ID`, and production `NEXT_PUBLIC_APP_URL` on Vercel.

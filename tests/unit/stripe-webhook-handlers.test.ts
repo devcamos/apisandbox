@@ -110,8 +110,6 @@ describe("handleCheckoutSessionCompleted", () => {
         subscriptionTier: "PREMIUM",
         stripeSubscriptionId: "sub_123",
         stripeSubscriptionStatus: "active",
-        stripeCurrentPeriodEnd: null,
-        subscriptionExpiresAt: null,
       },
     })
     expect(sendSubscriptionConfirmationMock).toHaveBeenCalledWith("user@example.com")

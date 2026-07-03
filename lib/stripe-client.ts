@@ -10,7 +10,6 @@ export function getStripeClient(): Stripe | null {
     return null
   }
   return new Stripe(key, {
-    apiVersion: "2026-04-22.dahlia",
     maxNetworkRetries: 2,
     timeout: 20_000,
     typescript: true,
