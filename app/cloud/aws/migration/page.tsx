@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Cloud, Calculator, CheckCircle, ArrowRight, Server, Database, Zap, Home } from "lucide-react";
+import { Cloud, Calculator, CheckCircle, Server, Database, Zap, Home } from "lucide-react";
 import Link from "next/link";
 
 export default function AwsMigrationPage() {

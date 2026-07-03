@@ -1,4 +1,5 @@
 import { createRequire } from "node:module";
+import tseslint from "typescript-eslint";
 
 const require = createRequire(import.meta.url);
 /** @type {import("eslint").Linter.Config[]} */
@@ -20,11 +21,37 @@ export default [
   },
   ...nextCoreWebVitals,
   {
+    files: ["**/*.{ts,tsx}"],
+    plugins: {
+      "@typescript-eslint": tseslint.plugin,
+    },
     rules: {
       // Pedantic for long-form learning copy; escaping every apostrophe hurts readability.
       "react/no-unescaped-entities": "off",
       // Legitimate patterns (hydration, derived reset-on-prop) trigger this in React 19 plugin.
       "react-hooks/set-state-in-effect": "off",
+
+      // Mirror Sonar "quick win" smells at lint time (see docs/CI_PIPELINE.md).
+      "no-unused-vars": "off",
+      "@typescript-eslint/no-unused-vars": [
+        "error",
+        {
+          argsIgnorePattern: "^_",
+          varsIgnorePattern: "^_",
+          caughtErrorsIgnorePattern: "^_",
+        },
+      ],
+      "no-restricted-globals": [
+        "error",
+        {
+          name: "parseInt",
+          message: "Use Number.parseInt instead.",
+        },
+        {
+          name: "isNaN",
+          message: "Use Number.isNaN instead.",
+        },
+      ],
     },
   },
 ];

@@ -15,7 +15,9 @@ Use this **before** `git push` and `gh pr create`. Do not mark work complete unt
 | Run locally (before PR) | GitHub job | Notes |
 |-------------------------|------------|-------|
 | `npm run verify:ci` | All blocking jobs below | Single command; requires Docker |
-| ↳ lint + build | `lint-and-build` | Same CI build env vars |
+| ↳ `npm run typecheck` | `lint-and-build` | Unused locals/parameters; runs before lint in CI |
+| ↳ `npm run lint` | `lint-and-build` | Unused imports/vars, `Number.parseInt`/`Number.isNaN` |
+| ↳ `npm run build` | `lint-and-build` | Same CI build env vars |
 | ↳ vitest `--coverage` | `unit-tests` | Same as CI |
 | ↳ `validate:compose` | `docker-compose-validate` | Needs `AUTH_SECRET` (script sets placeholder) |
 | ↳ `npm audit --audit-level=critical` | `dependency-review` | Approximates critical vuln gate |
@@ -53,13 +55,14 @@ npm run verify:ci
 - Port **4000 free** (stop `npm run dev` — Playwright starts its own server)
 - Dependencies installed (`npm ci` recommended before verify, same as CI)
 
-**What it runs** (see `scripts/verify-ci-local.sh`):
-1. `npm run lint`
-2. `npm run build` (CI placeholder env: `AUTH_SECRET`, `RESEND_API_KEY`, etc.)
-3. `npx vitest run --coverage`
-4. `npm run validate:compose`
-5. `npm audit --audit-level=critical`
-6. Docker `postgres-ci` → `prisma db push` → `tests/ci-smoke.spec.ts` with `CI=true`
+**What it runs** (see `scripts/verify-ci-local.sh` and [CI_PIPELINE.md](CI_PIPELINE.md)):
+1. `npm run typecheck`
+2. `npm run lint`
+3. `npm run build` (CI placeholder env: `AUTH_SECRET`, `RESEND_API_KEY`, etc.)
+4. `npx vitest run --coverage`
+5. `npm run validate:compose`
+6. `npm audit --audit-level=critical`
+7. Docker `postgres-ci` → `prisma db push` → `tests/ci-smoke.spec.ts` with `CI=true`
 
 Optional: if `SONAR_TOKEN` is in env or `.env.local`, also runs `npm run sonar:local`.
 

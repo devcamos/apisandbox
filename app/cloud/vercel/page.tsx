@@ -8,11 +8,7 @@ import {
   Zap, 
   Database, 
   Code, 
-  Globe, 
-  BarChart3, 
-  Shield,
   Home,
-  ArrowRight 
 } from "lucide-react";
 
 export default function VercelPage() {

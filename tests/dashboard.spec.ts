@@ -55,7 +55,7 @@ test.describe('Dashboard', () => {
 
   test('should show premium badge for premium users', async ({ page, request }) => {
     const uniqueEmail = `test-${Date.now()}-${randomUUID()}@example.com`;
-    const signupResponse = await request.post('/api/auth/signup', {
+    await request.post('/api/auth/signup', {
       data: {
         email: uniqueEmail,
         password: 'Test1234!@#$',

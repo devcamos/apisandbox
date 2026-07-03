@@ -25,7 +25,7 @@ interface UpgradePromptProps {
   currentTier?: "FREE" | "PREMIUM"
 }
 
-export function UpgradePrompt({ lockedContent, currentTier = "FREE" }: UpgradePromptProps) {
+export function UpgradePrompt({ lockedContent }: UpgradePromptProps) {
   return (
     <div className="bg-gradient-to-r from-purple-500/20 via-pink-500/20 to-orange-500/20 border-2 border-purple-500/30 rounded-2xl p-8 mb-8">
       <div className="flex items-start gap-4">

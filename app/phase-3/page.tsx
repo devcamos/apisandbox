@@ -6,7 +6,7 @@ import PhaseQuiz from "@/components/PhaseQuiz";
 import ProjectCard from "@/components/ProjectCard";
 import { SubscriptionGate } from "@/components/SubscriptionGate";
 import { LessonTracker } from "@/components/LessonTracker";
-import { Network, Zap, MessageSquare, GitBranch, Activity, Eye } from "lucide-react";
+import { Network, MessageSquare, GitBranch, Activity } from "lucide-react";
 
 import { ExpandableCodeBlock } from "@/components/HighlightedCodeBlock"
 export default function Phase3() {

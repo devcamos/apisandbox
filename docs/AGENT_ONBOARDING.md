@@ -9,7 +9,8 @@
 ## Read first
 
 1. This file — setup and verification  
-2. `.cursor/rules/` — green builds, auth/subscription conventions  
+2. [CI_PIPELINE.md](./CI_PIPELINE.md) — PR job ↔ local command map  
+3. `.cursor/rules/` — green builds, auth/subscription conventions  
 3. [AGENT_PR_CHECKLIST.md](./AGENT_PR_CHECKLIST.md) — before every PR  
 4. [DEPLOYMENT.md](./DEPLOYMENT.md) — only if you touch auth, env, or deploy  
 5. [SAAS.md](./SAAS.md) — production billing flags, Stripe, rate limits  

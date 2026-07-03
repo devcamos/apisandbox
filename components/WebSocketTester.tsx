@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { Play, Square, CheckCircle, Activity } from "lucide-react";
-import { collectHttpRequest, collectError } from "@/lib/metrics";
+import { Play, Square, Activity } from "lucide-react";
+import { collectHttpRequest } from "@/lib/metrics";
 
 interface WebSocketTesterProps {
   title: string;

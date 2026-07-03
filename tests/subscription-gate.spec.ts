@@ -138,7 +138,6 @@ test.describe('Subscription Gate', () => {
         password: 'Test1234!@#$',
       }
     });
-    const { user } = await signupResponse.json();
 
     // Upgrade to premium
     await request.post('/api/subscription/upgrade', {

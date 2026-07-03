@@ -1,6 +1,6 @@
 import { Metadata } from 'next'
 import Link from 'next/link'
-import { Database, Shield, Zap, Code, Layers } from 'lucide-react'
+import { Database, Shield, Code, Layers } from 'lucide-react'
 
 export const metadata: Metadata = {
   title: 'Object-Relational Mapping (ORMs) | API Integration Training',

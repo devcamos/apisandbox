@@ -81,7 +81,6 @@ test.describe('Auth Signup', () => {
 
   test('should validate email format', async ({ page }) => {
     const emailInput = page.getByLabel(/email address/i);
-    const submitButton = page.getByRole('button', { name: /create account/i });
     
     await emailInput.fill('invalid-email');
     await emailInput.blur();
@@ -92,7 +91,7 @@ test.describe('Auth Signup', () => {
     expect(isValid).toBeFalsy();
   });
 
-  test('should successfully sign up with valid credentials', async ({ request, page }) => {
+  test('should successfully sign up with valid credentials', async ({ page }) => {
     const uniqueEmail = `test-${Date.now()}-${randomUUID()}@example.com`;
     
     await page.getByLabel(/email address/i).fill(uniqueEmail);

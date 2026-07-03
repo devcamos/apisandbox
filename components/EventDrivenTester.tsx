@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Send, CheckCircle, Clock, Archive } from "lucide-react";
-import { collectHttpRequest, collectError } from "@/lib/metrics";
+import { collectHttpRequest } from "@/lib/metrics";
 
 interface EventDrivenTesterProps {
   title: string;
