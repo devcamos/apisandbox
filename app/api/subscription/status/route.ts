@@ -25,6 +25,8 @@ export async function GET(request: NextRequest) {
       tier: subscription.tier,
       isExpired: subscription.isExpired,
       expiresAt: subscription.expiresAt,
+      status: subscription.status,
+      currentPeriodEnd: subscription.currentPeriodEnd,
     })
   } catch (error) {
     return handleRouteError(error)

@@ -15,9 +15,32 @@ function envSet(key: string): boolean {
   return typeof v === "string" && v.trim().length > 0
 }
 
+function envStartsWith(key: string, prefix: string): boolean {
+  const value = process.env[key]
+  return typeof value === "string" && value.trim().startsWith(prefix)
+}
+
 /** True when running a production Node deployment (Vercel prod). */
 export function isProductionDeploy(): boolean {
   return process.env.NODE_ENV === "production" || process.env.VERCEL_ENV === "production"
+}
+
+function publicAppUrlIsValid(): boolean {
+  const value = process.env.NEXT_PUBLIC_APP_URL?.trim()
+  if (!value) return false
+  try {
+    const url = new URL(value)
+    const isLocalCi =
+      process.env.CI === "true" &&
+      process.env.VERCEL_ENV !== "production" &&
+      ["localhost", "127.0.0.1", "[::1]"].includes(url.hostname)
+    if (isProductionDeploy() && !isLocalCi) {
+      return url.protocol === "https:" && url.hostname !== "localhost"
+    }
+    return url.protocol === "http:" || url.protocol === "https:"
+  } catch {
+    return false
+  }
 }
 
 /** Instant POST /api/subscription/upgrade — dev/demo only, never when Stripe checkout is live. */
@@ -61,21 +84,47 @@ function authCheck(): SaasReadinessCheck {
 }
 
 function appUrlCheck(): SaasReadinessCheck {
-  const configured = envSet("NEXT_PUBLIC_APP_URL")
   return {
     id: "app_url",
     label: "Public app URL",
-    status: configured ? "ok" : "fail",
-    detail: configured
+    status: publicAppUrlIsValid() ? "ok" : "fail",
+    detail: publicAppUrlIsValid()
       ? `NEXT_PUBLIC_APP_URL=${process.env.NEXT_PUBLIC_APP_URL}`
-      : "NEXT_PUBLIC_APP_URL required for checkout redirects",
+      : "NEXT_PUBLIC_APP_URL must be valid; production checkout requires HTTPS",
   }
+}
+
+function stripeFailureDetail(
+  stripeMissing: string[],
+  productionUsingNonLiveStripeKey: boolean,
+  stripeMalformed: string[][],
+): string {
+  if (stripeMissing.length > 0) {
+    return `STRIPE_CHECKOUT is on but required Stripe env vars are missing: ${stripeMissing.join(", ")}`
+  }
+  if (productionUsingNonLiveStripeKey) {
+    return "Production Stripe checkout must use a live secret key (sk_live_...)"
+  }
+  if (stripeMalformed.length > 0) {
+    return `Stripe env value has an unexpected prefix: ${stripeMalformed.map(([key]) => key).join(", ")}`
+  }
+  return "Stripe configuration is invalid"
 }
 
 function stripeCheck(): SaasReadinessCheck {
   const stripeCheckout = isFeatureEnabled("STRIPE_CHECKOUT")
+  const stripeMissing = ["STRIPE_SECRET_KEY", "STRIPE_WEBHOOK_SECRET", "STRIPE_PRICE_ID"].filter(
+    (key) => !envSet(key),
+  )
+  const stripeMalformed = [
+    ["STRIPE_SECRET_KEY", "sk_"],
+    ["STRIPE_WEBHOOK_SECRET", "whsec_"],
+    ["STRIPE_PRICE_ID", "price_"],
+  ].filter(([key, prefix]) => envSet(key) && !envStartsWith(key, prefix))
+  const productionUsingNonLiveStripeKey =
+    isProductionDeploy() && !envStartsWith("STRIPE_SECRET_KEY", "sk_live_")
   const stripeConfigured =
-    envSet("STRIPE_SECRET_KEY") && envSet("STRIPE_WEBHOOK_SECRET") && envSet("STRIPE_PRICE_ID")
+    stripeMissing.length === 0 && stripeMalformed.length === 0 && !productionUsingNonLiveStripeKey
 
   if (!stripeCheckout) {
     return {
@@ -99,8 +148,7 @@ function stripeCheck(): SaasReadinessCheck {
     id: "stripe",
     label: "Stripe billing",
     status: "fail",
-    detail:
-      "STRIPE_CHECKOUT is on but STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET, or STRIPE_PRICE_ID missing",
+    detail: stripeFailureDetail(stripeMissing, productionUsingNonLiveStripeKey, stripeMalformed),
   }
 }
 

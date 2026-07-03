@@ -106,6 +106,8 @@ export async function getUserSubscription(userId: string) {
     select: {
       subscriptionTier: true,
       subscriptionExpiresAt: true,
+      stripeSubscriptionStatus: true,
+      stripeCurrentPeriodEnd: true,
     },
   })
 
@@ -121,6 +123,8 @@ export async function getUserSubscription(userId: string) {
     tier: user.subscriptionTier as SubscriptionTier,
     isExpired,
     expiresAt: user.subscriptionExpiresAt,
+    status: user.stripeSubscriptionStatus,
+    currentPeriodEnd: user.stripeCurrentPeriodEnd,
   }
 }
 

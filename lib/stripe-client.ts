@@ -9,7 +9,11 @@ export function getStripeClient(): Stripe | null {
   if (!key) {
     return null
   }
-  return new Stripe(key, { typescript: true })
+  return new Stripe(key, {
+    maxNetworkRetries: 2,
+    timeout: 20_000,
+    typescript: true,
+  })
 }
 
 export function requireStripeClient(): Stripe {

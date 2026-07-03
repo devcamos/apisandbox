@@ -28,7 +28,19 @@ export function isAllowedStripeCheckoutRedirectUrl(url: string): boolean {
     const u = new URL(trimmed)
     if (u.protocol !== "https:") return false
     const host = u.hostname.toLowerCase()
-    return host === "checkout.stripe.com" || host.endsWith(".stripe.com")
+    return host === "checkout.stripe.com"
+  } catch {
+    return false
+  }
+}
+
+/** Stripe-hosted Customer Portal session URLs use the billing.stripe.com host. */
+export function isAllowedStripeBillingPortalRedirectUrl(url: string): boolean {
+  const trimmed = url?.trim() ?? ""
+  if (!trimmed || trimmed.length > MAX_ABSOLUTE_URL_LEN) return false
+  try {
+    const parsed = new URL(trimmed)
+    return parsed.protocol === "https:" && parsed.hostname.toLowerCase() === "billing.stripe.com"
   } catch {
     return false
   }
