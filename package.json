@@ -23,7 +23,8 @@
     "test:ci:chromium": "playwright test --project=chromium --reporter=github",
     "test:ci:smoke": "playwright test tests/ci-smoke.spec.ts --project=chromium --reporter=github",
     "verify:ci": "bash scripts/verify-ci-local.sh",
-    "verify:pr": "npm run verify:ci",
+    "verify:ci:strict": "npm ci && bash scripts/verify-ci-local.sh",
+    "verify:pr": "npm run verify:ci:strict",
     "test:all": "playwright test --reporter=list",
     "test:staging": "STAGING_TEST=1 playwright test tests/staging.spec.ts --project=staging",
     "test:prod": "playwright test tests/prod-deployment-auth.spec.ts --project=chromium",
@@ -50,7 +51,8 @@
     "staging:db:studio": "DATABASE_URL='postgresql://postgres:postgres@localhost:5434/apisandbox_staging' prisma studio",
     "env:local": "cp config/environments/local.env.example .env.local",
     "env:staging": "cp config/environments/staging.env.example .env.staging.local",
-    "env:prod": "echo 'See config/environments/prod.env.example for Vercel environment variables'"
+    "env:preview": "echo 'See config/environments/preview.env.example for Vercel Preview environment variables'",
+    "env:prod": "echo 'See config/environments/prod.env.example for Vercel Production environment variables'"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.11.1",

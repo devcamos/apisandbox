@@ -1,6 +1,6 @@
 # CI pipeline — PR checks and local parity
 
-Every blocking GitHub Actions job on a pull request has a local equivalent. Run `npm run verify:ci` before push so PR CI only surfaces what you cannot run locally (Vercel preview approval, hosted deploy env, PR-only dependency diff).
+Every blocking GitHub Actions job on a pull request has a local equivalent. Run **`npm run verify:ci:strict`** before push (`npm ci` + full verify) so PR CI only surfaces what you cannot run locally (Vercel preview approval, hosted deploy env, PR-only dependency diff).
 
 ## PR pipeline map
 
@@ -16,7 +16,7 @@ Every blocking GitHub Actions job on a pull request has a local equivalent. Run 
 | **SonarQube Cloud** | `npm run sonar:local:full` (needs `SONAR_TOKEN`) | Cognitive complexity, duplication, security hotspots, coverage on new code |
 | **Preview approved (Vercel)** | — | Human reviewer only |
 
-**One command:** `npm run verify:ci` runs all rows except Sonar (optional with token) and the Vercel preview gate.
+**One command:** `npm run verify:ci:strict` runs `npm ci` then all rows except Sonar (optional with token) and the Vercel preview gate. Use `npm run verify:ci` for a faster re-run when dependencies are already installed.
 
 ## What should fail in CI vs Sonar
 
