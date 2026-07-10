@@ -3,6 +3,8 @@
 import { X, BookOpen, CheckCircle, Lightbulb, Target } from "lucide-react";
 import { useEffect } from "react";
 
+import { getDocumentationKeywords } from "@/lib/learning/documentation-keywords";
+
 interface DocumentationModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -57,6 +59,8 @@ export default function DocumentationModal({
   color,
   documentation,
 }: DocumentationModalProps) {
+  const keywords = getDocumentationKeywords(title);
+
   // Close on escape key
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
@@ -92,9 +96,23 @@ export default function DocumentationModal({
           >
             <X className="w-5 h-5 text-white" />
           </button>
-          <div className="flex items-center gap-3">
-            <BookOpen className="w-8 h-8 text-white" />
-            <h2 className="text-3xl font-bold text-white">{title} Documentation</h2>
+          <div className="flex items-start gap-3 pr-12">
+            <BookOpen className="mt-1 w-8 h-8 shrink-0 text-white" />
+            <div>
+              <h2 className="text-3xl font-bold text-white">{title} Documentation</h2>
+              {keywords.length > 0 && (
+                <div className="mt-3 flex flex-wrap gap-2" aria-label={`${title} keywords`}>
+                  {keywords.map((keyword) => (
+                    <span
+                      key={keyword}
+                      className="rounded-full border border-white/30 bg-slate-950/25 px-2.5 py-1 text-xs font-medium text-white"
+                    >
+                      {keyword}
+                    </span>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
         </div>
 

@@ -145,6 +145,18 @@ describe("saas config", () => {
       expect(stripe.detail).toContain("live secret key")
     })
 
+    it("fails stripe when configured values have unexpected prefixes", async () => {
+      stubProductionSaasEnv({
+        STRIPE_WEBHOOK_SECRET: "not-a-webhook-secret",
+        STRIPE_PRICE_ID: "not-a-price",
+      })
+      const { evaluateSaasReadiness } = await import("@/lib/saas/config")
+      const checks = evaluateSaasReadiness()
+
+      expect(checkById(checks, "stripe").status).toBe("fail")
+      expect(checkById(checks, "stripe").detail).toContain("unexpected prefix")
+    })
+
     it("fails production readiness when the public URL is not HTTPS", async () => {
       stubProductionSaasEnv({ NEXT_PUBLIC_APP_URL: "http://app.example.com" })
       const { evaluateSaasReadiness } = await import("@/lib/saas/config")

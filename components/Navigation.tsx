@@ -109,6 +109,7 @@ export default function Navigation() {
       items: [
         { name: "Cloud Migration", href: "/cloud", badge: "Premium" },
         { name: "AI Learning", href: "/ai", badge: "Premium" },
+        { name: "Dependency Map", href: "/dependencies", badge: "Docs" },
         { name: "Java Track", href: "/docs/java", badge: "Docs" },
       ],
     },

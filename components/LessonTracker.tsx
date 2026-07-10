@@ -11,69 +11,57 @@ import {
   ChevronRight,
   Focus,
   Timer,
+  ArrowRight,
+  Clock,
+  Bell,
+  Trophy,
 } from "lucide-react"
 import { getPhaseLessonPlan, type LessonCheckpoint } from "@/lib/lessons/phase-lessons"
+import {
+  canCompleteCheckpoint,
+  computeModuleStats,
+  computeOverallStats,
+  countReviewsDue,
+  emptyCheckpointProgress,
+  findNextIncomplete,
+  getCompletionChecks,
+  scheduleNextRetrieval,
+  type CheckpointProgress,
+  type LessonProgressState as ProgressState,
+} from "@/lib/lessons/lesson-progress"
 import { useSession } from "@/components/providers/SessionProvider"
-
-interface CheckpointProgress {
-  done: boolean
-  answer: string
-  evidence: string
-  serviceName: string
-  endpointName: string
-  criticalPathStep: string
-  auditEvidence: string
-  retrievalStep: number
-  retrievalDueAt: string
-}
-
-type ProgressState = Record<string, Record<string, CheckpointProgress>>
+import { authApiJsonInit, authApiRequestInit } from "@/lib/auth/client-fetch"
+import { courseIdForPhase, hasAnyLessonProgress } from "@/lib/learning/progress-mapping"
 
 interface LessonTrackerProps {
   phase: number
 }
 
-interface CompletionCheck {
-  id: string
-  label: string
-  pass: boolean
-}
-
-const RETRIEVAL_INTERVAL_DAYS = [1, 3, 7, 14]
-
 function progressKey(phase: number, userKey: string) {
   return `lesson-progress:v2:${phase}:${userKey}`
 }
 
-function emptyProgress(): CheckpointProgress {
-  return {
-    done: false,
-    answer: "",
-    evidence: "",
-    serviceName: "",
-    endpointName: "",
-    criticalPathStep: "",
-    auditEvidence: "",
-    retrievalStep: 0,
-    retrievalDueAt: "",
-  }
+function metaKey(phase: number, userKey: string) {
+  return `lesson-progress:v2:${phase}:${userKey}:updated`
 }
 
-function countBullets(value: string) {
-  return value
-    .split("\n")
-    .filter((line) => /^\s*([-*•]|\d+\.)\s+/.test(line.trim())).length
+function importKey(phase: number, userKey: string) {
+  return `lesson-progress:v2:${phase}:${userKey}:server-imported`
 }
 
-function hasMeasurableDecision(value: string) {
-  const hasTimedOrRateMetric = /\b\d+(?:\.\d+)?\s?(?:ms|s|sec|seconds|minutes|m|hours|h|%|x)\b/i.test(value)
-  const hasPercentile = /\bp(?:95|99)\b/i.test(value)
-  const hasOpsKeyword = /\b(?:slo|latency|error rate|cost)\b/i.test(value)
-  return hasTimedOrRateMetric || hasPercentile || hasOpsKeyword
-}
-
-function hasFallbackPolicy(value: string) {
-  return /(fallback|fail-open|fail-closed|graceful degradation|degrade|circuit breaker|retry budget|shed load|timeout)/i.test(value)
+function formatRelativeTime(isoDate: string) {
+  if (!isoDate) return ""
+  const then = new Date(isoDate)
+  if (Number.isNaN(then.getTime())) return ""
+  const diffMs = Date.now() - then.getTime()
+  const minutes = Math.round(diffMs / 60000)
+  if (minutes < 1) return "just now"
+  if (minutes < 60) return `${minutes}m ago`
+  const hours = Math.round(minutes / 60)
+  if (hours < 24) return `${hours}h ago`
+  const days = Math.round(hours / 24)
+  if (days < 30) return `${days}d ago`
+  return then.toLocaleDateString()
 }
 
 function checkpointTemplate(checkpoint: LessonCheckpoint) {
@@ -96,17 +84,6 @@ function checkpointTemplate(checkpoint: LessonCheckpoint) {
   ].join("\n")
 }
 
-function getCompletionChecks(state: CheckpointProgress): CompletionCheck[] {
-  const answer = state.answer.trim()
-  return [
-    { id: "answer", label: "Answer is provided", pass: answer.length > 0 },
-    { id: "evidence", label: "Project evidence is provided", pass: state.evidence.trim().length > 0 },
-    { id: "bullets", label: "Minimum 3 bullets", pass: countBullets(state.answer) >= 3 },
-    { id: "measurable", label: "Contains 1 measurable decision", pass: hasMeasurableDecision(state.answer) },
-    { id: "fallback", label: "Contains 1 explicit fallback policy", pass: hasFallbackPolicy(state.answer) },
-  ]
-}
-
 function formatDueLabel(isoDate: string) {
   if (!isoDate) return "Not scheduled"
   const due = new Date(isoDate)
@@ -116,21 +93,17 @@ function formatDueLabel(isoDate: string) {
   return `Due ${due.toLocaleDateString()}`
 }
 
-function scheduleNextRetrieval(prevStep: number) {
-  const boundedStep = Math.max(0, Math.min(prevStep, RETRIEVAL_INTERVAL_DAYS.length - 1))
-  const nextStep = Math.min(boundedStep + 1, RETRIEVAL_INTERVAL_DAYS.length - 1)
-  const days = RETRIEVAL_INTERVAL_DAYS[boundedStep]
-  const dueAt = new Date()
-  dueAt.setDate(dueAt.getDate() + days)
-  return { nextStep, dueAt: dueAt.toISOString() }
-}
-
 export function LessonTracker({ phase }: LessonTrackerProps) {
   const plan = getPhaseLessonPlan(phase)
-  const { data: session } = useSession()
+  const { data: session, status } = useSession()
   const userKey = session?.user?.id || session?.user?.email || "anonymous"
   const storageKey = progressKey(phase, userKey)
+  const lastUpdatedStorageKey = metaKey(phase, userKey)
+  const serverImportStorageKey = importKey(phase, userKey)
+  const courseId = courseIdForPhase(phase)
   const [progress, setProgress] = useState<ProgressState>({})
+  const [lastUpdatedAt, setLastUpdatedAt] = useState<string>("")
+  const [serverHydrated, setServerHydrated] = useState(false)
   const [isOpen, setIsOpen] = useState(false)
   const [focusMode, setFocusMode] = useState(false)
   const [focusIndex, setFocusIndex] = useState(0)
@@ -139,23 +112,101 @@ export function LessonTracker({ phase }: LessonTrackerProps) {
 
   useEffect(() => {
     if (globalThis.window === undefined || !plan) return
-    const raw = localStorage.getItem(storageKey)
-    if (!raw) {
-      setProgress({})
-      return
+    let cancelled = false
+    setServerHydrated(false)
+
+    const readLocalProgress = (): ProgressState => {
+      const raw = localStorage.getItem(storageKey)
+      if (!raw) return {}
+      try {
+        return (JSON.parse(raw) as ProgressState) || {}
+      } catch {
+        return {}
+      }
     }
-    try {
-      const parsed = JSON.parse(raw) as ProgressState
-      setProgress(parsed || {})
-    } catch {
-      setProgress({})
+
+    const loadProgress = async () => {
+      const localProgress = readLocalProgress()
+      const localLastUpdated = localStorage.getItem(lastUpdatedStorageKey) ?? ""
+      setLastUpdatedAt(localLastUpdated)
+
+      if (status !== "authenticated") {
+        if (!cancelled) {
+          setProgress(localProgress)
+          setServerHydrated(true)
+        }
+        return
+      }
+
+      const shouldImportLocal =
+        hasAnyLessonProgress(localProgress) && !localStorage.getItem(serverImportStorageKey)
+      if (shouldImportLocal) {
+        const importResponse = await fetch(
+          "/api/learning/progress",
+          authApiJsonInit({ courseId, progress: localProgress }),
+        ).catch(() => null)
+        if (importResponse?.ok) {
+          localStorage.setItem(serverImportStorageKey, "true")
+        }
+      }
+
+      const response = await fetch(
+        `/api/learning/progress?courseId=${encodeURIComponent(courseId)}`,
+        authApiRequestInit(),
+      ).catch(() => null)
+      if (!response?.ok) {
+        if (!cancelled) {
+          setProgress(localProgress)
+          setServerHydrated(true)
+        }
+        return
+      }
+
+      const payload = await response.json().catch(() => null)
+      if (cancelled) return
+      const serverProgress = payload?.data?.progress ?? {}
+      setProgress(serverProgress)
+      setLastUpdatedAt(payload?.data?.lastActivityAt ?? localLastUpdated)
+      setServerHydrated(true)
     }
-  }, [storageKey, plan])
+
+    void loadProgress()
+    return () => {
+      cancelled = true
+    }
+  }, [courseId, lastUpdatedStorageKey, plan, serverImportStorageKey, status, storageKey])
 
   useEffect(() => {
-    if (globalThis.window === undefined || !plan) return
+    if (globalThis.window === undefined || !plan || !serverHydrated) return
     localStorage.setItem(storageKey, JSON.stringify(progress))
-  }, [progress, storageKey, plan])
+  }, [progress, serverHydrated, storageKey, plan])
+
+  useEffect(() => {
+    if (
+      globalThis.window === undefined ||
+      !plan ||
+      !serverHydrated ||
+      status !== "authenticated" ||
+      !hasAnyLessonProgress(progress)
+    ) {
+      return
+    }
+
+    const timeoutId = window.setTimeout(() => {
+      void fetch(
+        "/api/learning/progress",
+        authApiJsonInit({ courseId, progress }),
+      ).catch(() => null)
+    }, 800)
+
+    return () => window.clearTimeout(timeoutId)
+  }, [courseId, progress, serverHydrated, status, plan])
+
+  const markActivity = () => {
+    const now = new Date().toISOString()
+    setLastUpdatedAt(now)
+    if (globalThis.window !== undefined) localStorage.setItem(lastUpdatedStorageKey, now)
+  }
 
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
@@ -185,30 +236,23 @@ export function LessonTracker({ phase }: LessonTrackerProps) {
     )
   }, [plan])
 
-  const { total, completed } = useMemo(() => {
-    if (!plan) return { total: 0, completed: 0 }
-    let t = 0
-    let c = 0
-    for (const courseModule of plan.modules) {
-      for (const checkpoint of courseModule.checkpoints) {
-        t += 1
-        if (progress[courseModule.id]?.[checkpoint.id]?.done) c += 1
-      }
-    }
-    return { total: t, completed: c }
-  }, [plan, progress])
+  const { total, completed, percent } = useMemo(
+    () => (plan ? computeOverallStats(plan, progress) : { total: 0, completed: 0, percent: 0 }),
+    [plan, progress],
+  )
+
+  const moduleStats = useMemo(() => (plan ? computeModuleStats(plan, progress) : []), [plan, progress])
 
   const moduleProgress = useMemo(() => {
-    if (!plan) return new Map<string, { total: number; completed: number; percent: number }>()
     const map = new Map<string, { total: number; completed: number; percent: number }>()
-    for (const courseModule of plan.modules) {
-      const totalCheckpoints = courseModule.checkpoints.length
-      const completedCheckpoints = courseModule.checkpoints.filter((cp) => progress[courseModule.id]?.[cp.id]?.done).length
-      const percent = totalCheckpoints > 0 ? Math.round((completedCheckpoints / totalCheckpoints) * 100) : 0
-      map.set(courseModule.id, { total: totalCheckpoints, completed: completedCheckpoints, percent })
+    for (const stat of moduleStats) {
+      map.set(stat.id, { total: stat.total, completed: stat.completed, percent: stat.percent })
     }
     return map
-  }, [plan, progress])
+  }, [moduleStats])
+
+  const nextIncomplete = useMemo(() => (plan ? findNextIncomplete(plan, progress) : null), [plan, progress])
+  const reviewsDue = useMemo(() => (plan ? countReviewsDue(plan, progress) : 0), [plan, progress])
 
   useEffect(() => {
     if (!plan || !focusMode) return
@@ -219,15 +263,16 @@ export function LessonTracker({ phase }: LessonTrackerProps) {
 
   if (!plan) return null
 
-  const getState = (moduleId: string, checkpointId: string) => progress[moduleId]?.[checkpointId] || emptyProgress()
+  const getState = (moduleId: string, checkpointId: string) => progress[moduleId]?.[checkpointId] || emptyCheckpointProgress()
 
   const patchState = (
     moduleId: string,
     checkpointId: string,
     patch: Partial<CheckpointProgress> | ((current: CheckpointProgress) => Partial<CheckpointProgress>),
   ) => {
+    markActivity()
     setProgress((prev) => {
-      const current = prev[moduleId]?.[checkpointId] || emptyProgress()
+      const current = prev[moduleId]?.[checkpointId] || emptyCheckpointProgress()
       const nextPatch = typeof patch === "function" ? patch(current) : patch
       const moduleProgress = prev[moduleId] ?? {}
       return {
@@ -245,9 +290,8 @@ export function LessonTracker({ phase }: LessonTrackerProps) {
 
   const toggleComplete = (moduleId: string, checkpoint: LessonCheckpoint) => {
     const state = getState(moduleId, checkpoint.id)
-    const checks = getCompletionChecks(state)
     const isRetrieval = checkpoint.id === "retrieval"
-    if (!state.done && !isRetrieval && checks.some((c) => !c.pass)) return
+    if (!state.done && !canCompleteCheckpoint(checkpoint, state)) return
 
     patchState(moduleId, checkpoint.id, (current) => {
       if (current.done) {
@@ -273,10 +317,21 @@ export function LessonTracker({ phase }: LessonTrackerProps) {
     })
   }
 
-  const reset = () => setProgress({})
-  const percent = total === 0 ? 0 : Math.round((completed / total) * 100)
+  const reset = () => {
+    setProgress({})
+    setLastUpdatedAt("")
+    if (globalThis.window !== undefined) localStorage.removeItem(lastUpdatedStorageKey)
+  }
   const lessonComplete = total > 0 && completed === total
   const focusItem = flatCheckpoints[focusIndex]
+
+  const resumeAtNext = () => {
+    if (nextIncomplete) {
+      setFocusMode(true)
+      setFocusIndex(nextIncomplete.index)
+    }
+    setIsOpen(true)
+  }
 
   const checkpointVisible = (moduleId: string, checkpointId: string) => {
     if (!focusMode || !focusItem) return true
@@ -287,7 +342,7 @@ export function LessonTracker({ phase }: LessonTrackerProps) {
     <>
       <section className="mb-12">
         <div className="bg-slate-800/50 border border-slate-700 rounded-2xl p-6">
-          <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
             <div>
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-900 border border-slate-700 text-sm text-gray-300 mb-3">
                 <BookOpen className="w-4 h-4 text-cyan-400" />
@@ -295,23 +350,75 @@ export function LessonTracker({ phase }: LessonTrackerProps) {
               </div>
               <h2 className="text-2xl font-bold text-white mb-1">{plan.title}</h2>
               <p className="text-sm text-gray-400">{plan.structureLabel}</p>
+              <div className="mt-3 flex flex-wrap items-center gap-2 text-xs">
+                {lastUpdatedAt && (
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-900 border border-slate-700 text-gray-300">
+                    <Clock className="w-3.5 h-3.5 text-cyan-400" />
+                    Last activity {formatRelativeTime(lastUpdatedAt)}
+                  </span>
+                )}
+                {reviewsDue > 0 && (
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-300">
+                    <Bell className="w-3.5 h-3.5" />
+                    {reviewsDue} review{reviewsDue > 1 ? "s" : ""} due
+                  </span>
+                )}
+              </div>
             </div>
-            <div className="min-w-full lg:min-w-[320px]">
+            <div className="min-w-full lg:min-w-[340px]">
               <div className="flex items-center justify-between text-sm mb-2">
-                <span className="text-gray-300">Progress</span>
+                <span className="text-gray-300">Overall progress</span>
                 <span className="text-white font-semibold">
                   {completed}/{total} ({percent}%)
                 </span>
               </div>
-              <div className="h-2 bg-slate-700 rounded-full overflow-hidden mb-4">
-                <div className="h-full bg-gradient-to-r from-green-500 to-emerald-500" style={{ width: `${percent}%` }} />
+              <div className="h-2.5 bg-slate-700 rounded-full overflow-hidden mb-4" role="progressbar" aria-valuenow={percent} aria-valuemin={0} aria-valuemax={100}>
+                <div className="h-full bg-gradient-to-r from-green-500 to-emerald-500 transition-all duration-500" style={{ width: `${percent}%` }} />
               </div>
+
+              {/* Per-module breakdown */}
+              <div className="space-y-2.5 mb-4">
+                {moduleStats.map((stat) => (
+                  <div key={stat.id}>
+                    <div className="flex items-center justify-between text-xs mb-1">
+                      <span className={stat.percent === 100 ? "text-emerald-300" : "text-gray-300"}>
+                        {stat.percent === 100 && <CheckCircle2 className="inline w-3 h-3 mr-1 -mt-0.5" />}
+                        {stat.title}
+                      </span>
+                      <span className="text-gray-400 tabular-nums">{stat.completed}/{stat.total}</span>
+                    </div>
+                    <div className="h-1.5 bg-slate-700/70 rounded-full overflow-hidden">
+                      <div
+                        className={`h-full transition-all duration-500 ${stat.percent === 100 ? "bg-emerald-500" : "bg-gradient-to-r from-cyan-500 to-emerald-500"}`}
+                        style={{ width: `${stat.percent}%` }}
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {lessonComplete ? (
+                <div className="rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-3 mb-3 flex items-center gap-3">
+                  <Trophy className="w-5 h-5 text-emerald-300 shrink-0" />
+                  <p className="text-sm text-emerald-200">All checkpoints complete. Revisit to keep the fundamentals sharp.</p>
+                </div>
+              ) : (
+                nextIncomplete && (
+                  <div className="rounded-xl border border-slate-700 bg-slate-900/60 p-3 mb-3">
+                    <p className="text-[11px] uppercase tracking-wide text-gray-500 mb-1">Next up</p>
+                    <p className="text-sm text-white font-medium truncate">
+                      {nextIncomplete.moduleTitle} · {nextIncomplete.label}
+                    </p>
+                  </div>
+                )
+              )}
+
               <button
-                onClick={() => setIsOpen(true)}
-                className="w-full inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-gradient-to-r from-green-500 to-emerald-500 text-white font-semibold"
+                onClick={lessonComplete ? () => setIsOpen(true) : resumeAtNext}
+                className="w-full inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-gradient-to-r from-green-500 to-emerald-500 text-white font-semibold hover:shadow-lg hover:shadow-emerald-500/20 transition-all"
               >
-                {lessonComplete ? <CheckCircle2 className="w-5 h-5" /> : <BookOpen className="w-5 h-5" />}
-                {lessonComplete ? "Review completed lesson" : "Open lesson"}
+                {lessonComplete ? <CheckCircle2 className="w-5 h-5" /> : <ArrowRight className="w-5 h-5" />}
+                {lessonComplete ? "Review completed lesson" : completed > 0 ? "Resume lesson" : "Start lesson"}
               </button>
             </div>
           </div>

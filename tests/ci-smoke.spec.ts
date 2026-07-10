@@ -82,6 +82,11 @@ test.describe("CI smoke", () => {
     // GSI script is blocked in smoke — container is attached before the button renders.
     await expect(page.getByTestId("google-auth-section")).toBeAttached();
     await expect(page.getByLabel(/email address/i)).toBeVisible();
+    await expect(page.getByLabel(/email address/i)).toHaveAttribute("autocomplete", "username");
+    await expect(page.getByLabel(/^password$/i)).toHaveAttribute(
+      "autocomplete",
+      "current-password",
+    );
     await expect(page.getByRole("button", { name: /sign in/i })).toBeVisible();
   });
 
@@ -93,6 +98,11 @@ test.describe("CI smoke", () => {
     ).toBeVisible();
     await expect(page.getByTestId("google-auth-section")).toBeAttached();
     await expect(page.getByLabel(/email address/i)).toBeVisible();
+    await expect(page.getByLabel(/^password$/i)).toHaveAttribute("autocomplete", "new-password");
+    await expect(page.getByLabel(/confirm password/i)).toHaveAttribute(
+      "autocomplete",
+      "new-password",
+    );
     await expect(page.getByRole("button", { name: /create account/i })).toBeVisible();
   });
 

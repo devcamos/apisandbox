@@ -6,6 +6,8 @@ import { Trophy, BarChart3, Target, TrendingUp } from "lucide-react"
 import { useSession } from "@/components/providers/SessionProvider"
 import { masteryLabel } from "@/lib/learning/phase-quiz-insights"
 import { phaseProgressMeta } from "@/lib/learning/phase-progress-meta"
+import { authApiRequestInit } from "@/lib/auth/client-fetch"
+import { courseIdForPhase } from "@/lib/learning/progress-mapping"
 
 interface PhaseProgress {
   phaseNumber: number
@@ -15,15 +17,27 @@ interface PhaseProgress {
   attempts: number
 }
 
+interface LearningSummary {
+  total: number
+  completed: number
+  percent: number
+  reviewsDue: number
+  nextIncomplete: {
+    moduleTitle: string
+    label: string
+  } | null
+}
+
 export default function PhaseProgressOverview() {
   const { status } = useSession()
   const [progress, setProgress] = useState<PhaseProgress[]>([])
+  const [learningSummaries, setLearningSummaries] = useState<Record<number, LearningSummary>>({})
 
   useEffect(() => {
     if (status !== "authenticated") return
 
     async function loadProgress() {
-      const res = await fetch("/api/phase-progress")
+      const res = await fetch("/api/phase-progress", authApiRequestInit())
       if (!res.ok) return
       const payload = await res.json()
       setProgress(payload.data.progress ?? [])
@@ -32,11 +46,53 @@ export default function PhaseProgressOverview() {
     void loadProgress()
   }, [status])
 
+  useEffect(() => {
+    if (status !== "authenticated") return
+
+    async function loadLearningProgress() {
+      const entries = await Promise.all(
+        Array.from({ length: 9 }, async (_, phaseNumber) => {
+          const res = await fetch(
+            `/api/learning/progress?courseId=${encodeURIComponent(courseIdForPhase(phaseNumber))}`,
+            authApiRequestInit(),
+          ).catch(() => null)
+          if (!res?.ok) return null
+          const payload = await res.json().catch(() => null)
+          return [phaseNumber, payload?.data?.summary] as const
+        }),
+      )
+
+      setLearningSummaries(
+        Object.fromEntries(
+          entries.filter((entry): entry is readonly [number, LearningSummary] => Boolean(entry?.[1])),
+        ),
+      )
+    }
+
+    void loadLearningProgress()
+  }, [status])
+
   const progressByPhase = useMemo(() => {
     return new Map(progress.map((item) => [item.phaseNumber, item]))
   }, [progress])
 
   const totalXp = useMemo(() => progress.reduce((sum, item) => sum + item.xpEarned, 0), [progress])
+  const lessonOverall = useMemo(() => {
+    const summaries = Object.entries(learningSummaries)
+      .map(([phaseNumber, summary]) => ({ phaseNumber: Number(phaseNumber), ...summary }))
+      .filter((summary) => summary.total > 0)
+    const total = summaries.reduce((sum, item) => sum + item.total, 0)
+    const completed = summaries.reduce((sum, item) => sum + item.completed, 0)
+    const reviewsDue = summaries.reduce((sum, item) => sum + item.reviewsDue, 0)
+    const next = summaries.find((item) => item.nextIncomplete) ?? null
+    return {
+      total,
+      completed,
+      reviewsDue,
+      next,
+      percent: total === 0 ? 0 : Math.round((completed / total) * 100),
+    }
+  }, [learningSummaries])
   const overall = useMemo(() => {
     const attempted = progress.filter((item) => item.attempts > 0)
     const readyCount = attempted.filter((item) => masteryLabel(item.correctAnswers, item.totalQuestions) === "Ready for the next phase").length
@@ -102,6 +158,23 @@ export default function PhaseProgressOverview() {
               {overall.nextFocus
                 ? masteryLabel(overall.nextFocus.correctAnswers, overall.nextFocus.totalQuestions)
                 : "You can keep moving or retake a checkpoint later."}
+            </div>
+          </div>
+        </div>
+
+        <div className="rounded-xl border border-cyan-500/20 bg-cyan-500/5 p-4 mb-6">
+          <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+            <div>
+              <div className="text-sm font-semibold text-cyan-100">Guided lesson practice</div>
+              <div className="text-sm text-gray-300">
+                {lessonOverall.completed}/{lessonOverall.total} checkpoints complete ({lessonOverall.percent}%)
+                {lessonOverall.reviewsDue > 0 ? ` · ${lessonOverall.reviewsDue} reviews due` : ""}
+              </div>
+            </div>
+            <div className="text-sm text-gray-300">
+              {lessonOverall.next?.nextIncomplete
+                ? `Next: Phase ${lessonOverall.next.phaseNumber} · ${lessonOverall.next.nextIncomplete.moduleTitle} · ${lessonOverall.next.nextIncomplete.label}`
+                : "Open a phase to start guided checkpoint practice."}
             </div>
           </div>
         </div>
