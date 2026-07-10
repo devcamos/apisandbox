@@ -3,25 +3,57 @@ import { prisma } from "@/lib/prisma"
 /** Same DB shape as Stripe `checkout.session.completed` provisioning. */
 export async function applyPremiumSubscription(
   userId: string,
-  options?: { stripeSubscriptionId?: string | null },
+  options?: {
+    stripeSubscriptionId?: string | null
+    stripeSubscriptionStatus?: string | null
+    stripeCurrentPeriodEnd?: Date | null
+    subscriptionExpiresAt?: Date | null
+  },
 ): Promise<void> {
+  const data: {
+    subscriptionTier: "PREMIUM"
+    stripeSubscriptionId?: string | null
+    stripeSubscriptionStatus?: string | null
+    stripeCurrentPeriodEnd?: Date | null
+    subscriptionExpiresAt?: Date | null
+  } = { subscriptionTier: "PREMIUM" }
+
+  if (options && "stripeSubscriptionId" in options) {
+    data.stripeSubscriptionId = options.stripeSubscriptionId
+  }
+  if (options && "stripeSubscriptionStatus" in options) {
+    data.stripeSubscriptionStatus = options.stripeSubscriptionStatus
+  }
+  if (options && "stripeCurrentPeriodEnd" in options) {
+    data.stripeCurrentPeriodEnd = options.stripeCurrentPeriodEnd
+  }
+  if (options && "subscriptionExpiresAt" in options) {
+    data.subscriptionExpiresAt = options.subscriptionExpiresAt
+  } else if (!options) {
+    data.subscriptionExpiresAt = null
+  }
+
   await prisma.user.update({
     where: { id: userId },
-    data: {
-      subscriptionTier: "PREMIUM",
-      stripeSubscriptionId: options?.stripeSubscriptionId ?? null,
-      subscriptionExpiresAt: null,
-    },
+    data,
   })
 }
 
 /** Same DB shape as subscription deleted / payment failed downgrade. */
-export async function downgradeToFreeSubscription(userId: string): Promise<void> {
+export async function downgradeToFreeSubscription(
+  userId: string,
+  options?: {
+    stripeSubscriptionStatus?: string | null
+    stripeCurrentPeriodEnd?: Date | null
+  },
+): Promise<void> {
   await prisma.user.update({
     where: { id: userId },
     data: {
       subscriptionTier: "FREE",
       stripeSubscriptionId: null,
+      stripeSubscriptionStatus: options?.stripeSubscriptionStatus ?? null,
+      stripeCurrentPeriodEnd: options?.stripeCurrentPeriodEnd ?? null,
       subscriptionExpiresAt: null,
     },
   })

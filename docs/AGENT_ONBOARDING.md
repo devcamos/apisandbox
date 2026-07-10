@@ -62,7 +62,7 @@ npm run dev                # http://localhost:4000
 ## Verify before PR
 
 ```bash
-npm run verify:ci
+npm run verify:ci:strict
 ```
 
 Mirrors CI: lint, build, unit tests + coverage, compose validate, audit (critical), e2e smoke (Docker Postgres on **5436**).

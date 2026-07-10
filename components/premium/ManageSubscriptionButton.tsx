@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { CreditCard, Loader2 } from "lucide-react"
 import { authApiFetchInit } from "@/lib/auth/client-fetch"
+import { isAllowedStripeBillingPortalRedirectUrl } from "@/lib/safe-redirect"
 
 interface ManageSubscriptionButtonProps {
   className?: string
@@ -27,7 +28,11 @@ export function ManageSubscriptionButton({
         ...authApiFetchInit,
       })
       const body = await res.json().catch(() => ({}))
-      if (!res.ok || typeof body.url !== "string") {
+      if (
+        !res.ok ||
+        typeof body.url !== "string" ||
+        !isAllowedStripeBillingPortalRedirectUrl(body.url)
+      ) {
         setError(
           typeof body.error === "string"
             ? body.error

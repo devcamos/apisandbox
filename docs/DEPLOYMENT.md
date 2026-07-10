@@ -103,7 +103,7 @@ curl -sS "https://apisandbox-coral.vercel.app/api/health/saas" | jq .
 PLAYWRIGHT_PROD_URL=https://apisandbox-coral.vercel.app npm run test:prod
 ```
 
-SaaS billing and feature-flag checklist: [SAAS.md](./SAAS.md).
+SaaS billing and feature-flag checklist: [SAAS.md](./SAAS.md). Flag reference: [FEATURE_FLAGS.md](./FEATURE_FLAGS.md).
 
 ---
 
@@ -123,6 +123,7 @@ Vercel previews provision a Neon `preview/<git-branch>` before the application b
 
 | Date | Change |
 |------|--------|
+| 2026-06-29 | Stripe production hardening: live-key validation, webhook idempotency ledger, status-driven entitlement reconciliation, and duplicate-subscription prevention |
 | 2026-06-29 | Switched PR Architecture Intelligence from OpenAI to the Gemini Developer API free tier |
 | 2026-06-29 | Documented environment-specific test users and separate OpenAI secret locations for GitHub Actions and Vercel Preview |
 | 2026-06-28 | Documented Neon preview branch capacity and added safe cleanup command (maximum five branches) |

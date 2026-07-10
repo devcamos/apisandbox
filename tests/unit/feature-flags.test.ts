@@ -34,12 +34,31 @@ describe("Feature Flags", () => {
     const flags = getAllFlags()
     expect(flags).toHaveProperty("PREMIUM_PAYWALL")
     expect(flags).toHaveProperty("STRIPE_CHECKOUT")
+    expect(flags).toHaveProperty("BILLING_PORTAL")
     expect(flags).toHaveProperty("EMAIL_VERIFICATION")
     expect(flags).toHaveProperty("RATE_LIMITING")
     expect(flags).toHaveProperty("ANALYTICS")
     expect(flags).toHaveProperty("DEMO_LOGIN")
     expect(flags.PREMIUM_PAYWALL).toHaveProperty("description")
     expect(flags.PREMIUM_PAYWALL).toHaveProperty("enabled")
+  })
+
+  it("featureFlagEnvKey returns the env var name", async () => {
+    const { featureFlagEnvKey } = await import("@/config/featureFlags")
+    expect(featureFlagEnvKey("BILLING_PORTAL")).toBe("NEXT_PUBLIC_FF_BILLING_PORTAL")
+  })
+
+  it("isBillingPortalEnabled requires both STRIPE_CHECKOUT and BILLING_PORTAL", async () => {
+    vi.stubEnv("NEXT_PUBLIC_FF_STRIPE_CHECKOUT", "true")
+    vi.stubEnv("NEXT_PUBLIC_FF_BILLING_PORTAL", "")
+    const { isBillingPortalEnabled } = await import("@/config/featureFlags")
+    expect(isBillingPortalEnabled()).toBe(false)
+
+    vi.resetModules()
+    vi.stubEnv("NEXT_PUBLIC_FF_STRIPE_CHECKOUT", "true")
+    vi.stubEnv("NEXT_PUBLIC_FF_BILLING_PORTAL", "true")
+    const mod = await import("@/config/featureFlags")
+    expect(mod.isBillingPortalEnabled()).toBe(true)
   })
 
   it("isFeatureEnabled returns false for an unknown flag key at runtime", async () => {

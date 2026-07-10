@@ -14,7 +14,8 @@ Use this **before** `git push` and `gh pr create`. Do not mark work complete unt
 
 | Run locally (before PR) | GitHub job | Notes |
 |-------------------------|------------|-------|
-| `npm run verify:ci` | All blocking jobs below | Single command; requires Docker |
+| `npm run verify:ci:strict` | All blocking jobs below | **`npm ci` + verify** — use before every push; catches lockfile/peer drift |
+| `npm run verify:ci` | Same (skip fresh install) | Faster re-run when `node_modules` already matches lockfile |
 | ↳ `npm run typecheck` | `lint-and-build` | Unused locals/parameters; runs before lint in CI |
 | ↳ `npm run lint` | `lint-and-build` | Unused imports/vars, `Number.parseInt`/`Number.isNaN` |
 | ↳ `npm run build` | `lint-and-build` | Same CI build env vars |
@@ -47,13 +48,15 @@ Use this **before** `git push` and `gh pr create`. Do not mark work complete unt
 ### One command (matches blocking CI jobs)
 
 ```bash
-npm run verify:ci
+npm run verify:ci:strict
 ```
+
+Use `npm run verify:ci` only for a fast re-run when you already ran `npm ci` and did not change the lockfile.
 
 **Prerequisites:**
 - Docker running (ephemeral `postgres-ci` on `localhost:5436`)
 - Port **4000 free** (stop `npm run dev` — Playwright starts its own server)
-- Dependencies installed (`npm ci` recommended before verify, same as CI)
+- `verify:ci:strict` runs `npm ci` first (same as CI install step)
 
 **What it runs** (see `scripts/verify-ci-local.sh` and [CI_PIPELINE.md](CI_PIPELINE.md)):
 1. `npm run typecheck`
@@ -76,7 +79,7 @@ Optional: if `SONAR_TOKEN` is in env or `.env.local`, also runs `npm run sonar:l
 | Stripe / billing | `npm run test:unit -- tests/unit/stripe-webhook-handlers.test.ts` |
 | Broad UI / routing | `CI=1 npm run test:ci:chromium` |
 
-`npm run verify:pr` is an alias for `npm run verify:ci`.
+`npm run verify:pr` is an alias for `npm run verify:ci:strict`.
 
 ---
 
@@ -103,7 +106,7 @@ If GitHub fails after local `verify:ci` passed:
 - <1–3 bullets>
 
 ## Test plan
-- [ ] `npm run verify:ci` passed locally
+- [ ] `npm run verify:ci:strict` passed locally
 - [ ] <area-specific tests if any>
 - [ ] CI checks green on GitHub (confirming, not first run)
 - [ ] Vercel Preview reviewed (human, for PRs → main)
@@ -128,7 +131,7 @@ Auth/subscription PRs: see `.cursor/rules/auth-subscription.mdc`.
 
 ## 6. Definition of done (agents)
 
-1. `npm run verify:ci` passes locally.
+1. `npm run verify:ci:strict` passes locally.
 2. Area-specific tests pass when applicable.
 3. Committed with clear message; no secrets/artifacts in diff.
 4. PR opened with test plan showing local verify.
@@ -141,5 +144,6 @@ Auth/subscription PRs: see `.cursor/rules/auth-subscription.mdc`.
 
 | Date | Change |
 |------|--------|
+| 2026-07-03 | `verify:ci:strict` (`npm ci` + verify); `verify:pr` aliases strict mode. |
 | 2026-05-25 | Local-first principle; `verify:ci` mirrors all blocking CI jobs including postgres-ci + coverage + compose + audit. |
 | 2026-05-25 | Initial agent PR checklist. |

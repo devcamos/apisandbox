@@ -12,10 +12,10 @@ alwaysApply: true
 ## Required before every PR
 
 ```bash
-npm run verify:ci
+npm run verify:ci:strict
 ```
 
-Mirrors CI jobs: `lint-and-build`, `unit-tests` (with coverage), `docker-compose-validate`, `npm audit` (critical), `e2e-smoke` (Postgres + `db push` + smoke tests).
+Runs `npm ci` then mirrors CI jobs: `lint-and-build`, `unit-tests` (with coverage), `docker-compose-validate`, `npm audit` (critical), `e2e-smoke` (Postgres + `db push` + smoke tests). Use `npm run verify:ci` for a faster re-run when `node_modules` already matches the lockfile.
 
 Requires **Docker** for e2e parity. Stop any `npm run dev` on port 4000 first.
 
@@ -46,11 +46,11 @@ Before push, optional local parity: `npm run sonar:local:full` (Docker + `SONAR_
 
 ## Before `gh pr create`
 
-1. `npm run verify:ci` green
+1. `npm run verify:ci:strict` green
 2. No secrets or generated artifacts in diff
 3. **Push the full branch** — every commit, including `.github/workflows/` changes. If HTTPS push rejects workflow files (OAuth `workflow` scope), use SSH: `git push git@github.com:ORG/REPO.git HEAD:BRANCH`
 4. `gh pr checks --watch` should confirm (not discover) green CI, including **SonarQube Cloud**
-5. PR body: Summary + Test plan with `verify:ci` checked
+5. PR body: Summary + Test plan with `verify:ci:strict` checked
 
 ## New logic in `lib/` (Sonar coverage)
 
@@ -58,7 +58,7 @@ When adding or changing testable `lib/**` modules that Sonar tracks (not exclude
 
 1. Add unit tests under `tests/unit/`
 2. Add the file to `vitest.config.ts` → `coverage.include` so LCOV reaches SonarCloud
-3. Re-run `npm run verify:ci` before push — do not leave coverage for the user to request
+3. Re-run `npm run verify:ci:strict` before push — do not leave coverage for the user to request
 
 ## GitHub-only (acceptable surprises)
 
@@ -68,4 +68,4 @@ When adding or changing testable `lib/**` modules that Sonar tracks (not exclude
 
 ## If a check fails
 
-Fix locally, re-run `npm run verify:ci`, push again.
+Fix locally, re-run `npm run verify:ci:strict`, push again.

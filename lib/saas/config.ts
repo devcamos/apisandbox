@@ -1,4 +1,4 @@
-import { isFeatureEnabled } from "@/config/featureFlags"
+import { isFeatureEnabled, isBillingPortalEnabled } from "@/config/featureFlags"
 import { isJwtSecretConfigured, jwtSecretSource } from "@/lib/auth/jwt-secret"
 
 export type SaasCheckStatus = "ok" | "warn" | "fail"
@@ -16,13 +16,31 @@ function envSet(key: string): boolean {
 }
 
 function envStartsWith(key: string, prefix: string): boolean {
-  const v = process.env[key]
-  return typeof v === "string" && v.trim().startsWith(prefix)
+  const value = process.env[key]
+  return typeof value === "string" && value.trim().startsWith(prefix)
 }
 
 /** True when running a production Node deployment (Vercel prod). */
 export function isProductionDeploy(): boolean {
   return process.env.NODE_ENV === "production" || process.env.VERCEL_ENV === "production"
+}
+
+function publicAppUrlIsValid(): boolean {
+  const value = process.env.NEXT_PUBLIC_APP_URL?.trim()
+  if (!value) return false
+  try {
+    const url = new URL(value)
+    const isLocalCi =
+      process.env.CI === "true" &&
+      process.env.VERCEL_ENV !== "production" &&
+      ["localhost", "127.0.0.1", "[::1]"].includes(url.hostname)
+    if (isProductionDeploy() && !isLocalCi) {
+      return url.protocol === "https:" && url.hostname !== "localhost"
+    }
+    return url.protocol === "http:" || url.protocol === "https:"
+  } catch {
+    return false
+  }
 }
 
 /** Instant POST /api/subscription/upgrade — dev/demo only, never when Stripe checkout is live. */
@@ -66,26 +84,25 @@ function authCheck(): SaasReadinessCheck {
 }
 
 function appUrlCheck(): SaasReadinessCheck {
-  const configured = envSet("NEXT_PUBLIC_APP_URL")
   return {
     id: "app_url",
     label: "Public app URL",
-    status: configured ? "ok" : "fail",
-    detail: configured
+    status: publicAppUrlIsValid() ? "ok" : "fail",
+    detail: publicAppUrlIsValid()
       ? `NEXT_PUBLIC_APP_URL=${process.env.NEXT_PUBLIC_APP_URL}`
-      : "NEXT_PUBLIC_APP_URL required for checkout redirects",
+      : "NEXT_PUBLIC_APP_URL must be valid; production checkout requires HTTPS",
   }
 }
 
 function stripeFailureDetail(
   stripeMissing: string[],
-  productionUsingStripeTestKey: boolean,
+  productionUsingNonLiveStripeKey: boolean,
   stripeMalformed: string[][],
 ): string {
   if (stripeMissing.length > 0) {
     return `STRIPE_CHECKOUT is on but required Stripe env vars are missing: ${stripeMissing.join(", ")}`
   }
-  if (productionUsingStripeTestKey) {
+  if (productionUsingNonLiveStripeKey) {
     return "Production Stripe checkout must use a live secret key (sk_live_...)"
   }
   if (stripeMalformed.length > 0) {
@@ -96,20 +113,18 @@ function stripeFailureDetail(
 
 function stripeCheck(): SaasReadinessCheck {
   const stripeCheckout = isFeatureEnabled("STRIPE_CHECKOUT")
-  const stripeMissing = [
-    "STRIPE_SECRET_KEY",
-    "STRIPE_WEBHOOK_SECRET",
-    "STRIPE_PRICE_ID",
-  ].filter((key) => !envSet(key))
+  const stripeMissing = ["STRIPE_SECRET_KEY", "STRIPE_WEBHOOK_SECRET", "STRIPE_PRICE_ID"].filter(
+    (key) => !envSet(key),
+  )
   const stripeMalformed = [
     ["STRIPE_SECRET_KEY", "sk_"],
     ["STRIPE_WEBHOOK_SECRET", "whsec_"],
     ["STRIPE_PRICE_ID", "price_"],
   ].filter(([key, prefix]) => envSet(key) && !envStartsWith(key, prefix))
-  const productionUsingStripeTestKey =
-    isProductionDeploy() && envStartsWith("STRIPE_SECRET_KEY", "sk_test_")
+  const productionUsingNonLiveStripeKey =
+    isProductionDeploy() && !envStartsWith("STRIPE_SECRET_KEY", "sk_live_")
   const stripeConfigured =
-    stripeMissing.length === 0 && stripeMalformed.length === 0 && !productionUsingStripeTestKey
+    stripeMissing.length === 0 && stripeMalformed.length === 0 && !productionUsingNonLiveStripeKey
 
   if (!stripeCheckout) {
     return {
@@ -133,7 +148,7 @@ function stripeCheck(): SaasReadinessCheck {
     id: "stripe",
     label: "Stripe billing",
     status: "fail",
-    detail: stripeFailureDetail(stripeMissing, productionUsingStripeTestKey, stripeMalformed),
+    detail: stripeFailureDetail(stripeMissing, productionUsingNonLiveStripeKey, stripeMalformed),
   }
 }
 
@@ -204,6 +219,36 @@ function instantUpgradeCheck(): SaasReadinessCheck {
   }
 }
 
+function billingPortalCheck(): SaasReadinessCheck {
+  const stripeCheckout = isFeatureEnabled("STRIPE_CHECKOUT")
+  const portalEnabled = isBillingPortalEnabled()
+
+  if (!stripeCheckout) {
+    return {
+      id: "billing_portal",
+      label: "Billing portal",
+      status: "warn",
+      detail: "Stripe checkout disabled — billing portal not applicable",
+    }
+  }
+
+  if (portalEnabled) {
+    return {
+      id: "billing_portal",
+      label: "Billing portal",
+      status: "ok",
+      detail: "Customer portal enabled (NEXT_PUBLIC_FF_BILLING_PORTAL=true)",
+    }
+  }
+
+  return {
+    id: "billing_portal",
+    label: "Billing portal",
+    status: "warn",
+    detail: "Set NEXT_PUBLIC_FF_BILLING_PORTAL=true and enable portal in Stripe Dashboard",
+  }
+}
+
 function assistantCheck(): SaasReadinessCheck {
   const aiKey = envSet("OPENAI_API_KEY") || envSet("GEMINI_API_KEY")
   return {
@@ -222,6 +267,7 @@ export function evaluateSaasReadiness(): SaasReadinessCheck[] {
     authCheck(),
     appUrlCheck(),
     stripeCheck(),
+    billingPortalCheck(),
     paywallCheck(),
     rateLimitCheck(),
     demoLoginCheck(),

@@ -9,6 +9,7 @@ function stubProductionSaasEnv(overrides: Record<string, string> = {}) {
   vi.stubEnv("NEXT_PUBLIC_APP_URL", "https://app.example.com")
   vi.stubEnv("NEXT_PUBLIC_FF_PREMIUM_PAYWALL", "true")
   vi.stubEnv("NEXT_PUBLIC_FF_STRIPE_CHECKOUT", "true")
+  vi.stubEnv("NEXT_PUBLIC_FF_BILLING_PORTAL", "true")
   vi.stubEnv("STRIPE_SECRET_KEY", "sk_live_x")
   vi.stubEnv("STRIPE_WEBHOOK_SECRET", "whsec_x")
   vi.stubEnv("STRIPE_PRICE_ID", "price_x")
@@ -89,6 +90,7 @@ describe("saas config", () => {
       expect(checkById(checks, "auth").status).toBe("ok")
       expect(checkById(checks, "app_url").status).toBe("ok")
       expect(checkById(checks, "stripe").status).toBe("ok")
+      expect(checkById(checks, "billing_portal").status).toBe("ok")
       expect(checkById(checks, "rate_limit").status).toBe("ok")
       expect(checkById(checks, "demo_login").status).toBe("ok")
       expect(checkById(checks, "instant_upgrade").status).toBe("ok")
@@ -125,18 +127,26 @@ describe("saas config", () => {
       expect(checkById(checks, "stripe").detail).toContain("STRIPE_CHECKOUT is on")
     })
 
-    it("fails stripe in production when live checkout uses a test secret key", async () => {
-      stubProductionSaasEnv({ STRIPE_SECRET_KEY: "sk_test_x" })
+    it("warns when Stripe checkout is on but billing portal flag is off", async () => {
+      stubProductionSaasEnv({ NEXT_PUBLIC_FF_BILLING_PORTAL: "" })
       const { evaluateSaasReadiness } = await import("@/lib/saas/config")
       const checks = evaluateSaasReadiness()
 
-      expect(checkById(checks, "stripe").status).toBe("fail")
-      expect(checkById(checks, "stripe").detail).toContain("live secret key")
+      expect(checkById(checks, "billing_portal").status).toBe("warn")
+      expect(checkById(checks, "billing_portal").detail).toContain("BILLING_PORTAL")
+    })
+
+    it("fails production readiness when Stripe uses a test key", async () => {
+      stubProductionSaasEnv({ STRIPE_SECRET_KEY: "sk_test_x" })
+      const { evaluateSaasReadiness } = await import("@/lib/saas/config")
+
+      const stripe = checkById(evaluateSaasReadiness(), "stripe")
+      expect(stripe.status).toBe("fail")
+      expect(stripe.detail).toContain("live secret key")
     })
 
     it("fails stripe when configured values have unexpected prefixes", async () => {
       stubProductionSaasEnv({
-        STRIPE_SECRET_KEY: "not-a-secret",
         STRIPE_WEBHOOK_SECRET: "not-a-webhook-secret",
         STRIPE_PRICE_ID: "not-a-price",
       })
@@ -145,6 +155,35 @@ describe("saas config", () => {
 
       expect(checkById(checks, "stripe").status).toBe("fail")
       expect(checkById(checks, "stripe").detail).toContain("unexpected prefix")
+    })
+
+    it("fails production readiness when the public URL is not HTTPS", async () => {
+      stubProductionSaasEnv({ NEXT_PUBLIC_APP_URL: "http://app.example.com" })
+      const { evaluateSaasReadiness } = await import("@/lib/saas/config")
+
+      expect(checkById(evaluateSaasReadiness(), "app_url").status).toBe("fail")
+    })
+
+    it("allows an HTTP loopback URL only for local CI smoke tests", async () => {
+      stubProductionSaasEnv({
+        CI: "true",
+        VERCEL_ENV: "preview",
+        NEXT_PUBLIC_APP_URL: "http://127.0.0.1:4000",
+      })
+      const { evaluateSaasReadiness } = await import("@/lib/saas/config")
+
+      expect(checkById(evaluateSaasReadiness(), "app_url").status).toBe("ok")
+    })
+
+    it("does not allow the CI exemption on Vercel production", async () => {
+      stubProductionSaasEnv({
+        CI: "true",
+        VERCEL_ENV: "production",
+        NEXT_PUBLIC_APP_URL: "http://127.0.0.1:4000",
+      })
+      const { evaluateSaasReadiness } = await import("@/lib/saas/config")
+
+      expect(checkById(evaluateSaasReadiness(), "app_url").status).toBe("fail")
     })
 
     it("warns when Stripe checkout is disabled in development", async () => {
