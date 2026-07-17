@@ -21,7 +21,7 @@ export default function NotFound() {
             Home
           </Link>
           <Link
-            href="/phase-0"
+            href="/learn/api-foundations"
             className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg border border-slate-600 hover:border-slate-500 text-gray-300 hover:text-white font-medium transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />

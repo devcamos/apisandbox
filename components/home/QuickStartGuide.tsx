@@ -16,23 +16,23 @@ export default function QuickStartGuide() {
       <div className="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto">
         <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border border-slate-700 text-center">
           <BookOpen className="w-12 h-12 text-blue-400 mx-auto mb-4" />
-          <h3 className="text-xl font-bold text-white mb-2">Read the Docs</h3>
+          <h3 className="text-xl font-bold text-white mb-2">Build the Mental Model</h3>
           <p className="text-gray-400 text-sm mb-4">
-            Start with our comprehensive documentation covering all integration patterns.
+            Follow one request from program state to a dependable integration.
           </p>
-          <Link href="/phase-1" className="inline-flex items-center text-blue-400 hover:text-blue-300 font-semibold">
-            Read More <ArrowRight className="w-4 h-4 ml-1" />
+          <Link href="/learn/api-foundations" className="inline-flex items-center text-blue-400 hover:text-blue-300 font-semibold">
+            Start foundation <ArrowRight className="w-4 h-4 ml-1" />
           </Link>
         </div>
 
         <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border border-slate-700 text-center">
           <Play className="w-12 h-12 text-purple-400 mx-auto mb-4" />
-          <h3 className="text-xl font-bold text-white mb-2">Try Interactive Demos</h3>
+          <h3 className="text-xl font-bold text-white mb-2">Trace a Request</h3>
           <p className="text-gray-400 text-sm mb-4">
-            Hands-on experience with real API calls and interactive examples.
+            Predict what happens at each layer, then reveal the package-tracking system trace.
           </p>
-          <Link href="/phase-1/categories" className="inline-flex items-center text-purple-400 hover:text-purple-300 font-semibold">
-            Try Demos <ArrowRight className="w-4 h-4 ml-1" />
+          <Link href="/learn/api-foundations/network-path" className="inline-flex items-center text-purple-400 hover:text-purple-300 font-semibold">
+            Trace the network <ArrowRight className="w-4 h-4 ml-1" />
           </Link>
         </div>
 

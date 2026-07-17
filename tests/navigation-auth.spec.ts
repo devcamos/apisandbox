@@ -7,6 +7,8 @@
 import { test, expect, type APIRequestContext } from '@playwright/test';
 import { randomUUID } from 'node:crypto';
 
+const testBaseUrl = process.env.PLAYWRIGHT_BASE_URL ?? (process.env.CI ? 'http://127.0.0.1:4000' : 'http://localhost:4000');
+
 async function createAuthenticatedSession(request: APIRequestContext) {
   const uniqueEmail = `test-${Date.now()}-${randomUUID()}@example.com`;
   const response = await request.post('/api/auth/register', {
@@ -32,7 +34,7 @@ async function applySession(page: import("@playwright/test").Page, token: string
     {
       name: 'auth_token',
       value: token,
-      url: 'http://localhost:4000',
+      url: testBaseUrl,
       httpOnly: true,
       sameSite: 'Lax',
     },
@@ -82,7 +84,7 @@ test.describe('Navigation with Authentication', () => {
       {
         name: 'auth_token',
         value: session.token,
-        url: 'http://localhost:4000',
+        url: testBaseUrl,
         httpOnly: true,
         sameSite: 'Lax',
       },

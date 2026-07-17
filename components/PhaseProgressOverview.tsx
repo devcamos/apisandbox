@@ -8,6 +8,7 @@ import { masteryLabel } from "@/lib/learning/phase-quiz-insights"
 import { phaseProgressMeta } from "@/lib/learning/phase-progress-meta"
 import { authApiRequestInit } from "@/lib/auth/client-fetch"
 import { courseIdForPhase } from "@/lib/learning/progress-mapping"
+import { API_FOUNDATIONS_COURSE_ID } from "@/lib/learning/course-ids"
 
 interface PhaseProgress {
   phaseNumber: number
@@ -28,10 +29,18 @@ interface LearningSummary {
   } | null
 }
 
+interface FoundationSummary {
+  totalUnits: number
+  attemptedUnits: number
+  masteredUnits: number
+  percent: number
+}
+
 export default function PhaseProgressOverview() {
   const { status } = useSession()
   const [progress, setProgress] = useState<PhaseProgress[]>([])
   const [learningSummaries, setLearningSummaries] = useState<Record<number, LearningSummary>>({})
+  const [foundationSummary, setFoundationSummary] = useState<FoundationSummary | null>(null)
 
   useEffect(() => {
     if (status !== "authenticated") return
@@ -44,6 +53,22 @@ export default function PhaseProgressOverview() {
     }
 
     void loadProgress()
+  }, [status])
+
+  useEffect(() => {
+    if (status !== "authenticated") return
+
+    async function loadFoundationProgress() {
+      const res = await fetch(
+        `/api/learning/assessments/${encodeURIComponent(API_FOUNDATIONS_COURSE_ID)}`,
+        authApiRequestInit(),
+      ).catch(() => null)
+      if (!res?.ok) return
+      const payload = await res.json().catch(() => null)
+      setFoundationSummary(payload?.data ?? null)
+    }
+
+    void loadFoundationProgress()
   }, [status])
 
   useEffect(() => {
@@ -178,6 +203,26 @@ export default function PhaseProgressOverview() {
             </div>
           </div>
         </div>
+
+        <Link
+          href="/learn/api-foundations"
+          className="mb-6 block rounded-xl border border-emerald-400/25 bg-gradient-to-r from-emerald-400/10 to-cyan-400/10 p-5 transition-colors hover:border-emerald-300/50"
+        >
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <div className="text-sm font-semibold text-emerald-200">First-principles foundation · Phases 0–1</div>
+              <div className="mt-1 text-xl font-bold text-white">Program → machine → network → HTTP → contract → integration</div>
+              <div className="mt-1 text-sm text-slate-300">
+                {foundationSummary
+                  ? `${foundationSummary.masteredUnits}/${foundationSummary.totalUnits} unit assessments demonstrate understanding (${foundationSummary.percent}%).`
+                  : "Six connected units with scenario-based assessments."}
+              </div>
+            </div>
+            <div className="text-sm font-semibold text-emerald-200">
+              {foundationSummary?.attemptedUnits ? "Continue foundation →" : "Start foundation →"}
+            </div>
+          </div>
+        </Link>
 
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
           {phaseProgressMeta.map((phase) => {

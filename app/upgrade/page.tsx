@@ -88,11 +88,11 @@ export default function UpgradePage() {
             <ul className="space-y-3 mb-6">
               <li className="flex items-center gap-2 text-gray-300">
                 <Check className="w-5 h-5 text-green-400 shrink-0" />
-                Phase 0: How the Internet Works
+                Phase 0: Program to Network
               </li>
               <li className="flex items-center gap-2 text-gray-300">
                 <Check className="w-5 h-5 text-green-400 shrink-0" />
-                Phase 1: Integration Mindset
+                Phase 1: HTTP to Integration
               </li>
               <li className="flex items-center gap-2 text-gray-300">
                 <Check className="w-5 h-5 text-green-400 shrink-0" />
@@ -108,7 +108,7 @@ export default function UpgradePage() {
               </li>
             </ul>
             <Link
-              href="/phase-0"
+              href="/learn/api-foundations"
               className="block w-full py-3 bg-slate-700 text-white rounded-lg font-semibold text-center hover:bg-slate-600 transition-all"
             >
               Start Free
@@ -196,7 +196,7 @@ export default function UpgradePage() {
           <div className="flex items-center justify-center gap-6 text-sm text-gray-500">
             <Link href="/terms" className="hover:text-gray-300 transition-colors">Terms</Link>
             <Link href="/privacy" className="hover:text-gray-300 transition-colors">Privacy</Link>
-            <Link href="/phase-1" className="text-violet-400 hover:text-violet-300 transition-colors">
+            <Link href="/learn/api-foundations" className="text-violet-400 hover:text-violet-300 transition-colors">
               ← Back to free content
             </Link>
           </div>

@@ -88,6 +88,7 @@ model User {
   apiTokenAuditEvents ApiTokenAuditEvent[]
   learningEnrollments LearningEnrollment[]
   learningCheckpointProgress LearningCheckpointProgress[]
+  learningUnitAssessmentProgress LearningUnitAssessmentProgress[]
 }
 
 model StripeWebhookEvent {
@@ -212,6 +213,26 @@ model LearningCheckpointProgress {
   @@index([userId])
   @@index([courseId])
   @@index([moduleId])
+}
+
+model LearningUnitAssessmentProgress {
+  id                  String   @id @default(cuid())
+  userId              String
+  courseId            String
+  unitId              String
+  bestCorrectAnswers  Int      @default(0)
+  totalQuestions      Int
+  attempts            Int      @default(0)
+  completedAt         DateTime?
+  lastAttemptAt       DateTime?
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, courseId, unitId])
+  @@index([userId])
+  @@index([courseId])
 }
 
 model UserProfile {
