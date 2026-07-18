@@ -75,14 +75,14 @@ export default function DashboardPage() {
                     {session ? `Welcome back, ${session.user?.name || session.user?.email}!` : "Explore your learning path"}
                   </h1>
                   <p className="text-xl text-gray-300 mb-4">
-                    {session ? "Continue your API integration learning journey" : "All phases and topics in one place. Free: Phase 0 & 1. Premium: unlock all."}
+                    {session ? "Continue from first principles to production API reasoning" : "Begin with the free first-principles foundation, then unlock advanced API engineering."}
                   </p>
                   
                   {/* Pareto Principle Badge */}
                   <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-yellow-500/20 to-orange-500/20 border border-yellow-500/30 rounded-lg mb-4">
                     <span className="text-2xl">📊</span>
-                    <span className="text-yellow-300 font-semibold">Pareto-Powered Training</span>
-                    <span className="text-gray-400 text-sm">• Master the 20% that delivers 80%</span>
+                    <span className="text-yellow-300 font-semibold">First-Principles Training</span>
+                    <span className="text-gray-400 text-sm">• Build the model before choosing the tools</span>
                   </div>
             
             {/* Subscription Status Badge */}
@@ -116,11 +116,11 @@ export default function DashboardPage() {
               <div className="text-center mb-12">
                 <h2 className="text-4xl font-bold text-white mb-4">Choose Your Learning Path</h2>
                 <p className="text-xl text-gray-300 max-w-3xl mx-auto mb-6">
-                  Our curriculum spans <strong className="text-white">10 learning phases</strong> (Phase 0–9) plus Cloud and AI tracks — from fundamentals through algorithms, monetisation, and production data systems. <strong className="text-green-400">Phase 0 and Phase 1 are free</strong> — start your journey today!
+                  Our curriculum spans <strong className="text-white">10 learning phases</strong> (Phase 0–9) plus Cloud and AI tracks. Start with the free six-unit foundation: <strong className="text-green-400">program → machine → network → HTTP → contract → integration</strong>.
                 </p>
           <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-4 max-w-2xl mx-auto">
             <p className="text-blue-200 text-sm">
-              <strong>💡 New to programming?</strong> Start with Phase 0 (Getting Started). <strong>New to APIs?</strong> Start with Phase 1. <strong>Already comfortable with REST?</strong> Jump to Phase 2. <strong>Building microservices?</strong> Phase 3 is for you. <strong>Ready for cloud?</strong> Explore the Cloud section. <strong>Interested in AI?</strong> Check out the AI section.
+              <strong>💡 New to APIs?</strong> Start with Phase 0 and follow the request from a program to the network. <strong>Comfortable with HTTP contracts?</strong> Jump to Phase 2. <strong>Building microservices?</strong> Phase 3 is for you. <strong>Ready for cloud?</strong> Explore the Cloud section.
             </p>
           </div>
         </div>

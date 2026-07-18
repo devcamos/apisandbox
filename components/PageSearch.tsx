@@ -34,20 +34,20 @@ const searchData: SearchResult[] = [
 
   // Phases
   {
-    title: "Phase 0: Getting Started",
-    description: "Introduction to API integration fundamentals",
-    href: "/phase-0",
+    title: "Phase 0: Program to Network",
+    description: "First principles: programs, processes, ports, DNS, TCP, and TLS",
+    href: "/learn/api-foundations/programs-and-state",
     category: "Phase 0",
     icon: BookOpen,
-    keywords: ["phase 0", "getting started", "introduction", "basics", "fundamentals"]
+    keywords: ["phase 0", "first principles", "programs", "async", "processes", "ports", "dns", "network", "fundamentals"]
   },
   {
-    title: "Phase 1: Integration Mindset",
-    description: "Understanding API categories and contract styles",
-    href: "/phase-1",
+    title: "Phase 1: HTTP to Integration",
+    description: "HTTP messages, JSON contracts, and dependable API integrations",
+    href: "/learn/api-foundations/http-messages",
     category: "Phase 1",
     icon: Brain,
-    keywords: ["phase 1", "mindset", "categories", "rest", "graphql", "contract", "styles"]
+    keywords: ["phase 1", "http", "json", "contract", "validation", "timeout", "retry", "integration"]
   },
   {
     title: "Phase 1: Categories",

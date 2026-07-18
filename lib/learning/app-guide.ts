@@ -19,23 +19,23 @@ export const APP_GUIDE_STEP_META: Record<
   { title: string; description: string; href: string; linkLabel: string }
 > = {
   pareto_methodology: {
-    title: "How training works (80/20)",
+    title: "How training works (first principles)",
     description:
-      "We teach the vital 20% of concepts that unlock most real-world API work, then deep-dive each one.",
+      "We build a causal model from program state to dependable integrations before introducing advanced tools.",
     href: "/dashboard#app-guide-pareto",
     linkLabel: "Review methodology",
   },
   read_docs: {
-    title: "Read the docs",
-    description: "Start with Phase 1 patterns and integration mindset.",
-    href: "/phase-1",
-    linkLabel: "Read More",
+    title: "Build the mental model",
+    description: "Start with the program-to-network foundation and follow one API request end to end.",
+    href: "/learn/api-foundations",
+    linkLabel: "Start foundation",
   },
   try_demos: {
-    title: "Try interactive demos",
-    description: "Hands-on API calls and examples in Phase 1 categories.",
-    href: "/phase-1/categories",
-    linkLabel: "Try Demos",
+    title: "Trace a request",
+    description: "Predict how the package-tracking request moves through each system boundary.",
+    href: "/learn/api-foundations/network-path",
+    linkLabel: "Trace the network",
   },
   track_progress: {
     title: "Monitor progress",

@@ -74,7 +74,14 @@ The GitHub `GEMINI_API_KEY` secret does not populate Vercel, and a Vercel enviro
 | Binary targets | `prisma/schema.prisma` — `native`, `rhel-openssl-3.0.x` |
 | Client | `lib/prisma.ts` — standard `PrismaClient` |
 
-After first deploy: `npx prisma migrate deploy` (or `db push` in non-prod) against the linked database.
+Vercel runs `npm run db:migrate:deploy` before each application build. This applies
+the versioned migrations to the exact Production or Preview database created for
+that deployment, before the app can query it. If a migration fails, the deployment
+fails rather than serving code against an older schema.
+
+For an existing environment that was deployed before this build contract, run
+`npx prisma migrate deploy` against that environment's database once, then redeploy.
+Use `db push` only for local development or intentionally disposable databases.
 
 ---
 

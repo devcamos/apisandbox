@@ -26,7 +26,7 @@ test.describe('Dashboard', () => {
     await page.goto('/login');
     await page.getByLabel(/email address/i).fill(uniqueEmail);
     await page.getByLabel(/^password$/i).fill('Test1234!@#$');
-    await page.getByRole('button', { name: /sign in/i }).click();
+    await page.getByRole('button', { name: 'Sign In', exact: true }).click();
     await page.waitForURL(/\/dashboard/);
 
     // Should see dashboard content
@@ -46,7 +46,7 @@ test.describe('Dashboard', () => {
     await page.goto('/login');
     await page.getByLabel(/email address/i).fill(uniqueEmail);
     await page.getByLabel(/^password$/i).fill('Test1234!@#$');
-    await page.getByRole('button', { name: /sign in/i }).click();
+    await page.getByRole('button', { name: 'Sign In', exact: true }).click();
     await page.waitForURL(/\/dashboard/);
 
     // Should show free plan badge
@@ -68,7 +68,7 @@ test.describe('Dashboard', () => {
     await page.goto('/login');
     await page.getByLabel(/email address/i).fill(uniqueEmail);
     await page.getByLabel(/^password$/i).fill('Test1234!@#$');
-    await page.getByRole('button', { name: /sign in/i }).click();
+    await page.getByRole('button', { name: 'Sign In', exact: true }).click();
     await page.waitForURL(/\/dashboard/);
 
     // Should show premium badge
@@ -87,12 +87,11 @@ test.describe('Dashboard', () => {
     await page.goto('/login');
     await page.getByLabel(/email address/i).fill(uniqueEmail);
     await page.getByLabel(/^password$/i).fill('Test1234!@#$');
-    await page.getByRole('button', { name: /sign in/i }).click();
+    await page.getByRole('button', { name: 'Sign In', exact: true }).click();
     await page.waitForURL(/\/dashboard/);
 
-    // Should see premium badges on phases 2-5
-    await expect(page.getByText(/phase 2/i)).toBeVisible();
-    // Check for premium indicator (lock icon or premium badge)
+    // Phase 2 stays premium while the new Phase 0-1 foundation is free.
+    await expect(page.getByRole('link', { name: /intermediate phase 2 third-party integrations/i })).toBeVisible();
   });
 
   test('should display all 5 learning phases', async ({ page, request }) => {
@@ -107,14 +106,14 @@ test.describe('Dashboard', () => {
     await page.goto('/login');
     await page.getByLabel(/email address/i).fill(uniqueEmail);
     await page.getByLabel(/^password$/i).fill('Test1234!@#$');
-    await page.getByRole('button', { name: /sign in/i }).click();
+    await page.getByRole('button', { name: 'Sign In', exact: true }).click();
     await page.waitForURL(/\/dashboard/);
 
-    await expect(page.getByText(/phase 1/i)).toBeVisible();
-    await expect(page.getByText(/phase 2/i)).toBeVisible();
-    await expect(page.getByText(/phase 3/i)).toBeVisible();
-    await expect(page.getByText(/phase 4/i)).toBeVisible();
-    await expect(page.getByText(/phase 5/i)).toBeVisible();
+    await expect(page.getByRole('link', { name: /beginner phase 1 first principles: http to integration/i })).toBeVisible();
+    await expect(page.getByRole('link', { name: /intermediate phase 2 third-party integrations/i })).toBeVisible();
+    await expect(page.getByRole('link', { name: /advanced phase 3 inter-service communication/i })).toBeVisible();
+    await expect(page.getByRole('link', { name: /expert phase 4 principal-level architecture/i })).toBeVisible();
+    await expect(page.getByRole('link', { name: /architect phase 5 api algorithms/i })).toBeVisible();
   });
 
   test('should have links to all phases', async ({ page, request }) => {
@@ -129,12 +128,12 @@ test.describe('Dashboard', () => {
     await page.goto('/login');
     await page.getByLabel(/email address/i).fill(uniqueEmail);
     await page.getByLabel(/^password$/i).fill('Test1234!@#$');
-    await page.getByRole('button', { name: /sign in/i }).click();
+    await page.getByRole('button', { name: 'Sign In', exact: true }).click();
     await page.waitForURL(/\/dashboard/);
 
     // Check phase links
-    const phase1Link = page.getByRole('link', { name: /integration mindset/i });
+    const phase1Link = page.getByRole('link', { name: /first principles: http to integration/i });
     await expect(phase1Link).toBeVisible();
-    await expect(phase1Link).toHaveAttribute('href', '/phase-1');
+    await expect(phase1Link).toHaveAttribute('href', '/learn/api-foundations/http-messages');
   });
 });

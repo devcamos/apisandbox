@@ -85,8 +85,8 @@ export default function Navigation() {
       title: "Phases",
       icon: BookOpen,
       items: [
-        { name: "Phase 0: Getting Started", href: "/phase-0", badge: "Free" },
-        { name: "Phase 1: Integration Mindset", href: "/phase-1", badge: "Free" },
+        { name: "Phase 0: Program to Network", href: "/learn/api-foundations/programs-and-state", badge: "Free" },
+        { name: "Phase 1: HTTP to Integration", href: "/learn/api-foundations/http-messages", badge: "Free" },
         { name: "Phase 2: Third-Party Integrations", href: "/phase-2", badge: "Premium" },
         { name: "Phase 3: Inter-Service Communication", href: "/phase-3", badge: "Premium" },
         { name: "Phase 4: Principal-Level Architecture", href: "/phase-4", badge: "Premium" },
@@ -135,7 +135,7 @@ export default function Navigation() {
                 <button
                   onClick={() => setExploreOpen(!exploreOpen)}
                   className={`px-4 py-2 rounded-lg transition-all flex items-center gap-1 ${
-                    pathname.startsWith("/phase") || pathname.startsWith("/cloud") || pathname.startsWith("/ai")
+                    pathname.startsWith("/phase") || pathname.startsWith("/learn") || pathname.startsWith("/cloud") || pathname.startsWith("/ai")
                       ? "bg-blue-500/10 text-blue-400 font-semibold"
                       : "text-gray-300 hover:text-white hover:bg-slate-800"
                   }`}
