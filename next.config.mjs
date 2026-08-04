@@ -16,7 +16,19 @@ const nextConfig = {
     '/api/**/*': ['./node_modules/.prisma/client/**/*'],
     '/*': ['./node_modules/.prisma/client/**/*'],
   },
+  async headers() {
+    return [
+      {
+        source: '/:path*',
+        headers: [
+          {
+            key: 'Cross-Origin-Opener-Policy',
+            value: 'same-origin-allow-popups',
+          },
+        ],
+      },
+    ]
+  },
 };
 
 export default nextConfig;
-
