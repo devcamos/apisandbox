@@ -25,7 +25,7 @@ export default function AuthSocialSection({
           <Script src="https://accounts.google.com/gsi/client" strategy="afterInteractive" />
           <div
             ref={googleButtonRef}
-            className="w-full flex justify-center [&_.g_id_signin]:!w-full [&_.g_id_signin]>div:!w-full"
+            className="mx-auto flex w-full max-w-[400px] justify-center overflow-hidden [&_.g_id_signin]:!w-full [&_.g_id_signin]>div:!w-full"
             data-testid="google-auth-section"
           />
         </>

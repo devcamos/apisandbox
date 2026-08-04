@@ -51,6 +51,13 @@ test.describe("Mobile layout", () => {
     }
   });
 
+  test("Google sign-in control fits within the mobile login page", async ({ page }) => {
+    await page.goto("/login", { waitUntil: "domcontentloaded" });
+
+    await expect(page.getByTestId("google-auth-section")).toBeVisible();
+    await assertNoHorizontalOverflow(page);
+  });
+
   test("signed-in dashboard and phase preview fit mobile width", async ({ page, request }) => {
     const uniqueEmail = `mobile-${Date.now()}@example.com`;
     await request.post("/api/auth/signup", {

@@ -134,6 +134,8 @@ function SignupForm({ googleClientId }: Readonly<{ googleClientId: string }>) {
     <AuthPageShell
       title="Create Account"
       subtitle="Free access to Phases 0 & 1 — upgrade anytime for full access"
+      isLoading={isLoading}
+      loadingMessage="Creating your account securely…"
     >
           <AuthSocialSection
             googleClientId={googleClientId}

@@ -201,6 +201,8 @@ function LoginForm({ googleClientId }: Readonly<{ googleClientId: string }>) {
     <AuthPageShell
       title="Welcome Back"
       subtitle="Sign in to continue your API integration journey"
+      isLoading={isLoading}
+      loadingMessage="Signing you in securely…"
     >
           <AuthSocialSection
             googleClientId={googleClientId}

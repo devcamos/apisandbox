@@ -7,6 +7,7 @@ import { Menu, X, LogOut, User, ChevronDown, BookOpen, Compass, Settings, Credit
 import { useState, useRef, useEffect } from "react";
 import { PageSearch } from "./PageSearch";
 import { ManageSubscriptionButton } from "@/components/premium/ManageSubscriptionButton";
+import { SignOutProgressOverlay } from "@/components/auth/SignOutProgressOverlay";
 import { isBillingPortalEnabled } from "@/config/featureFlags";
 
 function mobileExploreBadgeClass(badge: string | undefined) {
@@ -21,6 +22,7 @@ export default function Navigation() {
   const [isOpen, setIsOpen] = useState(false);
   const [exploreOpen, setExploreOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
+  const [isSigningOut, setIsSigningOut] = useState(false);
   const [subscription, setSubscription] = useState<{ tier: "FREE" | "PREMIUM"; isExpired: boolean } | null>(null);
   const exploreRef = useRef<HTMLDivElement>(null);
   const profileRef = useRef<HTMLDivElement>(null);
@@ -34,6 +36,14 @@ export default function Navigation() {
   const protectedNavItems = [{ name: "Dashboard", href: "/dashboard" }];
 
   const navItems = session ? protectedNavItems : [...publicNavItems, { name: "Upgrade", href: "/upgrade" }];
+
+  const handleSignOut = async () => {
+    if (isSigningOut) return;
+    setIsSigningOut(true);
+    setProfileOpen(false);
+    setIsOpen(false);
+    await signOut({ callbackUrl: "/" });
+  };
 
   // Fetch subscription status
   useEffect(() => {
@@ -325,11 +335,9 @@ export default function Navigation() {
                         ) : null}
                         <div className="border-t border-slate-700 my-2"></div>
                         <button
-                          onClick={() => {
-                            setProfileOpen(false);
-                            signOut({ callbackUrl: "/" });
-                          }}
-                          className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-all"
+                          onClick={() => void handleSignOut()}
+                          disabled={isSigningOut}
+                          className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-all disabled:cursor-wait disabled:opacity-60"
                         >
                           <LogOut className="w-4 h-4" />
                           <span className="text-sm">Sign Out</span>
@@ -518,11 +526,9 @@ export default function Navigation() {
                   </Link>
                 ) : null}
                 <button
-                  onClick={() => {
-                    setIsOpen(false)
-                    signOut({ callbackUrl: "/" })
-                  }}
-                  className="w-full px-4 py-2 rounded-lg text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-all flex items-center justify-center gap-2"
+                  onClick={() => void handleSignOut()}
+                  disabled={isSigningOut}
+                  className="w-full px-4 py-2 rounded-lg text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-all flex items-center justify-center gap-2 disabled:cursor-wait disabled:opacity-60"
                 >
                   <LogOut className="w-4 h-4" />
                   Sign Out
@@ -549,6 +555,7 @@ export default function Navigation() {
           </div>
         )}
       </div>
+      <SignOutProgressOverlay visible={isSigningOut} />
     </nav>
   );
 }
