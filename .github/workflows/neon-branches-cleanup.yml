@@ -1,0 +1,52 @@
+name: Neon branches cleanup
+
+on:
+  workflow_dispatch:
+    inputs:
+      apply:
+        description: Delete eligible obsolete preview branches (otherwise dry-run)
+        required: true
+        type: boolean
+        default: false
+      max:
+        description: Maximum total Neon branches to retain
+        required: true
+        type: number
+        default: 5
+
+permissions:
+  contents: read
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+
+      - name: Plan or apply Neon branch cleanup
+        env:
+          NEON_API_KEY: ${{ secrets.NEON_API_KEY }}
+          NEON_PROJECT_ID: ${{ vars.NEON_PROJECT_ID }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          if [ -z "${NEON_API_KEY:-}" ]; then
+            echo "NEON_API_KEY secret is missing"
+            exit 1
+          fi
+          if [ -z "${NEON_PROJECT_ID:-}" ]; then
+            echo "NEON_PROJECT_ID variable is missing"
+            exit 1
+          fi
+          args=(--max "${{ inputs.max }}")
+          if [ "${{ inputs.apply }}" = "true" ]; then
+            args+=(--apply)
+          fi
+          npm run neon:branches:cleanup -- "${args[@]}"
