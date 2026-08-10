@@ -5,7 +5,8 @@
     "Report only findings supported by the changed files, diff, or diagnostic output.",
     "Prefer small, actionable findings over speculative redesigns.",
     "Treat authentication, authorization, billing, and data integrity changes as high-risk boundaries.",
-    "Do not treat generated files, lockfiles, or diagnostic noise as architectural violations by themselves."
+    "Do not treat generated files, lockfiles, or diagnostic noise as architectural violations by themselves.",
+    "Apply docs/NEXUS_ENGINEERING_PRINCIPLES.md when reviewing applications and reusable MotivusLabs resources for Nexus."
   ],
   "rules": [
     {
@@ -70,6 +71,13 @@
       "title": "Make failures observable and safe",
       "description": "External calls and background work need bounded failure handling, useful structured logs without sensitive data, and user-facing errors that do not leak internals.",
       "evidence": ["app/api/**", "lib/services/**", "lib/**"]
+    },
+    {
+      "id": "ARCH-010",
+      "severity": "medium",
+      "title": "Govern reusable Nexus resources",
+      "description": "Code, services, templates, workflows, datasets, and documentation presented as reusable MotivusLabs resources must define their purpose, consumers, owner, contract, versioning, quality, security, operations, cost, and lifecycle in proportion to risk.",
+      "evidence": ["docs/**", "components/**", "lib/**", "config/**", ".github/workflows/**"]
     }
   ]
 }
