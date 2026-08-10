@@ -119,6 +119,21 @@ SaaS billing and feature-flag checklist: [SAAS.md](./SAAS.md). Flag reference: [
 - CI runs on PRs and pushes to `main` (see `.github/workflows/ci.yml`).
 - Vercel deploys from Git integration; production on merge to `main`.
 - Optional human gate: GitHub Environment `preview` for PR approval (see workflow `preview-deploy-gate`).
+- Vercel `vercel.deployment.ready` repository-dispatch events run
+  `.github/workflows/vercel-e2e.yml` against the exact deployed SHA and URL.
+- Preview E2E verifies database/auth health, then registers a disposable test user,
+  signs in, and opens the dashboard with Playwright. Production deployments run
+  read-only database/auth health checks and do not create a test account.
+- If Preview Deployment Protection is enabled, create a Protection Bypass for
+  Automation and store the same value as the GitHub Actions secret
+  `VERCEL_AUTOMATION_BYPASS_SECRET`.
+
+The repository-dispatch workflow must exist on `main`. In Vercel project Git
+settings, enable repository-dispatch deployment events. Optionally select
+`Vercel - API Sandbox E2E (preview)` and
+`Vercel - API Sandbox E2E (production)` as Vercel Deployment Checks. The
+environment suffix keeps Preview and Production statuses for the same commit
+independent.
 
 ### Neon preview branch capacity
 
@@ -130,6 +145,7 @@ Vercel previews provision a Neon `preview/<git-branch>` before the application b
 
 | Date | Change |
 |------|--------|
+| 2026-08-10 | Added deployed-URL E2E for Vercel repository-dispatch events, including Preview database/auth checks and Playwright registration/login coverage |
 | 2026-06-29 | Stripe production hardening: live-key validation, webhook idempotency ledger, status-driven entitlement reconciliation, and duplicate-subscription prevention |
 | 2026-06-29 | Switched PR Architecture Intelligence from OpenAI to the Gemini Developer API free tier |
 | 2026-06-29 | Documented environment-specific test users and separate OpenAI secret locations for GitHub Actions and Vercel Preview |

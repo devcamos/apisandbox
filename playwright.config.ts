@@ -11,6 +11,14 @@ const useProdServer =
 const useStandaloneServer =
   useProdServer && existsSync(".next/standalone/server.js");
 
+const externalDeploymentUrl = process.env.PLAYWRIGHT_PROD_URL?.replace(/\/$/, "");
+const deploymentProtectionHeaders = process.env.VERCEL_AUTOMATION_BYPASS_SECRET
+  ? {
+      "x-vercel-protection-bypass": process.env.VERCEL_AUTOMATION_BYPASS_SECRET,
+      "x-vercel-set-bypass-cookie": "true",
+    }
+  : undefined;
+
 const ciWebServerCommand = useStandaloneServer
   ? "node .next/standalone/server.js"
   : useProdServer
@@ -110,13 +118,14 @@ export default defineConfig({
           },
         ]
       : []),
-    ...(process.env.PLAYWRIGHT_PROD_URL
+    ...(externalDeploymentUrl
       ? [
           {
             name: 'prod-deployment',
             testMatch: '**/prod-deployment-auth.spec.ts',
             use: {
-              baseURL: process.env.PLAYWRIGHT_PROD_URL.replace(/\/$/, ''),
+              baseURL: externalDeploymentUrl,
+              extraHTTPHeaders: deploymentProtectionHeaders,
             },
           },
         ]
@@ -124,7 +133,7 @@ export default defineConfig({
   ],
 
   /* Run your local dev server before starting the tests (skip when running staging tests) */
-  webServer: process.env.STAGING_TEST
+  webServer: process.env.STAGING_TEST || externalDeploymentUrl
     ? undefined
     : {
         // CI: reuse lint-and-build output via `next start` when CI_E2E_USE_PROD_SERVER=1.
