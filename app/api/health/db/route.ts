@@ -1,4 +1,4 @@
-import { prisma } from "@/lib/prisma"
+import { getDatabaseUrlSource, prisma } from "@/lib/prisma"
 import { okResponse, errorResponse } from "@/lib/http/responses"
 
 export const runtime = "nodejs"
@@ -10,17 +10,15 @@ function urlProtocol(value: string | undefined) {
 
 export async function GET() {
   const resolved = process.env.DATABASE_URL
-  const hasDatabaseUrl = Boolean(
-    process.env.DATABASE_URL ||
-      process.env.POSTGRES_PRISMA_URL ||
-      process.env.POSTGRES_URL,
-  )
+  const source = getDatabaseUrlSource()
+  const hasDatabaseUrl = Boolean(source)
 
   try {
     await prisma.$queryRaw`SELECT 1`
     return okResponse({
       ok: true,
       hasDatabaseUrl,
+      source: source ?? "missing",
       nodeEnv: process.env.NODE_ENV ?? "unknown",
       protocols: {
         databaseUrl: urlProtocol(process.env.DATABASE_URL),
@@ -32,6 +30,7 @@ export async function GET() {
     const message = error instanceof Error ? error.message : "Unknown database error"
     return errorResponse(503, "configuration_error", message, {
       hasDatabaseUrl,
+      source: source ?? "missing",
       protocols: {
         databaseUrl: urlProtocol(process.env.DATABASE_URL),
         postgresPrismaUrl: urlProtocol(process.env.POSTGRES_PRISMA_URL),
