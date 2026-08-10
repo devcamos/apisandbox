@@ -117,6 +117,7 @@ export default function Navigation() {
       title: "Advanced Topics",
       icon: Compass,
       items: [
+        { name: "AWS Certification Journey", href: "/cloud/aws/certifications", badge: "Premium" },
         { name: "Cloud Migration", href: "/cloud", badge: "Premium" },
         { name: "AI Learning", href: "/ai", badge: "Premium" },
         { name: "Dependency Map", href: "/dependencies", badge: "Docs" },

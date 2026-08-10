@@ -6,10 +6,9 @@ import {
   API_FOUNDATIONS_COURSE_ID,
   API_FOUNDATIONS_MASTERY_THRESHOLD,
 } from "@/lib/learning/course-ids"
+import { awsCertificationCourses } from "@/lib/learning/aws-certification-course"
 
 export { API_FOUNDATIONS_COURSE_ID, API_FOUNDATIONS_MASTERY_THRESHOLD } from "@/lib/learning/course-ids"
-
-export type FoundationPhase = 0 | 1
 
 export interface InteractiveScenarioOption {
   id: string
@@ -49,7 +48,7 @@ export interface AssessmentDefinition {
 
 export interface LearningUnit {
   id: string
-  phase: FoundationPhase
+  phase: number
   title: string
   subtitle: string
   principle: string
@@ -452,6 +451,7 @@ const apiFoundationsCourse: LearningCourse = {
 
 const learningCourses: Record<string, LearningCourse> = {
   [API_FOUNDATIONS_COURSE_ID]: apiFoundationsCourse,
+  ...awsCertificationCourses,
 }
 
 export function getLearningCourse(courseId: string): LearningCourse | null {
@@ -500,8 +500,9 @@ export function gradeLearningUnitAssessment(
   unitId: string,
   answers: Record<string, string>,
 ): AssessmentGrade | null {
-  const unit = getLearningUnit(courseId, unitId)
-  if (!unit) return null
+  const course = getLearningCourse(courseId)
+  const unit = course?.units.find((item) => item.id === unitId)
+  if (!course || !unit) return null
   const { questions } = unit.assessment
   const correctAnswers = questions.filter((question) => answers[question.id] === question.correctAnswer).length
   const totalQuestions = questions.length
@@ -511,7 +512,7 @@ export function gradeLearningUnitAssessment(
     correctAnswers,
     totalQuestions,
     scorePercent,
-    mastered: correctAnswers / totalQuestions >= apiFoundationsCourse.masteryThreshold,
+    mastered: totalQuestions > 0 && correctAnswers / totalQuestions >= course.masteryThreshold,
     details: questions.map((question) => ({
       questionId: question.id,
       correct: answers[question.id] === question.correctAnswer,

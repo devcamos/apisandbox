@@ -228,6 +228,30 @@ const searchData: SearchResult[] = [
     keywords: ["aws", "services", "ec2", "s3", "lambda", "api gateway"]
   },
   {
+    title: "AWS Certification Journey",
+    description: "Practitioner, Associate, and Professional AWS certification courses",
+    href: "/cloud/aws/certifications",
+    category: "Cloud",
+    icon: Cloud,
+    keywords: ["aws", "certification", "practitioner", "associate", "professional", "clf-c02", "saa-c03", "sap-c02"]
+  },
+  {
+    title: "AWS Cloud Practitioner",
+    description: "CLF-C02 foundational AWS certification course",
+    href: "/cloud/aws/certifications/practitioner",
+    category: "Cloud",
+    icon: Cloud,
+    keywords: ["aws", "cloud practitioner", "clf-c02", "foundational", "billing", "shared responsibility"]
+  },
+  {
+    title: "AWS Solutions Architect",
+    description: "SAA-C03 and SAP-C02 architecture certification courses",
+    href: "/cloud/aws/certifications/associate",
+    category: "Cloud",
+    icon: Cloud,
+    keywords: ["aws", "solutions architect", "saa-c03", "sap-c02", "associate", "professional", "architecture"]
+  },
+  {
     title: "Migration Strategies",
     description: "Lift-and-shift, re-platform, and refactor approaches",
     href: "/cloud/aws/strategies",
