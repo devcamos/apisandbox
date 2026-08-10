@@ -1,10 +1,18 @@
 "use client";
 
 import Link from "next/link";
-import { Cloud, Server, Database, Zap, Shield, ArrowRight, BookOpen, Play, Network } from "lucide-react";
+import { Cloud, Server, Database, Zap, Shield, ArrowRight, BookOpen, Play, Network, Award } from "lucide-react";
 
 export default function CloudPage() {
   const cloudTopics = [
+    {
+      icon: Award,
+      title: "AWS Certification Journey",
+      description: "Practitioner, Solutions Architect Associate, and Solutions Architect Professional",
+      href: "/cloud/aws/certifications",
+      color: "from-sky-500 via-orange-500 to-violet-500",
+      topics: ["CLF-C02 Foundations", "SAA-C03 Architecture", "SAP-C02 Enterprise", "Exam Readiness"]
+    },
     {
       icon: Zap,
       title: "Vercel Platform",
@@ -100,7 +108,7 @@ export default function CloudPage() {
           </p>
         </div>
         
-        <div className="grid md:grid-cols-3 gap-8">
+        <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-8">
           {cloudTopics.map((topic, idx) => {
             const Icon = topic.icon;
             return (
@@ -205,4 +213,3 @@ export default function CloudPage() {
     </div>
   );
 }
-
