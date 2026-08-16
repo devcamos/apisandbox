@@ -2,6 +2,18 @@
 
 Next.js app for learning API integrations — phases, demos, auth, and subscriptions.
 
+## Operating runbook
+
+**Checklist (live):** [API Sandbox](https://app.notion.com/p/3be7233a96ec81eb9a2cd98d826a5b46)  
+Tick boxes on Notion. Do not copy the checklist into git.
+
+**Local:** http://localhost:4000  
+**GitHub:** https://github.com/devcamos/apisandbox  
+**Pipeline:** PR [ci.yml](https://github.com/devcamos/apisandbox/actions/workflows/ci.yml) (lint / test / build / e2e-smoke). Preview E2E template is [PR #33](https://github.com/devcamos/apisandbox/pull/33) (`vercel-e2e`) — still Open, mixed with AWS course on that branch. Do not merge as Production GO.  
+**Production:** https://apisandbox-coral.vercel.app  
+**Verify:** `npm run verify:ci:strict`  
+**Surface:** local + Preview. Adding a Preview pipeline is not Production GO.
+
 ## Developers
 
 **Start here:** [docs/AGENT_ONBOARDING.md](docs/AGENT_ONBOARDING.md)
