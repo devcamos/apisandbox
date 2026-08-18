@@ -8,10 +8,10 @@ export default function CloudPage() {
     {
       icon: Award,
       title: "AWS Certification Journey",
-      description: "Practitioner, Solutions Architect Associate, and Solutions Architect Professional",
+      description: "Cloud Practitioner, AI Practitioner, Solutions Architect Associate, and Solutions Architect Professional",
       href: "/cloud/aws/certifications",
       color: "from-sky-500 via-orange-500 to-violet-500",
-      topics: ["CLF-C02 Foundations", "SAA-C03 Architecture", "SAP-C02 Enterprise", "Exam Readiness"]
+      topics: ["CLF-C02 Foundations", "AIF-C01 AI", "SAA-C03 Architecture", "SAP-C02 Enterprise"]
     },
     {
       icon: Zap,

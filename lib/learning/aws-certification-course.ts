@@ -1,5 +1,6 @@
 import {
   AWS_CERTIFICATION_MASTERY_THRESHOLD,
+  AWS_AI_PRACTITIONER_COURSE_ID,
   AWS_CLOUD_PRACTITIONER_COURSE_ID,
   AWS_SOLUTIONS_ARCHITECT_ASSOCIATE_COURSE_ID,
   AWS_SOLUTIONS_ARCHITECT_PROFESSIONAL_COURSE_ID,
@@ -10,7 +11,7 @@ import type {
   LearningUnit,
 } from "@/lib/learning/api-foundations-course"
 
-export type AwsCertificationTrackSlug = "practitioner" | "associate" | "professional"
+export type AwsCertificationTrackSlug = "practitioner" | "ai-practitioner" | "associate" | "professional"
 
 export interface AwsExamDomain {
   id: string
@@ -28,7 +29,7 @@ export interface AwsReadinessRequirement {
 export interface AwsCertificationTrack {
   slug: AwsCertificationTrackSlug
   level: "Foundational" | "Associate" | "Professional"
-  examCode: "CLF-C02" | "SAA-C03" | "SAP-C02"
+  examCode: "CLF-C02" | "AIF-C01" | "SAA-C03" | "SAP-C02"
   shortTitle: string
   description: string
   audience: string
@@ -449,7 +450,7 @@ const associateUnits: LearningUnit[] = [
     subtitle: "Protect access, workloads, networks, and data with layered controls.",
     principle: "Use temporary identity, least privilege, network boundaries, encryption, and detection together; no single control is the architecture.",
     goal: "Design the identity, network, and data-protection model for API Sandbox on AWS.",
-    concepts: ["IAM roles", "STS", "Organizations", "SCP", "security groups", "NACL", "KMS", "Secrets Manager", "WAF", "CloudTrail"],
+    concepts: ["IAM roles", "STS", "Organizations", "SCP", "security groups", "NACL", "TLS", "mTLS", "KMS", "Secrets Manager", "WAF", "CloudTrail"],
     sections: [
       {
         title: "Secure access at human and workload boundaries",
@@ -462,6 +463,10 @@ const associateUnits: LearningUnit[] = [
       {
         title: "Protect data through its lifecycle",
         body: "Use KMS-backed encryption where key control is required, TLS in transit, Secrets Manager for rotated secrets, S3 Block Public Access, and logging that supports investigation without leaking sensitive values.",
+      },
+      {
+        title: "Place TLS and mTLS at the transport boundary",
+        body: "TLS encrypts traffic and authenticates the server at an HTTPS or API endpoint. Use mTLS when both sides of a trusted service-to-service connection must authenticate with certificates; it belongs at the transport or service-mesh boundary and complements, rather than replaces, IAM authorization and application identity.",
       },
     ],
     scenario: {
@@ -769,6 +774,323 @@ const associateUnits: LearningUnit[] = [
         correctAnswer: "Three fresh timed mocks at 85%+ with no domain below 80%",
         explanation: "Fresh, consistent, domain-balanced results reduce the risk that recall of one bank is mistaken for transferable knowledge.",
         reviewLabel: "Exam readiness",
+      },
+    ],
+  }),
+]
+
+const aiPractitionerUnits: LearningUnit[] = [
+  certificationUnit({
+    id: "ai-ml-fundamentals",
+    sequence: 1,
+    title: "AI and machine learning fundamentals",
+    subtitle: "Choose the right learning approach for the business problem.",
+    principle: "Start with the problem, data, and success measure before choosing an AI or ML technique.",
+    goal: "Distinguish AI, ML, deep learning, supervised learning, unsupervised learning, and common evaluation measures.",
+    concepts: ["AI and ML", "training and inference", "supervised learning", "unsupervised learning", "classification", "regression", "overfitting"],
+    sections: [
+      {
+        title: "Match the technique to the task",
+        body: "Classification predicts a category, regression predicts a numeric value, clustering groups similar examples, and generative AI creates new content. The right choice depends on the desired output and the available labelled or unlabelled data.",
+      },
+      {
+        title: "Measure what matters",
+        body: "Accuracy can hide an imbalanced-class problem. Precision, recall, F1 score, and a confusion matrix expose different error costs, while a validation set helps reveal overfitting before a model is used in production.",
+      },
+    ],
+    scenario: {
+      title: "Classify support requests",
+      prompt: "API Sandbox wants to route incoming support requests into billing, access, or technical categories. Which approach fits the stated output?",
+      options: [
+        { id: "classification", label: "Train or use a classification model", consequence: "The model predicts one of the known categories so each request can be routed." },
+        { id: "regression", label: "Use regression to predict a category name", consequence: "Regression predicts numeric values and does not naturally represent a discrete support category." },
+      ],
+      trace: [
+        { id: "task", label: "Define the output", system: "Business requirement", detail: "Each request needs one or more known routing labels." },
+        { id: "data", label: "Prepare examples", system: "Training data", detail: "Historical requests are labelled consistently and checked for bias." },
+        { id: "train", label: "Fit the model", system: "ML workflow", detail: "The model learns patterns from training examples." },
+        { id: "measure", label: "Evaluate errors", system: "Validation set", detail: "Precision and recall are reviewed against the cost of misrouting." },
+      ],
+    },
+    assessmentTitle: "AI and ML fundamentals checkpoint",
+    assessmentDescription: "Identify core AI and ML concepts and select useful evaluation measures.",
+    reflectionPrompt: "Explain which error matters more for a support router: a false escalation or a missed urgent request.",
+    questions: [
+      {
+        id: "ai-classification",
+        prompt: "Which ML task predicts a label such as billing, access, or technical?",
+        options: ["Classification", "Regression", "Clustering only", "Dimensionality reduction"],
+        correctAnswer: "Classification",
+        explanation: "Classification predicts one or more discrete categories.",
+        reviewLabel: "ML task selection",
+      },
+      {
+        id: "ai-overfitting",
+        prompt: "What is overfitting?",
+        options: ["A model memorises training patterns and performs poorly on new data", "A model has no training data", "A model always predicts the majority class correctly", "A model is encrypted at rest"],
+        correctAnswer: "A model memorises training patterns and performs poorly on new data",
+        explanation: "Overfitting occurs when a model learns training-specific noise rather than patterns that generalise.",
+        reviewLabel: "Model quality",
+      },
+      {
+        id: "ai-imbalanced-metrics",
+        prompt: "Which measures are useful when false positives and false negatives have different costs?",
+        options: ["Precision and recall", "Only training accuracy", "Storage capacity and latency", "Region count and instance size"],
+        correctAnswer: "Precision and recall",
+        explanation: "Precision and recall expose different classes of prediction error and are more informative than accuracy alone in many imbalanced problems.",
+        reviewLabel: "Evaluation metrics",
+      },
+    ],
+  }),
+  certificationUnit({
+    id: "generative-ai-fundamentals",
+    sequence: 2,
+    title: "Generative AI and foundation models",
+    subtitle: "Understand how generative systems create useful but fallible outputs.",
+    principle: "A foundation model is a capable starting point, not a guarantee that an answer is factual, safe, or fit for a business process.",
+    goal: "Explain tokens, embeddings, transformers, inference, hallucinations, and the trade-offs among model capabilities and costs.",
+    concepts: ["generative AI", "foundation models", "tokens", "embeddings", "transformers", "inference", "hallucinations", "temperature"],
+    sections: [
+      {
+        title: "From tokens to generated content",
+        body: "Text is processed as tokens. Transformer-based foundation models use learned relationships among tokens to generate a likely continuation. Embeddings represent semantic relationships in a numeric space and support similarity search.",
+      },
+      {
+        title: "Capabilities have boundaries",
+        body: "A model can produce fluent but incorrect content, reflect training-data bias, or fail on a task outside its context. Latency, context length, quality, and token cost should be measured against the actual business use case.",
+      },
+    ],
+    scenario: {
+      title: "Explain a generated lesson",
+      prompt: "A learner asks an AI assistant for the current API Sandbox refund policy. What should the product do before presenting a definitive answer?",
+      options: [
+        { id: "ground", label: "Ground the response in an approved policy source and show uncertainty when needed", consequence: "Retrieval and review reduce unsupported claims and make the answer traceable." },
+        { id: "trust", label: "Treat fluent model output as the policy automatically", consequence: "Fluency does not prove that the model knows the current business rule." },
+      ],
+      trace: [
+        { id: "question", label: "Receive the request", system: "Application", detail: "The assistant identifies a policy question that needs authoritative context." },
+        { id: "retrieve", label: "Find approved context", system: "Knowledge base", detail: "The current policy is retrieved from a controlled source." },
+        { id: "generate", label: "Generate a response", system: "Foundation model", detail: "The model uses the question and relevant context to draft an answer." },
+        { id: "verify", label: "Check the claim", system: "Application policy", detail: "The response is evaluated, cited, or escalated when confidence is insufficient." },
+      ],
+    },
+    assessmentTitle: "Generative AI fundamentals checkpoint",
+    assessmentDescription: "Apply the basic concepts and limitations of generative AI systems.",
+    reflectionPrompt: "Describe one useful AI assistant capability and one control required before users rely on it.",
+    questions: [
+      {
+        id: "genai-token",
+        prompt: "What is a token in a language-model workflow?",
+        options: ["A unit of text or other input processed by the model", "A permanent IAM credential", "A database backup", "A network Availability Zone"],
+        correctAnswer: "A unit of text or other input processed by the model",
+        explanation: "Models process input and output as tokens, which also commonly influence context and usage cost.",
+        reviewLabel: "Generative AI concepts",
+      },
+      {
+        id: "genai-hallucination",
+        prompt: "What is a hallucination in a generative AI response?",
+        options: ["Plausible-sounding content that is unsupported or incorrect", "A model refusing every request", "A successful database failover", "An encrypted training example"],
+        correctAnswer: "Plausible-sounding content that is unsupported or incorrect",
+        explanation: "Generative models optimise likely output, so a fluent answer can still contain unsupported claims.",
+        reviewLabel: "Model limitations",
+      },
+      {
+        id: "genai-embedding",
+        prompt: "What are embeddings commonly used for?",
+        options: ["Representing semantic relationships for similarity or retrieval", "Replacing all IAM policies", "Encrypting an AWS account root user", "Measuring CPU temperature"],
+        correctAnswer: "Representing semantic relationships for similarity or retrieval",
+        explanation: "Embeddings map content to vectors that can be compared for semantic similarity.",
+        reviewLabel: "Foundation-model components",
+      },
+    ],
+  }),
+  certificationUnit({
+    id: "foundation-model-applications",
+    sequence: 3,
+    title: "Applications of foundation models",
+    subtitle: "Design prompts, retrieval, fine-tuning, and evaluations around a real use case.",
+    principle: "Reliable AI applications are systems around a model: context, instructions, tools, evaluation, guardrails, and observability all matter.",
+    goal: "Choose prompt engineering, retrieval-augmented generation, fine-tuning, and evaluation techniques for a grounded assistant.",
+    concepts: ["prompt engineering", "zero-shot", "few-shot", "RAG", "fine-tuning", "Amazon Bedrock", "guardrails", "evaluation"],
+    sections: [
+      {
+        title: "Give the model the right context",
+        body: "Clear instructions, delimiters, examples, output schemas, and explicit constraints improve consistency. Retrieval-augmented generation supplies current domain context at request time, while fine-tuning adapts behaviour from curated examples rather than supplying a live knowledge source.",
+      },
+      {
+        title: "Evaluate the whole application",
+        body: "Test factuality, relevance, safety, latency, cost, and refusal behaviour with representative examples. Amazon Bedrock provides managed access to foundation models and features such as model evaluation and guardrails that can support production workflows.",
+      },
+    ],
+    scenario: {
+      title: "Build a grounded AWS tutor",
+      prompt: "The tutor must answer from a changing set of AWS notes and cite the note used. Which first design is most appropriate?",
+      options: [
+        { id: "rag", label: "Retrieve relevant notes, then prompt the model with that context", consequence: "The answer can use current source material without retraining the model for every note change." },
+        { id: "fine-tune-all", label: "Fine-tune once and assume it will know every future note", consequence: "Fine-tuning is not a live knowledge synchronisation mechanism and still needs evaluation." },
+      ],
+      trace: [
+        { id: "index", label: "Prepare the notes", system: "Embeddings and vector store", detail: "Approved notes are chunked and indexed for semantic retrieval." },
+        { id: "retrieve", label: "Retrieve evidence", system: "Application", detail: "Relevant note sections are selected for the learner's question." },
+        { id: "prompt", label: "Compose instructions", system: "Prompt", detail: "The model receives the question, source context, and citation rules." },
+        { id: "evaluate", label: "Assess the answer", system: "Evaluation set", detail: "Grounding, relevance, safety, and citation quality are measured." },
+      ],
+    },
+    assessmentTitle: "Foundation-model applications checkpoint",
+    assessmentDescription: "Select practical patterns for prompting, retrieval, model adaptation, and evaluation.",
+    reflectionPrompt: "Explain why retrieval is preferable to retraining when the source documents change daily.",
+    questions: [
+      {
+        id: "fm-rag",
+        prompt: "What is the main purpose of retrieval-augmented generation?",
+        options: ["Provide relevant external context to the model at inference time", "Guarantee every generated answer is true", "Replace authentication", "Eliminate the need for evaluation"],
+        correctAnswer: "Provide relevant external context to the model at inference time",
+        explanation: "RAG retrieves information from a source and includes it in the generation context; it still requires quality and safety checks.",
+        reviewLabel: "RAG",
+      },
+      {
+        id: "fm-prompt-constraint",
+        prompt: "Which prompt practice most improves structured API output?",
+        options: ["Specify the required schema, constraints, and an example", "Ask for anything without describing the output", "Remove all context", "Use a random temperature for every request"],
+        correctAnswer: "Specify the required schema, constraints, and an example",
+        explanation: "Explicit output requirements and examples make the desired response shape clearer to the model and the application.",
+        reviewLabel: "Prompt engineering",
+      },
+      {
+        id: "fm-finetuning",
+        prompt: "What is fine-tuning best described as?",
+        options: ["Adapting a pretrained model with curated examples for a target behaviour", "Adding live documents to a prompt at request time", "Increasing an IAM policy's permissions", "A replacement for monitoring"],
+        correctAnswer: "Adapting a pretrained model with curated examples for a target behaviour",
+        explanation: "Fine-tuning changes model behaviour from training examples; it is distinct from retrieving current knowledge at inference time.",
+        reviewLabel: "Model adaptation",
+      },
+    ],
+  }),
+  certificationUnit({
+    id: "responsible-ai",
+    sequence: 4,
+    title: "Responsible AI and explainability",
+    subtitle: "Make AI behaviour fair, transparent, robust, and accountable.",
+    principle: "Responsible AI is an ongoing product and governance practice, not a final checkbox after the model ships.",
+    goal: "Recognise bias, fairness, transparency, explainability, human oversight, and model monitoring responsibilities.",
+    concepts: ["bias", "fairness", "transparency", "explainability", "human-in-the-loop", "robustness", "Amazon SageMaker Clarify", "Model Monitor"],
+    sections: [
+      {
+        title: "Risk enters through data and decisions",
+        body: "Training data can encode historical bias, missing groups, or proxy variables. Teams should document intended use, inspect data, test subgroup outcomes, and define escalation paths for high-impact decisions.",
+      },
+      {
+        title: "Keep humans and evidence in the loop",
+        body: "Explainability helps stakeholders understand relevant factors; it does not prove a model is correct. Human review, feedback, drift monitoring, and repeatable evaluation keep accountability with the organisation using the system.",
+      },
+    ],
+    scenario: {
+      title: "Review an AI access recommendation",
+      prompt: "An AI system recommends whether a learner should receive elevated API access. What is the safest first release pattern?",
+      options: [
+        { id: "human-review", label: "Use the recommendation as an input to documented human review", consequence: "A trained reviewer can challenge errors while the team measures subgroup outcomes before automation expands." },
+        { id: "auto-grant", label: "Automatically grant access from the model score", consequence: "A model score alone can amplify bias and create an uncontrolled high-impact decision." },
+      ],
+      trace: [
+        { id: "document", label: "Define intended use", system: "Product governance", detail: "The team records who may be affected and what the model must not decide." },
+        { id: "test", label: "Test groups and edge cases", system: "Evaluation", detail: "Quality and error rates are compared across relevant cohorts." },
+        { id: "review", label: "Route to a reviewer", system: "Human oversight", detail: "A trained person can approve, reject, or escalate the recommendation." },
+        { id: "monitor", label: "Monitor after launch", system: "Model operations", detail: "Feedback, drift, and adverse outcomes trigger investigation and improvement." },
+      ],
+    },
+    assessmentTitle: "Responsible AI checkpoint",
+    assessmentDescription: "Apply fairness, transparency, explainability, and human-oversight principles.",
+    reflectionPrompt: "Name two groups that could be affected by an automated learner-access decision and how you would test for disparate outcomes.",
+    questions: [
+      {
+        id: "responsible-bias",
+        prompt: "Where can bias enter an ML system?",
+        options: ["Data, labels, features, modelling choices, and the way outputs are used", "Only the model's colour scheme", "Only after a database backup", "It cannot enter a trained system"],
+        correctAnswer: "Data, labels, features, modelling choices, and the way outputs are used",
+        explanation: "Bias can be introduced or amplified throughout the data, modelling, deployment, and decision lifecycle.",
+        reviewLabel: "Bias and fairness",
+      },
+      {
+        id: "responsible-human",
+        prompt: "Why use human oversight for a high-impact AI decision?",
+        options: ["A reviewer can challenge uncertain or harmful recommendations", "Humans make every model prediction mathematically identical", "It removes the need for testing", "It guarantees the model has no bias"],
+        correctAnswer: "A reviewer can challenge uncertain or harmful recommendations",
+        explanation: "Human review provides accountability and a path to challenge model output; it complements rather than replaces evaluation.",
+        reviewLabel: "Human oversight",
+      },
+      {
+        id: "responsible-explainability",
+        prompt: "What does explainability help a team do?",
+        options: ["Understand factors contributing to a model output and investigate errors", "Prove every prediction is correct", "Remove the need for access control", "Turn a classifier into a database"],
+        correctAnswer: "Understand factors contributing to a model output and investigate errors",
+        explanation: "Explainability supports review and debugging but is not a guarantee of correctness or fairness.",
+        reviewLabel: "Transparency and explainability",
+      },
+    ],
+  }),
+  certificationUnit({
+    id: "ai-security-governance",
+    sequence: 5,
+    title: "Security, compliance, and governance for AI",
+    subtitle: "Protect data, control access, and govern AI workloads across their lifecycle.",
+    principle: "AI security extends familiar cloud controls with data lineage, prompt and output risks, model access, privacy, and continuous governance.",
+    goal: "Apply least privilege, encryption, secure data handling, monitoring, and governance to an Amazon Bedrock-based assistant.",
+    concepts: ["Amazon Bedrock", "IAM", "KMS", "TLS", "mTLS", "CloudTrail", "Guardrails", "data privacy", "prompt injection", "governance", "auditability"],
+    sections: [
+      {
+        title: "Protect the data and the interfaces",
+        body: "Classify training and retrieval data, minimise sensitive content, encrypt data, restrict model and knowledge-base access, validate inputs, and treat prompts and model outputs as untrusted application data. Prompt injection and data leakage need application-layer controls as well as IAM.",
+      },
+      {
+        title: "Govern the lifecycle",
+        body: "Record model and prompt versions, approval owners, evaluation results, and access events. AWS services such as IAM, KMS, CloudTrail, and Amazon Bedrock Guardrails can contribute controls, but the organisation remains responsible for its compliance obligations and intended use.",
+      },
+      {
+        title: "Secure AI transport and workload identity",
+        body: "Use TLS for encrypted client-to-API and API-to-service transport. Where AI services communicate across a trusted service boundary and both workloads must prove identity, mTLS provides mutual certificate authentication; keep authorization, data filtering, and model guardrails at their respective application and policy layers.",
+      },
+    ],
+    scenario: {
+      title: "Release a private course assistant",
+      prompt: "The assistant can access paid course notes and learner records. Which launch plan best protects the system?",
+      options: [
+        { id: "controlled", label: "Use scoped roles, encrypted approved data, guardrails, audit logs, and evaluation gates", consequence: "Access, privacy, safety, and evidence are addressed across the application lifecycle." },
+        { id: "public-prompt", label: "Put all records in one public prompt so the model has maximum context", consequence: "Broad exposure creates privacy, security, and governance risk and does not guarantee better answers." },
+      ],
+      trace: [
+        { id: "classify", label: "Classify and minimise", system: "Data governance", detail: "Only the approved fields and course material enter the AI workflow." },
+        { id: "authorize", label: "Scope access", system: "IAM and KMS", detail: "The application role can access only the required encrypted resources." },
+        { id: "guard", label: "Filter and constrain", system: "Bedrock Guardrails", detail: "Configured policies reduce unsafe content and unwanted disclosure." },
+        { id: "audit", label: "Retain evidence", system: "CloudTrail and evaluation", detail: "Access, versions, test results, and incidents support review and improvement." },
+      ],
+    },
+    assessmentTitle: "AI security and governance checkpoint",
+    assessmentDescription: "Select security, privacy, compliance, and governance controls for AI solutions.",
+    reflectionPrompt: "Describe how you would prevent learner records from being exposed through an AI assistant response.",
+    questions: [
+      {
+        id: "ai-least-privilege",
+        prompt: "Which IAM approach is most appropriate for an AI application?",
+        options: ["A scoped workload role with only the required model and data permissions", "A root access key embedded in the prompt", "AdministratorAccess for every user", "A public bucket containing all learner data"],
+        correctAnswer: "A scoped workload role with only the required model and data permissions",
+        explanation: "Least privilege limits the blast radius of application compromise and accidental misuse.",
+        reviewLabel: "AI security",
+      },
+      {
+        id: "ai-data-privacy",
+        prompt: "What is a sound first step before using learner records in an AI workflow?",
+        options: ["Classify and minimise the data, then confirm the approved purpose and controls", "Copy every record into a public prompt", "Disable audit logging", "Assume a model makes private data safe automatically"],
+        correctAnswer: "Classify and minimise the data, then confirm the approved purpose and controls",
+        explanation: "Data minimisation and purpose-driven governance reduce privacy exposure before a model is involved.",
+        reviewLabel: "Data governance",
+      },
+      {
+        id: "ai-audit",
+        prompt: "Why retain model, prompt, access, and evaluation records?",
+        options: ["To support accountability, investigation, reproducibility, and compliance review", "To guarantee outputs never change", "To replace encryption", "To make the model larger"],
+        correctAnswer: "To support accountability, investigation, reproducibility, and compliance review",
+        explanation: "Lifecycle evidence helps teams understand what was deployed, who used it, how it performed, and why decisions were made.",
+        reviewLabel: "Governance evidence",
       },
     ],
   }),
@@ -1116,6 +1438,15 @@ const cloudPractitionerCourse: LearningCourse = {
   units: practitionerUnits,
 }
 
+const aiPractitionerCourse: LearningCourse = {
+  id: AWS_AI_PRACTITIONER_COURSE_ID,
+  title: "AWS Certified AI Practitioner",
+  description: "Build practical AI and machine learning literacy through an AWS-powered learning assistant: fundamentals, generative AI, foundation-model applications, responsible AI, and governance.",
+  audience: "Developers, product professionals, and technical practitioners building foundational AI fluency before a deeper ML or AI engineering role.",
+  masteryThreshold: AWS_CERTIFICATION_MASTERY_THRESHOLD,
+  units: aiPractitionerUnits,
+}
+
 const solutionsArchitectAssociateCourse: LearningCourse = {
   id: AWS_SOLUTIONS_ARCHITECT_ASSOCIATE_COURSE_ID,
   title: "AWS Certified Solutions Architect – Associate",
@@ -1160,6 +1491,33 @@ export const awsCertificationTracks: AwsCertificationTrack[] = [
     ],
     capstone: "A one-page API Sandbox AWS proposal covering Region, service families, shared responsibility, cost controls, and support.",
     course: cloudPractitionerCourse,
+  },
+  {
+    slug: "ai-practitioner",
+    level: "Foundational",
+    examCode: "AIF-C01",
+    shortTitle: "AI Practitioner",
+    description: "Understand AI, ML, generative AI, foundation-model applications, responsible AI, and AI security on AWS.",
+    audience: aiPractitionerCourse.audience,
+    examFormat: "65 questions · 90 minutes",
+    experienceGuidance: "No prior AI or ML experience is required; basic AWS and software-development familiarity makes the examples easier to apply.",
+    accent: "violet",
+    officialExamGuideUrl: "https://docs.aws.amazon.com/aws-certification/latest/ai-practitioner-01.html",
+    officialPrepUrl: "https://aws.amazon.com/certification/certified-ai-practitioner/",
+    domains: [
+      { id: "ai-ml-fundamentals", title: "Fundamentals of AI and ML", weight: 20, focus: ["AI and ML concepts", "data", "model evaluation", "use cases"] },
+      { id: "genai-fundamentals", title: "Fundamentals of GenAI", weight: 24, focus: ["foundation models", "tokens", "embeddings", "capabilities and limitations"] },
+      { id: "foundation-models", title: "Applications of Foundation Models", weight: 28, focus: ["prompt engineering", "RAG", "fine-tuning", "evaluation"] },
+      { id: "responsible-ai", title: "Guidelines for Responsible AI", weight: 14, focus: ["bias", "fairness", "transparency", "explainability"] },
+      { id: "ai-security", title: "Security, Compliance, and Governance for AI Solutions", weight: 14, focus: ["data privacy", "access control", "guardrails", "auditability"] },
+    ],
+    readinessRequirements: [
+      ...sharedReadinessRequirements,
+      { id: "ai-use-cases", label: "AI and ML use cases mapped to business outcomes", detail: "Explain why classification, regression, clustering, and generative AI fit different requirements and error costs." },
+      { id: "ai-safety-review", label: "Responsible AI review completed", detail: "Test representative prompts and data for bias, unsafe outputs, privacy exposure, prompt injection, and escalation behaviour." },
+    ],
+    capstone: "A grounded AWS learning assistant design using Amazon Bedrock, retrieval, scoped access, guardrails, evaluation evidence, and a responsible-AI review.",
+    course: aiPractitionerCourse,
   },
   {
     slug: "associate",

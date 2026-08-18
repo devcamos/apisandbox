@@ -15,7 +15,7 @@ import { awsCertificationTracks } from "@/lib/learning/aws-certification-course"
 
 export const metadata: Metadata = {
   title: "AWS Certification Journey | API Sandbox",
-  description: "Prepare for AWS Cloud Practitioner, Solutions Architect Associate, and Solutions Architect Professional through one connected API Sandbox course.",
+  description: "Prepare for AWS Cloud Practitioner, AI Practitioner, Solutions Architect Associate, and Solutions Architect Professional through one connected API Sandbox course.",
 }
 
 const trackStyles = {
@@ -37,11 +37,11 @@ export default function AwsCertificationsPage() {
           <div className="mt-7 max-w-4xl">
             <div className="inline-flex items-center gap-2 rounded-full border border-orange-400/25 bg-orange-400/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.17em] text-orange-200">
               <Award className="h-3.5 w-3.5" />
-              Practitioner → Associate → Professional
+              Practitioner → AI Practitioner → Associate → Professional
             </div>
             <h1 className="mt-5 text-5xl font-bold tracking-tight text-white sm:text-6xl">AWS Certification Journey</h1>
             <p className="mt-5 text-xl leading-8 text-slate-300">
-              Learn AWS through one evolving system. Explain the cloud at Practitioner, deploy API Sandbox at Associate, then govern and transform it at Professional.
+              Learn AWS through one evolving system. Explain the cloud, apply AI responsibly, deploy API Sandbox at Associate, then govern and transform it at Professional.
             </p>
           </div>
 
