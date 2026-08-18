@@ -38,6 +38,7 @@ export function AwsCertificationProgress({
 }>) {
   const { status } = useSession()
   const [summary, setSummary] = useState<CourseAssessmentSummary | null>(null)
+  const [loadError, setLoadError] = useState(false)
   const styles = accentClasses[accent]
   const totalQuestions = useMemo(
     () => course.units.reduce((total, unit) => total + unit.assessment.questions.length, 0),
@@ -52,9 +53,18 @@ export function AwsCertificationProgress({
 
     async function loadSummary() {
       const response = await fetch(`/api/learning/assessments/${encodeURIComponent(courseId)}`, authApiRequestInit()).catch(() => null)
-      if (!response?.ok || cancelled) return
+      if (cancelled) return
+      if (!response?.ok) {
+        setLoadError(true)
+        return
+      }
       const payload = (await response.json().catch(() => null)) as AuthApiEnvelope<CourseAssessmentSummary> | null
-      if (!cancelled) setSummary(payload?.data ?? null)
+      if (!payload?.data) {
+        setLoadError(true)
+        return
+      }
+      setLoadError(false)
+      setSummary(payload.data)
     }
 
     void loadSummary()
@@ -117,6 +127,12 @@ export function AwsCertificationProgress({
           fill={styles.fill}
         />
       </div>
+
+      {loadError ? (
+        <p role="alert" className="mt-4 rounded-lg border border-amber-400/30 bg-amber-400/10 p-3 text-sm text-amber-100">
+          We couldn&apos;t load your saved progress. Your answers are still available below; please try again later.
+        </p>
+      ) : null}
 
       <div className="mt-4 flex flex-wrap items-center gap-4 text-xs text-slate-400">
         <span className="inline-flex items-center gap-1.5"><CheckCircle2 className="h-3.5 w-3.5 text-emerald-300" /> {masteredUnits} mastered</span>
