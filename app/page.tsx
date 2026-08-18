@@ -230,7 +230,7 @@ export default function Home() {
             <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-lg flex items-center justify-center mb-4">
               <BookOpen className="w-6 h-6 text-white" />
             </div>
-            <h3 className="text-xl font-bold text-white mb-3">4 Progressive Phases</h3>
+            <h3 className="text-xl font-bold text-white mb-3">5 Progressive Phases</h3>
             <p className="text-gray-400 mb-4">
               Structured learning path from API basics to principal-level architecture patterns
             </p>
@@ -250,6 +250,10 @@ export default function Home() {
               <li className="flex items-center gap-2">
                 <Check className="w-4 h-4 text-green-400" />
                 Principal-Level Architecture
+              </li>
+              <li className="flex items-center gap-2">
+                <Check className="w-4 h-4 text-green-400" />
+                API Algorithms
               </li>
             </ul>
           </div>
@@ -333,7 +337,7 @@ export default function Home() {
             </div>
             <div className="text-center">
               <div className="w-16 h-16 bg-orange-500 rounded-full flex items-center justify-center mx-auto mb-4 text-white font-bold text-xl">
-                4
+                5
               </div>
               <h3 className="font-semibold text-white mb-2">Learning Phases</h3>
               <p className="text-gray-400 text-sm">From fundamentals to principal-level architecture</p>
@@ -451,7 +455,7 @@ export default function Home() {
             <ul className="space-y-3 mb-6">
               <li className="flex items-center gap-2 text-gray-300">
                 <Check className="w-5 h-5 text-green-400" />
-                Explore all phases (2-5)
+                Explore all premium phases (2-9)
               </li>
               <li className="flex items-center gap-2 text-gray-300">
                 <Check className="w-5 h-5 text-green-400" />
