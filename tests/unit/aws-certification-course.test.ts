@@ -19,6 +19,10 @@ describe("AWS certification curriculum", () => {
       ["professional", "SAP-C02"],
     ])
     expect(awsCertificationTracks.every((track) => track.course.units.length === 5)).toBe(true)
+    expect(awsCertificationTracks.flatMap((track) => track.course.units).every((unit) => unit.difficulty)).toBe(true)
+    expect(new Set(awsCertificationTracks.flatMap((track) => track.course.units).map((unit) => unit.difficulty))).toEqual(
+      new Set(["Easy", "Medium", "Hard", "Expert"]),
+    )
     expect(awsCertificationTracks.flatMap((track) => track.course.units)).toHaveLength(20)
     expect(
       awsCertificationTracks.flatMap((track) => track.course.units).flatMap((unit) => unit.assessment.questions),

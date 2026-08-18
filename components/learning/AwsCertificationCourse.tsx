@@ -3,15 +3,12 @@ import {
   ArrowLeft,
   ArrowRight,
   Award,
-  BookOpen,
   CheckCircle2,
   ExternalLink,
-  FlaskConical,
   GraduationCap,
   Target,
 } from "lucide-react"
-import { ApiJourneySimulator } from "@/components/learning/ApiJourneySimulator"
-import { AwsReadinessChecklist } from "@/components/learning/AwsReadinessChecklist"
+import { AwsCertificationProgress } from "@/components/learning/AwsCertificationProgress"
 import { CourseAssessment } from "@/components/learning/CourseAssessment"
 import type { SanitizedLearningCourse } from "@/lib/learning/api-foundations-course"
 import type { AwsCertificationTrack } from "@/lib/learning/aws-certification-course"
@@ -37,6 +34,13 @@ const accentClasses = {
   },
 } as const
 
+const difficultyClasses = {
+  Easy: "border-emerald-400/30 bg-emerald-400/10 text-emerald-200",
+  Medium: "border-sky-400/30 bg-sky-400/10 text-sky-200",
+  Hard: "border-orange-400/30 bg-orange-400/10 text-orange-200",
+  Expert: "border-rose-400/30 bg-rose-400/10 text-rose-200",
+} as const
+
 function CourseUnitLink({
   track,
   unit,
@@ -54,9 +58,12 @@ function CourseUnitLink({
       href={`/cloud/aws/certifications/${track.slug}/${unit.id}`}
       className={`block rounded-xl border p-4 transition-colors ${active ? `${accent.border} ${accent.soft}` : "border-slate-700 bg-slate-900/50 hover:border-slate-500"}`}
     >
-      <div className={`text-xs font-semibold uppercase tracking-[0.16em] ${active ? accent.text : "text-slate-500"}`}>Module {index + 1}</div>
+      <div className="flex items-center justify-between gap-2">
+        <div className={`text-xs font-semibold uppercase tracking-[0.16em] ${active ? accent.text : "text-slate-500"}`}>Question set {index + 1}</div>
+        <span className={`rounded-full border px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide ${difficultyClasses[unit.difficulty ?? "Medium"]}`}>{unit.difficulty ?? "Medium"}</span>
+      </div>
       <h2 className="mt-2 text-sm font-bold text-white">{unit.title}</h2>
-      <p className="mt-1 line-clamp-2 text-xs leading-5 text-slate-400">{unit.subtitle}</p>
+      <p className="mt-1 text-xs leading-5 text-slate-400">{unit.assessment.questions.length} questions</p>
     </Link>
   )
 }
@@ -74,8 +81,8 @@ export function AwsCertificationCourse({
   const activeIndex = course.units.findIndex((unit) => unit.id === activeUnit.id)
   const previous = activeIndex > 0 ? course.units[activeIndex - 1] : null
   const next = activeIndex < course.units.length - 1 ? course.units[activeIndex + 1] : null
-  const isFinalUnit = activeIndex === course.units.length - 1
   const accent = accentClasses[track.accent]
+  const difficulty = activeUnit.difficulty ?? "Medium"
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
@@ -130,6 +137,8 @@ export function AwsCertificationCourse({
               </div>
             ))}
           </div>
+
+          <AwsCertificationProgress courseId={course.id} course={course} accent={track.accent} />
         </div>
       </section>
 
@@ -137,8 +146,8 @@ export function AwsCertificationCourse({
         <div className="grid gap-8 lg:grid-cols-[18rem_minmax(0,1fr)]">
           <aside aria-label="Certification course modules" className="lg:sticky lg:top-24 lg:h-fit">
             <div className="mb-3 flex items-center gap-2 text-sm font-semibold text-slate-200">
-              <BookOpen className={`h-4 w-4 ${accent.text}`} />
-              Complete course
+              <CheckCircle2 className={`h-4 w-4 ${accent.text}`} />
+              Question path
             </div>
             <nav className="grid gap-2 sm:grid-cols-2 lg:grid-cols-1">
               {course.units.map((unit, index) => (
@@ -149,66 +158,23 @@ export function AwsCertificationCourse({
 
           <article className="min-w-0">
             <section className="rounded-2xl border border-slate-700 bg-slate-900/60 p-6 sm:p-8">
-              <p className={`text-sm font-semibold uppercase tracking-[0.18em] ${accent.text}`}>Module {activeIndex + 1} of {course.units.length}</p>
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <p className={`text-sm font-semibold uppercase tracking-[0.18em] ${accent.text}`}>Question set {activeIndex + 1} of {course.units.length}</p>
+                <span className={`rounded-full border px-3 py-1 text-xs font-semibold uppercase tracking-wide ${difficultyClasses[difficulty]}`}>{difficulty} difficulty</span>
+              </div>
               <h2 className="mt-3 text-3xl font-bold text-white">{activeUnit.title}</h2>
-              <p className="mt-3 text-lg leading-7 text-slate-300">{activeUnit.subtitle}</p>
-
-              <div className={`mt-6 rounded-xl border p-4 ${accent.border} ${accent.soft}`}>
-                <div className={`text-sm font-semibold ${accent.text}`}>Architecture principle</div>
-                <p className="mt-1 text-base leading-6 text-white">{activeUnit.principle}</p>
-                <p className="mt-3 text-sm text-slate-300"><span className={`font-semibold ${accent.text}`}>By the end:</span> {activeUnit.goal}</p>
-              </div>
-
-              <div className="mt-8 grid gap-6">
-                {activeUnit.sections.map((section) => (
-                  <section key={section.title}>
-                    <h3 className="text-xl font-bold text-white">{section.title}</h3>
-                    <p className="mt-2 leading-7 text-slate-300">{section.body}</p>
-                  </section>
-                ))}
-              </div>
-
-              <div className="mt-8">
-                <h3 className="text-sm font-semibold uppercase tracking-[0.16em] text-slate-400">Services and concepts to retrieve</h3>
-                <div className="mt-3 flex flex-wrap gap-2">
-                  {activeUnit.concepts.map((concept) => (
-                    <span key={concept} className="rounded-full border border-slate-700 bg-slate-950/50 px-3 py-1 text-sm text-slate-200">{concept}</span>
-                  ))}
-                </div>
-              </div>
+              <p className="mt-3 text-lg leading-7 text-slate-300">Answer {activeUnit.assessment.questions.length} questions to test this certification domain. You can retry the set and keep your best score.</p>
             </section>
 
             <div className="mt-6">
-              <ApiJourneySimulator
-                scenario={activeUnit.scenario}
-                eyebrow="Architecture decision lab"
-                traceLabel="Decision trace"
-                emptyPrompt="Choose an architecture, then inspect the decision trace."
+              <CourseAssessment
+                courseId={course.id}
+                unitId={activeUnit.id}
+                assessment={activeUnit.assessment}
+                loginCallbackUrl={`/cloud/aws/certifications/${track.slug}/${activeUnit.id}`}
+                showReflection={false}
               />
             </div>
-
-            {isFinalUnit ? (
-              <section className="mt-6 rounded-2xl border border-amber-400/25 bg-amber-400/5 p-5 sm:p-6">
-                <div className="flex gap-3">
-                  <FlaskConical className="mt-0.5 h-5 w-5 shrink-0 text-amber-300" />
-                  <div>
-                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-amber-300">Certification capstone</p>
-                    <h2 className="mt-1 text-xl font-bold text-white">Build evidence, not just notes</h2>
-                    <p className="mt-2 text-sm leading-6 text-slate-300">{track.capstone}</p>
-                  </div>
-                </div>
-              </section>
-            ) : null}
-
-            <div className="mt-6">
-              <CourseAssessment courseId={course.id} unitId={activeUnit.id} assessment={activeUnit.assessment} />
-            </div>
-
-            {isFinalUnit ? (
-              <div className="mt-6">
-                <AwsReadinessChecklist trackSlug={track.slug} requirements={track.readinessRequirements} />
-              </div>
-            ) : null}
 
             <nav aria-label="Adjacent certification modules" className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-between">
               {previous ? (

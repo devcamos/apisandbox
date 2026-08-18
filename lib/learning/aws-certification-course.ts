@@ -8,6 +8,7 @@ import {
 import type {
   AssessmentQuestion,
   LearningCourse,
+  LearningDifficulty,
   LearningUnit,
 } from "@/lib/learning/api-foundations-course"
 
@@ -47,6 +48,7 @@ export interface AwsCertificationTrack {
 interface UnitInput {
   id: string
   sequence: number
+  difficulty?: LearningDifficulty
   title: string
   subtitle: string
   principle: string
@@ -60,10 +62,18 @@ interface UnitInput {
   questions: AssessmentQuestion[]
 }
 
+function difficultyForSequence(sequence: number): LearningDifficulty {
+  if (sequence === 1) return "Easy"
+  if (sequence <= 3) return "Medium"
+  if (sequence === 4) return "Hard"
+  return "Expert"
+}
+
 function certificationUnit(input: UnitInput): LearningUnit {
   return {
     id: input.id,
     phase: input.sequence,
+    difficulty: input.difficulty ?? difficultyForSequence(input.sequence),
     title: input.title,
     subtitle: input.subtitle,
     principle: input.principle,

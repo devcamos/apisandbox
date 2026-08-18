@@ -29,10 +29,14 @@ export function CourseAssessment({
   courseId,
   unitId,
   assessment,
+  loginCallbackUrl = `/learn/api-foundations/${unitId}`,
+  showReflection = true,
 }: Readonly<{
   courseId: string
   unitId: string
   assessment: SanitizedAssessmentDefinition
+  loginCallbackUrl?: string
+  showReflection?: boolean
 }>) {
   const { status } = useSession()
   const [answers, setAnswers] = useState<Record<string, string>>({})
@@ -47,6 +51,8 @@ export function CourseAssessment({
     () => assessment.questions.every((question) => Boolean(answers[question.id])),
     [answers, assessment.questions],
   )
+  const answeredCount = assessment.questions.filter((question) => Boolean(answers[question.id])).length
+  const answeredPercent = assessment.questions.length === 0 ? 0 : Math.round((answeredCount / assessment.questions.length) * 100)
 
   useEffect(() => {
     if (status !== "authenticated") return
@@ -90,7 +96,7 @@ export function CourseAssessment({
         <ClipboardCheck className="h-6 w-6 text-violet-300" />
         <h2 id="assessment-title" className="mt-3 text-xl font-bold text-white">{assessment.title}</h2>
         <p className="mt-2 text-sm leading-6 text-slate-300">Sign in to take the unit assessment and keep your best result.</p>
-        <Link href={`/login?callbackUrl=${encodeURIComponent(`/learn/api-foundations/${unitId}`)}`} className="mt-4 inline-flex rounded-lg bg-violet-500 px-4 py-2 text-sm font-semibold text-white hover:bg-violet-400">
+        <Link href={`/login?callbackUrl=${encodeURIComponent(loginCallbackUrl)}`} className="mt-4 inline-flex rounded-lg bg-violet-500 px-4 py-2 text-sm font-semibold text-white hover:bg-violet-400">
           Sign in to assess understanding
         </Link>
       </section>
@@ -103,7 +109,7 @@ export function CourseAssessment({
         <div>
           <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-violet-300">
             <ClipboardCheck className="h-4 w-4" />
-            Unit assessment
+            Question set
           </div>
           <h2 id="assessment-title" className="mt-2 text-xl font-bold text-white">{assessment.title}</h2>
           <p className="mt-2 text-sm leading-6 text-slate-300">{assessment.description}</p>
@@ -113,6 +119,16 @@ export function CourseAssessment({
             Best: <span className="font-semibold text-white">{progress.bestCorrectAnswers}/{progress.totalQuestions}</span> · {progress.attempts} attempt{progress.attempts === 1 ? "" : "s"}
           </div>
         ) : null}
+      </div>
+
+      <div className="mt-5" aria-label="Question completion">
+        <div className="flex items-center justify-between gap-3 text-xs text-slate-400">
+          <span>{answeredCount}/{assessment.questions.length} questions answered</span>
+          <span>{answeredPercent}%</span>
+        </div>
+        <div className="mt-2 h-2 overflow-hidden rounded-full bg-slate-800" role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={answeredPercent}>
+          <div className="h-full rounded-full bg-violet-400 transition-all" style={{ width: `${answeredPercent}%` }} />
+        </div>
       </div>
 
       <form onSubmit={submit} className="mt-6 space-y-6">
@@ -133,11 +149,13 @@ export function CourseAssessment({
           </fieldset>
         ))}
 
-        <div>
-          <label htmlFor={`${unitId}-reflection`} className="text-sm font-semibold text-white">Explain it back <span className="font-normal text-slate-400">(not graded or saved)</span></label>
-          <p className="mt-1 text-sm text-slate-400">{assessment.reflectionPrompt}</p>
-          <textarea id={`${unitId}-reflection`} value={reflection} onChange={(event) => setReflection(event.target.value)} rows={4} className="mt-3 w-full rounded-xl border border-slate-700 bg-slate-950/50 p-3 text-sm text-white placeholder:text-slate-600 focus:border-violet-300 focus:outline-none" placeholder="Teach the idea back in your own words…" />
-        </div>
+        {showReflection ? (
+          <div>
+            <label htmlFor={`${unitId}-reflection`} className="text-sm font-semibold text-white">Explain it back <span className="font-normal text-slate-400">(not graded or saved)</span></label>
+            <p className="mt-1 text-sm text-slate-400">{assessment.reflectionPrompt}</p>
+            <textarea id={`${unitId}-reflection`} value={reflection} onChange={(event) => setReflection(event.target.value)} rows={4} className="mt-3 w-full rounded-xl border border-slate-700 bg-slate-950/50 p-3 text-sm text-white placeholder:text-slate-600 focus:border-violet-300 focus:outline-none" placeholder="Teach the idea back in your own words…" />
+          </div>
+        ) : null}
 
         {loadError ? <p role="alert" className="rounded-lg border border-rose-400/30 bg-rose-400/10 p-3 text-sm text-rose-100">{loadError}</p> : null}
 
