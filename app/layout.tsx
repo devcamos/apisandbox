@@ -15,11 +15,11 @@ const inter = Inter({ subsets: ["latin"] });
 export const metadata: Metadata = {
   title: "API Sandbox — Learn API Development Interactively",
   description:
-    "Master API integrations, algorithms, and architecture patterns through interactive visualisers and guided practice. Free to start, £5/month for full access.",
+    "Master API integrations, algorithms, and architecture patterns through stack-aware scenarios and assessments. Free to start, £5/month for full access.",
   openGraph: {
     title: "API Sandbox — Learn API Development Interactively",
     description:
-      "Master API integrations, algorithms, and architecture patterns through interactive visualisers and guided practice.",
+      "Master API integrations, algorithms, and architecture patterns through stack-aware scenarios and assessments.",
     type: "website",
   },
 };

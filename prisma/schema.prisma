@@ -78,16 +78,16 @@ model User {
   createdAt                DateTime         @default(now())
   updatedAt                DateTime         @updatedAt
 
-  accounts            Account[]
-  sessions            Session[]
-  verificationToken   VerificationToken[]
-  profile             UserProfile?
-  phaseProgress       UserPhaseProgress[]
-  appGuide            UserAppGuide?
-  apiTokens           ApiToken[]
-  apiTokenAuditEvents ApiTokenAuditEvent[]
-  learningEnrollments LearningEnrollment[]
-  learningCheckpointProgress LearningCheckpointProgress[]
+  accounts                       Account[]
+  sessions                       Session[]
+  verificationToken              VerificationToken[]
+  profile                        UserProfile?
+  phaseProgress                  UserPhaseProgress[]
+  appGuide                       UserAppGuide?
+  apiTokens                      ApiToken[]
+  apiTokenAuditEvents            ApiTokenAuditEvent[]
+  learningEnrollments            LearningEnrollment[]
+  learningCheckpointProgress     LearningCheckpointProgress[]
   learningUnitAssessmentProgress LearningUnitAssessmentProgress[]
 }
 
@@ -216,17 +216,17 @@ model LearningCheckpointProgress {
 }
 
 model LearningUnitAssessmentProgress {
-  id                  String   @id @default(cuid())
-  userId              String
-  courseId            String
-  unitId              String
-  bestCorrectAnswers  Int      @default(0)
-  totalQuestions      Int
-  attempts            Int      @default(0)
-  completedAt         DateTime?
-  lastAttemptAt       DateTime?
-  createdAt           DateTime @default(now())
-  updatedAt           DateTime @updatedAt
+  id                 String    @id @default(cuid())
+  userId             String
+  courseId           String
+  unitId             String
+  bestCorrectAnswers Int       @default(0)
+  totalQuestions     Int
+  attempts           Int       @default(0)
+  completedAt        DateTime?
+  lastAttemptAt      DateTime?
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -236,15 +236,23 @@ model LearningUnitAssessmentProgress {
 }
 
 model UserProfile {
-  id                String   @id @default(cuid())
-  userId            String   @unique
-  firstName         String?
-  lastName          String?
-  avatarUrl         String?
-  roleLabel         String?
-  identityStatement String?
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
+  id                    String    @id @default(cuid())
+  userId                String    @unique
+  firstName             String?
+  lastName              String?
+  avatarUrl             String?
+  roleLabel             String?
+  identityStatement     String?
+  engineeringRole       String?
+  experienceLevel       String?
+  primaryLanguage       String?
+  primaryFramework      String?
+  runtimeEnvironment    String?
+  cloudProvider         String?
+  learningGoal          String?
+  onboardingCompletedAt DateTime?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }

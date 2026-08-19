@@ -52,7 +52,7 @@ export function FirstPrinciplesCourse({
             <div className="max-w-3xl">
               <div className="inline-flex items-center gap-2 rounded-full border border-cyan-400/25 bg-cyan-400/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.15em] text-cyan-200">
                 <Network className="h-3.5 w-3.5" />
-                Free foundation · Phases 0–1
+                API Foundations · Free
               </div>
               <h1 className="mt-4 text-4xl font-bold tracking-tight text-white sm:text-5xl">{course.title}</h1>
               <p className="mt-4 text-lg leading-8 text-slate-300">{course.description}</p>

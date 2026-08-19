@@ -24,8 +24,7 @@ test.describe("Upgrade Page", () => {
   test("should show feature comparison", async ({ page }) => {
     await page.goto("/upgrade")
 
-    await expect(page.getByText(/phase 0: how the internet works/i)).toBeVisible()
-    await expect(page.getByText(/phase 1: integration mindset/i)).toBeVisible()
+    await expect(page.getByText(/API Foundations: Program to Integration/i)).toBeVisible()
     await expect(page.getByText(/all learning phases/i)).toBeVisible()
   })
 
@@ -72,6 +71,6 @@ test.describe("Upgrade Page", () => {
 
     const backLink = page.getByRole("link", { name: /back to free content/i })
     await expect(backLink).toBeVisible()
-    await expect(backLink).toHaveAttribute("href", "/phase-1")
+    await expect(backLink).toHaveAttribute("href", "/learn/api-foundations")
   })
 })

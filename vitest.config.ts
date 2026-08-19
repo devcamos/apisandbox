@@ -30,6 +30,7 @@ export default defineConfig({
         "lib/learning/app-guide.ts",
         "lib/learning/aws-certification-course.ts",
         "lib/learning/documentation-keywords.ts",
+        "lib/learning/learner-profile.ts",
         "lib/learning/phase-quizzes.ts",
         "lib/learning/progress-mapping.ts",
         "lib/lessons/lesson-progress.ts",
