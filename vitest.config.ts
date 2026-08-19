@@ -46,6 +46,7 @@ export default defineConfig({
         "lib/stripe-client.ts",
         "lib/user-name.ts",
         "lib/validation/email.ts",
+        "lib/validation/learner-profile.ts",
         "config/featureFlags.ts",
       ],
       // subscription.test.ts imports DB-backed helpers; keep them out of LCOV so SonarCloud
