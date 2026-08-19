@@ -11,17 +11,23 @@ import {
 } from "@/lib/learning/aws-certification-course"
 
 describe("AWS certification curriculum", () => {
-  test("defines the Practitioner, Associate, and Professional ladder", () => {
+  test("defines the Cloud Practitioner, AI Practitioner, Associate, and Professional ladder", () => {
     expect(awsCertificationTracks.map((track) => [track.slug, track.examCode])).toEqual([
       ["practitioner", "CLF-C02"],
+      ["ai-practitioner", "AIF-C01"],
       ["associate", "SAA-C03"],
       ["professional", "SAP-C02"],
     ])
     expect(awsCertificationTracks.every((track) => track.course.units.length === 5)).toBe(true)
-    expect(awsCertificationTracks.flatMap((track) => track.course.units)).toHaveLength(15)
+    expect(awsCertificationTracks.flatMap((track) => track.course.units).every((unit) => unit.difficulty)).toBe(true)
+    expect(new Set(awsCertificationTracks.flatMap((track) => track.course.units).map((unit) => unit.difficulty))).toEqual(
+      new Set(["Easy", "Medium", "Hard", "Expert"]),
+    )
+    expect(awsCertificationTracks.flatMap((track) => track.course.units)).toHaveLength(20)
     expect(
       awsCertificationTracks.flatMap((track) => track.course.units).flatMap((unit) => unit.assessment.questions),
-    ).toHaveLength(45)
+    ).toHaveLength(60)
+    expect(getAwsCertificationTrack("ai-practitioner")?.examCode).toBe("AIF-C01")
     expect(getAwsCertificationTrack("associate")?.examCode).toBe("SAA-C03")
     expect(getAwsCertificationTrack("unknown")).toBeNull()
   })
@@ -29,7 +35,7 @@ describe("AWS certification curriculum", () => {
   test("matches the official domain weight totals", () => {
     for (const track of awsCertificationTracks) {
       expect(track.domains.reduce((total, domain) => total + domain.weight, 0)).toBe(100)
-      expect(track.domains).toHaveLength(4)
+      expect(track.domains.length).toBeGreaterThanOrEqual(4)
     }
   })
 
@@ -44,7 +50,7 @@ describe("AWS certification curriculum", () => {
   test("keeps answers server-side and grades every module", () => {
     for (const track of awsCertificationTracks) {
       const sanitized = getSanitizedLearningCourse(track.course.id)
-      expect(sanitized?.units).toHaveLength(5)
+      expect(sanitized?.units).toHaveLength(track.course.units.length)
 
       for (const unit of track.course.units) {
         const questionIds = unit.assessment.questions.map((question) => question.id)

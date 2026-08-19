@@ -15,7 +15,7 @@ import { awsCertificationTracks } from "@/lib/learning/aws-certification-course"
 
 export const metadata: Metadata = {
   title: "AWS Certification Journey | API Sandbox",
-  description: "Prepare for AWS Cloud Practitioner, Solutions Architect Associate, and Solutions Architect Professional through one connected API Sandbox course.",
+  description: "Prepare for AWS Cloud Practitioner, AI Practitioner, Solutions Architect Associate, and Solutions Architect Professional through one connected API Sandbox course.",
 }
 
 const trackStyles = {
@@ -37,18 +37,18 @@ export default function AwsCertificationsPage() {
           <div className="mt-7 max-w-4xl">
             <div className="inline-flex items-center gap-2 rounded-full border border-orange-400/25 bg-orange-400/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.17em] text-orange-200">
               <Award className="h-3.5 w-3.5" />
-              Practitioner → Associate → Professional
+              Foundational paths → Associate → Professional
             </div>
             <h1 className="mt-5 text-5xl font-bold tracking-tight text-white sm:text-6xl">AWS Certification Journey</h1>
             <p className="mt-5 text-xl leading-8 text-slate-300">
-              Learn AWS through one evolving system. Explain the cloud at Practitioner, deploy API Sandbox at Associate, then govern and transform it at Professional.
+              Choose a foundational path in cloud or AI, then progress into associate architecture and professional-level governance and transformation.
             </p>
           </div>
 
           <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {[
-              { icon: BookOpenCheck, value: "15", label: "connected modules" },
-              { icon: BrainCircuit, value: "45", label: "original assessment questions" },
+              { icon: BookOpenCheck, value: "20", label: "connected modules" },
+              { icon: BrainCircuit, value: "60", label: "original assessment questions" },
               { icon: Route, value: "3", label: "architecture capstones" },
               { icon: ShieldCheck, value: "80%", label: "module mastery threshold" },
             ].map((stat) => {
@@ -67,14 +67,15 @@ export default function AwsCertificationsPage() {
 
       <section className="container mx-auto max-w-7xl px-6 py-12 sm:py-16" aria-labelledby="choose-track">
         <div className="max-w-3xl">
-          <p className="text-sm font-semibold uppercase tracking-[0.18em] text-orange-300">One ladder, increasing responsibility</p>
-          <h2 id="choose-track" className="mt-2 text-3xl font-bold text-white">Choose your certification level</h2>
+          <p className="text-sm font-semibold uppercase tracking-[0.18em] text-orange-300">Foundational paths, increasing responsibility</p>
+          <h2 id="choose-track" className="mt-2 text-3xl font-bold text-white">Choose your certification path</h2>
           <p className="mt-3 leading-7 text-slate-400">Each level includes official domain weighting, original lessons, architecture decision labs, persistent signed-in assessments, a capstone, and external readiness requirements.</p>
         </div>
 
-        <div className="mt-8 grid gap-6 lg:grid-cols-3">
-          {awsCertificationTracks.map((track, index) => {
+        <div className="mt-8 grid gap-6 lg:grid-cols-2 xl:grid-cols-4">
+          {awsCertificationTracks.map((track) => {
             const style = trackStyles[track.accent]
+            const progressionLabel = track.level === "Foundational" ? "Foundational path" : track.level === "Associate" ? "Step 1" : "Step 2"
             return (
               <article key={track.slug} className={`group flex flex-col overflow-hidden rounded-2xl border border-slate-700 bg-slate-900/65 transition-all ${style.border}`}>
                 <div className={`h-1.5 bg-gradient-to-r ${style.gradient}`} />
@@ -83,7 +84,7 @@ export default function AwsCertificationsPage() {
                     <div className={`rounded-xl p-3 ${style.soft}`}>
                       <GraduationCap className={`h-7 w-7 ${style.text}`} />
                     </div>
-                    <span className={`rounded-full border border-slate-700 px-3 py-1 text-xs font-semibold ${style.text}`}>Step {index + 1}</span>
+                    <span className={`rounded-full border border-slate-700 px-3 py-1 text-xs font-semibold ${style.text}`}>{progressionLabel}</span>
                   </div>
 
                   <p className={`mt-5 text-xs font-semibold uppercase tracking-[0.16em] ${style.text}`}>{track.level} · {track.examCode}</p>

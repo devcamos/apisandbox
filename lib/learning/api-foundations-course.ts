@@ -46,9 +46,12 @@ export interface AssessmentDefinition {
   reflectionPrompt: string
 }
 
+export type LearningDifficulty = "Easy" | "Medium" | "Hard" | "Expert"
+
 export interface LearningUnit {
   id: string
   phase: number
+  difficulty?: LearningDifficulty
   title: string
   subtitle: string
   principle: string
