@@ -8,13 +8,14 @@
 
 ## Read first
 
-1. This file — setup and verification  
-2. [CI_PIPELINE.md](./CI_PIPELINE.md) — PR job ↔ local command map  
-3. `.cursor/rules/` — green builds, auth/subscription conventions  
-3. [AGENT_PR_CHECKLIST.md](./AGENT_PR_CHECKLIST.md) — before every PR  
-4. [DEPLOYMENT.md](./DEPLOYMENT.md) — only if you touch auth, env, or deploy  
-5. [SAAS.md](./SAAS.md) — production billing flags, Stripe, rate limits  
-6. [STRIPE_LOCAL.md](./STRIPE_LOCAL.md) — real Checkout + webhooks on localhost  
+1. This file — setup and verification
+2. [NEXUS_ENGINEERING_PRINCIPLES.md](./NEXUS_ENGINEERING_PRINCIPLES.md) — normative Nexus/MotivusLabs engineering and resource standard
+3. [CI_PIPELINE.md](./CI_PIPELINE.md) — PR job ↔ local command map
+4. `.cursor/rules/` — Nexus principles, green builds, auth/subscription conventions
+5. [AGENT_PR_CHECKLIST.md](./AGENT_PR_CHECKLIST.md) — before every PR
+6. [DEPLOYMENT.md](./DEPLOYMENT.md) — only if you touch auth, env, or deploy
+7. [SAAS.md](./SAAS.md) — production billing flags, Stripe, rate limits
+8. [STRIPE_LOCAL.md](./STRIPE_LOCAL.md) — real Checkout + webhooks on localhost
 
 ---
 
@@ -80,6 +81,7 @@ After push: `gh pr checks --watch` (includes **SonarQube Cloud**). Optional: `np
 
 ## Conventions
 
+- Follow the [Nexus Motivus engineering principles](./NEXUS_ENGINEERING_PRINCIPLES.md); shared MotivusLabs resources must satisfy its resource contract.
 - Minimal diffs; match existing patterns.
 - Never commit `.env.local` or secrets.
 - New users: `createUserWithInitialData` with `subscriptionTier: "FREE"` (see `.cursor/rules/auth-subscription.mdc`).
