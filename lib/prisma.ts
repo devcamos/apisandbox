@@ -1,7 +1,8 @@
 /**
  * Prisma Client Singleton
  *
- * Uses the Rust query engine (binary) with pooled Neon/Vercel Postgres URLs.
+ * Uses the Rust query engine (binary) with pooled Postgres URLs
+ * (Supabase Preview / Neon Production / local Docker).
  * outputFileTracingIncludes in next.config.mjs ensures engines ship on Vercel.
  */
 
@@ -10,6 +11,14 @@ import { PrismaClient } from "@prisma/client"
 const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined
 }
+
+const DATABASE_ENV_KEYS = [
+  "POSTGRES_PRISMA_URL",
+  "DATABASE_URL",
+  "POSTGRES_URL_NON_POOLING",
+  "POSTGRES_URL",
+  "DATABASE_URL_UNPOOLED",
+] as const
 
 function normalizePooledDatabaseUrl(url: string) {
   try {
@@ -26,14 +35,21 @@ function normalizePooledDatabaseUrl(url: string) {
   }
 }
 
-function resolveDatabaseUrl() {
-  const candidates = [
-    process.env.DATABASE_URL,
-    process.env.POSTGRES_PRISMA_URL,
-    process.env.POSTGRES_URL,
-  ]
+export function getDatabaseUrlSource(): (typeof DATABASE_ENV_KEYS)[number] | undefined {
+  for (const key of DATABASE_ENV_KEYS) {
+    const value = process.env[key]
+    if (!value) continue
+    if (value.startsWith("prisma://") || value.startsWith("prisma+postgres://")) {
+      continue
+    }
+    return key
+  }
+  return undefined
+}
 
-  for (const raw of candidates) {
+function resolveDatabaseUrl() {
+  for (const key of DATABASE_ENV_KEYS) {
+    const raw = process.env[key]
     if (!raw) continue
     if (raw.startsWith("prisma://") || raw.startsWith("prisma+postgres://")) {
       continue

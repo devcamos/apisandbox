@@ -9,12 +9,14 @@ Use `gh pr checks` to identify the failing job before applying a recovery. The s
 | `unit-tests` | failed assertion, missing mock, or coverage collection error | [Run unit CI locally](#unit-tests-or-coverage-fail) |
 | `e2e-smoke` | schema, PostgreSQL, standalone server, or browser failure | [Run the full smoke environment](#e2e-smoke-fails) |
 | `SonarQube Cloud` | new-code coverage, duplication, reliability, or security gate | [Inspect the quality gate](#sonarqube-cloud-quality-gate-fails) |
-| Vercel | Neon preview-branch capacity is exhausted | [Check provisioning](#vercel-preview-fails-before-build-neon-branch-limit) |
+| Vercel | Neon preview-branch capacity is exhausted (legacy) | [Check provisioning](#vercel-preview-fails-before-build-neon-branch-limit) |
 | Architecture review | Gemini configuration, quota, or PR comment permission | [Inspect review generation](#pr-architecture-intelligence-fails) |
 
 ## Vercel preview fails before build: Neon branch limit
 
-### Symptoms
+**Current Preview path:** Supabase Marketplace (`apisandbox-preview-db`), not Neon branches. Prefer reconnecting Supabase Preview over re-enabling Neon for Preview.
+
+### Symptoms (legacy Neon Marketplace)
 
 - The Vercel PR check fails immediately.
 - The deployment reports `BUILD_FAILED: Resource provisioning failed`.

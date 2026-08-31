@@ -21,7 +21,7 @@ Preview hosts change per PR (`https://apisandbox-<hash>-….vercel.app`). Each h
 
 | Variable | Value |
 |----------|-------|
-| `DATABASE_URL` | `$POSTGRES_PRISMA_URL` |
+| `DATABASE_URL` / `POSTGRES_PRISMA_URL` | Preview: Supabase Marketplace (`apisandbox-preview-db`). Production: separate Postgres URLs (currently Neon static). Never share Preview/Production DB values. |
 | `AUTH_SECRET` | `openssl rand -base64 32` |
 | `AUTH_JWT_SECRET` | same generator (required on Preview) |
 | `NEXTAUTH_SECRET` | same as `AUTH_SECRET` (optional) |
@@ -120,9 +120,15 @@ SaaS billing and feature-flag checklist: [SAAS.md](./SAAS.md). Flag reference: [
 - Vercel deploys from Git integration; production on merge to `main`.
 - Optional human gate: GitHub Environment `preview` for PR approval (see workflow `preview-deploy-gate`).
 
-### Neon preview branch capacity
+### Preview database (Supabase)
 
-Vercel previews provision a Neon `preview/<git-branch>` before the application build. If Neon reaches its branch limit, Vercel fails immediately with `Resource provisioning failed` and no build logs. See [KNOWN_ERRORS.md](./KNOWN_ERRORS.md#vercel-preview-fails-before-build-neon-branch-limit) and run `npm run neon:branches:cleanup` to review an obsolete-branch cleanup plan. The repository policy retains no more than five total Neon branches.
+Preview uses a dedicated Supabase project connected via Vercel Marketplace (`apisandbox-preview-db`). All Preview deployments share that database (no per-PR DB branches). Production Postgres URLs must stay Production-scoped and must not reuse Preview `POSTGRES_*` values.
+
+Auth is unchanged: custom JWT + Google GSI. Supabase is Postgres hosting only (no Supabase Auth).
+
+### Legacy: Neon preview branch capacity
+
+If a Neon Marketplace resource is reconnected and Preview starts failing with `Resource provisioning failed` (0ms build), Neon may be creating per-PR branches again. Prefer the Supabase Preview setup above. For leftover Neon branch cleanup while Production still uses Neon, see [KNOWN_ERRORS.md](./KNOWN_ERRORS.md#vercel-preview-fails-before-build-neon-branch-limit).
 
 ---
 
@@ -130,6 +136,7 @@ Vercel previews provision a Neon `preview/<git-branch>` before the application b
 
 | Date | Change |
 |------|--------|
+| 2026-08-10 | Preview cutover to Supabase Marketplace Postgres; Neon disconnected from Preview branching; auth unchanged |
 | 2026-06-29 | Stripe production hardening: live-key validation, webhook idempotency ledger, status-driven entitlement reconciliation, and duplicate-subscription prevention |
 | 2026-06-29 | Switched PR Architecture Intelligence from OpenAI to the Gemini Developer API free tier |
 | 2026-06-29 | Documented environment-specific test users and separate OpenAI secret locations for GitHub Actions and Vercel Preview |

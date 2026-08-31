@@ -69,7 +69,7 @@ export async function createUserWithInitialData(input: BootstrapInput) {
   }
 
   try {
-    // Sequential writes (no nested create / transaction) for Neon HTTP driver on Vercel.
+    // Sequential writes (no nested create / transaction) keep serverless Postgres paths simple.
     const user = await prisma.user.create({
       data: {
         email: input.email,

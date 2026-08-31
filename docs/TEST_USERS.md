@@ -41,7 +41,7 @@ npm run dev
 
 ## Preview deployments
 
-Each PR preview uses its associated Neon branch. A preview database may be copied from another branch, but the local test-user command is not automatically run during deployment. This means `test@example.com` and `qa@example.com` commonly do not exist in Preview.
+All PR previews share the Supabase Preview database. The local test-user command is not automatically run during deployment, so `test@example.com` / `qa@example.com` exist only if they were seeded against that Preview DB.
 
 For routine preview testing:
 

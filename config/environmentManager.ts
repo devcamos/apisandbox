@@ -44,12 +44,14 @@ export function getConfig(): AppConfig {
   const nodeEnv = process.env.NODE_ENV || 'development'
   const isProduction = nodeEnv === 'production'
   
-  // Database URL - supports both local PostgreSQL and Vercel Postgres
-  const databaseUrl = 
-    process.env.DATABASE_URL || 
-    process.env.POSTGRES_PRISMA_URL || // Vercel Postgres
-    process.env.POSTGRES_URL || // Vercel Postgres (alternative)
-    'postgresql://postgres:postgres@localhost:5432/apisandbox_dev'
+  // Database URL - local Docker, Supabase Preview, or Production Postgres
+  const databaseUrl =
+    process.env.POSTGRES_PRISMA_URL ||
+    process.env.DATABASE_URL ||
+    process.env.POSTGRES_URL_NON_POOLING ||
+    process.env.POSTGRES_URL ||
+    process.env.DATABASE_URL_UNPOOLED ||
+    "postgresql://postgres:postgres@localhost:5432/apisandbox_dev"
 
   // Auth secret - required for NextAuth
   const authSecret = 
