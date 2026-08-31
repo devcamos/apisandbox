@@ -137,6 +137,23 @@ describe("AWS certification curriculum", () => {
     }
   })
 
+  test("does not expose prediction roles through browser choice identifiers", () => {
+    const aiTrack = getAwsCertificationTrack("ai-practitioner")
+    const browserCourse = aiTrack ? getSanitizedLearningCourse(aiTrack.course.id) : null
+    if (!browserCourse) throw new Error("AI Practitioner browser course is missing")
+    const browserCapabilities = browserCourse.units.filter((unit) => unit.certification?.kind === "capability")
+    const allChoiceIds = browserCapabilities.flatMap((unit) => unit.scenario.options.map((option) => option.id))
+
+    expect(new Set(allChoiceIds).size).toBe(allChoiceIds.length)
+    for (const unit of browserCapabilities) {
+      expect(unit.scenario.options).toHaveLength(2)
+      for (const option of unit.scenario.options) {
+        expect(option.id).toMatch(/^choice-[0-9a-z]{7}$/)
+        expect(option.id).not.toMatch(/preferred|alternative|correct|incorrect|answer/i)
+      }
+    }
+  })
+
   test("places TLS and mTLS at transport while retaining separate authorization", () => {
     const security = getAifC01Capability("ai-security")
     const journey = security?.certification?.masteryJourney

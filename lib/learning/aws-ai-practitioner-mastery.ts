@@ -44,7 +44,27 @@ interface CapabilityInput {
   questions: AssessmentQuestion[]
 }
 
+function predictionChoiceId(capabilityId: string, position: number) {
+  // Stable FNV-1a tokens keep answer roles out of serialized browser values.
+  const source = capabilityId + ":" + position
+  let hash = 2_166_136_261
+
+  for (let index = 0; index < source.length; index += 1) {
+    hash ^= source.charCodeAt(index)
+    hash = Math.imul(hash, 16_777_619)
+  }
+
+  return "choice-" + (hash >>> 0).toString(36).padStart(7, "0")
+}
+
 function capabilityUnit(input: CapabilityInput): LearningUnit {
+  const predictionChoices = [
+    { label: input.prediction.preferred[0], consequence: input.prediction.preferred[1] },
+    { label: input.prediction.alternative[0], consequence: input.prediction.alternative[1] },
+  ]
+  const orderedPredictionChoices = input.sequence % 2 === 0
+    ? [predictionChoices[1], predictionChoices[0]]
+    : predictionChoices
   const masteryJourney: CapabilityMasteryJourney = {
     problem: input.problem,
     mechanism: input.mechanism,
@@ -86,10 +106,10 @@ function capabilityUnit(input: CapabilityInput): LearningUnit {
     scenario: {
       title: "Predict before learning",
       prompt: input.prediction.prompt,
-      options: [
-        { id: "preferred", label: input.prediction.preferred[0], consequence: input.prediction.preferred[1] },
-        { id: "alternative", label: input.prediction.alternative[0], consequence: input.prediction.alternative[1] },
-      ],
+      options: orderedPredictionChoices.map((choice, index) => ({
+        id: predictionChoiceId(input.id, index),
+        ...choice,
+      })),
       trace: [
         { id: "problem", label: "Constraint", system: "Problem", detail: input.problem },
         { id: "mechanism", label: "Mechanism", system: "Capability", detail: input.mechanism },
