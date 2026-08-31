@@ -1,5 +1,5 @@
 import type { Metadata } from "next"
-import { notFound } from "next/navigation"
+import { notFound, redirect } from "next/navigation"
 import { SubscriptionGate } from "@/components/SubscriptionGate"
 import { AwsCertificationCourse } from "@/components/learning/AwsCertificationCourse"
 import { getSanitizedLearningCourse } from "@/lib/learning/api-foundations-course"
@@ -7,9 +7,12 @@ import { awsCertificationTracks, getAwsCertificationTrack } from "@/lib/learning
 
 export function generateStaticParams() {
   return awsCertificationTracks.flatMap((track) =>
-    track.course.units.map((unit) => ({ trackId: track.slug, unitId: unit.id })),
+    track.course.units
+      .filter((unit) => unit.certification?.kind !== "capability")
+      .map((unit) => ({ trackId: track.slug, unitId: unit.id })),
   )
 }
+
 export async function generateMetadata({
   params,
 }: Readonly<{ params: Promise<{ trackId: string; unitId: string }> }>): Promise<Metadata> {
@@ -28,7 +31,20 @@ export default async function AwsCertificationUnitPage({
 }: Readonly<{ params: Promise<{ trackId: string; unitId: string }> }>) {
   const { trackId, unitId } = await params
   const track = getAwsCertificationTrack(trackId)
-  if (!track || !track.course.units.some((unit) => unit.id === unitId)) notFound()
+  const unit = track?.course.units.find((item) => item.id === unitId)
+  if (!track || !unit) notFound()
+
+  if (unit.certification?.kind === "capability") {
+    redirect(
+      "/cloud/aws/certifications/" +
+        track.slug +
+        "/domains/" +
+        unit.certification.domainId +
+        "/capabilities/" +
+        unit.id,
+    )
+  }
+
   const course = getSanitizedLearningCourse(track.course.id)
   if (!course) notFound()
 

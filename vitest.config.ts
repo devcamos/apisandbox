@@ -28,6 +28,7 @@ export default defineConfig({
         "lib/auth/jwt-secret.ts",
         "lib/google-client-id.ts",
         "lib/learning/app-guide.ts",
+        "lib/learning/aws-ai-practitioner-mastery.ts",
         "lib/learning/aws-certification-course.ts",
         "lib/learning/documentation-keywords.ts",
         "lib/learning/phase-quizzes.ts",

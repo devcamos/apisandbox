@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { FormEvent, useEffect, useMemo, useState } from "react"
+import { useEffect, useMemo, useState, type FormEvent } from "react"
 import { CheckCircle2, CircleAlert, ClipboardCheck, LoaderCircle } from "lucide-react"
 import { useSession } from "@/components/providers/SessionProvider"
 import { authApiJsonInit, authApiRequestInit, type AuthApiEnvelope } from "@/lib/auth/client-fetch"
@@ -109,7 +109,7 @@ export function CourseAssessment({
         <div>
           <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-violet-300">
             <ClipboardCheck className="h-4 w-4" />
-            Question set
+            Scored checkpoint
           </div>
           <h2 id="assessment-title" className="mt-2 text-xl font-bold text-white">{assessment.title}</h2>
           <p className="mt-2 text-sm leading-6 text-slate-300">{assessment.description}</p>
@@ -161,7 +161,7 @@ export function CourseAssessment({
 
         <button type="submit" disabled={!completed || loading || status !== "authenticated"} className="inline-flex items-center gap-2 rounded-lg bg-violet-500 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-violet-400 disabled:cursor-not-allowed disabled:opacity-50">
           {loading ? <LoaderCircle className="h-4 w-4 animate-spin" /> : <ClipboardCheck className="h-4 w-4" />}
-          Check my understanding
+          Submit checkpoint
         </button>
       </form>
 
@@ -170,8 +170,8 @@ export function CourseAssessment({
           <div className="flex gap-3">
             {result.result.mastered ? <CheckCircle2 className="h-5 w-5 shrink-0 text-emerald-300" /> : <CircleAlert className="h-5 w-5 shrink-0 text-amber-300" />}
             <div>
-              <h3 className="font-semibold text-white">{result.result.mastered ? "Concept demonstrated" : "Keep the model moving"}</h3>
-              <p className="mt-1 text-sm text-slate-200">You answered {result.result.correctAnswers}/{result.result.totalQuestions} correctly ({result.result.scorePercent}%). {result.result.mastered ? "80% is the demonstrated-understanding threshold." : "Revisit the explanations below, then try again when ready."}</p>
+              <h3 className="font-semibold text-white">{result.result.mastered ? "Checkpoint passed" : "Checkpoint not yet passed"}</h3>
+              <p className="mt-1 text-sm text-slate-200">You answered {result.result.correctAnswers}/{result.result.totalQuestions} correctly ({result.result.scorePercent}%). {result.result.mastered ? "80% is the scored checkpoint threshold." : "Revisit the explanations below, then try again when ready."}</p>
             </div>
           </div>
           <ul className="mt-4 space-y-3">

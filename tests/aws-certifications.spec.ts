@@ -35,6 +35,7 @@ test.describe("AWS certification journey", () => {
 
     await expect(page.getByRole("heading", { name: "AWS Certification Journey" })).toBeVisible()
     await expect(page.getByRole("heading", { name: "Cloud Practitioner" })).toBeVisible()
+    await expect(page.getByRole("heading", { name: "AI Practitioner" })).toBeVisible()
     await expect(page.getByRole("heading", { name: "Solutions Architect Associate" })).toBeVisible()
     await expect(page.getByRole("heading", { name: "Solutions Architect Professional" })).toBeVisible()
 
@@ -48,6 +49,16 @@ test.describe("AWS certification journey", () => {
     await page.getByText("Publish durable work to SQS and acknowledge the webhook promptly", { exact: true }).click()
     await expect(page.getByText("Decision trace")).toBeVisible()
     await expect(page.getByText("Retry independently")).toBeVisible()
+
+    await page.goto("/cloud/aws/certifications/ai-practitioner/rag")
+    await expect(page).toHaveURL("/cloud/aws/certifications/ai-practitioner/domains/foundation-models/capabilities/rag")
+    await expect(page.getByRole("article").getByRole("heading", { name: "Retrieval-augmented generation (RAG)", exact: true })).toBeVisible()
+    await expect(page.getByText("Opening this capability", { exact: false })).toBeVisible()
+    await expect(page.getByRole("heading", { name: "Problem", exact: true })).toBeVisible()
+    await expect(page.getByRole("heading", { name: "Build", exact: true })).toBeVisible()
+    await expect(page.getByRole("heading", { name: "AWS Map", exact: true })).toBeVisible()
+    await expect(page.getByRole("heading", { name: "Exam", exact: true })).toBeVisible()
+    await expect(page.getByText("Java 21", { exact: true })).toBeVisible()
   })
 
   test("persists certification assessment mastery through the shared API", async ({ request }) => {
