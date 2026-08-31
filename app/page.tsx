@@ -74,7 +74,7 @@ export default function Home() {
               </Link>
             </div>
             <p className="text-sm text-gray-500 mt-4">
-              No credit card required • First-principles Phases 0 & 1 free to explore
+              No credit card required • API Foundations free to explore
             </p>
           </div>
         </div>
@@ -237,7 +237,7 @@ export default function Home() {
             <ul className="space-y-2 text-sm text-gray-300">
               <li className="flex items-center gap-2">
                 <Check className="w-4 h-4 text-green-400" />
-                Integration Mindset
+                API Foundations
               </li>
               <li className="flex items-center gap-2">
                 <Check className="w-4 h-4 text-green-400" />
@@ -382,9 +382,9 @@ export default function Home() {
 
           {/* Preview Content (blurred) */}
           <div className="bg-slate-800/50 backdrop-blur-sm rounded-2xl p-8 border border-slate-700 opacity-50 blur-sm">
-            <div className="text-sm font-semibold text-gray-400 mb-2">Phase 1</div>
-            <h3 className="text-2xl font-bold text-white mb-2">HTTP to Integration</h3>
-            <p className="text-gray-400 mb-4">Turn a network request into a dependable API integration</p>
+            <div className="text-sm font-semibold text-gray-400 mb-2">API Foundations</div>
+            <h3 className="text-2xl font-bold text-white mb-2">Program to Integration</h3>
+            <p className="text-gray-400 mb-4">Turn a program action into a dependable API integration</p>
             <div className="space-y-2">
               <div className="h-2 bg-slate-700 rounded"></div>
               <div className="h-2 bg-slate-700 rounded w-3/4"></div>
@@ -518,7 +518,7 @@ export default function Home() {
         <div className="text-center">
           <h2 className="text-3xl font-bold text-white mb-4">Ready to Explore?</h2>
           <p className="text-gray-300 mb-8 max-w-2xl mx-auto">
-            Join developers who are mastering API integrations with our comprehensive, interactive training program. Start exploring Phase 0 & 1 for free!
+            Join developers who are mastering API integrations with our comprehensive, interactive training program. Start with API Foundations for free!
           </p>
           <Link 
             href="/signup"

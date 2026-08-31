@@ -11,7 +11,7 @@ test.describe('Start Page', () => {
   });
 
   test('should have working Start Learning button that scrolls to phases', async ({ page }) => {
-    const startButton = page.getByRole('link', { name: 'Start Learning' });
+    const startButton = page.getByRole('link', { name: 'Start Learning', exact: true });
     await expect(startButton).toBeVisible();
     await expect(startButton).toHaveAttribute('href', '#phases');
     
@@ -28,36 +28,36 @@ test.describe('Start Page', () => {
     await expect(page.getByText('from API basics to architecture-level theory mastery')).toBeVisible();
     
     // Check skill level indicators
-    await expect(page.getByText('Phase 1 • Beginner')).toBeVisible();
-    await expect(page.getByText('Phase 2 • Intermediate')).toBeVisible();
-    await expect(page.getByText('Phase 3 • Advanced')).toBeVisible();
-    await expect(page.getByText('Phase 4 • Expert')).toBeVisible();
-    await expect(page.getByText('Phase 5 • Architect')).toBeVisible();
+    await expect(page.getByRole('link', { name: /Beginner Phase 1/ })).toBeVisible();
+    await expect(page.getByRole('link', { name: /Intermediate Phase 2/ })).toBeVisible();
+    await expect(page.getByRole('link', { name: /Advanced Phase 3/ })).toBeVisible();
+    await expect(page.getByRole('link', { name: /Expert Phase 4/ })).toBeVisible();
+    await expect(page.getByRole('link', { name: /Architect Phase 5/ })).toBeVisible();
   });
 
   test('should display all 5 phase cards', async ({ page }) => {
     await expect(page.getByRole('heading', { name: 'Choose Your Learning Path' })).toBeVisible();
     
     // Check all phase cards are present
-    await expect(page.getByText('Phase 1')).toBeVisible();
-    await expect(page.getByText('Phase 2')).toBeVisible();
-    await expect(page.getByText('Phase 3')).toBeVisible();
-    await expect(page.getByText('Phase 4')).toBeVisible();
-    await expect(page.getByText('Phase 5')).toBeVisible();
+    await expect(page.getByRole('link', { name: /Beginner Phase 1/ })).toBeVisible();
+    await expect(page.getByRole('link', { name: /Intermediate Phase 2/ })).toBeVisible();
+    await expect(page.getByRole('link', { name: /Advanced Phase 3/ })).toBeVisible();
+    await expect(page.getByRole('link', { name: /Expert Phase 4/ })).toBeVisible();
+    await expect(page.getByRole('link', { name: /Architect Phase 5/ })).toBeVisible();
     
     // Check phase titles
-    await expect(page.getByText('Integration Mindset')).toBeVisible();
-    await expect(page.getByText('Third-Party Integrations')).toBeVisible();
-    await expect(page.getByText('Inter-Service Communication')).toBeVisible();
-    await expect(page.getByText('Principal-Level Architecture')).toBeVisible();
-    await expect(page.getByText('API Algorithms')).toBeVisible();
+    await expect(page.getByRole('link', { name: /Beginner Phase 1 API Foundations/ })).toBeVisible();
+    await expect(page.getByRole('link', { name: /Intermediate Phase 2 Third-Party Integrations/ })).toBeVisible();
+    await expect(page.getByRole('link', { name: /Advanced Phase 3 Inter-Service Communication/ })).toBeVisible();
+    await expect(page.getByRole('link', { name: /Expert Phase 4 Principal-Level Architecture/ })).toBeVisible();
+    await expect(page.getByRole('link', { name: /Architect Phase 5 API Algorithms/ })).toBeVisible();
   });
 
   test('should have working phase links', async ({ page }) => {
     // Test Phase 1 link
-    const phase1Link = page.getByRole('link', { name: /Phase 1.*Integration Mindset/ });
+    const phase1Link = page.getByRole('link', { name: /Phase 1.*API Foundations/ });
     await expect(phase1Link).toBeVisible();
-    await expect(phase1Link).toHaveAttribute('href', '/phase-1');
+    await expect(phase1Link).toHaveAttribute('href', '/learn/api-foundations');
     
     // Test Phase 2 link
     const phase2Link = page.getByRole('link', { name: /Phase 2.*Third-Party Integrations/ });
@@ -72,31 +72,31 @@ test.describe('Start Page', () => {
     await expect(page.getByText('Learn Concepts')).toBeVisible();
     await expect(page.getByText('Build Projects')).toBeVisible();
     await expect(page.getByText('Test & Debug')).toBeVisible();
-    await expect(page.getByText('Architect')).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Architect', exact: true })).toBeVisible();
   });
 
   test('should display quick start guide', async ({ page }) => {
     await expect(page.getByRole('heading', { name: 'Quick Start Guide' })).toBeVisible();
     
     // Check quick start cards
-    await expect(page.getByText('Read the Docs')).toBeVisible();
-    await expect(page.getByText('Try Interactive Demos')).toBeVisible();
+    await expect(page.getByText('Build the Mental Model')).toBeVisible();
+    await expect(page.getByText('Trace a Request')).toBeVisible();
     await expect(page.getByText('Monitor Progress')).toBeVisible();
   });
 
   test('should have working quick start links', async ({ page }) => {
-    // Test Read More link
-    const readMoreLink = page.getByRole('link', { name: 'Read More' });
-    await expect(readMoreLink).toBeVisible();
-    await expect(readMoreLink).toHaveAttribute('href', '/phase-1');
+    // Test foundation link
+    const foundationLink = page.getByRole('link', { name: 'Start foundation' });
+    await expect(foundationLink).toBeVisible();
+    await expect(foundationLink).toHaveAttribute('href', '/learn/api-foundations');
     
-    // Test Try Demos link
-    const tryDemosLink = page.getByRole('link', { name: 'Try Demos' });
+    // Test network trace link
+    const tryDemosLink = page.getByRole('link', { name: 'Trace the network' });
     await expect(tryDemosLink).toBeVisible();
-    await expect(tryDemosLink).toHaveAttribute('href', '/phase-1/categories');
+    await expect(tryDemosLink).toHaveAttribute('href', '/learn/api-foundations/network-path');
     
     // Test View Dashboard link
-    const viewDashboardLink = page.getByRole('link', { name: 'View Dashboard' });
+    const viewDashboardLink = page.getByRole('link', { name: 'View Dashboard' }).last();
     await expect(viewDashboardLink).toBeVisible();
     await expect(viewDashboardLink).toHaveAttribute('href', '/observability');
   });
@@ -109,7 +109,7 @@ test.describe('Start Page', () => {
     await expect(page.getByRole('heading', { name: 'Choose Your Learning Path' })).toBeVisible();
     
     // Check that phase cards stack properly
-    await expect(page.getByText('Phase 1')).toBeVisible();
-    await expect(page.getByText('Phase 2')).toBeVisible();
+    await expect(page.getByRole('link', { name: /Beginner Phase 1/ })).toBeVisible();
+    await expect(page.getByRole('link', { name: /Intermediate Phase 2/ })).toBeVisible();
   });
 });

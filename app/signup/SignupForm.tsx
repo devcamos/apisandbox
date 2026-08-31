@@ -82,7 +82,7 @@ function SignupForm({ googleClientId }: Readonly<{ googleClientId: string }>) {
 
       await completeClientAuthSession({
         authData: payload.data,
-        redirectTo: "/dashboard",
+        redirectTo: "/onboarding",
         setSession: setSessionFromAuthResponse,
         savePassword: { email: formData.email, password: formData.password },
       })
@@ -108,7 +108,7 @@ function SignupForm({ googleClientId }: Readonly<{ googleClientId: string }>) {
         }
         await completeClientAuthSession({
           authData: payload.data,
-          redirectTo: "/dashboard",
+          redirectTo: "/onboarding",
           setSession: setSessionFromAuthResponse,
         })
         return
@@ -133,7 +133,7 @@ function SignupForm({ googleClientId }: Readonly<{ googleClientId: string }>) {
   return (
     <AuthPageShell
       title="Create Account"
-      subtitle="Free access to Phases 0 & 1 — upgrade anytime for full access"
+      subtitle="Free access to API Foundations — upgrade anytime for full access"
       isLoading={isLoading}
       loadingMessage="Creating your account securely…"
     >

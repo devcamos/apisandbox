@@ -74,7 +74,7 @@ export default function UpgradePage() {
             Unlock Full Access
           </h1>
           <p className="text-xl text-gray-300 max-w-2xl mx-auto">
-            Master APIs, algorithms, and architecture with interactive tools and guided practice
+            Master APIs, algorithms, and architecture with stack-aware scenarios and question practice
           </p>
         </div>
 
@@ -88,11 +88,7 @@ export default function UpgradePage() {
             <ul className="space-y-3 mb-6">
               <li className="flex items-center gap-2 text-gray-300">
                 <Check className="w-5 h-5 text-green-400 shrink-0" />
-                Phase 0: Program to Network
-              </li>
-              <li className="flex items-center gap-2 text-gray-300">
-                <Check className="w-5 h-5 text-green-400 shrink-0" />
-                Phase 1: HTTP to Integration
+                API Foundations: Program to Integration
               </li>
               <li className="flex items-center gap-2 text-gray-300">
                 <Check className="w-5 h-5 text-green-400 shrink-0" />

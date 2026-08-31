@@ -31,6 +31,7 @@ export default defineConfig({
         "lib/learning/aws-ai-practitioner-mastery.ts",
         "lib/learning/aws-certification-course.ts",
         "lib/learning/documentation-keywords.ts",
+        "lib/learning/learner-profile.ts",
         "lib/learning/phase-quizzes.ts",
         "lib/learning/progress-mapping.ts",
         "lib/lessons/lesson-progress.ts",
@@ -46,6 +47,7 @@ export default defineConfig({
         "lib/stripe-client.ts",
         "lib/user-name.ts",
         "lib/validation/email.ts",
+        "lib/validation/learner-profile.ts",
         "config/featureFlags.ts",
       ],
       // subscription.test.ts imports DB-backed helpers; keep them out of LCOV so SonarCloud

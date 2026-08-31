@@ -2,7 +2,7 @@
  * Dashboard Page – Explore free/premium
  *
  * Open to all (no sign-in required). Shows all phases + Cloud + AI.
- * Free: only Phase 0 & 1 open; premium content links to /upgrade.
+ * Free: the API Foundations course is open; premium content links to /upgrade.
  * Premium: all phases and sections open.
  */
 
@@ -16,7 +16,7 @@ import { signupRequiredForPremium } from "@/config/featureFlags"
 import PhaseProgressOverview from "@/components/PhaseProgressOverview"
 import AppGuide from "@/components/home/AppGuide"
 import CloudSectionCard from "@/components/home/CloudSectionCard"
-import { getLearningPhases } from "@/lib/learning/dashboard-phase-catalog"
+import PersonalizedLearningPath from "@/components/learning/PersonalizedLearningPath"
 import { getPremiumCatalogPhases } from "@/lib/learning/premium-catalog"
 
 const isPremiumPhase = (phaseId: number) => phaseId > 1
@@ -59,10 +59,7 @@ export default function DashboardPage() {
     )
   }
 
-  const phases = [
-    ...getLearningPhases(true).filter((p) => p.id <= 1),
-    ...getPremiumCatalogPhases(),
-  ]
+  const phases = getPremiumCatalogPhases()
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
@@ -109,6 +106,8 @@ export default function DashboardPage() {
         </div>
       </section>
 
+            <PersonalizedLearningPath />
+
             <PhaseProgressOverview />
 
             {/* Learning Path Section */}
@@ -116,11 +115,11 @@ export default function DashboardPage() {
               <div className="text-center mb-12">
                 <h2 className="text-4xl font-bold text-white mb-4">Choose Your Learning Path</h2>
                 <p className="text-xl text-gray-300 max-w-3xl mx-auto mb-6">
-                  Our curriculum spans <strong className="text-white">10 learning phases</strong> (Phase 0–9) plus Cloud and AI tracks. Start with the free six-unit foundation: <strong className="text-green-400">program → machine → network → HTTP → contract → integration</strong>.
+                  Our curriculum starts with one free first-principles foundation, followed by eight advanced phases (Phases 2–9) plus Cloud and AI tracks. Follow the request from <strong className="text-green-400">program → machine → network → HTTP → contract → integration</strong>.
                 </p>
           <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-4 max-w-2xl mx-auto">
             <p className="text-blue-200 text-sm">
-              <strong>💡 New to APIs?</strong> Start with Phase 0 and follow the request from a program to the network. <strong>Comfortable with HTTP contracts?</strong> Jump to Phase 2. <strong>Building microservices?</strong> Phase 3 is for you. <strong>Ready for cloud?</strong> Explore the Cloud section.
+              <strong>💡 New to APIs?</strong> Start with API Foundations and follow the request from a program to the network. <strong>Comfortable with HTTP contracts?</strong> Jump to Phase 2. <strong>Building microservices?</strong> Phase 3 is for you. <strong>Ready for cloud?</strong> Explore the Cloud section.
             </p>
           </div>
         </div>

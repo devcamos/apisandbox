@@ -14,10 +14,10 @@ test.describe('Navigation', () => {
   test('should navigate from start page to phase 1', async ({ page }) => {
     await page.goto('/start');
     
-    const phase1Link = page.getByRole('link', { name: /Phase 1.*Integration Mindset/ });
+    const phase1Link = page.getByRole('link', { name: /Phase 1.*API Foundations/ });
     await phase1Link.click();
     
-    await expect(page).toHaveURL(/\/login/);
+    await expect(page).toHaveURL(/\/learn\/api-foundations/);
   });
 
   test('should navigate from start page to observability dashboard', async ({ page }) => {

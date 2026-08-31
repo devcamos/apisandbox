@@ -94,7 +94,7 @@ test.describe("CI smoke", () => {
     const response = await page.goto("/signup", { waitUntil: "domcontentloaded" });
     expect(response?.ok()).toBeTruthy();
     await expect(
-      page.getByText(/Free access to Phases 0 & 1/i),
+      page.getByText(/Free access to API Foundations/i),
     ).toBeVisible();
     await expect(page.getByTestId("google-auth-section")).toBeAttached();
     await expect(page.getByLabel(/email address/i)).toBeVisible();

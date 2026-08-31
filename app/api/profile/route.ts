@@ -3,6 +3,7 @@ import { z } from "zod"
 import { requireAuthenticatedUser } from "@/lib/auth/jwt-auth-middleware"
 import { getProfileByUserId, updateProfileByUserId } from "@/lib/services/profile/profile-service"
 import { errorResponse, handleRouteError, okResponse } from "@/lib/http/responses"
+import { learnerProfileUpdateSchema } from "@/lib/validation/learner-profile"
 
 const schema = z.object({
   firstName: z.string().trim().max(100).nullable().optional(),
@@ -10,7 +11,7 @@ const schema = z.object({
   avatarUrl: z.string().url().nullable().optional(),
   roleLabel: z.string().trim().max(100).nullable().optional(),
   identityStatement: z.string().trim().max(500).nullable().optional(),
-})
+}).merge(learnerProfileUpdateSchema)
 
 export async function GET(request: NextRequest) {
   try {
@@ -37,4 +38,3 @@ export async function PATCH(request: NextRequest) {
     return handleRouteError(error)
   }
 }
-

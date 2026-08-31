@@ -90,11 +90,11 @@ test.describe('Dashboard', () => {
     await page.getByRole('button', { name: 'Sign In', exact: true }).click();
     await page.waitForURL(/\/dashboard/);
 
-    // Phase 2 stays premium while the new Phase 0-1 foundation is free.
+    // Phase 2 stays premium while API Foundations is free.
     await expect(page.getByRole('link', { name: /intermediate phase 2 third-party integrations/i })).toBeVisible();
   });
 
-  test('should display all 5 learning phases', async ({ page, request }) => {
+  test('should display the foundation and advanced learning phases', async ({ page, request }) => {
     const uniqueEmail = `test-${Date.now()}-${randomUUID()}@example.com`;
     await request.post('/api/auth/signup', {
       data: {
@@ -109,7 +109,7 @@ test.describe('Dashboard', () => {
     await page.getByRole('button', { name: 'Sign In', exact: true }).click();
     await page.waitForURL(/\/dashboard/);
 
-    await expect(page.getByRole('link', { name: /beginner phase 1 first principles: http to integration/i })).toBeVisible();
+    await expect(page.getByRole('link', { name: /api foundations.*free/i })).toBeVisible();
     await expect(page.getByRole('link', { name: /intermediate phase 2 third-party integrations/i })).toBeVisible();
     await expect(page.getByRole('link', { name: /advanced phase 3 inter-service communication/i })).toBeVisible();
     await expect(page.getByRole('link', { name: /expert phase 4 principal-level architecture/i })).toBeVisible();
@@ -131,9 +131,9 @@ test.describe('Dashboard', () => {
     await page.getByRole('button', { name: 'Sign In', exact: true }).click();
     await page.waitForURL(/\/dashboard/);
 
-    // Check phase links
-    const phase1Link = page.getByRole('link', { name: /first principles: http to integration/i });
-    await expect(phase1Link).toBeVisible();
-    await expect(phase1Link).toHaveAttribute('href', '/learn/api-foundations/http-messages');
+    // The foundation is the single free entry point; advanced phases use the main cards.
+    const foundationLink = page.getByRole('link', { name: /api foundations.*free/i });
+    await expect(foundationLink).toBeVisible();
+    await expect(foundationLink).toHaveAttribute('href', '/learn/api-foundations');
   });
 });

@@ -23,7 +23,7 @@ export async function sendWelcomeEmail(to: string, name?: string) {
     html: `
       <h1>Welcome${name ? `, ${name}` : ""}!</h1>
       <p>Thanks for signing up to API Sandbox. You now have access to our free learning phases.</p>
-      <p>Ready to unlock all interactive visualizers, exercises, and guided practice?</p>
+      <p>Ready to unlock all interactive visualizers, scenarios, and question practice?</p>
       <p><a href="${process.env.NEXT_PUBLIC_APP_URL}/upgrade">Upgrade to Premium — £5/month</a></p>
     `,
   })

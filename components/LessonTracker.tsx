@@ -346,7 +346,7 @@ export function LessonTracker({ phase }: LessonTrackerProps) {
             <div>
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-900 border border-slate-700 text-sm text-gray-300 mb-3">
                 <BookOpen className="w-4 h-4 text-cyan-400" />
-                Guided lesson
+                Course checkpoint
               </div>
               <h2 className="text-2xl font-bold text-white mb-1">{plan.title}</h2>
               <p className="text-sm text-gray-400">{plan.structureLabel}</p>
