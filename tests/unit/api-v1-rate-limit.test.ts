@@ -12,8 +12,9 @@ vi.mock("@/lib/rate-limit", () => ({
   }),
 }))
 
-import { applyV1TokenRateLimit } from "@/lib/api/v1/rate-limit"
+import { applyV1TokenRateLimit, attachV1RateLimitHeaders } from "@/lib/api/v1/rate-limit"
 import { REQUEST_ID_HEADER } from "@/lib/api/v1/request-id"
+import { NextResponse } from "next/server"
 
 describe("applyV1TokenRateLimit", () => {
   beforeEach(() => {
@@ -73,5 +74,30 @@ describe("applyV1TokenRateLimit", () => {
     expect(result.blocked).toBeNull()
     if (result.blocked !== null) return
     expect(result.result.allowed).toBe(true)
+  })
+})
+
+describe("attachV1RateLimitHeaders", () => {
+  it("copies X-RateLimit headers onto the response", () => {
+    const response = NextResponse.json({ ok: true })
+    const withHeaders = attachV1RateLimitHeaders(response, {
+      allowed: true,
+      remaining: 42,
+      resetAt: 0,
+    })
+    expect(withHeaders.headers.get("X-RateLimit-Remaining")).toBe("42")
+  })
+
+  it("adds IETF RateLimit headers when resetAt is set", () => {
+    const resetAt = Date.now() + 60_000
+    const response = NextResponse.json({ ok: true })
+    const withHeaders = attachV1RateLimitHeaders(response, {
+      allowed: true,
+      remaining: 10,
+      resetAt,
+    })
+    expect(withHeaders.headers.get("RateLimit-Limit")).toBe("100")
+    expect(withHeaders.headers.get("RateLimit-Remaining")).toBe("10")
+    expect(withHeaders.headers.get("RateLimit-Reset")).toBeTruthy()
   })
 })

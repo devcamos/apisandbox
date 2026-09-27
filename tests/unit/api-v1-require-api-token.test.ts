@@ -46,6 +46,11 @@ describe("requireApiToken", () => {
     })
   })
 
+  it("rethrows unexpected errors from the token service", async () => {
+    authenticateApiTokenMock.mockRejectedValue(new Error("database offline"))
+    await expect(requireApiToken(bearerRequest("apisb_validtoken"))).rejects.toThrow("database offline")
+  })
+
   it("rejects a valid token that lacks the required scope", async () => {
     authenticateApiTokenMock.mockResolvedValue({
       tokenId: "tok_1",

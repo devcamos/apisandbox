@@ -98,4 +98,18 @@ describe("authenticateApiToken", () => {
       status: 403,
     })
   })
+
+  it("rejects inactive users", async () => {
+    prismaMock.apiToken.findUnique.mockResolvedValue(
+      tokenRecord({ user: { id: "user_1", email: "x@y.z", isActive: false, subscriptionTier: "FREE" } }),
+    )
+    await expect(authenticateApiToken(raw)).rejects.toMatchObject({ status: 401 })
+  })
+
+  it("rejects expired tokens", async () => {
+    prismaMock.apiToken.findUnique.mockResolvedValue(
+      tokenRecord({ expiresAt: new Date("2020-01-01T00:00:00.000Z") }),
+    )
+    await expect(authenticateApiToken(raw)).rejects.toMatchObject({ status: 401 })
+  })
 })

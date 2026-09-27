@@ -99,6 +99,127 @@ describe("withV1Auth", () => {
     expect(body).toEqual({ userId: "user_1", requestId: "fixed-request-id" })
     expect(requireApiTokenMock).toHaveBeenCalledWith(expect.anything(), "profile:read")
   })
+  it("returns 429 when the per-token rate limit blocks", async () => {
+    requireApiTokenMock.mockResolvedValue({
+      tokenId: "tok_1",
+      userId: "user_1",
+      scopes: ["profile:read"],
+      subscriptionTier: "FREE",
+      expiresAt: null,
+    })
+    applyV1TokenRateLimitMock.mockResolvedValue({
+      blocked: new NextResponse(JSON.stringify({ code: "rate_limited" }), { status: 429 }),
+      result: undefined,
+    })
+
+    const handler = withV1Auth({ scope: "profile:read" }, async () =>
+      v1Json({ ok: true }, "unused"),
+    )
+    const response = await handler(new NextRequest("http://localhost/api/v1/me"))
+    expect(response.status).toBe(429)
+  })
+
+  it("maps AppError from handlers to problem+json", async () => {
+    requireApiTokenMock.mockResolvedValue({
+      tokenId: "tok_1",
+      userId: "user_1",
+      scopes: ["progress:read"],
+      subscriptionTier: "FREE",
+      expiresAt: null,
+    })
+    const { AppError } = await import("@/lib/http/errors")
+
+    const handler = withV1Auth({ scope: "progress:read" }, async () => {
+      throw new AppError("Learning course not found", 404, "not_found")
+    })
+    const response = await handler(new NextRequest("http://localhost/api/v1/progress/courses/x"))
+    const body = await response.json()
+    expect(response.status).toBe(404)
+    expect(body.code).toBe("not_found")
+  })
+
+  it("maps auth-shaped AppErrors to invalid_token and insufficient_scope codes", async () => {
+    requireApiTokenMock.mockResolvedValue({
+      tokenId: "tok_1",
+      userId: "user_1",
+      scopes: ["profile:read"],
+      subscriptionTier: "FREE",
+      expiresAt: null,
+    })
+    const { AppError } = await import("@/lib/http/errors")
+
+    const unauthorized = withV1Auth({ scope: "profile:read" }, async () => {
+      throw new AppError("nope", 401, "auth_failure")
+    })
+    const forbidden = withV1Auth({ scope: "profile:read" }, async () => {
+      throw new AppError("nope", 403, "auth_failure")
+    })
+    expect((await (await unauthorized(new NextRequest("http://localhost/api/v1/me"))).json()).code).toBe(
+      "invalid_token",
+    )
+    expect((await (await forbidden(new NextRequest("http://localhost/api/v1/me"))).json()).code).toBe(
+      "insufficient_scope",
+    )
+  })
+
+  it("maps validation AppErrors with details", async () => {
+    requireApiTokenMock.mockResolvedValue({
+      tokenId: "tok_1",
+      userId: "user_1",
+      scopes: ["progress:write"],
+      subscriptionTier: "FREE",
+      expiresAt: null,
+    })
+    const { AppError } = await import("@/lib/http/errors")
+
+    const handler = withV1Auth({ scope: "progress:write" }, async () => {
+      throw new AppError("Invalid", 400, "validation_error", [
+        { path: ["done"], message: "Required" },
+      ])
+    })
+    const response = await handler(new NextRequest("http://localhost/api/v1/x", { method: "PUT" }))
+    const body = await response.json()
+    expect(response.status).toBe(400)
+    expect(body.code).toBe("validation_error")
+    expect(body.errors).toEqual([{ path: "done", message: "Required" }])
+  })
+
+  it("maps unexpected errors to 500 unknown_error", async () => {
+    requireApiTokenMock.mockResolvedValue({
+      tokenId: "tok_1",
+      userId: "user_1",
+      scopes: ["profile:read"],
+      subscriptionTier: "FREE",
+      expiresAt: null,
+    })
+
+    const handler = withV1Auth({ scope: "profile:read" }, async () => {
+      throw new Error("boom")
+    })
+    const response = await handler(new NextRequest("http://localhost/api/v1/me"))
+    const body = await response.json()
+    expect(response.status).toBe(500)
+    expect(body.code).toBe("unknown_error")
+  })
+
+  it("resolves async route params", async () => {
+    requireApiTokenMock.mockResolvedValue({
+      tokenId: "tok_1",
+      userId: "user_1",
+      scopes: ["progress:read"],
+      subscriptionTier: "FREE",
+      expiresAt: null,
+    })
+
+    const handler = withV1Auth({ scope: "progress:read" }, async ({ params, requestId }) =>
+      v1Json({ courseId: params.courseId }, requestId),
+    )
+    const response = await handler(new NextRequest("http://localhost/api/v1/progress/courses/phase-1"), {
+      params: Promise.resolve({ courseId: "phase-1" }),
+    })
+    const body = await response.json()
+    expect(body.courseId).toBe("phase-1")
+  })
 })
 
 describe("parseV1JsonBody", () => {
@@ -126,6 +247,33 @@ describe("parseV1JsonBody", () => {
     expect(result.ok).toBe(false)
     if (result.ok) return
     expect(result.response.status).toBe(400)
+  })
+
+  it("rejects schema mismatches with validation errors", async () => {
+    const request = new NextRequest("http://localhost/api/v1/x", {
+      method: "PUT",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ done: "yes" }),
+    })
+    const result = await parseV1JsonBody(request, z.object({ done: z.boolean() }), "req-3")
+    expect(result.ok).toBe(false)
+    if (result.ok) return
+    expect(result.response.status).toBe(400)
+    const body = await result.response.json()
+    expect(body.code).toBe("validation_error")
+    expect(body.errors?.length).toBeGreaterThan(0)
+  })
+
+  it("returns parsed data for a valid body", async () => {
+    const request = new NextRequest("http://localhost/api/v1/x", {
+      method: "PUT",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ done: true }),
+    })
+    const result = await parseV1JsonBody(request, z.object({ done: z.boolean() }), "req-4")
+    expect(result.ok).toBe(true)
+    if (!result.ok) return
+    expect(result.data).toEqual({ done: true })
   })
 })
 
