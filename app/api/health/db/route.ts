@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma"
+import { logger } from "@/lib/logger"
 import { okResponse, errorResponse } from "@/lib/http/responses"
 
 export const runtime = "nodejs"
@@ -16,27 +17,25 @@ export async function GET() {
       process.env.POSTGRES_URL,
   )
 
+  const protocols = {
+    databaseUrl: urlProtocol(process.env.DATABASE_URL),
+    postgresPrismaUrl: urlProtocol(process.env.POSTGRES_PRISMA_URL),
+    resolved: urlProtocol(resolved),
+  }
+
   try {
     await prisma.$queryRaw`SELECT 1`
     return okResponse({
       ok: true,
       hasDatabaseUrl,
       nodeEnv: process.env.NODE_ENV ?? "unknown",
-      protocols: {
-        databaseUrl: urlProtocol(process.env.DATABASE_URL),
-        postgresPrismaUrl: urlProtocol(process.env.POSTGRES_PRISMA_URL),
-        resolved: urlProtocol(resolved),
-      },
+      protocols,
     })
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Unknown database error"
-    return errorResponse(503, "configuration_error", message, {
+    logger.error({ err: error }, "Database health check failed")
+    return errorResponse(503, "configuration_error", "Database unavailable", {
       hasDatabaseUrl,
-      protocols: {
-        databaseUrl: urlProtocol(process.env.DATABASE_URL),
-        postgresPrismaUrl: urlProtocol(process.env.POSTGRES_PRISMA_URL),
-        resolved: urlProtocol(resolved),
-      },
+      protocols,
     })
   }
 }
