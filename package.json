@@ -39,7 +39,7 @@
     "postinstall": "env -u PRISMA_GENERATE_DATAPROXY prisma generate",
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev",
-    "db:migrate:deploy": "prisma migrate deploy",
+    "db:migrate:deploy": "bash scripts/prisma-migrate-deploy.sh",
     "db:ensure-test-users": "node scripts/ensure-test-users.js",
     "db:ensure-demo-user": "node scripts/ensure-demo-user.js",
     "db:studio": "prisma studio",
