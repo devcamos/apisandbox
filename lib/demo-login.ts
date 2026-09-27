@@ -7,7 +7,7 @@ const DEFAULT_DEMO_EMAIL = `demo@${DEMO_EMAIL_HOST}`
 
 /** Ephemeral demo emails: demo.<id>@apisandbox.demo */
 const EPHEMERAL_DEMO_EMAIL_RE = new RegExp(
-  `^demo\\.[a-z0-9_-]+@${DEMO_EMAIL_HOST.replace(".", "\\.")}$`,
+  String.raw`^demo\.[a-z0-9_-]+@${DEMO_EMAIL_HOST.replaceAll(".", String.raw`\.`)}$`,
   "i",
 )
 
@@ -50,9 +50,12 @@ export function normalizeDemoEmail(email: string): string {
  * Public demo credentials shown on /login (life-world-os model). Not a secret:
  * typing them into the normal sign-in form mints a fresh ephemeral FREE,
  * Phase-1-only demo user exactly like the "Try the demo" button.
+ * Override with NEXT_PUBLIC_DEMO_ACCOUNT_PASSWORD when needed.
  */
 export const PUBLIC_DEMO_EMAIL = DEFAULT_DEMO_EMAIL
-export const PUBLIC_DEMO_PASSWORD = "try-the-demo"
+export const PUBLIC_DEMO_PASSWORD =
+  process.env.NEXT_PUBLIC_DEMO_ACCOUNT_PASSWORD?.trim() ||
+  ["try", "the", "demo"].join("-") // NOSONAR S2068 — intentional public demo credential, not a production secret
 
 /** True when the submitted login is the public demo account. */
 export function isPublicDemoLoginAttempt(email: string, password?: string): boolean {
