@@ -33,7 +33,6 @@ export default defineConfig({
         "lib/dependency-integrations.ts",
         "lib/demo-completion.ts",
         "lib/demo-login.ts",
-        "lib/prisma-url.ts",
         "lib/saas/config.ts",
         "lib/auth/jwt-secret.ts",
         "lib/google-client-id.ts",

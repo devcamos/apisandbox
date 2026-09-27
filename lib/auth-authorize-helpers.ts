@@ -2,6 +2,10 @@ import type { OAuth2Client } from "google-auth-library"
 import { prisma } from "@/lib/prisma"
 import { verifyPassword } from "@/lib/auth"
 import { isAccountLocked, lockMinutesRemaining, registerFailedAttempt } from "@/lib/auth/login-lockout"
+import {
+  DATABASE_BUSY_MESSAGE,
+  isPrismaDatabaseBusyError,
+} from "@/lib/http/database-busy"
 import { withPrismaBusyRetry } from "@/lib/prisma-busy-retry"
 
 export type AuthorizeUserResult = {
@@ -11,7 +15,28 @@ export type AuthorizeUserResult = {
   image: string | null
 }
 
+function rethrowMappedPrismaBusy(error: unknown): never {
+  if (isPrismaDatabaseBusyError(error)) {
+    throw new Error(DATABASE_BUSY_MESSAGE)
+  }
+  throw error
+}
+
 export async function authorizeWithGoogleIdToken(
+  googleIdToken: string,
+  googleOAuth2Client: OAuth2Client,
+  googleClientId: string
+): Promise<AuthorizeUserResult> {
+  try {
+    return await withPrismaBusyRetry(() =>
+      authorizeWithGoogleIdTokenOnce(googleIdToken, googleOAuth2Client, googleClientId),
+    )
+  } catch (error) {
+    rethrowMappedPrismaBusy(error)
+  }
+}
+
+async function authorizeWithGoogleIdTokenOnce(
   googleIdToken: string,
   googleOAuth2Client: OAuth2Client,
   googleClientId: string
@@ -56,7 +81,11 @@ export async function authorizeWithEmailPassword(
   email: string,
   password: string
 ): Promise<AuthorizeUserResult> {
-  return withPrismaBusyRetry(() => authorizeWithEmailPasswordOnce(email, password))
+  try {
+    return await withPrismaBusyRetry(() => authorizeWithEmailPasswordOnce(email, password))
+  } catch (error) {
+    rethrowMappedPrismaBusy(error)
+  }
 }
 
 async function authorizeWithEmailPasswordOnce(

@@ -210,4 +210,23 @@ describe("authorizeWithEmailPassword", () => {
       image: "img",
     })
   })
+
+  it("maps Prisma pool exhaustion to a friendly DATABASE_BUSY message", async () => {
+    const { Prisma } = await import("@prisma/client")
+    const busy = Object.assign(
+      Object.create(Prisma.PrismaClientInitializationError.prototype),
+      {
+        name: "PrismaClientInitializationError",
+        message: "FATAL: (EMAXCONNSESSION) max clients reached in session mode",
+        errorCode: "P1001",
+        clientVersion: "test",
+      },
+    )
+    prismaMock.user.findUnique.mockRejectedValue(busy)
+
+    await expect(authorizeWithEmailPassword("x@example.com", "pw")).rejects.toThrow(
+      /database is busy/i,
+    )
+    expect(prismaMock.user.findUnique).toHaveBeenCalledTimes(2)
+  })
 })
