@@ -10,7 +10,35 @@ Use `gh pr checks` to identify the failing job before applying a recovery. The s
 | `e2e-smoke` | schema, PostgreSQL, standalone server, or browser failure | [Run the full smoke environment](#e2e-smoke-fails) |
 | `SonarQube Cloud` | new-code coverage, duplication, reliability, or security gate | [Inspect the quality gate](#sonarqube-cloud-quality-gate-fails) |
 | Vercel | Neon preview-branch capacity is exhausted | [Check provisioning](#vercel-preview-fails-before-build-neon-branch-limit) |
+| Vercel Preview build | `prisma migrate deploy` / unreachable Preview DB | [Preview build vs migrate](#vercel-preview-build-fails-on-prisma-migrate-deploy) |
 | Architecture review | Gemini configuration, quota, or PR comment permission | [Inspect review generation](#pr-architecture-intelligence-fails) |
+
+## Vercel Preview build fails on `prisma migrate deploy`
+
+### Symptoms
+
+- Vercel Preview build logs show `prisma migrate deploy` failing with connection
+  errors (for example `ENOTFOUND` / `tenant/user postgres.<ref> not found`).
+- The failure happens before or instead of a successful `next build`.
+
+### Current contract
+
+Production builds still run `prisma migrate deploy` via
+`npm run db:migrate:deploy:vercel`. Preview and Development builds **skip**
+migrations and log `[migrate-on-production] Skipping migrations: …`.
+
+If an older deployment still runs migrate on every environment, redeploy from a
+commit that includes `scripts/migrate-on-production.mjs` and the updated
+`vercel.json` `buildCommand`.
+
+When the Preview database is reachable and needs a schema update:
+
+```bash
+DATABASE_URL='<preview-database-url>' npx prisma migrate deploy
+```
+
+Do not use Production credentials. Runtime Preview features that query Postgres
+still require a healthy Preview DB even after the build succeeds.
 
 ## Vercel preview fails before build: Neon branch limit
 

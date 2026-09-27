@@ -40,6 +40,7 @@
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev",
     "db:migrate:deploy": "prisma migrate deploy",
+    "db:migrate:deploy:vercel": "node scripts/migrate-on-production.mjs",
     "db:ensure-test-users": "node scripts/ensure-test-users.js",
     "db:ensure-demo-user": "node scripts/ensure-demo-user.js",
     "db:studio": "prisma studio",
