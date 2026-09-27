@@ -2,17 +2,19 @@ import OpenAI from "openai"
 import { NextRequest, NextResponse } from "next/server"
 import { GoogleGenAI } from "@google/genai"
 import { inferAssistantRedirect } from "@/lib/assistant/redirect"
+import {
+  ASSISTANT_LLM_TIMEOUT_MS,
+  ASSISTANT_MAX_BODY_BYTES,
+  ASSISTANT_MAX_DURATION_SECONDS,
+  isAbortError,
+  validateAssistantInput,
+} from "@/lib/assistant/limits"
 import { requirePremiumUser } from "@/lib/auth/jwt-auth-middleware"
 import { applyRateLimit, attachRateLimitHeaders } from "@/lib/http/apply-rate-limit"
 import { handleRouteError } from "@/lib/http/responses"
 import { assistantLimiter } from "@/lib/rate-limit"
 
-type AssistantRequest = {
-  message: string
-  pathname?: string
-  mode?: "guided" | "expert"
-  history?: Array<{ role: "user" | "assistant"; content: string }>
-}
+export const maxDuration = ASSISTANT_MAX_DURATION_SECONDS
 
 function contextForPath(pathname: string) {
   if (pathname.startsWith("/docs/java")) {
@@ -77,6 +79,20 @@ function formatConversation({
   return lines.join("\n")
 }
 
+function bodyTooLargeResponse() {
+  return NextResponse.json(
+    { error: `Request body exceeds the ${ASSISTANT_MAX_BODY_BYTES} byte limit.` },
+    { status: 413 },
+  )
+}
+
+function timeoutResponse() {
+  return NextResponse.json(
+    { error: "Assistant timed out. Please try again with a shorter question." },
+    { status: 504 },
+  )
+}
+
 export async function POST(request: NextRequest) {
   try {
     const user = await requirePremiumUser(request)
@@ -88,17 +104,31 @@ export async function POST(request: NextRequest) {
     )
     if (rate.blocked) return rate.blocked
 
-    const body = (await request.json().catch(() => null)) as AssistantRequest | null
+    const contentLength = request.headers.get("content-length")
+    if (contentLength && Number(contentLength) > ASSISTANT_MAX_BODY_BYTES) {
+      return bodyTooLargeResponse()
+    }
 
-    if (!body || typeof body.message !== "string") {
+    const rawText = await request.text()
+    if (rawText.length > ASSISTANT_MAX_BODY_BYTES) {
+      return bodyTooLargeResponse()
+    }
+
+    let body: unknown = null
+    try {
+      body = rawText ? JSON.parse(rawText) : null
+    } catch {
       return NextResponse.json({ error: "Invalid request" }, { status: 400 })
     }
 
-    const pathname = body.pathname ?? "/"
-    const mode = body.mode ?? "guided"
-    const redirect = inferAssistantRedirect({ message: body.message, pathname })
+    const validated = validateAssistantInput(body)
+    if (!validated.ok) {
+      return NextResponse.json({ error: validated.error }, { status: validated.status })
+    }
 
-    const history = Array.isArray(body.history) ? body.history.slice(-12) : []
+    const { message, pathname, mode, history } = validated
+    const redirect = inferAssistantRedirect({ message, pathname })
+    const abortSignal = AbortSignal.timeout(ASSISTANT_LLM_TIMEOUT_MS)
 
     const provider =
       (process.env.ASSISTANT_PROVIDER as "openai" | "gemini" | undefined) ||
@@ -123,28 +153,36 @@ export async function POST(request: NextRequest) {
         buildInstructions({ pathname, mode }),
         "",
         "Conversation:",
-        formatConversation({ history, message: body.message }),
+        formatConversation({ history, message }),
       ].join("\n")
 
-      const result = await ai.models.generateContent({
-        model,
-        contents: prompt,
-      })
-
-      const reply =
-        (typeof result.text === "string" ? result.text : "")?.trim() ||
-        "I didn’t produce any text output. Try asking again."
-
-      return attachRateLimitHeaders(
-        NextResponse.json({
-          reply,
-          provider: "gemini",
+      try {
+        const result = await ai.models.generateContent({
           model,
-          redirect,
-          suggestions: ["Explain idempotency", "Cookies vs tokens", "Show a retry policy example"],
-        }),
-        rate.result,
-      )
+          contents: prompt,
+          config: { abortSignal },
+        })
+
+        const reply =
+          (typeof result.text === "string" ? result.text : "")?.trim() ||
+          "I didn’t produce any text output. Try asking again."
+
+        return attachRateLimitHeaders(
+          NextResponse.json({
+            reply,
+            provider: "gemini",
+            model,
+            redirect,
+            suggestions: ["Explain idempotency", "Cookies vs tokens", "Show a retry policy example"],
+          }),
+          rate.result,
+        )
+      } catch (error) {
+        if (isAbortError(error) || abortSignal.aborted) {
+          return timeoutResponse()
+        }
+        throw error
+      }
     }
 
     const apiKey = process.env.OPENAI_API_KEY
@@ -158,7 +196,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const client = new OpenAI({ apiKey })
+    const client = new OpenAI({ apiKey, timeout: ASSISTANT_LLM_TIMEOUT_MS })
     const model = process.env.OPENAI_MODEL || "gpt-4.1-mini"
 
     const input = [
@@ -166,32 +204,45 @@ export async function POST(request: NextRequest) {
         role: m.role,
         content: m.content,
       })),
-      { role: "user" as const, content: body.message },
+      { role: "user" as const, content: message },
     ]
 
-    const response = await client.responses.create({
-      model,
-      instructions: buildInstructions({ pathname, mode }),
-      input,
-    })
+    try {
+      const response = await client.responses.create(
+        {
+          model,
+          instructions: buildInstructions({ pathname, mode }),
+          input,
+        },
+        { signal: abortSignal },
+      )
 
-    const reply = response.output_text?.trim() || "I didn’t produce any text output. Try asking again."
+      const reply = response.output_text?.trim() || "I didn’t produce any text output. Try asking again."
 
-    return attachRateLimitHeaders(
-      NextResponse.json({
-        reply,
-        provider: "openai",
-        model: response.model ?? model,
-        redirect,
-        suggestions: [
-          "Explain idempotency",
-          "Cookies vs tokens",
-          "Show a retry policy example",
-        ],
-      }),
-      rate.result,
-    )
+      return attachRateLimitHeaders(
+        NextResponse.json({
+          reply,
+          provider: "openai",
+          model: response.model ?? model,
+          redirect,
+          suggestions: [
+            "Explain idempotency",
+            "Cookies vs tokens",
+            "Show a retry policy example",
+          ],
+        }),
+        rate.result,
+      )
+    } catch (error) {
+      if (isAbortError(error) || abortSignal.aborted) {
+        return timeoutResponse()
+      }
+      throw error
+    }
   } catch (error) {
+    if (isAbortError(error)) {
+      return timeoutResponse()
+    }
     return handleRouteError(error)
   }
 }
