@@ -4,10 +4,13 @@
  * constructing PrismaClient.
  */
 
+/** Env bag used by URL helpers (subset of process.env). */
+export type PrismaUrlEnv = Record<string, string | undefined>
+
 /** True when this process should limit itself to a single DB connection. */
 export function shouldLimitPrismaConnections(
   hostname: string,
-  env: NodeJS.ProcessEnv = process.env,
+  env: PrismaUrlEnv = process.env,
 ): boolean {
   if (env.VERCEL === "1") return true
   if (hostname.includes("pooler")) return true
@@ -20,7 +23,7 @@ export function shouldLimitPrismaConnections(
  */
 export function normalizePooledDatabaseUrl(
   url: string,
-  env: NodeJS.ProcessEnv = process.env,
+  env: PrismaUrlEnv = process.env,
 ): string {
   try {
     const parsed = new URL(url)
@@ -43,7 +46,7 @@ export function normalizePooledDatabaseUrl(
   }
 }
 
-export function resolveDatabaseUrl(env: NodeJS.ProcessEnv = process.env): string | undefined {
+export function resolveDatabaseUrl(env: PrismaUrlEnv = process.env): string | undefined {
   const candidates = [env.DATABASE_URL, env.POSTGRES_PRISMA_URL, env.POSTGRES_URL]
 
   for (const raw of candidates) {
