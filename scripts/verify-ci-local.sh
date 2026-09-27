@@ -33,6 +33,7 @@ fi
 
 log "lint-and-build (job: lint-and-build)"
 export DATABASE_URL="$BUILD_DATABASE_URL"
+export DIRECT_URL="${DIRECT_URL:-$BUILD_DATABASE_URL}"
 npm run typecheck
 npm run lint
 npm run build
@@ -73,6 +74,7 @@ if [[ "$ready" -ne 1 ]]; then
 fi
 
 export DATABASE_URL="$E2E_DATABASE_URL"
+export DIRECT_URL="$E2E_DATABASE_URL"
 npx prisma db push --accept-data-loss
 npx playwright install chromium --with-deps >/dev/null 2>&1 || npx playwright install chromium
 
