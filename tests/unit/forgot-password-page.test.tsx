@@ -20,5 +20,7 @@ describe("ForgotPasswordPage", () => {
       "href",
       "mailto:support@apisandbox.dev",
     )
+    expect(screen.getByTestId("forgot-password-form")).toBeInTheDocument()
+    expect(screen.getByLabelText(/account email/i)).toHaveAttribute("autocomplete", "email")
   })
 })

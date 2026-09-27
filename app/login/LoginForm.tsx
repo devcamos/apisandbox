@@ -22,6 +22,7 @@ import { useGoogleSignInButton } from "@/hooks/useGoogleSignInButton"
 import { parseLoginErrorMessage, type LoginErrorInfo } from "@/lib/login-error-parser"
 import { authApiPostJson } from "@/lib/auth/client-fetch"
 import { completeClientAuthSession, type ClientAuthSessionPayload } from "@/lib/auth/client-session"
+import { adoptAutofilledValue } from "@/lib/auth/autofill-sync"
 import { validateEmailFormat } from "@/lib/validation/email"
 import AuthPageShell from "@/components/auth/AuthPageShell"
 import AuthSocialSection from "@/components/auth/AuthSocialSection"
@@ -43,6 +44,8 @@ function LoginForm({
   const [emailTouched, setEmailTouched] = useState(false)
   const [passwordTouched, setPasswordTouched] = useState(false)
   const googleButtonRef = useRef<HTMLDivElement>(null)
+  const emailInputRef = useRef<HTMLInputElement>(null)
+  const passwordInputRef = useRef<HTMLInputElement>(null)
 
   // MENTOR NOTE: Get callbackUrl from query params
   // This is set by middleware when user tries to access protected route
@@ -61,6 +64,17 @@ function LoginForm({
       })
     }
   }, [searchParams])
+
+  // Password managers often fill without onChange — adopt DOM values after mount.
+  useEffect(() => {
+    const frame = window.requestAnimationFrame(() => {
+      adoptAutofilledValue(emailInputRef.current, email, setEmail)
+      adoptAutofilledValue(passwordInputRef.current, password, setPassword)
+    })
+    return () => window.cancelAnimationFrame(frame)
+    // Intentionally once on mount — do not clear controlled values.
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- autofill sync on mount only
+  }, [])
 
   const validateEmail = (emailValue: string) => validateEmailFormat(emailValue)
 
@@ -100,6 +114,7 @@ function LoginForm({
       setError(null)
     }
   }
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -226,8 +241,10 @@ function LoginForm({
                   name="email"
                   type="email"
                   autoComplete="username"
+                  ref={emailInputRef}
                   value={email}
                   onChange={handleEmailChange}
+                  onInput={handleEmailChange}
                   onBlur={() => {
                     setEmailTouched(true)
                     setEmailError(validateEmail(email))
@@ -274,8 +291,10 @@ function LoginForm({
                   name="password"
                   type="password"
                   autoComplete="current-password"
+                  ref={passwordInputRef}
                   value={password}
                   onChange={handlePasswordChange}
+                  onInput={handlePasswordChange}
                   onBlur={() => {
                     setPasswordTouched(true)
                     setPasswordError(validatePassword(password))

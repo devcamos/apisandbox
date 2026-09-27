@@ -12,7 +12,7 @@
 
 "use client"
 
-import { Suspense, useState, useRef, useCallback } from "react"
+import { Suspense, useState, useRef, useCallback, useEffect } from "react"
 import Link from "next/link"
 import { useSearchParams } from "next/navigation"
 import { ArrowRight, Mail, Lock, User, AlertCircle, CheckCircle } from "lucide-react"
@@ -22,6 +22,7 @@ import AuthPageShell from "@/components/auth/AuthPageShell"
 import AuthSocialSection from "@/components/auth/AuthSocialSection"
 import { authApiPostJson } from "@/lib/auth/client-fetch"
 import { completeClientAuthSession, type ClientAuthSessionPayload } from "@/lib/auth/client-session"
+import { adoptAutofilledValue } from "@/lib/auth/autofill-sync"
 import { getPasswordRequirements } from "@/lib/password-validation"
 
 function SignupFormInner({ googleClientId }: Readonly<{ googleClientId: string }>) {
@@ -33,6 +34,10 @@ function SignupFormInner({ googleClientId }: Readonly<{ googleClientId: string }
   const claimingDemo = fromDemo && Boolean(session?.isDemo)
 
   const googleButtonRef = useRef<HTMLDivElement>(null)
+  const nameInputRef = useRef<HTMLInputElement>(null)
+  const emailInputRef = useRef<HTMLInputElement>(null)
+  const passwordInputRef = useRef<HTMLInputElement>(null)
+  const confirmPasswordInputRef = useRef<HTMLInputElement>(null)
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -41,6 +46,33 @@ function SignupFormInner({ googleClientId }: Readonly<{ googleClientId: string }
   })
   const [errors, setErrors] = useState<string[]>([])
   const [isLoading, setIsLoading] = useState(false)
+
+  useEffect(() => {
+    const frame = window.requestAnimationFrame(() => {
+      adoptAutofilledValue(nameInputRef.current, formData.name, (name) =>
+        setFormData((prev) => ({ ...prev, name })),
+      )
+      adoptAutofilledValue(emailInputRef.current, formData.email, (email) =>
+        setFormData((prev) => ({ ...prev, email })),
+      )
+      adoptAutofilledValue(passwordInputRef.current, formData.password, (password) =>
+        setFormData((prev) => ({ ...prev, password })),
+      )
+      adoptAutofilledValue(
+        confirmPasswordInputRef.current,
+        formData.confirmPassword,
+        (confirmPassword) => setFormData((prev) => ({ ...prev, confirmPassword })),
+      )
+    })
+    return () => window.cancelAnimationFrame(frame)
+    // Intentionally once on mount — do not clear controlled values.
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- autofill sync on mount only
+  }, [])
+
+  const updateField = (field: keyof typeof formData) => (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value
+    setFormData((prev) => ({ ...prev, [field]: value }))
+  }
 
   const passwordRequirements = formData.password
     ? getPasswordRequirements(formData.password)
@@ -207,8 +239,10 @@ function SignupFormInner({ googleClientId }: Readonly<{ googleClientId: string }
                 name="name"
                 type="text"
                 autoComplete="name"
+                ref={nameInputRef}
                 value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                onChange={updateField("name")}
+                onInput={updateField("name")}
                 className="w-full pl-10 pr-4 py-3 bg-slate-900/50 border border-slate-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 placeholder="Your name"
               />
@@ -226,8 +260,10 @@ function SignupFormInner({ googleClientId }: Readonly<{ googleClientId: string }
                 name="email"
                 type="email"
                 autoComplete="email"
+                ref={emailInputRef}
                 value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                onChange={updateField("email")}
+                onInput={updateField("email")}
                 required
                 className="w-full pl-10 pr-4 py-3 bg-slate-900/50 border border-slate-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 placeholder="you@example.com"
@@ -246,8 +282,10 @@ function SignupFormInner({ googleClientId }: Readonly<{ googleClientId: string }
                 name="password"
                 type="password"
                 autoComplete="new-password"
+                ref={passwordInputRef}
                 value={formData.password}
-                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                onChange={updateField("password")}
+                onInput={updateField("password")}
                 required
                 className="w-full pl-10 pr-4 py-3 bg-slate-900/50 border border-slate-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 placeholder="Create a strong password"
@@ -293,11 +331,13 @@ function SignupFormInner({ googleClientId }: Readonly<{ googleClientId: string }
               <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
               <input
                 id="confirmPassword"
-                name="confirm-password"
+                name="confirmPassword"
                 type="password"
                 autoComplete="new-password"
+                ref={confirmPasswordInputRef}
                 value={formData.confirmPassword}
-                onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
+                onChange={updateField("confirmPassword")}
+                onInput={updateField("confirmPassword")}
                 required
                 className="w-full pl-10 pr-4 py-3 bg-slate-900/50 border border-slate-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 placeholder="Confirm your password"
