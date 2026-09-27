@@ -5,7 +5,6 @@ import { inferAssistantRedirect } from "@/lib/assistant/redirect"
 import {
   ASSISTANT_LLM_TIMEOUT_MS,
   ASSISTANT_MAX_BODY_BYTES,
-  ASSISTANT_MAX_DURATION_SECONDS,
   type AssistantHistoryItem,
   isAbortError,
   validateAssistantInput,
@@ -15,7 +14,7 @@ import { applyRateLimit, attachRateLimitHeaders } from "@/lib/http/apply-rate-li
 import { handleRouteError } from "@/lib/http/responses"
 import { assistantLimiter, type RateLimitResult } from "@/lib/rate-limit"
 
-export const maxDuration = ASSISTANT_MAX_DURATION_SECONDS
+export const maxDuration = 30
 
 const DEFAULT_SUGGESTIONS = [
   "Explain idempotency",
