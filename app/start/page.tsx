@@ -34,7 +34,7 @@ export default function StartPage() {
                 nextPath="/dashboard"
                 className="px-8 py-4 rounded-xl font-semibold border border-amber-500/50 bg-amber-950/40 text-amber-100 hover:bg-amber-900/50 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
               >
-                Try live demo (full app)
+                Try the demo
               </TryDemoButton>
               <Link 
                 href="/observability"

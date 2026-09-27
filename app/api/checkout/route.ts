@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
+import { assertNotDemoUser } from "@/lib/auth/demo-guards"
 import { requireAuthenticatedUser } from "@/lib/auth/jwt-auth-middleware"
 import { handleRouteError } from "@/lib/http/responses"
 import { requireStripeClient, PLANS } from "@/lib/stripe"
@@ -38,6 +39,10 @@ export async function POST(request: NextRequest) {
     }
 
     const user = await requireAuthenticatedUser(request)
+    assertNotDemoUser(
+      user.email,
+      "Demo accounts cannot start billing. Create a free account to upgrade.",
+    )
 
     const dbUser = await prisma.user.findUnique({
       where: { id: user.id },

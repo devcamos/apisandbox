@@ -9,6 +9,20 @@ describe("demo-login", () => {
     vi.unstubAllEnvs()
   })
 
+  it("isDemoUserEmail matches ephemeral demo addresses", async () => {
+    const { isDemoUserEmail } = await import("@/lib/demo-login")
+    expect(isDemoUserEmail("demo.abc123@apisandbox.demo")).toBe(true)
+    expect(isDemoUserEmail("Demo.XYZ_99@Apisandbox.Demo")).toBe(true)
+    expect(isDemoUserEmail("user@example.com")).toBe(false)
+    expect(isDemoUserEmail("demo@other.com")).toBe(false)
+  })
+
+  it("isDemoUserEmail matches legacy shared demo email from env", async () => {
+    vi.stubEnv("DEMO_USER_EMAIL", "legacy-demo@apisandbox.demo")
+    const { isDemoUserEmail } = await import("@/lib/demo-login")
+    expect(isDemoUserEmail("legacy-demo@apisandbox.demo")).toBe(true)
+  })
+
   it("isDemoSessionEmail matches public demo email when env set", async () => {
     vi.stubEnv("NEXT_PUBLIC_DEMO_USER_EMAIL", "demo@example.com")
     const { isDemoSessionEmail } = await import("@/lib/demo-login")
@@ -32,6 +46,11 @@ describe("demo-login", () => {
   it("normalizeDemoEmail trims and lowercases", async () => {
     const { normalizeDemoEmail } = await import("@/lib/demo-login")
     expect(normalizeDemoEmail("  Foo@Bar.COM  ")).toBe("foo@bar.com")
+  })
+
+  it("buildEphemeralDemoEmail builds a reserved-host address", async () => {
+    const { buildEphemeralDemoEmail } = await import("@/lib/demo-login")
+    expect(buildEphemeralDemoEmail("AbC-123")).toBe("demo.abc-123@apisandbox.demo")
   })
 
   it("getDemoUserEmail honours DEMO_USER_EMAIL env (trimmed, lowercased)", async () => {
@@ -74,22 +93,33 @@ describe("demo-login", () => {
     expect(mod.getDemoUserPassword()).toBe("s3cret")
   })
 
-  it("isDemoLoginRouteEnabled requires both feature flag and password", async () => {
+  it("isDemoLoginRouteEnabled requires only the feature flag (no password)", async () => {
     vi.stubEnv("NEXT_PUBLIC_FF_DEMO_LOGIN", "")
-    vi.stubEnv("DEMO_USER_PASSWORD", "s3cret")
+    vi.stubEnv("DEMO_USER_PASSWORD", "")
     let mod = await import("@/lib/demo-login")
     expect(mod.isDemoLoginRouteEnabled()).toBe(false)
 
     vi.resetModules()
     vi.stubEnv("NEXT_PUBLIC_FF_DEMO_LOGIN", "true")
     vi.stubEnv("DEMO_USER_PASSWORD", "")
-    mod = await import("@/lib/demo-login")
-    expect(mod.isDemoLoginRouteEnabled()).toBe(false)
-
-    vi.resetModules()
-    vi.stubEnv("NEXT_PUBLIC_FF_DEMO_LOGIN", "true")
-    vi.stubEnv("DEMO_USER_PASSWORD", "s3cret")
+    vi.stubEnv("NODE_ENV", "development")
     mod = await import("@/lib/demo-login")
     expect(mod.isDemoLoginRouteEnabled()).toBe(true)
+  })
+
+  it("getDemoUserTtlHours defaults to 24 and clamps invalid values", async () => {
+    vi.stubEnv("DEMO_USER_TTL_HOURS", "")
+    let mod = await import("@/lib/demo-login")
+    expect(mod.getDemoUserTtlHours()).toBe(24)
+
+    vi.resetModules()
+    vi.stubEnv("DEMO_USER_TTL_HOURS", "48")
+    mod = await import("@/lib/demo-login")
+    expect(mod.getDemoUserTtlHours()).toBe(48)
+
+    vi.resetModules()
+    vi.stubEnv("DEMO_USER_TTL_HOURS", "0")
+    mod = await import("@/lib/demo-login")
+    expect(mod.getDemoUserTtlHours()).toBe(24)
   })
 })

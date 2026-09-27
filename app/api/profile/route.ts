@@ -1,5 +1,6 @@
 import { NextRequest } from "next/server"
 import { z } from "zod"
+import { assertNotDemoUser } from "@/lib/auth/demo-guards"
 import { requireAuthenticatedUser } from "@/lib/auth/jwt-auth-middleware"
 import { getProfileByUserId, updateProfileByUserId } from "@/lib/services/profile/profile-service"
 import { errorResponse, handleRouteError, okResponse } from "@/lib/http/responses"
@@ -25,6 +26,10 @@ export async function GET(request: NextRequest) {
 export async function PATCH(request: NextRequest) {
   try {
     const user = await requireAuthenticatedUser(request)
+    assertNotDemoUser(
+      user.email,
+      "Demo accounts cannot change profile details. Create a free account to personalize your profile.",
+    )
     const body = await request.json()
     const parsed = schema.safeParse(body)
     if (!parsed.success) {
@@ -37,4 +42,3 @@ export async function PATCH(request: NextRequest) {
     return handleRouteError(error)
   }
 }
-

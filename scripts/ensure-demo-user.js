@@ -1,24 +1,26 @@
 #!/usr/bin/env node
 /**
- * Upserts a PREMIUM demo user for live / preview "Try demo" flows.
+ * Optional maintenance: delete expired ephemeral demo users.
+ *
+ * Demo login no longer seeds a shared PREMIUM account. Each POST /api/auth/demo
+ * creates an isolated FREE user (`demo.<id>@apisandbox.demo`) and cleans up
+ * expired rows opportunistically. Run this script if you want an explicit purge.
  *
  * Env:
- *   DATABASE_URL          — required
- *   DEMO_USER_EMAIL       — optional, default demo@apisandbox.demo
- *   DEMO_USER_PASSWORD    — required (generate a strong password for production)
+ *   DATABASE_URL           — required
+ *   DEMO_USER_TTL_HOURS    — optional, default 24
  *
  * Production guard:
  *   DEMO_ALLOW_PRODUCTION_SEED=true  — required when NODE_ENV=production
  *
  * Usage:
- *   DEMO_USER_PASSWORD='...' node scripts/ensure-demo-user.js
+ *   node scripts/ensure-demo-user.js
  *   npm run db:ensure-demo-user
  */
 
 const fs = require("node:fs");
 const path = require("node:path");
 const dotenv = require("dotenv");
-const bcrypt = require("bcryptjs");
 const { PrismaClient } = require("@prisma/client");
 
 function loadEnv() {
@@ -31,7 +33,12 @@ function loadEnv() {
   }
 }
 
-const DEFAULT_EMAIL = "demo@apisandbox.demo";
+function ttlHours() {
+  const raw = process.env.DEMO_USER_TTL_HOURS;
+  const parsed = raw ? Number.parseInt(raw, 10) : Number.NaN;
+  if (Number.isFinite(parsed) && parsed > 0 && parsed <= 24 * 30) return parsed;
+  return 24;
+}
 
 async function main() {
   loadEnv();
@@ -46,55 +53,27 @@ async function main() {
     );
   }
 
-  const email = (process.env.DEMO_USER_EMAIL || DEFAULT_EMAIL).trim().toLowerCase();
-  const password = process.env.DEMO_USER_PASSWORD;
-  if (!password || password.length < 12) {
-    throw new Error("DEMO_USER_PASSWORD is required and must be at least 12 characters.");
-  }
-
   const prisma = new PrismaClient();
-  const passwordHash = await bcrypt.hash(password, 12);
+  const hours = ttlHours();
+  const cutoff = new Date(Date.now() - hours * 60 * 60 * 1000);
 
   try {
-    const user = await prisma.user.upsert({
-      where: { email },
-      create: {
-        email,
-        name: "Demo Explorer",
-        passwordHash,
-        isActive: true,
-        loginAttempts: 0,
-        subscriptionTier: "PREMIUM",
-      },
-      update: {
-        name: "Demo Explorer",
-        passwordHash,
-        isActive: true,
-        loginAttempts: 0,
-        lockedUntil: null,
-        subscriptionTier: "PREMIUM",
+    const result = await prisma.user.deleteMany({
+      where: {
+        AND: [
+          { email: { startsWith: "demo." } },
+          { email: { endsWith: "@apisandbox.demo" } },
+          { createdAt: { lt: cutoff } },
+        ],
       },
     });
 
-    await prisma.userProfile.upsert({
-      where: { userId: user.id },
-      create: {
-        userId: user.id,
-        firstName: "Demo",
-        lastName: "Explorer",
-        roleLabel: "Live demo",
-        identityStatement: "Shared demo account — sign out when finished.",
-      },
-      update: {
-        firstName: "Demo",
-        lastName: "Explorer",
-        roleLabel: "Live demo",
-        identityStatement: "Shared demo account — sign out when finished.",
-      },
-    });
-
-    console.log(`Demo user ready: ${email} (PREMIUM). Password from DEMO_USER_PASSWORD.`);
-    console.log("Set NEXT_PUBLIC_FF_DEMO_LOGIN=true in Vercel (and DEMO_USER_EMAIL / DEMO_USER_PASSWORD to match this seed).");
+    console.log(
+      `Demo cleanup complete: removed ${result.count} ephemeral demo user(s) older than ${hours}h (cutoff ${cutoff.toISOString()}).`
+    );
+    console.log(
+      "No shared demo seed is required. Enable NEXT_PUBLIC_FF_DEMO_LOGIN=true; POST /api/auth/demo creates Phase-1-only sessions on demand."
+    );
   } finally {
     await prisma.$disconnect();
   }

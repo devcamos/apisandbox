@@ -63,21 +63,19 @@ Staging accounts must be provisioned intentionally against the staging database.
 
 The local seed command is blocked in production. Production testing should use real accounts or the optional demo-user flow with its explicit production guard.
 
-## Optional demo user
+## Optional demo login (Phase 1 only)
 
-The demo flow signs in server-side, so its password is never sent to the browser.
+Demo login creates an **ephemeral FREE user** per visitor (`demo.<id>@apisandbox.demo`) with full Phase 1 access. Later phases, billing, API tokens, and profile edits are blocked on the server. Expired demos are deleted on the next demo login (default TTL 24h).
 
-1. Set `DEMO_USER_PASSWORD` (at least 12 characters) and optionally `DEMO_USER_EMAIL` (default `demo@apisandbox.demo`) in the target environment.
-2. Set `NEXT_PUBLIC_FF_DEMO_LOGIN=true` to show **Try live demo** on `/login` and `/start`.
-3. Run once against the target database:
+No shared password seed is required.
 
-   ```bash
-   DEMO_USER_PASSWORD='your-strong-secret' npm run db:ensure-demo-user
-   ```
+1. Set `NEXT_PUBLIC_FF_DEMO_LOGIN=true` to show **Try the demo** on `/login` and `/start`.
+2. On production deploys, also set `ALLOW_DEMO_LOGIN_IN_PRODUCTION=true`.
+3. Optional: `DEMO_USER_TTL_HOURS` (default `24`) and `npm run db:ensure-demo-user` for an explicit cleanup of expired demos.
 
-   For production only, also set `DEMO_ALLOW_PRODUCTION_SEED=true` for that single run, then remove it.
+The UI calls `POST /api/auth/demo` (rate-limited). The response is a normal auth session for the new demo user.
 
-The UI calls `POST /api/auth/demo`; the server reads `DEMO_USER_EMAIL` and `DEMO_USER_PASSWORD` and creates the session.
+**Migration note:** This flow does **not** add a Prisma migration. Preview (Supabase) and production (Neon) only need the existing schema. PR #43 (skip migrate on Preview) does not affect this feature.
 
 ## Invalid login credentials
 

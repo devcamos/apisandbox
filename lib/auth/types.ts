@@ -9,6 +9,8 @@ export interface AuthUser {
   roleLabel: string | null
   identityStatement: string | null
   subscriptionTier: AuthSubscriptionTier
+  /** True for ephemeral/legacy demo sessions (Phase 1 only). */
+  isDemo: boolean
 }
 
 export interface AuthPayload {

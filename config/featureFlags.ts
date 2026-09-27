@@ -60,7 +60,7 @@ const flags: Record<FeatureFlag, FlagConfig> = {
   DEMO_LOGIN: {
     enabled: envFlagEnabled(FEATURE_FLAG_ENV_KEYS.DEMO_LOGIN),
     description:
-      "Show Try demo entry points and POST /api/auth/demo. Server needs DEMO_USER_EMAIL + DEMO_USER_PASSWORD and a PREMIUM demo user (scripts/ensure-demo-user.js). Banner email comes from DEMO_USER_EMAIL.",
+      "Show Try the demo entry points and POST /api/auth/demo. Creates an ephemeral FREE user with Phase 1 access only (no shared password seed). Rate-limited; expired demos are cleaned up on login.",
   },
 }
 

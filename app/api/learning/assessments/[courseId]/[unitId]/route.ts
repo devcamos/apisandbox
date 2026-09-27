@@ -1,5 +1,6 @@
 import { NextRequest } from "next/server"
 import { z } from "zod"
+import { assertLearningCourseAccessForUser } from "@/lib/auth/demo-guards"
 import { requireAuthenticatedUser } from "@/lib/auth/jwt-auth-middleware"
 import { parseJsonBody } from "@/lib/http/auth-route-helpers"
 import { errorResponse, handleRouteError, okResponse } from "@/lib/http/responses"
@@ -20,6 +21,7 @@ export async function GET(
   try {
     const user = await requireAuthenticatedUser(request)
     const { courseId, unitId } = await context.params
+    await assertLearningCourseAccessForUser(user, courseId)
     const assessment = getSanitizedAssessment(courseId, unitId)
     if (!assessment) return errorResponse(404, "not_found", "Learning assessment not found")
 
@@ -37,6 +39,7 @@ export async function POST(
   try {
     const user = await requireAuthenticatedUser(request)
     const { courseId, unitId } = await context.params
+    await assertLearningCourseAccessForUser(user, courseId)
     const parsed = await parseJsonBody(request, submissionSchema, "Invalid learning assessment submission")
     if (!parsed.ok) return parsed.response
 

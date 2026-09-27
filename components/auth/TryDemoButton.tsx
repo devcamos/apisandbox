@@ -38,7 +38,7 @@ export function TryDemoButton({
         const msg =
           typeof body?.error?.message === "string"
             ? body.error.message
-            : "Demo sign-in failed. Is the demo user provisioned?"
+            : "Demo sign-in failed. Try again in a moment."
         setError(parseLoginErrorMessage(msg).message)
         setLoading(false)
         return
@@ -75,7 +75,7 @@ export function TryDemoButton({
         ) : (
           <Sparkles className="h-4 w-4 text-amber-400" aria-hidden />
         )}
-        {children ?? "Try live demo (full app)"}
+        {children ?? "Try the demo"}
       </button>
       {error ? <p className="text-center text-xs text-red-400">{error}</p> : null}
     </div>

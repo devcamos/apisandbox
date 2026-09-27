@@ -5,7 +5,6 @@ import Navigation from "@/components/Navigation";
 import { DemoSessionBanner } from "@/components/DemoSessionBanner";
 import { SessionProvider } from "@/components/providers/SessionProvider";
 import { isFeatureEnabled } from "@/config/featureFlags";
-import { getDemoUserEmail } from "@/lib/demo-login";
 import { CookieConsent } from "@/components/CookieConsent";
 import { AnalyticsProvider } from "@/components/AnalyticsProvider";
 import { LearningAssistantWidget } from "@/components/LearningAssistantWidget";
@@ -34,14 +33,14 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const demoAccountEmail = isFeatureEnabled("DEMO_LOGIN") ? getDemoUserEmail() : null
+  const demoLoginEnabled = isFeatureEnabled("DEMO_LOGIN")
 
   return (
     <html lang="en" className="dark" suppressHydrationWarning>
       <body className={`${inter.className} overflow-x-hidden bg-slate-900 text-white`}>
         <SessionProvider>
           <Navigation />
-          <DemoSessionBanner demoAccountEmail={demoAccountEmail} />
+          <DemoSessionBanner enabled={demoLoginEnabled} />
           <main className="min-h-screen">
             {children}
           </main>
