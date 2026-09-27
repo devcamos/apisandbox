@@ -90,6 +90,21 @@ test.describe("CI smoke", () => {
     await expect(page.getByRole("button", { name: /sign in/i })).toBeVisible();
   });
 
+  test("forgot-password page explains recovery and links back to login", async ({
+    page,
+  }) => {
+    const response = await page.goto("/forgot-password", {
+      waitUntil: "domcontentloaded",
+    });
+    expect(response?.ok()).toBeTruthy();
+    await expect(page.getByTestId("forgot-password-page")).toBeVisible();
+    await expect(page.getByRole("heading", { name: /reset password/i })).toBeVisible();
+    await expect(page.getByRole("link", { name: /back to sign in/i })).toHaveAttribute(
+      "href",
+      "/login",
+    );
+  });
+
   test("signup page presents Google and local account creation", async ({ page }) => {
     const response = await page.goto("/signup", { waitUntil: "domcontentloaded" });
     expect(response?.ok()).toBeTruthy();

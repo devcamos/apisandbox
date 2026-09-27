@@ -86,7 +86,7 @@ If a documented user cannot sign in:
 3. Check whether the account was registered with email/password or Google; use the matching login method.
 4. Confirm the target database contains the user before changing passwords or reseeding.
 
-Password-reset pages are not currently implemented, so the login screen's **Forgot password** link is not a recovery path yet.
+`/forgot-password` explains recovery options (Google sign-in, demo claim, support email). Automated reset email is not implemented yet.
 
 
 ## Sign-in lockout and throttling
