@@ -1,3 +1,4 @@
+/** Must match `export const maxDuration` literal in `app/api/assistant/route.ts` (Next requires a literal). */
 export const ASSISTANT_MAX_DURATION_SECONDS = 30
 /** Soft cap for the upstream LLM call; leave headroom under route maxDuration. */
 export const ASSISTANT_LLM_TIMEOUT_MS = 25_000
