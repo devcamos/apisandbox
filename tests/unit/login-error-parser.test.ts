@@ -102,6 +102,15 @@ describe("parseLoginErrorMessage", () => {
     expect(rl.suggestion).toContain("10 minutes")
   })
 
+  it("maps database busy to a recoverable retry message", () => {
+    const info = parseLoginErrorMessage(
+      "The database is busy. Please wait a moment and try again.",
+    )
+    expect(info.message).toBe("Service is busy")
+    expect(info.recoverable).toBe(true)
+    expect(info.suggestion).toMatch(/wait a moment/i)
+  })
+
   it("generic invalid credentials explains the 5-attempt lock policy", () => {
     const info = parseLoginErrorMessage("Invalid email or password")
     expect(info.message).toBe("Invalid login credentials")

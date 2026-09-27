@@ -101,4 +101,18 @@ describe("POST /api/auth/login", () => {
     const res = await POST(req({ email: "not-an-email", password: "" }))
     expect(res.status).toBe(400)
   })
+
+  it("maps database pool exhaustion to DATABASE_BUSY with Retry-After", async () => {
+    loginWithPassword.mockRejectedValue(
+      new AppError("The database is busy. Please wait a moment and try again.", 503, "configuration_error", {
+        code: "DATABASE_BUSY",
+      }),
+    )
+    const res = await POST(req({ email: "user@example.com", password: "x" }))
+    expect(res.status).toBe(503)
+    expect(res.headers.get("Retry-After")).toBe("2")
+    const body = await res.json()
+    expect(body.error.message).toMatch(/database is busy/i)
+    expect(body.error.details).toEqual({ code: "DATABASE_BUSY" })
+  })
 })

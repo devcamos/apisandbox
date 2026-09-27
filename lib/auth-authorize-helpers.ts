@@ -2,6 +2,7 @@ import type { OAuth2Client } from "google-auth-library"
 import { prisma } from "@/lib/prisma"
 import { verifyPassword } from "@/lib/auth"
 import { isAccountLocked, lockMinutesRemaining, registerFailedAttempt } from "@/lib/auth/login-lockout"
+import { withPrismaBusyRetry } from "@/lib/prisma-busy-retry"
 
 export type AuthorizeUserResult = {
   id: string
@@ -52,6 +53,13 @@ export async function authorizeWithGoogleIdToken(
 }
 
 export async function authorizeWithEmailPassword(
+  email: string,
+  password: string
+): Promise<AuthorizeUserResult> {
+  return withPrismaBusyRetry(() => authorizeWithEmailPasswordOnce(email, password))
+}
+
+async function authorizeWithEmailPasswordOnce(
   email: string,
   password: string
 ): Promise<AuthorizeUserResult> {

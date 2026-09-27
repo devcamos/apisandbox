@@ -1,7 +1,13 @@
 import { Prisma } from "@prisma/client"
 import { prisma } from "@/lib/prisma"
 import { AppError } from "@/lib/http/errors"
+import {
+  databaseBusyAppError,
+  isDatabaseCapacityError,
+  isPrismaDatabaseBusyError,
+} from "@/lib/http/database-busy"
 import { logger } from "@/lib/logger"
+import { withPrismaBusyRetry } from "@/lib/prisma-busy-retry"
 import { composeDisplayName } from "@/lib/user-name"
 
 interface BootstrapInput {
@@ -35,26 +41,7 @@ function isMissingSchemaError(error: unknown): boolean {
   )
 }
 
-/** Supabase/Neon session-pool exhaustion (and similar capacity errors). */
-export function isDatabaseCapacityError(error: unknown): boolean {
-  const message = error instanceof Error ? error.message : String(error ?? "")
-  return (
-    message.includes("EMAXCONNSESSION") ||
-    message.includes("max clients reached") ||
-    message.includes("too many clients") ||
-    message.includes("remaining connection slots") ||
-    message.includes("MaxClientsInSessionMode")
-  )
-}
-
-function databaseBusyError(): AppError {
-  return new AppError(
-    "The database is busy. Please wait a moment and try signing up again.",
-    503,
-    "configuration_error",
-    { code: "DATABASE_BUSY" },
-  )
-}
+export { isDatabaseCapacityError }
 
 function mapKnownBootstrapError(error: unknown): AppError | null {
   if (error instanceof AppError) {
@@ -69,12 +56,8 @@ function mapKnownBootstrapError(error: unknown): AppError | null {
     return missingSchemaError()
   }
 
-  if (isDatabaseCapacityError(error)) {
-    return databaseBusyError()
-  }
-
-  if (error instanceof Prisma.PrismaClientInitializationError) {
-    return databaseBusyError()
+  if (isPrismaDatabaseBusyError(error)) {
+    return databaseBusyAppError()
   }
 
   return null
@@ -98,37 +81,7 @@ export async function createUserWithInitialData(input: BootstrapInput) {
   }
 
   try {
-    // Sequential writes (no nested create / transaction) for Neon HTTP driver on Vercel.
-    const user = await prisma.user.create({
-      data: {
-        email: input.email,
-        name: composeDisplayName(input.firstName, input.lastName),
-        image: input.avatarUrl ?? null,
-        passwordHash: input.passwordHash,
-        isActive: true,
-        loginAttempts: 0,
-        subscriptionTier: "FREE",
-      },
-    })
-
-    try {
-      await prisma.userProfile.create({
-        data: {
-          userId: user.id,
-          firstName: input.firstName,
-          lastName: input.lastName,
-          avatarUrl: input.avatarUrl ?? null,
-        },
-      })
-    } catch (profileError) {
-      await prisma.user.delete({ where: { id: user.id } }).catch(() => undefined)
-      throw profileError
-    }
-
-    return prisma.user.findUniqueOrThrow({
-      where: { id: user.id },
-      include: { profile: true },
-    })
+    return await withPrismaBusyRetry(() => createUserWithInitialDataOnce(input))
   } catch (error) {
     const known = mapKnownBootstrapError(error)
     if (known) {
@@ -144,4 +97,38 @@ export async function createUserWithInitialData(input: BootstrapInput) {
       bootstrapDevDetails(error),
     )
   }
+}
+
+async function createUserWithInitialDataOnce(input: BootstrapInput) {
+  // Sequential writes (no nested create / transaction) for Neon HTTP driver on Vercel.
+  const user = await prisma.user.create({
+    data: {
+      email: input.email,
+      name: composeDisplayName(input.firstName, input.lastName),
+      image: input.avatarUrl ?? null,
+      passwordHash: input.passwordHash,
+      isActive: true,
+      loginAttempts: 0,
+      subscriptionTier: "FREE",
+    },
+  })
+
+  try {
+    await prisma.userProfile.create({
+      data: {
+        userId: user.id,
+        firstName: input.firstName,
+        lastName: input.lastName,
+        avatarUrl: input.avatarUrl ?? null,
+      },
+    })
+  } catch (profileError) {
+    await prisma.user.delete({ where: { id: user.id } }).catch(() => undefined)
+    throw profileError
+  }
+
+  return prisma.user.findUniqueOrThrow({
+    where: { id: user.id },
+    include: { profile: true },
+  })
 }

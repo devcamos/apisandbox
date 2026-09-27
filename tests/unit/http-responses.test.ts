@@ -1,13 +1,20 @@
 import { describe, expect, it } from "vitest"
 import { Prisma } from "@prisma/client"
 import { handleRouteError } from "@/lib/http/responses"
+import {
+  DATABASE_BUSY_CODE,
+  DATABASE_BUSY_MESSAGE,
+  DATABASE_BUSY_RETRY_AFTER_SECONDS,
+  databaseBusyAppError,
+  isDatabaseCapacityError,
+} from "@/lib/http/database-busy"
 
-function prismaInitializationError() {
+function prismaInitializationError(message = "Database unavailable") {
   return Object.assign(
     Object.create(Prisma.PrismaClientInitializationError.prototype),
     {
       name: "PrismaClientInitializationError",
-      message: "Database unavailable",
+      message,
       errorCode: "P1001",
       clientVersion: "test",
     },
@@ -27,19 +34,43 @@ function prismaKnownRequestError(code: string) {
   ) as Prisma.PrismaClientKnownRequestError
 }
 
+describe("isDatabaseCapacityError", () => {
+  it("detects EMAXCONNSESSION", () => {
+    expect(
+      isDatabaseCapacityError(
+        new Error("FATAL: (EMAXCONNSESSION) max clients reached in session mode"),
+      ),
+    ).toBe(true)
+  })
+})
+
 describe("handleRouteError", () => {
-  it("maps Prisma initialization failures to configuration_error", async () => {
-    const response = handleRouteError(prismaInitializationError())
+  it("maps Prisma initialization / pool exhaustion to DATABASE_BUSY with Retry-After", async () => {
+    const response = handleRouteError(
+      prismaInitializationError(
+        "Error querying the database: FATAL: (EMAXCONNSESSION) max clients reached in session mode",
+      ),
+    )
     const body = await response.json()
 
     expect(response.status).toBe(503)
+    expect(response.headers.get("Retry-After")).toBe(String(DATABASE_BUSY_RETRY_AFTER_SECONDS))
     expect(body).toEqual({
       success: false,
       error: {
         category: "configuration_error",
-        message: "Authentication service is temporarily unavailable",
+        message: DATABASE_BUSY_MESSAGE,
+        details: { code: DATABASE_BUSY_CODE },
       },
     })
+  })
+
+  it("maps databaseBusyAppError the same way", async () => {
+    const response = handleRouteError(databaseBusyAppError())
+    const body = await response.json()
+    expect(response.status).toBe(503)
+    expect(response.headers.get("Retry-After")).toBe(String(DATABASE_BUSY_RETRY_AFTER_SECONDS))
+    expect(body.error.details.code).toBe(DATABASE_BUSY_CODE)
   })
 
   it("maps Prisma schema drift failures to configuration_error", async () => {

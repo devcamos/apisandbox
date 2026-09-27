@@ -2,6 +2,11 @@ import { Prisma } from "@prisma/client"
 import { NextResponse } from "next/server"
 import { AppError } from "@/lib/http/errors"
 import { logger } from "@/lib/logger"
+import {
+  databaseBusyResponse,
+  isDatabaseBusyAppError,
+  isPrismaDatabaseBusyError,
+} from "@/lib/http/database-busy"
 
 export function okResponse<T>(data: T, status = 200) {
   return NextResponse.json(
@@ -33,23 +38,22 @@ export function errorResponse(
 }
 
 export function handleRouteError(error: unknown) {
-  if (error instanceof AppError) {
-    return errorResponse(error.status, error.category, error.message, error.details)
+  if (isDatabaseBusyAppError(error) || isPrismaDatabaseBusyError(error)) {
+    if (!(error instanceof AppError)) {
+      logger.error(
+        {
+          err: error,
+          category: "configuration_error",
+          code: "DATABASE_BUSY",
+        },
+        "Database busy / Prisma initialization failed",
+      )
+    }
+    return databaseBusyResponse()
   }
 
-  if (error instanceof Prisma.PrismaClientInitializationError) {
-    logger.error(
-      {
-        err: error,
-        category: "configuration_error",
-      },
-      "Prisma initialization failed",
-    )
-    return errorResponse(
-      503,
-      "configuration_error",
-      "Authentication service is temporarily unavailable",
-    )
+  if (error instanceof AppError) {
+    return errorResponse(error.status, error.category, error.message, error.details)
   }
 
   if (error instanceof Prisma.PrismaClientKnownRequestError) {

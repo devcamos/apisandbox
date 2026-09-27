@@ -2,8 +2,10 @@ import { prisma } from "@/lib/prisma"
 import { hashPassword, validatePasswordStrength } from "@/lib/auth"
 import { isDemoUserEmail } from "@/lib/demo-login"
 import { AppError } from "@/lib/http/errors"
+import { databaseBusyAppError, isPrismaDatabaseBusyError } from "@/lib/http/database-busy"
 import { mapUserToAuthResponse } from "@/lib/services/auth/auth-response-mapper"
 import { composeDisplayName, splitFullName } from "@/lib/user-name"
+import { withPrismaBusyRetry } from "@/lib/prisma-busy-retry"
 
 export type DemoClaimPlan = "free" | "pro"
 
@@ -20,6 +22,17 @@ interface ClaimDemoAccountInput {
  * Keeps the same user id so Phase 1 progress, lessons, and quizzes stay attached.
  */
 export async function claimDemoAccount(input: ClaimDemoAccountInput) {
+  try {
+    return await withPrismaBusyRetry(() => claimDemoAccountOnce(input))
+  } catch (error) {
+    if (isPrismaDatabaseBusyError(error)) {
+      throw databaseBusyAppError()
+    }
+    throw error
+  }
+}
+
+async function claimDemoAccountOnce(input: ClaimDemoAccountInput) {
   const email = input.email.trim().toLowerCase()
   if (!email) {
     throw new AppError("Email is required", 400, "validation_error")

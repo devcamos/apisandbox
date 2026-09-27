@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma"
 import { verifyPassword } from "@/lib/auth"
 import { AppError } from "@/lib/http/errors"
+import { databaseBusyAppError, isPrismaDatabaseBusyError } from "@/lib/http/database-busy"
 import {
   accountLockedMessage,
   effectiveFailedAttempts,
@@ -8,6 +9,7 @@ import {
   lockMinutesRemaining,
   registerFailedAttempt,
 } from "@/lib/auth/login-lockout"
+import { withPrismaBusyRetry } from "@/lib/prisma-busy-retry"
 
 export const INVALID_CREDENTIALS_MESSAGE = "Invalid email or password"
 
@@ -18,6 +20,17 @@ function invalidCredentials(): AppError {
 }
 
 export async function validatePasswordLogin(email: string, password: string) {
+  try {
+    return await withPrismaBusyRetry(() => validatePasswordLoginOnce(email, password))
+  } catch (error) {
+    if (isPrismaDatabaseBusyError(error)) {
+      throw databaseBusyAppError()
+    }
+    throw error
+  }
+}
+
+async function validatePasswordLoginOnce(email: string, password: string) {
   const normalizedEmail = email.trim().toLowerCase()
   const user = await prisma.user.findUnique({
     where: { email: normalizedEmail },

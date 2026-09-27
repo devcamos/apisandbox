@@ -139,6 +139,24 @@ function parseDemoDisabled(message: string): LoginErrorInfo | null {
   }
 }
 
+function parseDatabaseBusy(message: string): LoginErrorInfo | null {
+  const lower = message.toLowerCase()
+  if (
+    lower.includes("database is busy") ||
+    lower.includes("database_busy") ||
+    (lower.includes("temporarily unavailable") && lower.includes("authentication"))
+  ) {
+    return {
+      message: "Service is busy",
+      type: "network",
+      recoverable: true,
+      suggestion:
+        "The database is busy right now. Please wait a moment and try again.",
+    }
+  }
+  return null
+}
+
 function parseRateLimited(message: string): LoginErrorInfo | null {
   if (!message.startsWith("Too many")) return null
   return {
@@ -258,6 +276,7 @@ const parsers: Array<(message: string) => LoginErrorInfo | null> = [
   parseAccountLockedPrefix,
   parseAccountLockedMessage,
   parseDemoDisabled,
+  parseDatabaseBusy,
   parseRateLimited,
   parseValidationPayload,
   parsePasswordIncorrectPrefix,
