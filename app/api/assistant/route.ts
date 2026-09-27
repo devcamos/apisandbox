@@ -6,15 +6,22 @@ import {
   ASSISTANT_LLM_TIMEOUT_MS,
   ASSISTANT_MAX_BODY_BYTES,
   ASSISTANT_MAX_DURATION_SECONDS,
+  type AssistantHistoryItem,
   isAbortError,
   validateAssistantInput,
 } from "@/lib/assistant/limits"
 import { requirePremiumUser } from "@/lib/auth/jwt-auth-middleware"
 import { applyRateLimit, attachRateLimitHeaders } from "@/lib/http/apply-rate-limit"
 import { handleRouteError } from "@/lib/http/responses"
-import { assistantLimiter } from "@/lib/rate-limit"
+import { assistantLimiter, type RateLimitResult } from "@/lib/rate-limit"
 
 export const maxDuration = ASSISTANT_MAX_DURATION_SECONDS
+
+const DEFAULT_SUGGESTIONS = [
+  "Explain idempotency",
+  "Cookies vs tokens",
+  "Show a retry policy example",
+] as const
 
 function contextForPath(pathname: string) {
   if (pathname.startsWith("/docs/java")) {
@@ -68,7 +75,7 @@ function formatConversation({
   history,
   message,
 }: {
-  history: Array<{ role: "user" | "assistant"; content: string }>
+  history: AssistantHistoryItem[]
   message: string
 }) {
   const lines: string[] = []
@@ -93,152 +100,192 @@ function timeoutResponse() {
   )
 }
 
+function successResponse(
+  payload: {
+    reply: string
+    provider: "gemini" | "openai"
+    model: string
+    redirect: ReturnType<typeof inferAssistantRedirect>
+  },
+  rateResult: RateLimitResult,
+) {
+  return attachRateLimitHeaders(
+    NextResponse.json({
+      ...payload,
+      suggestions: [...DEFAULT_SUGGESTIONS],
+    }),
+    rateResult,
+  )
+}
+
+async function parseAssistantBody(request: NextRequest) {
+  const contentLength = request.headers.get("content-length")
+  if (contentLength && Number(contentLength) > ASSISTANT_MAX_BODY_BYTES) {
+    return { error: bodyTooLargeResponse() as NextResponse }
+  }
+
+  const rawText = await request.text()
+  if (rawText.length > ASSISTANT_MAX_BODY_BYTES) {
+    return { error: bodyTooLargeResponse() as NextResponse }
+  }
+
+  let body: unknown = null
+  try {
+    body = rawText ? JSON.parse(rawText) : null
+  } catch {
+    return {
+      error: NextResponse.json({ error: "Invalid request" }, { status: 400 }),
+    }
+  }
+
+  const validated = validateAssistantInput(body)
+  if (!validated.ok) {
+    return {
+      error: NextResponse.json({ error: validated.error }, { status: validated.status }),
+    }
+  }
+
+  return { data: validated }
+}
+
+async function generateGeminiReply(input: {
+  message: string
+  pathname: string
+  mode: "guided" | "expert"
+  history: AssistantHistoryItem[]
+  abortSignal: AbortSignal
+  redirect: ReturnType<typeof inferAssistantRedirect>
+  rateResult: RateLimitResult
+}) {
+  const apiKey = process.env.GEMINI_API_KEY
+  if (!apiKey) {
+    return NextResponse.json(
+      {
+        error:
+          "Missing GEMINI_API_KEY. Set it in your environment (e.g. .env.local) to enable Gemini responses.",
+      },
+      { status: 500 },
+    )
+  }
+
+  const model = process.env.GEMINI_MODEL || "gemini-2.5-flash"
+  const ai = new GoogleGenAI({ apiKey })
+  const prompt = [
+    buildInstructions({ pathname: input.pathname, mode: input.mode }),
+    "",
+    "Conversation:",
+    formatConversation({ history: input.history, message: input.message }),
+  ].join("\n")
+
+  try {
+    const result = await ai.models.generateContent({
+      model,
+      contents: prompt,
+      config: { abortSignal: input.abortSignal },
+    })
+    const reply =
+      (typeof result.text === "string" ? result.text : "")?.trim() ||
+      "I didn’t produce any text output. Try asking again."
+    return successResponse(
+      { reply, provider: "gemini", model, redirect: input.redirect },
+      input.rateResult,
+    )
+  } catch (error) {
+    if (isAbortError(error) || input.abortSignal.aborted) {
+      return timeoutResponse()
+    }
+    throw error
+  }
+}
+
+async function generateOpenAiReply(input: {
+  message: string
+  pathname: string
+  mode: "guided" | "expert"
+  history: AssistantHistoryItem[]
+  abortSignal: AbortSignal
+  redirect: ReturnType<typeof inferAssistantRedirect>
+  rateResult: RateLimitResult
+}) {
+  const apiKey = process.env.OPENAI_API_KEY
+  if (!apiKey) {
+    return NextResponse.json(
+      {
+        error:
+          "Missing OPENAI_API_KEY. Set it in your environment (e.g. .env.local) to enable OpenAI responses, or set ASSISTANT_PROVIDER=gemini with GEMINI_API_KEY.",
+      },
+      { status: 500 },
+    )
+  }
+
+  const client = new OpenAI({ apiKey, timeout: ASSISTANT_LLM_TIMEOUT_MS })
+  const model = process.env.OPENAI_MODEL || "gpt-4.1-mini"
+  const chatInput = [
+    ...input.history.map((m) => ({ role: m.role, content: m.content })),
+    { role: "user" as const, content: input.message },
+  ]
+
+  try {
+    const response = await client.responses.create(
+      {
+        model,
+        instructions: buildInstructions({ pathname: input.pathname, mode: input.mode }),
+        input: chatInput,
+      },
+      { signal: input.abortSignal },
+    )
+    const reply = response.output_text?.trim() || "I didn’t produce any text output. Try asking again."
+    return successResponse(
+      {
+        reply,
+        provider: "openai",
+        model: response.model ?? model,
+        redirect: input.redirect,
+      },
+      input.rateResult,
+    )
+  } catch (error) {
+    if (isAbortError(error) || input.abortSignal.aborted) {
+      return timeoutResponse()
+    }
+    throw error
+  }
+}
+
+function resolveProvider(): "openai" | "gemini" {
+  return (
+    (process.env.ASSISTANT_PROVIDER as "openai" | "gemini" | undefined) ||
+    (process.env.GEMINI_API_KEY ? "gemini" : "openai")
+  )
+}
+
 export async function POST(request: NextRequest) {
   try {
     const user = await requirePremiumUser(request)
 
-    const rate = await applyRateLimit(
-      request,
-      assistantLimiter,
-      `assistant:${user.id}`,
-    )
+    const rate = await applyRateLimit(request, assistantLimiter, `assistant:${user.id}`)
     if (rate.blocked) return rate.blocked
 
-    const contentLength = request.headers.get("content-length")
-    if (contentLength && Number(contentLength) > ASSISTANT_MAX_BODY_BYTES) {
-      return bodyTooLargeResponse()
-    }
+    const parsed = await parseAssistantBody(request)
+    if ("error" in parsed && parsed.error) return parsed.error
 
-    const rawText = await request.text()
-    if (rawText.length > ASSISTANT_MAX_BODY_BYTES) {
-      return bodyTooLargeResponse()
-    }
-
-    let body: unknown = null
-    try {
-      body = rawText ? JSON.parse(rawText) : null
-    } catch {
-      return NextResponse.json({ error: "Invalid request" }, { status: 400 })
-    }
-
-    const validated = validateAssistantInput(body)
-    if (!validated.ok) {
-      return NextResponse.json({ error: validated.error }, { status: validated.status })
-    }
-
-    const { message, pathname, mode, history } = validated
+    const { message, pathname, mode, history } = parsed.data!
     const redirect = inferAssistantRedirect({ message, pathname })
     const abortSignal = AbortSignal.timeout(ASSISTANT_LLM_TIMEOUT_MS)
-
-    const provider =
-      (process.env.ASSISTANT_PROVIDER as "openai" | "gemini" | undefined) ||
-      (process.env.GEMINI_API_KEY ? "gemini" : "openai")
-
-    if (provider === "gemini") {
-      const apiKey = process.env.GEMINI_API_KEY
-      if (!apiKey) {
-        return NextResponse.json(
-          {
-            error:
-              "Missing GEMINI_API_KEY. Set it in your environment (e.g. .env.local) to enable Gemini responses.",
-          },
-          { status: 500 },
-        )
-      }
-
-      const model = process.env.GEMINI_MODEL || "gemini-2.5-flash"
-      const ai = new GoogleGenAI({ apiKey })
-
-      const prompt = [
-        buildInstructions({ pathname, mode }),
-        "",
-        "Conversation:",
-        formatConversation({ history, message }),
-      ].join("\n")
-
-      try {
-        const result = await ai.models.generateContent({
-          model,
-          contents: prompt,
-          config: { abortSignal },
-        })
-
-        const reply =
-          (typeof result.text === "string" ? result.text : "")?.trim() ||
-          "I didn’t produce any text output. Try asking again."
-
-        return attachRateLimitHeaders(
-          NextResponse.json({
-            reply,
-            provider: "gemini",
-            model,
-            redirect,
-            suggestions: ["Explain idempotency", "Cookies vs tokens", "Show a retry policy example"],
-          }),
-          rate.result,
-        )
-      } catch (error) {
-        if (isAbortError(error) || abortSignal.aborted) {
-          return timeoutResponse()
-        }
-        throw error
-      }
+    const providerInput = {
+      message,
+      pathname,
+      mode,
+      history,
+      abortSignal,
+      redirect,
+      rateResult: rate.result,
     }
 
-    const apiKey = process.env.OPENAI_API_KEY
-    if (!apiKey) {
-      return NextResponse.json(
-        {
-          error:
-            "Missing OPENAI_API_KEY. Set it in your environment (e.g. .env.local) to enable OpenAI responses, or set ASSISTANT_PROVIDER=gemini with GEMINI_API_KEY.",
-        },
-        { status: 500 },
-      )
+    if (resolveProvider() === "gemini") {
+      return await generateGeminiReply(providerInput)
     }
-
-    const client = new OpenAI({ apiKey, timeout: ASSISTANT_LLM_TIMEOUT_MS })
-    const model = process.env.OPENAI_MODEL || "gpt-4.1-mini"
-
-    const input = [
-      ...history.map((m) => ({
-        role: m.role,
-        content: m.content,
-      })),
-      { role: "user" as const, content: message },
-    ]
-
-    try {
-      const response = await client.responses.create(
-        {
-          model,
-          instructions: buildInstructions({ pathname, mode }),
-          input,
-        },
-        { signal: abortSignal },
-      )
-
-      const reply = response.output_text?.trim() || "I didn’t produce any text output. Try asking again."
-
-      return attachRateLimitHeaders(
-        NextResponse.json({
-          reply,
-          provider: "openai",
-          model: response.model ?? model,
-          redirect,
-          suggestions: [
-            "Explain idempotency",
-            "Cookies vs tokens",
-            "Show a retry policy example",
-          ],
-        }),
-        rate.result,
-      )
-    } catch (error) {
-      if (isAbortError(error) || abortSignal.aborted) {
-        return timeoutResponse()
-      }
-      throw error
-    }
+    return await generateOpenAiReply(providerInput)
   } catch (error) {
     if (isAbortError(error)) {
       return timeoutResponse()
