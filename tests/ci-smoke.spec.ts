@@ -99,6 +99,7 @@ test.describe("CI smoke", () => {
     expect(response?.ok()).toBeTruthy();
     await expect(page.getByTestId("forgot-password-page")).toBeVisible();
     await expect(page.getByRole("heading", { name: /reset password/i })).toBeVisible();
+    await expect(page.getByLabel(/account email/i)).toHaveAttribute("autocomplete", "email");
     await expect(page.getByRole("link", { name: /back to sign in/i })).toHaveAttribute(
       "href",
       "/login",
@@ -113,6 +114,7 @@ test.describe("CI smoke", () => {
     ).toBeVisible();
     await expect(page.getByTestId("google-auth-section")).toBeAttached();
     await expect(page.getByLabel(/email address/i)).toBeVisible();
+    await expect(page.getByLabel(/email address/i)).toHaveAttribute("autocomplete", "email");
     await expect(page.getByLabel(/^password$/i)).toHaveAttribute("autocomplete", "new-password");
     await expect(page.getByLabel(/confirm password/i)).toHaveAttribute(
       "autocomplete",
@@ -134,7 +136,10 @@ test.describe("CI smoke", () => {
       },
     });
 
-    expect(registerResponse.ok()).toBeTruthy();
+    expect(registerResponse.status(), await registerResponse.text()).toBe(201);
+    const registerBody = await registerResponse.json();
+    expect(registerBody.success).toBeTruthy();
+    expect(registerBody.error?.message ?? "").not.toMatch(/Failed to initialize account data/i);
 
     await page.goto("/login", { waitUntil: "domcontentloaded" });
     await dismissCookieBanner(page);
@@ -157,7 +162,9 @@ test.describe("CI smoke", () => {
       const res = await request.post("/api/auth/register", {
         data: { email, password: strongPassword, firstName: "Sign", lastName: "In" },
       });
-      expect(res.ok()).toBeTruthy();
+      expect(res.status(), await res.text()).toBe(201);
+      const body = await res.json();
+      expect(body.error?.message ?? "").not.toMatch(/Failed to initialize account data/i);
       await request.post("/api/auth/logout");
       return email;
     }
@@ -272,6 +279,7 @@ test.describe("CI smoke", () => {
         expect(body.data.user.email).toBe(email);
         expect(body.data.user.isDemo).toBe(false);
         expect(body.data.plan).toBe(plan);
+        expect(body.error?.message ?? "").not.toMatch(/Failed to initialize account data/i);
         await request.post("/api/auth/logout");
         expect((await apiLogin(request, email, strongPassword)).status()).toBe(200);
       });

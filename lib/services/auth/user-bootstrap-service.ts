@@ -35,6 +35,27 @@ function isMissingSchemaError(error: unknown): boolean {
   )
 }
 
+/** Supabase/Neon session-pool exhaustion (and similar capacity errors). */
+export function isDatabaseCapacityError(error: unknown): boolean {
+  const message = error instanceof Error ? error.message : String(error ?? "")
+  return (
+    message.includes("EMAXCONNSESSION") ||
+    message.includes("max clients reached") ||
+    message.includes("too many clients") ||
+    message.includes("remaining connection slots") ||
+    message.includes("MaxClientsInSessionMode")
+  )
+}
+
+function databaseBusyError(): AppError {
+  return new AppError(
+    "The database is busy. Please wait a moment and try signing up again.",
+    503,
+    "configuration_error",
+    { code: "DATABASE_BUSY" },
+  )
+}
+
 function mapKnownBootstrapError(error: unknown): AppError | null {
   if (error instanceof AppError) {
     return error
@@ -46,6 +67,14 @@ function mapKnownBootstrapError(error: unknown): AppError | null {
 
   if (isMissingSchemaError(error)) {
     return missingSchemaError()
+  }
+
+  if (isDatabaseCapacityError(error)) {
+    return databaseBusyError()
+  }
+
+  if (error instanceof Prisma.PrismaClientInitializationError) {
+    return databaseBusyError()
   }
 
   return null
