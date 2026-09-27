@@ -87,3 +87,22 @@ If a documented user cannot sign in:
 4. Confirm the target database contains the user before changing passwords or reseeding.
 
 Password-reset pages are not currently implemented, so the login screen's **Forgot password** link is not a recovery path yet.
+
+
+## Sign-in lockout and throttling
+
+- Each account gets **5 failed password attempts**. All 5 are checked normally and return
+  `401 Invalid email or password`. The 5th failure starts a **30-minute lock**, so the 6th
+  attempt (even with the right password) returns `423` with
+  `Account locked after 5 failed sign-in attempts. Try again in N minutes.`
+- A successful sign-in resets the counter. When a lock expires the account gets a fresh 5 attempts.
+- The optional Upstash throttle on `/api/auth/login` (`NEXT_PUBLIC_FF_RATE_LIMITING=true`) is keyed per
+  IP + email at 20 requests / 15 min, so it never fires before the per-account lock.
+
+## Demo account on the sign-in page (life-world-os model)
+
+`/login` shows a demo panel with **Try the demo** and the public credentials
+`demo@apisandbox.demo` / `try-the-demo`. Either path creates a fresh ephemeral FREE,
+Phase-1-only demo user (no shared account, no seeding). It is on by default for Local, CI
+and Vercel Preview; set `NEXT_PUBLIC_FF_DEMO_LOGIN=false` to hide it. On the production target
+it needs `NEXT_PUBLIC_FF_DEMO_LOGIN=true` **and** `ALLOW_DEMO_LOGIN_IN_PRODUCTION=true`.

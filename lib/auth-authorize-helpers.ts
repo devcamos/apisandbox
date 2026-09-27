@@ -1,6 +1,7 @@
 import type { OAuth2Client } from "google-auth-library"
 import { prisma } from "@/lib/prisma"
 import { verifyPassword } from "@/lib/auth"
+import { isAccountLocked, lockMinutesRemaining, registerFailedAttempt } from "@/lib/auth/login-lockout"
 
 export type AuthorizeUserResult = {
   id: string
@@ -62,9 +63,9 @@ export async function authorizeWithEmailPassword(
     throw new Error("CREDENTIALS_INVALID")
   }
 
-  if (user.lockedUntil && user.lockedUntil > new Date()) {
-    const minutesRemaining = Math.ceil((user.lockedUntil.getTime() - Date.now()) / (1000 * 60))
-    throw new Error(`ACCOUNT_LOCKED:${minutesRemaining}`)
+  const now = new Date()
+  if (isAccountLocked(user, now)) {
+    throw new Error(`ACCOUNT_LOCKED:${lockMinutesRemaining(user, now)}`)
   }
 
   if (!user.isActive) {
@@ -78,26 +79,17 @@ export async function authorizeWithEmailPassword(
   const isValidPassword = await verifyPassword(password, user.passwordHash)
 
   if (!isValidPassword) {
-    const newAttempts = (user.loginAttempts || 0) + 1
-    let lockedUntil = null
-
-    if (newAttempts >= 5) {
-      lockedUntil = new Date(Date.now() + 30 * 60 * 1000)
-    }
-
+    const update = registerFailedAttempt(user, now)
     await prisma.user.update({
       where: { id: user.id },
       data: {
-        loginAttempts: newAttempts,
-        lockedUntil,
+        loginAttempts: update.loginAttempts,
+        lockedUntil: update.lockedUntil,
       },
     })
-
-    if (newAttempts >= 5) {
-      throw new Error("ACCOUNT_LOCKED")
-    }
-    const attemptsRemaining = 5 - newAttempts
-    throw new Error(`PASSWORD_INCORRECT:${attemptsRemaining}`)
+    // Attempts 1-5 are all reported as a wrong password; the lock only
+    // surfaces on the next (6th) attempt.
+    throw new Error(`PASSWORD_INCORRECT:${update.attemptsRemaining}`)
   }
 
   await prisma.user.update({

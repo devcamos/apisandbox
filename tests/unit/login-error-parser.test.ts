@@ -79,4 +79,32 @@ describe("parseLoginErrorMessage", () => {
     expect(info.message).toBe("An unexpected error occurred")
     expect(info.recoverable).toBe(true)
   })
+
+  it("server lockout message shows the lock duration", () => {
+    const info = parseLoginErrorMessage(
+      "Account locked after 5 failed sign-in attempts. Try again in 30 minutes.",
+    )
+    expect(info.message).toBe("Account temporarily locked")
+    expect(info.suggestion).toContain("30 more minutes")
+  })
+
+  it("does not show 'Invalid login credentials' for unrelated invalid errors", () => {
+    expect(parseLoginErrorMessage("Invalid token signature").message).not.toBe("Invalid login credentials")
+    expect(parseLoginErrorMessage("Invalid login payload").type).toBe("validation")
+  })
+
+  it("maps disabled demo and rate limiting to specific messages", () => {
+    expect(parseLoginErrorMessage("Demo sign-in is not enabled on this deployment").message).toBe(
+      "Demo sign-in is not enabled here",
+    )
+    const rl = parseLoginErrorMessage("Too many requests. Try again in 10 minutes.")
+    expect(rl.message).toBe("Too many attempts")
+    expect(rl.suggestion).toContain("10 minutes")
+  })
+
+  it("generic invalid credentials explains the 5-attempt lock policy", () => {
+    const info = parseLoginErrorMessage("Invalid email or password")
+    expect(info.message).toBe("Invalid login credentials")
+    expect(info.suggestion).toContain("After 5 failed attempts")
+  })
 })

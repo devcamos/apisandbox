@@ -93,18 +93,44 @@ describe("demo-login", () => {
     expect(mod.getDemoUserPassword()).toBe("s3cret")
   })
 
-  it("isDemoLoginRouteEnabled requires only the feature flag (no password)", async () => {
+  it("isDemoLoginRouteEnabled: on by default outside production, explicit false disables", async () => {
     vi.stubEnv("NEXT_PUBLIC_FF_DEMO_LOGIN", "")
     vi.stubEnv("DEMO_USER_PASSWORD", "")
+    vi.stubEnv("VERCEL_ENV", "preview")
+    vi.stubEnv("NODE_ENV", "production")
+    let mod = await import("@/lib/demo-login")
+    expect(mod.isDemoLoginRouteEnabled()).toBe(true)
+
+    vi.resetModules()
+    vi.stubEnv("NEXT_PUBLIC_FF_DEMO_LOGIN", "false")
+    mod = await import("@/lib/demo-login")
+    expect(mod.isDemoLoginRouteEnabled()).toBe(false)
+  })
+
+  it("isDemoLoginRouteEnabled on the production target needs flag + production override", async () => {
+    vi.stubEnv("VERCEL_ENV", "production")
+    vi.stubEnv("NEXT_PUBLIC_FF_DEMO_LOGIN", "")
+    vi.stubEnv("ALLOW_DEMO_LOGIN_IN_PRODUCTION", "")
     let mod = await import("@/lib/demo-login")
     expect(mod.isDemoLoginRouteEnabled()).toBe(false)
 
     vi.resetModules()
     vi.stubEnv("NEXT_PUBLIC_FF_DEMO_LOGIN", "true")
-    vi.stubEnv("DEMO_USER_PASSWORD", "")
-    vi.stubEnv("NODE_ENV", "development")
+    mod = await import("@/lib/demo-login")
+    expect(mod.isDemoLoginRouteEnabled()).toBe(false)
+
+    vi.resetModules()
+    vi.stubEnv("ALLOW_DEMO_LOGIN_IN_PRODUCTION", "true")
     mod = await import("@/lib/demo-login")
     expect(mod.isDemoLoginRouteEnabled()).toBe(true)
+  })
+
+  it("isPublicDemoLoginAttempt matches the displayed demo credentials only", async () => {
+    const mod = await import("@/lib/demo-login")
+    expect(mod.isPublicDemoLoginAttempt("Demo@ApiSandbox.demo")).toBe(true)
+    expect(mod.isPublicDemoLoginAttempt("demo@apisandbox.demo", "try-the-demo")).toBe(true)
+    expect(mod.isPublicDemoLoginAttempt("demo@apisandbox.demo", "nope")).toBe(false)
+    expect(mod.isPublicDemoLoginAttempt("someone@example.com", "try-the-demo")).toBe(false)
   })
 
   it("getDemoUserTtlHours defaults to 24 and clamps invalid values", async () => {

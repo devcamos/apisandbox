@@ -128,7 +128,7 @@ describe("authorizeWithEmailPassword", () => {
     expect(prismaMock.user.update).toHaveBeenCalled()
   })
 
-  it("locks account and throws ACCOUNT_LOCKED when attempts reach 5", async () => {
+  it("5th wrong password is still reported as PASSWORD_INCORRECT but starts the lock", async () => {
     prismaMock.user.findUnique.mockResolvedValue({
       id: "u5",
       email: "x@example.com",
@@ -141,7 +141,47 @@ describe("authorizeWithEmailPassword", () => {
     })
     verifyPasswordMock.mockResolvedValue(false)
 
-    await expect(authorizeWithEmailPassword("x@example.com", "pw")).rejects.toThrow("ACCOUNT_LOCKED")
+    prismaMock.user.update.mockResolvedValue({})
+    await expect(authorizeWithEmailPassword("x@example.com", "pw")).rejects.toThrow("PASSWORD_INCORRECT:0")
+    expect(prismaMock.user.update).toHaveBeenCalledWith({
+      where: { id: "u5" },
+      data: { loginAttempts: 5, lockedUntil: expect.any(Date) },
+    })
+  })
+
+  it("6th attempt after 5 failures is refused as ACCOUNT_LOCKED:<minutes>", async () => {
+    prismaMock.user.findUnique.mockResolvedValue({
+      id: "u7",
+      email: "x@example.com",
+      name: "X",
+      image: null,
+      passwordHash: "hash",
+      isActive: true,
+      loginAttempts: 5,
+      lockedUntil: new Date(Date.now() + 30 * 60 * 1000),
+    })
+    verifyPasswordMock.mockResolvedValue(true)
+    await expect(authorizeWithEmailPassword("x@example.com", "pw")).rejects.toThrow("ACCOUNT_LOCKED:30")
+  })
+
+  it("an expired lock gives a fresh window instead of re-locking on one mistake", async () => {
+    prismaMock.user.findUnique.mockResolvedValue({
+      id: "u8",
+      email: "x@example.com",
+      name: "X",
+      image: null,
+      passwordHash: "hash",
+      isActive: true,
+      loginAttempts: 5,
+      lockedUntil: new Date(Date.now() - 60_000),
+    })
+    verifyPasswordMock.mockResolvedValue(false)
+    prismaMock.user.update.mockResolvedValue({})
+    await expect(authorizeWithEmailPassword("x@example.com", "pw")).rejects.toThrow("PASSWORD_INCORRECT:4")
+    expect(prismaMock.user.update).toHaveBeenCalledWith({
+      where: { id: "u8" },
+      data: { loginAttempts: 1, lockedUntil: null },
+    })
   })
 
   it("resets attempts and returns user when password is correct", async () => {

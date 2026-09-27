@@ -115,8 +115,44 @@ function parseOAuthHint(message: string): LoginErrorInfo | null {
   return null
 }
 
+function parseAccountLockedMessage(message: string): LoginErrorInfo | null {
+  if (!message.startsWith("Account locked after")) return null
+  const minutes = extractIntegerBeforeWord(message, "minute") ?? "30"
+  const unit = minutes === "1" ? "minute" : "minutes"
+  return {
+    message: "Account temporarily locked",
+    type: "account",
+    recoverable: true,
+    suggestion: `Too many failed sign-in attempts (5). For your security the account is locked for ${minutes} more ${unit}. You can try again after that, or use "Try the demo" in the meantime.`,
+  }
+}
+
+function parseDemoDisabled(message: string): LoginErrorInfo | null {
+  if (!message.startsWith("Demo sign-in is not enabled") && message !== "Demo login is not available") {
+    return null
+  }
+  return {
+    message: "Demo sign-in is not enabled here",
+    type: "account",
+    recoverable: false,
+    suggestion: "The demo account is switched off on this deployment. Sign in with your own account or create one with Sign up.",
+  }
+}
+
+function parseRateLimited(message: string): LoginErrorInfo | null {
+  if (!message.startsWith("Too many")) return null
+  return {
+    message: "Too many attempts",
+    type: "account",
+    recoverable: true,
+    suggestion: message,
+  }
+}
+
 function parseLegacyInvalidCredentials(message: string): LoginErrorInfo | null {
-  if (message.includes("Invalid email or password") || message.includes("invalid")) {
+  // Match only real credential failures. A bare "invalid" (e.g. "Invalid token",
+  // "Invalid request payload") must not be shown as "Invalid login credentials".
+  if (message.includes("Invalid email or password") || message === "Invalid credentials") {
     const attempts = extractIntegerBeforeWord(message, "attempt")
     if (attempts) {
       const plural = attempts === "1" ? "" : "s"
@@ -132,7 +168,7 @@ function parseLegacyInvalidCredentials(message: string): LoginErrorInfo | null {
       type: "authentication",
       recoverable: true,
       suggestion:
-        "The email address or password you entered may be incorrect. Please check both and try again, or use 'Forgot password' to reset your password.",
+        "The email address or password you entered may be incorrect. Please check both and try again. After 5 failed attempts the account is locked for 30 minutes. No account on this site yet? Use Sign up, or Try the demo.",
     }
   }
   return null
@@ -146,6 +182,18 @@ function parseLegacyLockout(message: string): LoginErrorInfo | null {
       type: "account",
       recoverable: true,
       suggestion: `Your account is temporarily locked. Please wait ${minutes} minutes or contact support if you need immediate access.`,
+    }
+  }
+  return null
+}
+
+function parseValidationPayload(message: string): LoginErrorInfo | null {
+  if (message === "Invalid login payload" || message === "Invalid request payload") {
+    return {
+      message: "Please enter a valid email address and password",
+      type: "validation",
+      recoverable: true,
+      suggestion: "Check the email format (name@example.com) and that the password is not empty.",
     }
   }
   return null
@@ -208,6 +256,10 @@ function parseServiceUnavailable(message: string): LoginErrorInfo | null {
 
 const parsers: Array<(message: string) => LoginErrorInfo | null> = [
   parseAccountLockedPrefix,
+  parseAccountLockedMessage,
+  parseDemoDisabled,
+  parseRateLimited,
+  parseValidationPayload,
   parsePasswordIncorrectPrefix,
   parseCredentialsInvalid,
   parseDeactivated,

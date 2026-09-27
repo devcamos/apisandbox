@@ -12,6 +12,8 @@ const demoEnabled = process.env.NEXT_PUBLIC_FF_DEMO_LOGIN === "true"
 interface TryDemoButtonProps {
   nextPath?: string
   className?: string
+  /** Server-computed gate (preferred). Falls back to NEXT_PUBLIC_FF_DEMO_LOGIN. */
+  enabled?: boolean
   children?: React.ReactNode
 }
 
@@ -19,12 +21,13 @@ export function TryDemoButton({
   nextPath = "/dashboard",
   className,
   children,
+  enabled,
 }: Readonly<TryDemoButtonProps>) {
   const { setSessionFromAuthResponse } = useAuthSessionWriter()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  if (!demoEnabled) {
+  if (!(enabled ?? demoEnabled)) {
     return null
   }
 

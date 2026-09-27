@@ -26,8 +26,12 @@ import { validateEmailFormat } from "@/lib/validation/email"
 import AuthPageShell from "@/components/auth/AuthPageShell"
 import AuthSocialSection from "@/components/auth/AuthSocialSection"
 import { TryDemoButton } from "@/components/auth/TryDemoButton"
+import { PUBLIC_DEMO_EMAIL, PUBLIC_DEMO_PASSWORD } from "@/lib/demo-login"
 
-function LoginForm({ googleClientId }: Readonly<{ googleClientId: string }>) {
+function LoginForm({
+  googleClientId,
+  demoEnabled = false,
+}: Readonly<{ googleClientId: string; demoEnabled?: boolean }>) {
   const searchParams = useSearchParams()
   const { setSessionFromAuthResponse } = useAuthSessionWriter()
   const [email, setEmail] = useState("")
@@ -373,9 +377,39 @@ function LoginForm({ googleClientId }: Readonly<{ googleClientId: string }>) {
             </button>
           </form>
 
-          <div className="mt-6 space-y-3">
-            <TryDemoButton nextPath={callbackUrl} />
-          </div>
+          {demoEnabled ? (
+            <section
+              aria-labelledby="demo-account-heading"
+              data-testid="login-demo-panel"
+              className="mt-6 space-y-3 rounded-lg border border-amber-500/30 bg-amber-950/20 p-4"
+            >
+              <h2 id="demo-account-heading" className="text-sm font-semibold text-amber-100">
+                Just looking? Use the demo account
+              </h2>
+              <p className="text-xs text-amber-200/80">
+                Phase 0 &amp; 1 only, private to you, removed after 24 hours. Sign up from inside the demo to keep your progress.
+              </p>
+              <TryDemoButton nextPath={callbackUrl} enabled>
+                Try the demo
+              </TryDemoButton>
+              <p className="text-center text-xs text-gray-400">
+                Or sign in above with{" "}
+                <button
+                  type="button"
+                  className="font-mono text-amber-200 underline hover:text-amber-100"
+                  onClick={() => {
+                    setEmail(PUBLIC_DEMO_EMAIL)
+                    setPassword(PUBLIC_DEMO_PASSWORD)
+                    setEmailError("")
+                    setPasswordError("")
+                    setError(null)
+                  }}
+                >
+                  {PUBLIC_DEMO_EMAIL} / {PUBLIC_DEMO_PASSWORD}
+                </button>
+              </p>
+            </section>
+          ) : null}
 
           {/* Sign Up Link */}
           <div className="mt-6 text-center text-sm text-gray-400">

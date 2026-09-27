@@ -46,6 +46,23 @@ export function normalizeDemoEmail(email: string): string {
   return email.trim().toLowerCase()
 }
 
+/**
+ * Public demo credentials shown on /login (life-world-os model). Not a secret:
+ * typing them into the normal sign-in form mints a fresh ephemeral FREE,
+ * Phase-1-only demo user exactly like the "Try the demo" button.
+ */
+export const PUBLIC_DEMO_EMAIL = DEFAULT_DEMO_EMAIL
+export const PUBLIC_DEMO_PASSWORD = "try-the-demo"
+
+/** True when the submitted login is the public demo account. */
+export function isPublicDemoLoginAttempt(email: string, password?: string): boolean {
+  const normalized = normalizeDemoEmail(email)
+  const emailMatches =
+    normalized === PUBLIC_DEMO_EMAIL || normalized === normalizeDemoEmail(getDemoUserEmail())
+  if (!emailMatches) return false
+  return password === undefined || password === PUBLIC_DEMO_PASSWORD
+}
+
 /** Hours before ephemeral demo users are eligible for cleanup (default 24). */
 export function getDemoUserTtlHours(): number {
   const raw = process.env.DEMO_USER_TTL_HOURS

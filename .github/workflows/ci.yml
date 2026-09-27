@@ -34,6 +34,10 @@ env:
   NEXT_PUBLIC_APP_URL: http://localhost:4000
   # `next build` runs with NODE_ENV=production; lib/email.ts validates this at import time.
   RESEND_API_KEY: github-actions-ci-resend-placeholder
+  # Demo sign-in is exercised by the smoke suite (tests/ci-smoke.spec.ts "Sign-in cases").
+  # The standalone smoke server runs with NODE_ENV=production, so the production
+  # override is needed there too. Never set these on the real production target.
+  NEXT_PUBLIC_FF_DEMO_LOGIN: "true"
 
 jobs:
   lint-and-build:
@@ -282,6 +286,7 @@ jobs:
       - name: Run E2E smoke (Chromium)
         env:
           CI_E2E_USE_PROD_SERVER: "1"
+          ALLOW_DEMO_LOGIN_IN_PRODUCTION: "true"
           PLAYWRIGHT_WORKERS: "3"
         run: |
           mkdir -p reports

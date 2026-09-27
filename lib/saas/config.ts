@@ -50,11 +50,28 @@ export function isInstantPremiumUpgradeAllowed(): boolean {
   return true
 }
 
-/** Demo login must stay off in production unless explicitly overridden. */
+/**
+ * True for the production *target* only. Unlike {@link isProductionDeploy},
+ * Vercel Preview (NODE_ENV=production, VERCEL_ENV=preview) is not production here.
+ */
+export function isProductionTarget(): boolean {
+  const vercelEnv = process.env.VERCEL_ENV
+  if (vercelEnv) return vercelEnv === "production"
+  return process.env.NODE_ENV === "production"
+}
+
+/**
+ * Demo sign-in gate (life-world-os model: on by default outside production).
+ * - `NEXT_PUBLIC_FF_DEMO_LOGIN=false` always disables it.
+ * - Local / CI / Vercel Preview: enabled unless explicitly disabled.
+ * - Production target: needs `NEXT_PUBLIC_FF_DEMO_LOGIN=true` AND
+ *   `ALLOW_DEMO_LOGIN_IN_PRODUCTION=true`.
+ */
 export function isDemoLoginAllowedInCurrentEnvironment(): boolean {
-  if (!isFeatureEnabled("DEMO_LOGIN")) return false
-  if (!isProductionDeploy()) return true
-  return process.env.ALLOW_DEMO_LOGIN_IN_PRODUCTION === "true"
+  const flag = process.env.NEXT_PUBLIC_FF_DEMO_LOGIN
+  if (flag === "false") return false
+  if (!isProductionTarget()) return true
+  return isFeatureEnabled("DEMO_LOGIN") && process.env.ALLOW_DEMO_LOGIN_IN_PRODUCTION === "true"
 }
 
 export function isAssistantAuthRequired(): boolean {

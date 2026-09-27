@@ -21,6 +21,8 @@ export default defineConfig({
         "lib/auth-authorize-helpers.ts",
         "lib/auth/client-fetch.ts",
         "lib/auth/demo-guards.ts",
+        "lib/auth/login-lockout.ts",
+        "lib/services/auth/password-auth-service.ts",
         "lib/auth/session-token.ts",
         "lib/browser-credentials.ts",
         "lib/dependency-integrations.ts",
