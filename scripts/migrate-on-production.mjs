@@ -19,7 +19,11 @@ import process from "node:process"
 import { pathToFileURL } from "node:url"
 
 /**
- * @param {NodeJS.ProcessEnv} [env]
+ * @typedef {Record<string, string | undefined>} EnvLike
+ */
+
+/**
+ * @param {EnvLike} [env]
  * @returns {{ run: boolean, reason: string }}
  */
 export function decideMigrateDeploy(env = process.env) {

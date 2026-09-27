@@ -10,7 +10,7 @@ describe("decideMigrateDeploy", () => {
     const decision = decideMigrateDeploy({
       VERCEL: "1",
       VERCEL_ENV: "production",
-    })
+    } as Record<string, string | undefined>)
     expect(decision.run).toBe(true)
     expect(decision.reason).toContain("VERCEL_ENV=production")
   })
@@ -19,7 +19,7 @@ describe("decideMigrateDeploy", () => {
     const decision = decideMigrateDeploy({
       VERCEL: "1",
       VERCEL_ENV: "preview",
-    })
+    } as Record<string, string | undefined>)
     expect(decision.run).toBe(false)
     expect(decision.reason).toContain("preview")
     expect(decision.reason.toLowerCase()).toContain("skip")
@@ -29,13 +29,15 @@ describe("decideMigrateDeploy", () => {
     const decision = decideMigrateDeploy({
       VERCEL: "1",
       VERCEL_ENV: "development",
-    })
+    } as Record<string, string | undefined>)
     expect(decision.run).toBe(false)
     expect(decision.reason).toContain("development")
   })
 
   it("fail-safe migrates on Vercel when VERCEL_ENV is unset", () => {
-    const decision = decideMigrateDeploy({ VERCEL: "1" })
+    const decision = decideMigrateDeploy({
+      VERCEL: "1",
+    } as Record<string, string | undefined>)
     expect(decision.run).toBe(true)
     expect(decision.reason.toLowerCase()).toContain("fail-safe")
   })
@@ -44,23 +46,31 @@ describe("decideMigrateDeploy", () => {
     const decision = decideMigrateDeploy({
       VERCEL: "1",
       VERCEL_ENV: "staging",
-    })
+    } as Record<string, string | undefined>)
     expect(decision.run).toBe(true)
     expect(decision.reason.toLowerCase()).toContain("fail-safe")
   })
 
   it("skips when not on Vercel and not production", () => {
-    const decision = decideMigrateDeploy({ NODE_ENV: "test" })
+    const decision = decideMigrateDeploy({
+      NODE_ENV: "test",
+    } as Record<string, string | undefined>)
     expect(decision.run).toBe(false)
     expect(decision.reason).toContain("Not on Vercel")
   })
 
   it("treats VERCEL_ENV case-insensitively", () => {
-    expect(decideMigrateDeploy({ VERCEL: "1", VERCEL_ENV: "Preview" }).run).toBe(
-      false,
-    )
     expect(
-      decideMigrateDeploy({ VERCEL: "1", VERCEL_ENV: "PRODUCTION" }).run,
+      decideMigrateDeploy({
+        VERCEL: "1",
+        VERCEL_ENV: "Preview",
+      } as Record<string, string | undefined>).run,
+    ).toBe(false)
+    expect(
+      decideMigrateDeploy({
+        VERCEL: "1",
+        VERCEL_ENV: "PRODUCTION",
+      } as Record<string, string | undefined>).run,
     ).toBe(true)
   })
 })
