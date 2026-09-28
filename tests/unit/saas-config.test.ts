@@ -136,13 +136,28 @@ describe("saas config", () => {
       expect(checkById(checks, "billing_portal").detail).toContain("BILLING_PORTAL")
     })
 
-    it("fails production readiness when Stripe uses a test key", async () => {
-      stubProductionSaasEnv({ STRIPE_SECRET_KEY: "sk_test_x" })
+    it("fails production target readiness when Stripe uses a test key", async () => {
+      stubProductionSaasEnv({
+        VERCEL_ENV: "production",
+        STRIPE_SECRET_KEY: "sk_test_x",
+      })
       const { evaluateSaasReadiness } = await import("@/lib/saas/config")
 
       const stripe = checkById(evaluateSaasReadiness(), "stripe")
       expect(stripe.status).toBe("fail")
       expect(stripe.detail).toContain("live secret key")
+    })
+
+    it("allows Stripe TEST keys on Vercel Preview (NODE_ENV=production)", async () => {
+      stubProductionSaasEnv({
+        VERCEL_ENV: "preview",
+        STRIPE_SECRET_KEY: "sk_test_x",
+      })
+      const { evaluateSaasReadiness } = await import("@/lib/saas/config")
+
+      const stripe = checkById(evaluateSaasReadiness(), "stripe")
+      expect(stripe.status).toBe("ok")
+      expect(stripe.detail).toContain("keys configured")
     })
 
     it("fails stripe when configured values have unexpected prefixes", async () => {

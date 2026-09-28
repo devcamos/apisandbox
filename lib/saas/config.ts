@@ -138,8 +138,10 @@ function stripeCheck(): SaasReadinessCheck {
     ["STRIPE_WEBHOOK_SECRET", "whsec_"],
     ["STRIPE_PRICE_ID", "price_"],
   ].filter(([key, prefix]) => envSet(key) && !envStartsWith(key, prefix))
+  // Use production *target* (VERCEL_ENV), not NODE_ENV — Preview deploys with
+  // NODE_ENV=production but must accept Stripe TEST keys (sk_test_...).
   const productionUsingNonLiveStripeKey =
-    isProductionDeploy() && !envStartsWith("STRIPE_SECRET_KEY", "sk_live_")
+    isProductionTarget() && !envStartsWith("STRIPE_SECRET_KEY", "sk_live_")
   const stripeConfigured =
     stripeMissing.length === 0 && stripeMalformed.length === 0 && !productionUsingNonLiveStripeKey
 
