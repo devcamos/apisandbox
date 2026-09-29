@@ -1,10 +1,14 @@
 "use client"
 
-import { useEffect, useRef, useState } from "react"
+import { useRef, useState } from "react"
 import Link from "next/link"
 import { Mail } from "lucide-react"
 import AuthPageShell from "@/components/auth/AuthPageShell"
-import { adoptAutofilledValue } from "@/lib/auth/autofill-sync"
+import {
+  syncValueFromDom,
+  syncValueFromEvent,
+  useAutofillSync,
+} from "@/lib/auth/autofill-sync"
 import { validateEmailFormat } from "@/lib/validation/email"
 
 /**
@@ -15,25 +19,28 @@ import { validateEmailFormat } from "@/lib/validation/email"
 export default function ForgotPasswordPage() {
   const emailInputRef = useRef<HTMLInputElement>(null)
   const [email, setEmail] = useState("")
+  const emailStateRef = useRef(email)
+  emailStateRef.current = email
   const [submitted, setSubmitted] = useState(false)
   const [emailError, setEmailError] = useState("")
 
-  useEffect(() => {
-    const frame = window.requestAnimationFrame(() => {
-      adoptAutofilledValue(emailInputRef.current, email, setEmail)
-    })
-    return () => window.cancelAnimationFrame(frame)
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- autofill sync on mount only
-  }, [])
+  useAutofillSync([
+    {
+      ref: emailInputRef,
+      getCurrent: () => emailStateRef.current,
+      setValue: setEmail,
+    },
+  ])
 
   const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setEmail(e.target.value)
+    syncValueFromEvent(e, setEmail)
     if (emailError) setEmailError("")
   }
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    const validation = validateEmailFormat(email)
+    const emailValue = syncValueFromDom(emailInputRef.current, email, setEmail)
+    const validation = validateEmailFormat(emailValue)
     if (validation) {
       setEmailError(validation)
       return

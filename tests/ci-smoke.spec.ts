@@ -90,6 +90,41 @@ test.describe("CI smoke", () => {
     await expect(page.getByRole("button", { name: /sign in/i })).toBeVisible();
   });
 
+  test("login adopts autofill-style DOM values and enables Sign In", async ({ page }) => {
+    await page.goto("/login", { waitUntil: "domcontentloaded" });
+    await dismissCookieBanner(page);
+
+    const email = page.getByLabel(/email address/i);
+    const password = page.getByLabel(/^password$/i);
+    const submit = page.getByRole("button", { name: /^Sign In$/i });
+
+    // Provoke validation against empty React state (Chrome autofill bug path).
+    await email.focus();
+    await email.blur();
+    await expect(page.getByText(/email is required/i)).toBeVisible();
+    await expect(submit).toBeDisabled();
+
+    // Silent autofill: set native value then blur — no Playwright fill / input events.
+    await email.evaluate((el) => {
+      const input = el as HTMLInputElement;
+      input.focus();
+      input.value = "devonteyeah@gmail.com";
+      input.dispatchEvent(new FocusEvent("blur", { bubbles: true }));
+    });
+
+    await expect(page.getByText(/email is required/i)).toHaveCount(0);
+    await expect(email).toHaveValue("devonteyeah@gmail.com");
+
+    await password.evaluate((el) => {
+      const input = el as HTMLInputElement;
+      input.focus();
+      input.value = "Test1234!@#$";
+      input.dispatchEvent(new FocusEvent("blur", { bubbles: true }));
+    });
+
+    await expect(submit).toBeEnabled();
+  });
+
   test("forgot-password page explains recovery and links back to login", async ({
     page,
   }) => {

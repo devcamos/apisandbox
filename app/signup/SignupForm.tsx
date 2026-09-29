@@ -12,7 +12,7 @@
 
 "use client"
 
-import { Suspense, useState, useRef, useCallback, useEffect } from "react"
+import { Suspense, useState, useRef, useCallback } from "react"
 import Link from "next/link"
 import { useSearchParams } from "next/navigation"
 import { ArrowRight, Mail, Lock, User, AlertCircle, CheckCircle } from "lucide-react"
@@ -22,7 +22,11 @@ import AuthPageShell from "@/components/auth/AuthPageShell"
 import AuthSocialSection from "@/components/auth/AuthSocialSection"
 import { authApiPostJson } from "@/lib/auth/client-fetch"
 import { completeClientAuthSession, type ClientAuthSessionPayload } from "@/lib/auth/client-session"
-import { adoptAutofilledValue } from "@/lib/auth/autofill-sync"
+import {
+  syncValueFromDom,
+  syncValueFromEvent,
+  useAutofillSync,
+} from "@/lib/auth/autofill-sync"
 import { getPasswordRequirements } from "@/lib/password-validation"
 
 function SignupFormInner({ googleClientId }: Readonly<{ googleClientId: string }>) {
@@ -44,34 +48,40 @@ function SignupFormInner({ googleClientId }: Readonly<{ googleClientId: string }
     password: "",
     confirmPassword: "",
   })
+  const formDataRef = useRef(formData)
+  formDataRef.current = formData
   const [errors, setErrors] = useState<string[]>([])
   const [isLoading, setIsLoading] = useState(false)
 
-  useEffect(() => {
-    const frame = window.requestAnimationFrame(() => {
-      adoptAutofilledValue(nameInputRef.current, formData.name, (name) =>
-        setFormData((prev) => ({ ...prev, name })),
-      )
-      adoptAutofilledValue(emailInputRef.current, formData.email, (email) =>
-        setFormData((prev) => ({ ...prev, email })),
-      )
-      adoptAutofilledValue(passwordInputRef.current, formData.password, (password) =>
-        setFormData((prev) => ({ ...prev, password })),
-      )
-      adoptAutofilledValue(
-        confirmPasswordInputRef.current,
-        formData.confirmPassword,
-        (confirmPassword) => setFormData((prev) => ({ ...prev, confirmPassword })),
-      )
-    })
-    return () => window.cancelAnimationFrame(frame)
-    // Intentionally once on mount — do not clear controlled values.
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- autofill sync on mount only
+  const setField = useCallback((field: keyof typeof formData, value: string) => {
+    setFormData((prev) => ({ ...prev, [field]: value }))
   }, [])
 
+  useAutofillSync([
+    {
+      ref: nameInputRef,
+      getCurrent: () => formDataRef.current.name,
+      setValue: (name) => setField("name", name),
+    },
+    {
+      ref: emailInputRef,
+      getCurrent: () => formDataRef.current.email,
+      setValue: (email) => setField("email", email),
+    },
+    {
+      ref: passwordInputRef,
+      getCurrent: () => formDataRef.current.password,
+      setValue: (password) => setField("password", password),
+    },
+    {
+      ref: confirmPasswordInputRef,
+      getCurrent: () => formDataRef.current.confirmPassword,
+      setValue: (confirmPassword) => setField("confirmPassword", confirmPassword),
+    },
+  ])
+
   const updateField = (field: keyof typeof formData) => (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value
-    setFormData((prev) => ({ ...prev, [field]: value }))
+    syncValueFromEvent(e, (value) => setField(field, value))
   }
 
   const passwordRequirements = formData.password
@@ -86,13 +96,30 @@ function SignupFormInner({ googleClientId }: Readonly<{ googleClientId: string }
     e.preventDefault()
     setErrors([])
 
+    const next = {
+      name: syncValueFromDom(nameInputRef.current, formData.name, (name) => setField("name", name)),
+      email: syncValueFromDom(emailInputRef.current, formData.email, (email) =>
+        setField("email", email),
+      ),
+      password: syncValueFromDom(passwordInputRef.current, formData.password, (password) =>
+        setField("password", password),
+      ),
+      confirmPassword: syncValueFromDom(
+        confirmPasswordInputRef.current,
+        formData.confirmPassword,
+        (confirmPassword) => setField("confirmPassword", confirmPassword),
+      ),
+    }
+
+    const livePasswordErrors = getPasswordRequirements(next.password).filter((r) => !r.met)
+
     const newErrors: string[] = []
-    if (!formData.email) newErrors.push("Email is required")
-    if (!formData.password) newErrors.push("Password is required")
-    if (formData.password !== formData.confirmPassword) {
+    if (!next.email) newErrors.push("Email is required")
+    if (!next.password) newErrors.push("Password is required")
+    if (next.password !== next.confirmPassword) {
       newErrors.push("Passwords do not match")
     }
-    if (passwordErrors.length > 0) {
+    if (livePasswordErrors.length > 0) {
       newErrors.push("Password does not meet requirements")
     }
 
@@ -107,15 +134,15 @@ function SignupFormInner({ googleClientId }: Readonly<{ googleClientId: string }
       const endpoint = claimingDemo ? "/api/auth/demo/claim" : "/api/auth/register"
       const body = claimingDemo
         ? {
-            email: formData.email,
-            password: formData.password,
-            name: formData.name || undefined,
+            email: next.email,
+            password: next.password,
+            name: next.name || undefined,
             plan,
           }
         : {
-            email: formData.email,
-            password: formData.password,
-            name: formData.name || undefined,
+            email: next.email,
+            password: next.password,
+            name: next.name || undefined,
           }
 
       const { ok, payload } = await authApiPostJson<ClientAuthSessionPayload & { plan?: string }>(
@@ -140,7 +167,7 @@ function SignupFormInner({ googleClientId }: Readonly<{ googleClientId: string }
         authData: payload.data,
         redirectTo,
         setSession: setSessionFromAuthResponse,
-        savePassword: { email: formData.email, password: formData.password },
+        savePassword: { email: next.email, password: next.password },
       })
       return
     } catch {

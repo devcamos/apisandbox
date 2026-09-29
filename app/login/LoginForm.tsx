@@ -22,7 +22,11 @@ import { useGoogleSignInButton } from "@/hooks/useGoogleSignInButton"
 import { parseLoginErrorMessage, type LoginErrorInfo } from "@/lib/login-error-parser"
 import { authApiPostJson } from "@/lib/auth/client-fetch"
 import { completeClientAuthSession, type ClientAuthSessionPayload } from "@/lib/auth/client-session"
-import { adoptAutofilledValue } from "@/lib/auth/autofill-sync"
+import {
+  syncValueFromDom,
+  syncValueFromEvent,
+  useAutofillSync,
+} from "@/lib/auth/autofill-sync"
 import { validateEmailFormat } from "@/lib/validation/email"
 import AuthPageShell from "@/components/auth/AuthPageShell"
 import AuthSocialSection from "@/components/auth/AuthSocialSection"
@@ -46,10 +50,31 @@ function LoginForm({
   const googleButtonRef = useRef<HTMLDivElement>(null)
   const emailInputRef = useRef<HTMLInputElement>(null)
   const passwordInputRef = useRef<HTMLInputElement>(null)
+  const emailStateRef = useRef(email)
+  const passwordStateRef = useRef(password)
+  const emailTouchedRef = useRef(emailTouched)
+  const passwordTouchedRef = useRef(passwordTouched)
+  emailStateRef.current = email
+  passwordStateRef.current = password
+  emailTouchedRef.current = emailTouched
+  passwordTouchedRef.current = passwordTouched
 
   // MENTOR NOTE: Get callbackUrl from query params
   // This is set by middleware when user tries to access protected route
   const callbackUrl = searchParams.get("callbackUrl") || "/dashboard"
+
+  const validateEmail = (emailValue: string) => validateEmailFormat(emailValue)
+
+  // Client-side password validation
+  const validatePassword = (passwordValue: string): string => {
+    if (!passwordValue) {
+      return "Password is required"
+    }
+    if (passwordValue.length < 6) {
+      return "Password must be at least 6 characters"
+    }
+    return ""
+  }
 
   // Show friendly message when NextAuth returns error=Configuration (e.g. AUTH_URL mismatch)
   useEffect(() => {
@@ -65,34 +90,29 @@ function LoginForm({
     }
   }, [searchParams])
 
-  // Password managers often fill without onChange — adopt DOM values after mount.
-  useEffect(() => {
-    const frame = window.requestAnimationFrame(() => {
-      adoptAutofilledValue(emailInputRef.current, email, setEmail)
-      adoptAutofilledValue(passwordInputRef.current, password, setPassword)
-    })
-    return () => window.cancelAnimationFrame(frame)
-    // Intentionally once on mount — do not clear controlled values.
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- autofill sync on mount only
-  }, [])
-
-  const validateEmail = (emailValue: string) => validateEmailFormat(emailValue)
-
-  // Client-side password validation
-  const validatePassword = (passwordValue: string): string => {
-    if (!passwordValue) {
-      return "Password is required"
-    }
-    if (passwordValue.length < 6) {
-      return "Password must be at least 6 characters"
-    }
-    return ""
-  }
+  // Password managers / Chrome autofill often fill the DOM without onChange.
+  useAutofillSync([
+    {
+      ref: emailInputRef,
+      getCurrent: () => emailStateRef.current,
+      setValue: (next) => {
+        setEmail(next)
+        if (emailTouchedRef.current) setEmailError(validateEmailFormat(next))
+      },
+    },
+    {
+      ref: passwordInputRef,
+      getCurrent: () => passwordStateRef.current,
+      setValue: (next) => {
+        setPassword(next)
+        if (passwordTouchedRef.current) setPasswordError(validatePassword(next))
+      },
+    },
+  ])
 
   // Handle email change with validation
   const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value
-    setEmail(value)
+    const value = syncValueFromEvent(e, setEmail)
     if (emailTouched) {
       setEmailError(validateEmail(value))
     }
@@ -104,8 +124,7 @@ function LoginForm({
 
   // Handle password change with validation
   const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value
-    setPassword(value)
+    const value = syncValueFromEvent(e, setPassword)
     if (passwordTouched) {
       setPasswordError(validatePassword(value))
     }
@@ -115,6 +134,18 @@ function LoginForm({
     }
   }
 
+  const handleEmailBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+    // Prefer live DOM value — Chrome autofill may blur before React state updates.
+    const value = syncValueFromEvent(e, setEmail)
+    setEmailTouched(true)
+    setEmailError(validateEmail(value))
+  }
+
+  const handlePasswordBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+    const value = syncValueFromEvent(e, setPassword)
+    setPasswordTouched(true)
+    setPasswordError(validatePassword(value))
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -124,9 +155,13 @@ function LoginForm({
     setEmailTouched(true)
     setPasswordTouched(true)
 
+    // Autofill may have updated the DOM without React state — sync before validate.
+    const emailValue = syncValueFromDom(emailInputRef.current, email, setEmail)
+    const passwordValue = syncValueFromDom(passwordInputRef.current, password, setPassword)
+
     // Client-side validation
-    const emailValidation = validateEmail(email)
-    const passwordValidation = validatePassword(password)
+    const emailValidation = validateEmail(emailValue)
+    const passwordValidation = validatePassword(passwordValue)
 
     if (emailValidation || passwordValidation) {
       setEmailError(emailValidation)
@@ -139,8 +174,8 @@ function LoginForm({
 
     try {
       const { ok, payload } = await authApiPostJson<ClientAuthSessionPayload>("/api/auth/login", {
-        email: email.trim().toLowerCase(),
-        password,
+        email: emailValue.trim().toLowerCase(),
+        password: passwordValue,
       })
       if (!ok || !payload.data) {
         const errorInfo = parseLoginErrorMessage(payload?.error?.message ?? "Login failed")
@@ -152,7 +187,7 @@ function LoginForm({
         authData: payload.data,
         redirectTo: callbackUrl,
         setSession: setSessionFromAuthResponse,
-        savePassword: { email, password },
+        savePassword: { email: emailValue, password: passwordValue },
       })
       return
     } catch (err) {
@@ -245,10 +280,7 @@ function LoginForm({
                   value={email}
                   onChange={handleEmailChange}
                   onInput={handleEmailChange}
-                  onBlur={() => {
-                    setEmailTouched(true)
-                    setEmailError(validateEmail(email))
-                  }}
+                  onBlur={handleEmailBlur}
                   required
                   className={`w-full pl-10 pr-10 py-3 bg-slate-900/50 border rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 transition-colors ${
                     emailError
@@ -295,10 +327,7 @@ function LoginForm({
                   value={password}
                   onChange={handlePasswordChange}
                   onInput={handlePasswordChange}
-                  onBlur={() => {
-                    setPasswordTouched(true)
-                    setPasswordError(validatePassword(password))
-                  }}
+                  onBlur={handlePasswordBlur}
                   required
                   className={`w-full pl-10 pr-10 py-3 bg-slate-900/50 border rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 transition-colors ${
                     passwordError
