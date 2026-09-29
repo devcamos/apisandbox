@@ -49,6 +49,9 @@ describe("auth form autofill attributes", () => {
     expect(password).toHaveAttribute("autocomplete", "current-password")
     expect(email).not.toHaveAttribute("autocomplete", "off")
     expect(password).not.toHaveAttribute("autocomplete", "off")
+    expect(screen.getByTestId("enter-demo-account")).toHaveTextContent("Enter Demo Account")
+    expect(screen.queryByText(/just looking/i)).not.toBeInTheDocument()
+    expect(screen.queryByText(/try the demo/i)).not.toBeInTheDocument()
   })
 
   it("signup uses new-password autocomplete on both password fields", () => {

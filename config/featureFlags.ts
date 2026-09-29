@@ -60,7 +60,7 @@ const flags: Record<FeatureFlag, FlagConfig> = {
   DEMO_LOGIN: {
     enabled: envFlagEnabled(FEATURE_FLAG_ENV_KEYS.DEMO_LOGIN),
     description:
-      "Show Try the demo entry points and POST /api/auth/demo. Creates an ephemeral FREE user with Phase 1 access only (no shared password seed). Rate-limited; expired demos are cleaned up on login.",
+      "Show Enter Demo Account entry points and POST /api/auth/demo. Creates an ephemeral FREE user with Phase 1 access only (no shared password seed). Rate-limited; expired demos are cleaned up on login.",
   },
 }
 

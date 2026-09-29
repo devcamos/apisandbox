@@ -1,13 +1,17 @@
 "use client"
 
 import { useState } from "react"
-import { Sparkles, Loader2 } from "lucide-react"
+import { Loader2 } from "lucide-react"
 import { useAuthSessionWriter } from "@/components/providers/SessionProvider"
 import { authApiFetchInit } from "@/lib/auth/client-fetch"
 import { completeClientAuthSession } from "@/lib/auth/client-session"
 import { parseLoginErrorMessage } from "@/lib/login-error-parser"
 
 const demoEnabled = process.env.NEXT_PUBLIC_FF_DEMO_LOGIN === "true"
+
+/** Shared muted teal style for the one-click demo entry CTA. */
+export const ENTER_DEMO_ACCOUNT_BUTTON_CLASS =
+  "w-full rounded-lg border border-teal-700/70 bg-teal-950/80 px-4 py-3 text-center text-sm font-semibold text-teal-50/95 hover:bg-teal-900/80 disabled:cursor-not-allowed disabled:opacity-50 transition-colors"
 
 interface TryDemoButtonProps {
   nextPath?: string
@@ -66,19 +70,20 @@ export function TryDemoButton({
     <div className="space-y-2">
       <button
         type="button"
+        data-testid="enter-demo-account"
         onClick={() => void onClick()}
         disabled={loading}
-        className={
-          className ??
-          "w-full flex items-center justify-center gap-2 rounded-lg border border-amber-500/50 bg-amber-950/40 px-4 py-3 text-sm font-semibold text-amber-100 hover:bg-amber-900/50 disabled:opacity-50 transition-colors"
-        }
+        title="Phase 0 & 1 only — private session, expires in 24 hours"
+        className={className ?? ENTER_DEMO_ACCOUNT_BUTTON_CLASS}
       >
         {loading ? (
-          <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
+          <span className="inline-flex items-center justify-center gap-2">
+            <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
+            Entering demo…
+          </span>
         ) : (
-          <Sparkles className="h-4 w-4 text-amber-400" aria-hidden />
+          (children ?? "Enter Demo Account")
         )}
-        {children ?? "Try the demo"}
       </button>
       {error ? <p className="text-center text-xs text-red-400">{error}</p> : null}
     </div>

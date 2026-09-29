@@ -275,12 +275,14 @@ test.describe("CI smoke", () => {
       ).toBe(200);
     });
 
-    test("Try the demo on the sign-in page opens an ephemeral Phase 1 demo", async ({ page }) => {
+    test("Enter Demo Account on the sign-in page opens an ephemeral Phase 1 demo", async ({
+      page,
+    }) => {
       await page.goto("/login", { waitUntil: "domcontentloaded" });
       await dismissCookieBanner(page);
       const panel = page.getByTestId("login-demo-panel");
       await expect(panel).toBeVisible();
-      await panel.getByRole("button", { name: /try the demo/i }).click();
+      await panel.getByRole("button", { name: /enter demo account/i }).click();
       await expect(page).toHaveURL(/\/dashboard/);
       const me = await page.evaluate(async () => {
         const res = await fetch("/api/auth/me", { credentials: "include" });
@@ -293,8 +295,8 @@ test.describe("CI smoke", () => {
     test("demo credentials typed into the normal form sign in as a demo", async ({ page }) => {
       await page.goto("/login", { waitUntil: "domcontentloaded" });
       await dismissCookieBanner(page);
-      await page.getByRole("button", { name: /demo@apisandbox\.demo/i }).click();
-      await expect(page.locator("#email")).toHaveValue("demo@apisandbox.demo");
+      await page.getByLabel(/email address/i).fill("demo@apisandbox.demo");
+      await page.getByLabel(/^password$/i).fill("try-the-demo");
       await page.getByRole("button", { name: /^Sign In$/i }).click();
       await expect(page).toHaveURL(/\/dashboard/);
     });

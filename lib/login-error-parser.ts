@@ -123,7 +123,7 @@ function parseAccountLockedMessage(message: string): LoginErrorInfo | null {
     message: "Account temporarily locked",
     type: "account",
     recoverable: true,
-    suggestion: `Too many failed sign-in attempts (5). For your security the account is locked for ${minutes} more ${unit}. You can try again after that, or use "Try the demo" in the meantime.`,
+    suggestion: `Too many failed sign-in attempts (5). For your security the account is locked for ${minutes} more ${unit}. You can try again after that, or use Enter Demo Account in the meantime.`,
   }
 }
 
@@ -186,7 +186,7 @@ function parseLegacyInvalidCredentials(message: string): LoginErrorInfo | null {
       type: "authentication",
       recoverable: true,
       suggestion:
-        "The email address or password you entered may be incorrect. Please check both and try again. After 5 failed attempts the account is locked for 30 minutes. No account on this site yet? Use Sign up, or Try the demo.",
+        "The email address or password you entered may be incorrect. Please check both and try again. After 5 failed attempts the account is locked for 30 minutes. No account on this site yet? Use Sign up, or Enter Demo Account.",
     }
   }
   return null

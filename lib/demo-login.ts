@@ -49,7 +49,7 @@ export function normalizeDemoEmail(email: string): string {
 /**
  * Public demo credentials shown on /login (life-world-os model). Not a secret:
  * typing them into the normal sign-in form mints a fresh ephemeral FREE,
- * Phase-1-only demo user exactly like the "Try the demo" button.
+ * Phase-1-only demo user exactly like the "Enter Demo Account" button.
  * Override with NEXT_PUBLIC_DEMO_ACCOUNT_PASSWORD when needed.
  */
 export const PUBLIC_DEMO_EMAIL = DEFAULT_DEMO_EMAIL

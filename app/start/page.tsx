@@ -32,9 +32,9 @@ export default function StartPage() {
               </Link>
               <TryDemoButton
                 nextPath="/dashboard"
-                className="px-8 py-4 rounded-xl font-semibold border border-amber-500/50 bg-amber-950/40 text-amber-100 hover:bg-amber-900/50 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+                className="w-full sm:w-auto px-8 py-4 rounded-xl border border-teal-700/70 bg-teal-950/80 text-center text-sm font-semibold text-teal-50/95 hover:bg-teal-900/80 transition-all disabled:opacity-50"
               >
-                Try the demo
+                Enter Demo Account
               </TryDemoButton>
               <Link 
                 href="/observability"
