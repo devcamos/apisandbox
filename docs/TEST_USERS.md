@@ -41,7 +41,12 @@ npm run dev
 
 ## Preview deployments
 
-Each PR preview uses its associated Neon branch. A preview database may be copied from another branch, but the local test-user command is not automatically run during deployment. This means `test@example.com` and `qa@example.com` commonly do not exist in Preview.
+Each PR preview shares the Preview-scoped database configured in Vercel (a separate
+Postgres project from Production Neon). Preview builds do not run migrations or seed
+users. The local test-user command is not automatically run during deployment, so
+`test@example.com` and `qa@example.com` commonly do not exist in Preview. When the
+Preview schema needs updating, run `npx prisma migrate deploy` against the Preview
+`DATABASE_URL` manually (see `config/environments/preview.env.example`).
 
 For routine preview testing:
 
