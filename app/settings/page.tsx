@@ -36,7 +36,8 @@ function tokenStatus(token: PublicApiToken) {
 }
 
 export default function SettingsPage() {
-  const { status } = useSession()
+  const { status, data: session } = useSession()
+  const isDemo = Boolean(session?.isDemo)
   const [tokens, setTokens] = useState<PublicApiToken[]>([])
   const [name, setName] = useState("")
   const [expiresAt, setExpiresAt] = useState("")
@@ -67,11 +68,16 @@ export default function SettingsPage() {
 
   useEffect(() => {
     if (status === "authenticated") {
+      if (isDemo) {
+        setLoading(false)
+        setMessage("Demo accounts cannot create API tokens. Create a free account to manage tokens.")
+        return
+      }
       void loadTokens()
     } else if (status === "unauthenticated") {
       setLoading(false)
     }
-  }, [status])
+  }, [status, isDemo])
 
   function toggleScope(scope: ApiTokenScope) {
     setScopes((current) => {
@@ -151,6 +157,34 @@ export default function SettingsPage() {
           >
             Sign in
           </Link>
+        </section>
+      </main>
+    )
+  }
+
+  if (isDemo) {
+    return (
+      <main className="min-h-screen bg-slate-950 px-6 py-12 text-white">
+        <section className="mx-auto max-w-3xl rounded-lg border border-amber-500/30 bg-amber-950/20 p-8">
+          <h1 className="text-2xl font-semibold">Demo settings are limited</h1>
+          <p className="mt-2 text-slate-300">
+            Demo sessions cannot create personal API tokens, change account details, or access billing.
+            Create a free account to keep progress and unlock settings.
+          </p>
+          <div className="mt-6 flex flex-wrap gap-3">
+            <Link
+              href="/signup"
+              className="inline-flex items-center rounded-lg bg-amber-500 px-4 py-2 font-semibold text-slate-950"
+            >
+              Create a free account
+            </Link>
+            <Link
+              href="/phase-1"
+              className="inline-flex items-center rounded-lg border border-amber-500/40 px-4 py-2 font-semibold text-amber-100"
+            >
+              Continue Phase 1
+            </Link>
+          </div>
         </section>
       </main>
     )

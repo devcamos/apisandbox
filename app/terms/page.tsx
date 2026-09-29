@@ -30,7 +30,8 @@ export default function TermsPage() {
       <section>
         <h2 className="text-xl font-semibold text-white">3. Subscriptions and Payment</h2>
         <p className="text-gray-300">
-          Premium access is available for £5 per month, billed monthly via Stripe.
+          Premium access is billed monthly via Stripe. The current price is shown on the
+          upgrade page and always matches the configured Stripe Price.
           Your subscription renews automatically each month until cancelled.
           You may cancel at any time through the billing portal — access continues
           until the end of your current billing period.

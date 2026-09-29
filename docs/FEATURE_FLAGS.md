@@ -62,7 +62,7 @@ featureFlagEnvKey("BILLING_PORTAL") // "NEXT_PUBLIC_FF_BILLING_PORTAL"
 | `BILLING_PORTAL` | `STRIPE_CHECKOUT` | Portal API returns 503 if checkout flag is off, even when portal flag is on |
 | `STRIPE_CHECKOUT` | Stripe env keys | See [STRIPE_LOCAL.md](./STRIPE_LOCAL.md), [SAAS.md](./SAAS.md) |
 | `RATE_LIMITING` | Upstash Redis URL + token | |
-| `DEMO_LOGIN` | `DEMO_USER_EMAIL`, `DEMO_USER_PASSWORD`, demo user in DB | [TEST_USERS.md](./TEST_USERS.md) |
+| `DEMO_LOGIN` | `ALLOW_DEMO_LOGIN_IN_PRODUCTION` on prod only | Creates ephemeral Phase-1 users; no password seed. [TEST_USERS.md](./TEST_USERS.md) |
 
 ## Billing portal
 
@@ -93,7 +93,7 @@ See [STRIPE_LOCAL.md](./STRIPE_LOCAL.md) for local test mode.
 | `BILLING_PORTAL` | `/api/billing/portal`, `ManageSubscriptionButton` in nav |
 | `RATE_LIMITING` | `lib/rate-limit.ts`, auth + assistant routes |
 | `ANALYTICS` | `AnalyticsProvider` |
-| `DEMO_LOGIN` | `TryDemoButton`, `/api/auth/demo`, layout demo banner |
+| `DEMO_LOGIN` | `TryDemoButton`, `/api/auth/demo` (ephemeral Phase-1 users), layout demo banner |
 
 ## Production checklist
 

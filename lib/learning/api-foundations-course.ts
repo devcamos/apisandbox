@@ -6,10 +6,9 @@ import {
   API_FOUNDATIONS_COURSE_ID,
   API_FOUNDATIONS_MASTERY_THRESHOLD,
 } from "@/lib/learning/course-ids"
+import { awsCertificationCourses } from "@/lib/learning/aws-certification-course"
 
 export { API_FOUNDATIONS_COURSE_ID, API_FOUNDATIONS_MASTERY_THRESHOLD } from "@/lib/learning/course-ids"
-
-export type FoundationPhase = 0 | 1
 
 export interface InteractiveScenarioOption {
   id: string
@@ -47,9 +46,91 @@ export interface AssessmentDefinition {
   reflectionPrompt: string
 }
 
+export type LearningDifficulty = "Easy" | "Medium" | "Hard" | "Expert"
+
+export const CAPABILITY_MASTERY_STAGES = [
+  { id: "problem", label: "Problem" },
+  { id: "predict", label: "Predict" },
+  { id: "learn", label: "Learn" },
+  { id: "recall", label: "Recall" },
+  { id: "reason", label: "Reason" },
+  { id: "build", label: "Build" },
+  { id: "break", label: "Break" },
+  { id: "explain", label: "Explain" },
+  { id: "aws-map", label: "AWS Map" },
+  { id: "exam", label: "Exam" },
+] as const
+
+export type CapabilityMasteryStageId = (typeof CAPABILITY_MASTERY_STAGES)[number]["id"]
+
+export interface CapabilityDecisionGuide {
+  useWhen: string[]
+  avoidWhen: string[]
+  alternatives: string[]
+}
+
+export interface CapabilityReasoningExercise {
+  prompt: string
+  strongAnswerIncludes: string[]
+}
+
+export interface CapabilityOpenSourceImplementation {
+  title: string
+  language: string
+  stack: string[]
+  objective: string
+  steps: string[]
+  code: string
+  successCriteria: string[]
+}
+
+export interface CapabilityBreakExercise {
+  faults: string[]
+  observe: string[]
+  recovery: string
+}
+
+export interface CapabilityExplanationExercise {
+  prompt: string
+  evidenceCriteria: string[]
+}
+
+export interface CapabilityPlatformMappingItem {
+  invariant: string
+  implementation: string
+  why: string
+}
+
+export interface CapabilityPlatformMapping {
+  label: string
+  items: CapabilityPlatformMappingItem[]
+  examLens: string
+}
+
+export interface CapabilityMasteryJourney {
+  problem: string
+  mechanism: string
+  decision: CapabilityDecisionGuide
+  tradeOffs: string[]
+  recallPrompts: string[]
+  reasoning: CapabilityReasoningExercise
+  implementation: CapabilityOpenSourceImplementation
+  breakExercise: CapabilityBreakExercise
+  explanation: CapabilityExplanationExercise
+  platformMap: CapabilityPlatformMapping
+}
+
+export interface CertificationUnitMetadata {
+  kind: "capability" | "domain-exam"
+  domainId: string
+  sequence?: number
+  masteryJourney?: CapabilityMasteryJourney
+}
+
 export interface LearningUnit {
   id: string
-  phase: FoundationPhase
+  phase: number
+  difficulty?: LearningDifficulty
   title: string
   subtitle: string
   principle: string
@@ -58,6 +139,7 @@ export interface LearningUnit {
   sections: Array<{ title: string; body: string }>
   scenario: InteractiveScenario
   assessment: AssessmentDefinition
+  certification?: CertificationUnitMetadata
 }
 
 export interface LearningCourse {
@@ -452,6 +534,7 @@ const apiFoundationsCourse: LearningCourse = {
 
 const learningCourses: Record<string, LearningCourse> = {
   [API_FOUNDATIONS_COURSE_ID]: apiFoundationsCourse,
+  ...awsCertificationCourses,
 }
 
 export function getLearningCourse(courseId: string): LearningCourse | null {
@@ -500,8 +583,9 @@ export function gradeLearningUnitAssessment(
   unitId: string,
   answers: Record<string, string>,
 ): AssessmentGrade | null {
-  const unit = getLearningUnit(courseId, unitId)
-  if (!unit) return null
+  const course = getLearningCourse(courseId)
+  const unit = course?.units.find((item) => item.id === unitId)
+  if (!course || !unit) return null
   const { questions } = unit.assessment
   const correctAnswers = questions.filter((question) => answers[question.id] === question.correctAnswer).length
   const totalQuestions = questions.length
@@ -511,7 +595,7 @@ export function gradeLearningUnitAssessment(
     correctAnswers,
     totalQuestions,
     scorePercent,
-    mastered: correctAnswers / totalQuestions >= apiFoundationsCourse.masteryThreshold,
+    mastered: totalQuestions > 0 && correctAnswers / totalQuestions >= course.masteryThreshold,
     details: questions.map((question) => ({
       questionId: question.id,
       correct: answers[question.id] === question.correctAnswer,

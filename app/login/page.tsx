@@ -1,11 +1,13 @@
 import { Suspense } from "react"
 import { getGoogleClientId } from "@/lib/google-client-id"
+import { isDemoLoginRouteEnabled } from "@/lib/demo-login"
 import LoginForm from "./LoginForm"
 
 export const dynamic = "force-dynamic"
 
 export default function LoginPage() {
   const googleClientId = getGoogleClientId()
+  const demoEnabled = isDemoLoginRouteEnabled()
 
   return (
     <Suspense
@@ -15,7 +17,7 @@ export default function LoginPage() {
         </div>
       }
     >
-      <LoginForm googleClientId={googleClientId} />
+      <LoginForm googleClientId={googleClientId} demoEnabled={demoEnabled} />
     </Suspense>
   )
 }

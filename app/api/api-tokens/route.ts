@@ -1,5 +1,6 @@
 import { NextRequest } from "next/server"
 import { z } from "zod"
+import { assertNotDemoUser } from "@/lib/auth/demo-guards"
 import { requireAuthenticatedUser } from "@/lib/auth/jwt-auth-middleware"
 import { parseJsonBody, withRouteErrorHandling } from "@/lib/http/auth-route-helpers"
 import { okResponse } from "@/lib/http/responses"
@@ -20,12 +21,14 @@ function getRequestContext(request: NextRequest) {
 
 export const GET = withRouteErrorHandling(async (request: NextRequest) => {
   const user = await requireAuthenticatedUser(request)
+  assertNotDemoUser(user.email, "Demo accounts cannot manage API tokens. Create a free account instead.")
   const tokens = await listApiTokensForUser(user.id)
   return okResponse({ tokens })
 })
 
 export const POST = withRouteErrorHandling(async (request: NextRequest) => {
   const user = await requireAuthenticatedUser(request)
+  assertNotDemoUser(user.email, "Demo accounts cannot create API tokens. Create a free account instead.")
   const parsed = await parseJsonBody(request, createTokenSchema, "Invalid API token payload")
   if (!parsed.ok) return parsed.response
 

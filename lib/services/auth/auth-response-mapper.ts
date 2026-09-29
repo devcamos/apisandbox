@@ -1,4 +1,5 @@
 import type { AuthResponse, AuthUser } from "@/lib/auth/types"
+import { isDemoUserEmail } from "@/lib/demo-login"
 import { issueJwtToken } from "@/lib/services/auth/token-service"
 import { splitFullName } from "@/lib/user-name"
 
@@ -28,6 +29,7 @@ export function mapUserToAuthUser(user: UserWithProfile): AuthUser {
     roleLabel: user.profile?.roleLabel ?? null,
     identityStatement: user.profile?.identityStatement ?? null,
     subscriptionTier: user.subscriptionTier,
+    isDemo: isDemoUserEmail(user.email),
   }
 }
 

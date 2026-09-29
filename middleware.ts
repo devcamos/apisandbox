@@ -7,6 +7,7 @@ const PREMIUM_PHASE_PATTERN = /^\/phase-([2-6])(\/|$)/
 const PROTECTED_API_PATTERN = /^\/api\/(subscription|profile|phase-progress)/
 const PROTECTED_RESOURCE_PATTERN =
   /^\/(dashboard|observability|phase-\d+|cloud|ai|docs\/(architecture|java))(\/|$)/
+const PUBLIC_RESOURCE_PATHS = new Set(["/cloud/aws/certifications"])
 
 function redirectToLogin(request: NextRequest, callbackPath: string) {
   const loginUrl = new URL("/login", request.url)
@@ -30,7 +31,11 @@ export function middleware(request: NextRequest) {
     )
   }
 
-  if (PROTECTED_RESOURCE_PATTERN.test(pathname) && !token) {
+  if (
+    PROTECTED_RESOURCE_PATTERN.test(pathname) &&
+    !PUBLIC_RESOURCE_PATHS.has(pathname) &&
+    !token
+  ) {
     return redirectToLogin(request, callbackPath)
   }
 

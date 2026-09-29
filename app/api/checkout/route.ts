@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
+import { assertNotDemoUser } from "@/lib/auth/demo-guards"
 import { requireAuthenticatedUser } from "@/lib/auth/jwt-auth-middleware"
 import { handleRouteError } from "@/lib/http/responses"
 import { requireStripeClient, PLANS } from "@/lib/stripe"
@@ -38,6 +39,10 @@ export async function POST(request: NextRequest) {
     }
 
     const user = await requireAuthenticatedUser(request)
+    assertNotDemoUser(
+      user.email,
+      "Demo accounts cannot start billing. Create a free account to upgrade.",
+    )
 
     const dbUser = await prisma.user.findUnique({
       where: { id: user.id },
@@ -89,15 +94,26 @@ export async function POST(request: NextRequest) {
     }
 
     const session = await stripe.checkout.sessions.create({
+      // App-owned: map the paid subscription back to this user (webhook + portal).
       customer: customerId,
       client_reference_id: user.id,
+      metadata: { userId: user.id },
+      subscription_data: { metadata: { userId: user.id } },
+      // Product: Premium monthly via STRIPE_PRICE_ID (UI amount from resolvePremiumPricing / Stripe Price).
       mode: "subscription",
       line_items: [{ price: priceId, quantity: 1 }],
       success_url: `${appUrl}/upgrade/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${appUrl}/upgrade`,
-      metadata: { userId: user.id },
-      subscription_data: { metadata: { userId: user.id } },
-      customer_update: { address: "auto", name: "auto" },
+      // Checkout Studio (hosted) fixed_by_ui — stripe@22.3.0 uses ui_mode hosted_page.
+      ui_mode: "hosted_page",
+      billing_address_collection: "auto",
+      phone_number_collection: { enabled: false },
+      automatic_tax: { enabled: false },
+      allow_promotion_codes: false,
+      payment_method_collection: "always",
+      integration_identifier: "hosted_web_0001",
+      origin_context: "web",
+      // submit_type omitted: Stripe rejects it for subscription-mode sessions (see STRIPE_INTEGRATION_TODO.md).
     }, {
       idempotencyKey: `checkout:${user.id}:${priceId}:${Math.floor(Date.now() / 300_000)}`,
     })

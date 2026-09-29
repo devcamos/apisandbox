@@ -85,6 +85,7 @@ Readiness probe: `GET /api/health/saas` (see [SAAS.md](./SAAS.md)).
 
 | Area | Teaching | Interactive | Live AWS | Gap |
 |------|----------|-------------|----------|-----|
+| **Certification journey** | ✅ CLF-C02, SAA-C03, SAP-C02 | 🎮 15 decision labs, 45 graded questions, 3 capstones | ❌ | Add provisioned sandbox labs and live resource validation |
 | **Service catalog** | ✅ | 📖 table | ❌ | Mock cost estimate only |
 | **Migration strategies** | ✅ | 🎮 Analyze API (mock) | ❌ | — |
 | **Architecture templates** | ✅ | 📖 | ❌ | — |

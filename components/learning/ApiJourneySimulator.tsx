@@ -4,7 +4,17 @@ import { useState } from "react"
 import { ChevronRight, Eye, Route, Sparkles } from "lucide-react"
 import type { InteractiveScenario } from "@/lib/learning/api-foundations-course"
 
-export function ApiJourneySimulator({ scenario }: Readonly<{ scenario: InteractiveScenario }>) {
+export function ApiJourneySimulator({
+  scenario,
+  eyebrow = "Interactive system model",
+  traceLabel = "Request trace",
+  emptyPrompt = "Pick a prediction to inspect the system trace.",
+}: Readonly<{
+  scenario: InteractiveScenario
+  eyebrow?: string
+  traceLabel?: string
+  emptyPrompt?: string
+}>) {
   const [selectedOption, setSelectedOption] = useState<string | null>(null)
   const option = scenario.options.find((item) => item.id === selectedOption)
 
@@ -15,7 +25,7 @@ export function ApiJourneySimulator({ scenario }: Readonly<{ scenario: Interacti
           <Route className="h-5 w-5 text-cyan-300" />
         </div>
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-cyan-300">Interactive system model</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-cyan-300">{eyebrow}</p>
           <h2 id="simulator-title" className="mt-1 text-xl font-bold text-white">{scenario.title}</h2>
           <p className="mt-2 text-sm leading-6 text-slate-300">{scenario.prompt}</p>
         </div>
@@ -55,7 +65,7 @@ export function ApiJourneySimulator({ scenario }: Readonly<{ scenario: Interacti
           <div className="rounded-xl border border-slate-700 bg-slate-950/40 p-4">
             <div className="mb-4 flex items-center gap-2 text-sm font-semibold text-white">
               <Eye className="h-4 w-4 text-cyan-300" />
-              Request trace
+              {traceLabel}
             </div>
             <ol className="space-y-3">
               {scenario.trace.map((step, index) => (
@@ -77,7 +87,7 @@ export function ApiJourneySimulator({ scenario }: Readonly<{ scenario: Interacti
       ) : (
         <div className="mt-5 flex items-center gap-2 text-sm text-slate-400">
           <ChevronRight className="h-4 w-4" />
-          Pick a prediction to inspect the system trace.
+          {emptyPrompt}
         </div>
       )}
     </section>

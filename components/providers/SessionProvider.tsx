@@ -3,6 +3,7 @@
 import { ReactNode, createContext, useContext, useEffect, useState } from "react"
 import type { AuthSubscriptionTier } from "@/lib/auth/types"
 import { authApiFetchInit, authApiRequestInit, AUTH_JWT_STORAGE_KEY } from "@/lib/auth/client-fetch"
+import { isDemoUserEmail } from "@/lib/demo-login"
 import { getSafeClientRelativeRedirect } from "@/lib/safe-redirect"
 
 type SessionStatus = "loading" | "authenticated" | "unauthenticated"
@@ -18,6 +19,7 @@ interface SessionUser {
 interface SessionData {
   user: SessionUser
   subscriptionTier: AuthSubscriptionTier
+  isDemo: boolean
 }
 
 interface AuthContextValue {
@@ -33,6 +35,7 @@ interface AuthContextValue {
       lastName: string | null
       avatarUrl: string | null
       subscriptionTier?: AuthSubscriptionTier
+      isDemo?: boolean
     }
   }) => void
   clearSession: () => Promise<void>
@@ -49,6 +52,7 @@ function mapToSessionData(user: {
   lastName: string | null
   avatarUrl: string | null
   subscriptionTier?: AuthSubscriptionTier
+  isDemo?: boolean
 }): SessionData {
   const name = [user.firstName, user.lastName].filter(Boolean).join(" ").trim() || null
   return {
@@ -60,6 +64,7 @@ function mapToSessionData(user: {
       image: user.avatarUrl,
     },
     subscriptionTier: user.subscriptionTier ?? "FREE",
+    isDemo: user.isDemo ?? isDemoUserEmail(user.email),
   }
 }
 
@@ -84,6 +89,7 @@ async function fetchCurrentUser() {
       lastName: string | null
       avatarUrl: string | null
       subscriptionTier: AuthSubscriptionTier
+      isDemo?: boolean
     }
     token?: string
   }
