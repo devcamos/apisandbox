@@ -73,14 +73,41 @@ The GitHub `GEMINI_API_KEY` secret does not populate Vercel, and a Vercel enviro
 | Generate | `package.json` `postinstall` / `build` |
 | Binary targets | `prisma/schema.prisma` — `native`, `rhel-openssl-3.0.x` |
 | Client | `lib/prisma.ts` — standard `PrismaClient` |
+| Build migrate gate | `scripts/migrate-on-production.mjs` via `npm run db:migrate:deploy:vercel` |
 
-Vercel runs `npm run db:migrate:deploy` before each application build. This applies
-the versioned migrations to the exact Production or Preview database created for
-that deployment, before the app can query it. If a migration fails, the deployment
-fails rather than serving code against an older schema.
+`vercel.json` runs `npm run db:migrate:deploy:vercel && npm run build`. That helper
+runs migrations **only when** `VERCEL_ENV=production` (or as a
+fail-safe when `VERCEL` is set but `VERCEL_ENV` is missing/unrecognized). Preview
+and Development builds skip migrations and log a clear skip reason, so an
+unreachable Preview database cannot fail the build step.
 
-For an existing environment that was deployed before this build contract, run
-`npx prisma migrate deploy` against that environment's database once, then redeploy.
+Production migrate invokes `bash scripts/prisma-migrate-deploy.sh` (via
+`ensureDirectUrlEnv`): if `DIRECT_URL` is unset it reuses `DATABASE_URL`, matching
+the Prisma schema `directUrl` requirement without requiring a new Vercel secret.
+
+| Vercel environment | `VERCEL_ENV` | Migrations at build |
+|--------------------|--------------|---------------------|
+| Production | `production` | Yes — `prisma migrate deploy` |
+| Preview | `preview` | No — migrate the Preview DB manually when needed |
+| Development | `development` | No |
+| On Vercel, env unset/unknown | (empty / other) | Yes — fail-safe (prefer migrate over shipping unmigrated) |
+
+**Production** uses Neon (via Vercel Postgres / `DATABASE_URL`). **Preview** uses a
+separate Preview-scoped Postgres (currently a Supabase project). Never point Preview
+at Production.
+
+When the Preview schema needs updating and the Preview DB is reachable:
+
+```bash
+# With Preview DATABASE_URL (and optional DIRECT_URL) in the environment:
+npm run db:migrate:deploy
+```
+
+`next build` does not query the database: Prisma is used from API routes / auth at
+runtime. Creating `PrismaClient` at module load does not open a connection until the
+first query, so a healthy Preview build can succeed even when the Preview DB is down;
+runtime routes that hit the DB will still fail until the Preview DB is restored.
+
 Use `db push` only for local development or intentionally disposable databases.
 
 ---
@@ -120,9 +147,18 @@ SaaS billing and feature-flag checklist: [SAAS.md](./SAAS.md). Flag reference: [
 - Vercel deploys from Git integration; production on merge to `main`.
 - Optional human gate: GitHub Environment `preview` for PR approval (see workflow `preview-deploy-gate`).
 
-### Neon preview branch capacity
+### Neon branch capacity (Production / historical preview branches)
 
-Vercel previews provision a Neon `preview/<git-branch>` before the application build. If Neon reaches its branch limit, Vercel fails immediately with `Resource provisioning failed` and no build logs. See [KNOWN_ERRORS.md](./KNOWN_ERRORS.md#vercel-preview-fails-before-build-neon-branch-limit) and run `npm run neon:branches:cleanup` to review an obsolete-branch cleanup plan. The repository policy retains no more than five total Neon branches.
+Production uses Neon. If a Neon/Vercel integration still tries to provision
+`preview/<git-branch>` branches and Neon hits its branch limit, Vercel can fail
+before the application build with `Resource provisioning failed`. See
+[KNOWN_ERRORS.md](./KNOWN_ERRORS.md#vercel-preview-fails-before-build-neon-branch-limit)
+and run `npm run neon:branches:cleanup` to review an obsolete-branch cleanup plan.
+The repository policy retains no more than five total Neon branches.
+
+Preview application data is configured via Preview-scoped `DATABASE_URL` (separate
+from Production Neon). Preview builds skip `migrate deploy`; apply schema changes
+manually against that Preview database when it is reachable.
 
 ---
 
@@ -130,6 +166,7 @@ Vercel previews provision a Neon `preview/<git-branch>` before the application b
 
 | Date | Change |
 |------|--------|
+| 2026-09-27 | Vercel build runs `prisma migrate deploy` only for Production (`db:migrate:deploy:vercel`); Preview skips migrate so unreachable Preview DB cannot fail the build |
 | 2026-06-29 | Stripe production hardening: live-key validation, webhook idempotency ledger, status-driven entitlement reconciliation, and duplicate-subscription prevention |
 | 2026-06-29 | Switched PR Architecture Intelligence from OpenAI to the Gemini Developer API free tier |
 | 2026-06-29 | Documented environment-specific test users and separate OpenAI secret locations for GitHub Actions and Vercel Preview |

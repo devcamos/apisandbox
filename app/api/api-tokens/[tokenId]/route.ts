@@ -1,4 +1,5 @@
 import { NextRequest } from "next/server"
+import { assertNotDemoUser } from "@/lib/auth/demo-guards"
 import { requireAuthenticatedUser } from "@/lib/auth/jwt-auth-middleware"
 import { handleRouteError, okResponse } from "@/lib/http/responses"
 import { revokeApiTokenForUser } from "@/lib/services/api-token-service"
@@ -19,6 +20,7 @@ function getRequestContext(request: NextRequest) {
 export async function DELETE(request: NextRequest, context: RouteParams) {
   try {
     const user = await requireAuthenticatedUser(request)
+    assertNotDemoUser(user.email, "Demo accounts cannot manage API tokens. Create a free account instead.")
     const { tokenId } = await context.params
     const token = await revokeApiTokenForUser({
       userId: user.id,

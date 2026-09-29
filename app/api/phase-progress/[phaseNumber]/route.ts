@@ -1,5 +1,6 @@
 import { NextRequest } from "next/server"
 import { z } from "zod"
+import { assertPhaseAccessForUser } from "@/lib/auth/demo-guards"
 import { requireAuthenticatedUser } from "@/lib/auth/jwt-auth-middleware"
 import { errorResponse, handleRouteError, okResponse } from "@/lib/http/responses"
 import { parseJsonBody } from "@/lib/http/auth-route-helpers"
@@ -25,6 +26,10 @@ export async function GET(request: NextRequest, context: { params: Promise<{ pha
     if (phaseNumber === null || !getPhaseQuiz(phaseNumber)) {
       return errorResponse(404, "not_found", "Quiz not found for this phase")
     }
+
+    await assertPhaseAccessForUser(user, phaseNumber)
+
+    await assertPhaseAccessForUser(user, phaseNumber)
 
     const [quiz, progress] = await Promise.all([
       Promise.resolve(getSanitizedPhaseQuiz(phaseNumber)),

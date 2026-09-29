@@ -10,9 +10,11 @@ datasource db {
   // MENTOR NOTE: Mono-Environment Framework
   // PostgreSQL for all environments (local, dev, staging, prod)
   // Works with: Local PostgreSQL, Docker, Vercel Postgres, AWS RDS, etc.
-  // Only the DATABASE_URL changes - same code everywhere!
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  // DATABASE_URL: pooled runtime URL (Supabase transaction pooler :6543 + pgbouncer).
+  // DIRECT_URL: direct/session URL for migrations and introspect (Supabase :5432).
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 // NextAuth.js v5 required models

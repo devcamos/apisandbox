@@ -32,6 +32,15 @@ describe("auth-response-mapper", () => {
   it("includes subscriptionTier on auth user", () => {
     const authUser = mapUserToAuthUser(baseUser)
     expect(authUser.subscriptionTier).toBe("FREE")
+    expect(authUser.isDemo).toBe(false)
+  })
+
+  it("marks ephemeral demo emails as isDemo", () => {
+    const authUser = mapUserToAuthUser({
+      ...baseUser,
+      email: "demo.abc123@apisandbox.demo",
+    })
+    expect(authUser.isDemo).toBe(true)
   })
 
   it("preserves premium subscriptionTier in auth response", () => {
@@ -41,6 +50,7 @@ describe("auth-response-mapper", () => {
     })
 
     expect(response.user.subscriptionTier).toBe("PREMIUM")
+    expect(response.user.isDemo).toBe(false)
     expect(response.token).toBeTruthy()
     expect(response.expiresIn).toBeGreaterThan(0)
   })

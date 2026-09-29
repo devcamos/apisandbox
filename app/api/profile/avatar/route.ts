@@ -1,4 +1,5 @@
 import { NextRequest } from "next/server"
+import { assertNotDemoUser } from "@/lib/auth/demo-guards"
 import { requireAuthenticatedUser } from "@/lib/auth/jwt-auth-middleware"
 import { uploadAvatarForUser } from "@/lib/services/profile/profile-service"
 import { errorResponse, handleRouteError, okResponse } from "@/lib/http/responses"
@@ -6,6 +7,10 @@ import { errorResponse, handleRouteError, okResponse } from "@/lib/http/response
 export async function POST(request: NextRequest) {
   try {
     const user = await requireAuthenticatedUser(request)
+    assertNotDemoUser(
+      user.email,
+      "Demo accounts cannot change profile details. Create a free account to personalize your profile.",
+    )
     const formData = await request.formData()
     const file = formData.get("avatar")
 
@@ -19,4 +24,3 @@ export async function POST(request: NextRequest) {
     return handleRouteError(error)
   }
 }
-

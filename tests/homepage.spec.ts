@@ -40,6 +40,7 @@ test.describe("Homepage", () => {
     await expect(page.getByRole("heading", { name: "What You'll Master" })).toBeVisible();
     await expect(page.getByRole("heading", { name: "Preview Your Learning Path" })).toBeVisible();
     await expect(page.getByRole("heading", { name: "Simple Pricing" })).toBeVisible();
+    await expect(page.getByTestId("home-explore-premium")).toHaveAttribute("href", "/signup?plan=pro");
     await expect(page.getByRole("heading", { name: "Ready to Explore?" })).toBeVisible();
 
     const finalCta = page.getByRole("link", { name: /^Explore Free$/ }).last();
