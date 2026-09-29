@@ -40,8 +40,10 @@ export default function DashboardPage() {
   }, [session])
 
   const tier = subscription?.tier ?? "FREE"
-  // When signup not required (staging), unlock all so navigation works; when live, gate by tier
-  const isPremium = !signupRequiredForPremium || tier === "PREMIUM"
+  const isDemo = Boolean(session?.isDemo)
+  // When signup not required (staging), unlock all so navigation works; when live, gate by tier.
+  // Demo sessions are always Phase 1 only regardless of the paywall flag.
+  const isPremium = !isDemo && (!signupRequiredForPremium || tier === "PREMIUM")
 
   if (status === "loading") {
     return (
@@ -93,6 +95,15 @@ export default function DashboardPage() {
                     <Sparkles className="w-4 h-4 text-purple-400" />
                     <span className="text-purple-300 font-semibold">Premium Member</span>
                   </div>
+                ) : isDemo ? (
+                  <Link
+                    href="/signup"
+                    className="inline-flex items-center gap-2 px-4 py-2 bg-amber-950/40 border border-amber-500/40 rounded-lg hover:bg-amber-900/40 transition-all"
+                  >
+                    <Lock className="w-4 h-4 text-amber-400" />
+                    <span className="text-amber-100 text-sm">Phase 1 demo</span>
+                    <span className="text-amber-300 text-sm font-semibold">Create account →</span>
+                  </Link>
                 ) : (
                   <Link
                     href="/upgrade"
@@ -102,8 +113,7 @@ export default function DashboardPage() {
                     <span className="text-gray-300 text-sm">Free Plan</span>
                     <span className="text-blue-400 text-sm font-semibold">Upgrade →</span>
                   </Link>
-                )}
-              </div>
+                )}              </div>
             )}
           </div>
         </div>

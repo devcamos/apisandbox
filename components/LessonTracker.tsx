@@ -17,6 +17,8 @@ import {
   Trophy,
 } from "lucide-react"
 import { getPhaseLessonPlan, type LessonCheckpoint } from "@/lib/lessons/phase-lessons"
+import { DemoConversionPrompt } from "@/components/demo/DemoConversionPrompt"
+import { shouldShowDemoPhase1LessonCompletion } from "@/lib/demo-completion"
 import {
   canCompleteCheckpoint,
   computeModuleStats,
@@ -97,6 +99,7 @@ export function LessonTracker({ phase }: LessonTrackerProps) {
   const plan = getPhaseLessonPlan(phase)
   const { data: session, status } = useSession()
   const userKey = session?.user?.id || session?.user?.email || "anonymous"
+  const isDemo = Boolean(session?.isDemo)
   const storageKey = progressKey(phase, userKey)
   const lastUpdatedStorageKey = metaKey(phase, userKey)
   const serverImportStorageKey = importKey(phase, userKey)
@@ -323,6 +326,11 @@ export function LessonTracker({ phase }: LessonTrackerProps) {
     if (globalThis.window !== undefined) localStorage.removeItem(lastUpdatedStorageKey)
   }
   const lessonComplete = total > 0 && completed === total
+  const showDemoLessonCompletion = shouldShowDemoPhase1LessonCompletion({
+    isDemo,
+    phase,
+    lessonComplete,
+  })
   const focusItem = flatCheckpoints[focusIndex]
 
   const resumeAtNext = () => {
@@ -412,6 +420,12 @@ export function LessonTracker({ phase }: LessonTrackerProps) {
                   </div>
                 )
               )}
+
+              {showDemoLessonCompletion ? (
+                <div className="mb-4">
+                  <DemoConversionPrompt variant="completion" />
+                </div>
+              ) : null}
 
               <button
                 onClick={lessonComplete ? () => setIsOpen(true) : resumeAtNext}

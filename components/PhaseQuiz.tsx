@@ -5,6 +5,8 @@ import { useCallback, useEffect, useMemo, useState } from "react"
 import { CheckCircle2, AlertCircle, Lock, Route, Target, TrendingUp } from "lucide-react"
 import { authApiRequestInit } from "@/lib/auth/client-fetch"
 import { useSession } from "@/components/providers/SessionProvider"
+import { DemoConversionPrompt } from "@/components/demo/DemoConversionPrompt"
+import { shouldShowDemoPhase1Completion } from "@/lib/demo-completion"
 import { masteryLabel, masterySummary, recommendedRedirects } from "@/lib/learning/phase-quiz-insights"
 
 interface PhaseQuizProps {
@@ -66,6 +68,7 @@ interface ProgressPayload {
   totalQuestions: number
   correctAnswers: number
   attempts: number
+  completedAt?: string | null
 }
 
 function quizOptionRowClass(showCorrect: boolean, showIncorrectSelection: boolean, isSelected: boolean) {
@@ -175,7 +178,7 @@ interface SubmissionResult {
 }
 
 export default function PhaseQuiz({ phaseNumber, accentClass }: PhaseQuizProps) {
-  const { status } = useSession()
+  const { data: session, status } = useSession()
   const [quiz, setQuiz] = useState<QuizPayload | null>(null)
   const [progress, setProgress] = useState<ProgressPayload | null>(null)
   const [answers, setAnswers] = useState<Record<string, string>>({})
@@ -183,6 +186,13 @@ export default function PhaseQuiz({ phaseNumber, accentClass }: PhaseQuizProps) 
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [result, setResult] = useState<SubmissionResult | null>(null)
+  const isDemo = Boolean(session?.isDemo)
+  const showDemoCompletion = shouldShowDemoPhase1Completion({
+    isDemo,
+    phaseNumber,
+    progress,
+    result,
+  })
 
   useEffect(() => {
     if (status !== "authenticated") {
@@ -430,7 +440,9 @@ export default function PhaseQuiz({ phaseNumber, accentClass }: PhaseQuizProps) 
             ) : null}
             </div>
 
-            {nextStep ? (
+            {showDemoCompletion ? (
+              <DemoConversionPrompt variant="completion" />
+            ) : nextStep ? (
               <div className="rounded-xl border border-green-500/30 bg-gradient-to-r from-green-500/15 to-emerald-500/15 p-6">
                 <h3 className="text-2xl font-bold text-white mb-3">✅ What&apos;s Next?</h3>
                 <p className="text-gray-300 mb-4">
@@ -451,6 +463,13 @@ export default function PhaseQuiz({ phaseNumber, accentClass }: PhaseQuizProps) 
             ) : null}
           </div>
         )}
+
+        {/* Demo users who already finished Phase 1 (reload / return visit) */}
+        {showDemoCompletion && !result ? (
+          <div className="mt-8">
+            <DemoConversionPrompt variant="completion" />
+          </div>
+        ) : null}
 
         {error && quiz && (
           <div className="mt-4 text-sm text-red-300">{error}</div>

@@ -26,7 +26,15 @@ function createLimiter(
   })
 }
 
-export const authLimiter = createLimiter(5, "15 m", "auth")
+/**
+ * Password sign-in throttle, keyed per client IP + email.
+ * Deliberately looser than the per-account lockout (5 failures -> 30 min lock,
+ * see lib/auth/login-lockout.ts) so a user always gets their 5 attempts and a
+ * clear lock message before any 429. Successful sign-ins also count here, so
+ * the ceiling must leave room for normal sign-in / sign-out cycles.
+ */
+export const AUTH_RATE_LIMIT_PER_WINDOW = 20
+export const authLimiter = createLimiter(AUTH_RATE_LIMIT_PER_WINDOW, "15 m", "auth")
 export const signupLimiter = createLimiter(3, "1 h", "signup")
 export const apiLimiter = createLimiter(100, "15 m", "api")
 export const webhookLimiter = createLimiter(50, "1 m", "webhook")
@@ -63,8 +71,15 @@ export function getClientIdentifier(request: Request): string {
 }
 
 export function rateLimitHeaders(result: RateLimitResult): HeadersInit {
-  return {
+  const headers: Record<string, string> = {
     "X-RateLimit-Remaining": String(result.remaining),
     "X-RateLimit-Reset": String(result.resetAt),
   }
+
+  if (!result.allowed && result.resetAt > 0) {
+    const retryAfterSec = Math.max(1, Math.ceil((result.resetAt - Date.now()) / 1000))
+    headers["Retry-After"] = String(retryAfterSec)
+  }
+
+  return headers
 }

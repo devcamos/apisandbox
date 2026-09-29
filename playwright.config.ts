@@ -33,7 +33,9 @@ const ciWorkers = process.env.PLAYWRIGHT_WORKERS
  * @see https://playwright.dev/docs/test-configuration
  */
 export default defineConfig({
-  testDir: './tests',
+  testDir: "./tests",
+  /* Opt-in live Stripe Preview checkout (set STRIPE_E2E_LIVE=1). */
+  testIgnore: process.env.STRIPE_E2E_LIVE === "1" ? undefined : ["**/premium-signup-live.spec.ts"],
   /* Run tests in files in parallel */
   fullyParallel: true,
   /* Fail the build on CI if you accidentally left test.only in the source code. */
@@ -142,7 +144,18 @@ export default defineConfig({
         reuseExistingServer: !process.env.CI,
         timeout: process.env.CI ? (useProdServer ? 60 * 1000 : 180 * 1000) : 120 * 1000,
         env: {
-          NODE_ENV: "test",
+          ...process.env,
+          NODE_ENV: process.env.CI_E2E_USE_PROD_SERVER === "1" ? "production" : "test",
+          // Preview-like Stripe TEST readiness for premium-signup e2e (stubbed Checkout).
+          VERCEL_ENV: process.env.VERCEL_ENV || "preview",
+          NEXT_PUBLIC_FF_STRIPE_CHECKOUT:
+            process.env.NEXT_PUBLIC_FF_STRIPE_CHECKOUT || "true",
+          STRIPE_SECRET_KEY:
+            process.env.STRIPE_SECRET_KEY || "sk_test_e2e_premium_signup_placeholder",
+          STRIPE_WEBHOOK_SECRET:
+            process.env.STRIPE_WEBHOOK_SECRET || "whsec_e2e_premium_signup_test_secret_32b",
+          STRIPE_PRICE_ID: process.env.STRIPE_PRICE_ID || "price_e2e_premium_signup",
+          NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL || baseURL,
           ...(useStandaloneServer
             ? { HOSTNAME: "127.0.0.1", PORT: "4000" }
             : {}),
