@@ -55,7 +55,8 @@ test.describe("Premium signup journey", () => {
     await dismissCookieBanner(page)
     await expect(page.getByRole("heading", { name: "Simple Pricing" })).toBeVisible()
     await page.getByTestId("home-explore-premium").click()
-    await expect(page).toHaveURL(/\/upgrade\?checkout=1/)
+    // Auto-checkout can navigate to Stripe before /upgrade is observable.
+    await page.waitForURL(/checkout\.stripe\.com|\/upgrade\?checkout=1/, { timeout: 30_000 })
     await page.waitForURL(/checkout\.stripe\.com/, { timeout: 30_000 })
     await expect(page).toHaveURL(E2E_STRIPE_CHECKOUT_URL)
   })
