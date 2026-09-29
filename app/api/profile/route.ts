@@ -3,6 +3,7 @@ import { z } from "zod"
 import { assertNotDemoUser } from "@/lib/auth/demo-guards"
 import { requireAuthenticatedUser } from "@/lib/auth/jwt-auth-middleware"
 import { getProfileByUserId, updateProfileByUserId } from "@/lib/services/profile/profile-service"
+import { learnerProfileUpdateSchema } from "@/lib/validation/learner-profile"
 import { parseJsonBody } from "@/lib/http/auth-route-helpers"
 import { handleRouteError, okResponse } from "@/lib/http/responses"
 
@@ -12,7 +13,7 @@ const schema = z.object({
   avatarUrl: z.string().url().nullable().optional(),
   roleLabel: z.string().trim().max(100).nullable().optional(),
   identityStatement: z.string().trim().max(500).nullable().optional(),
-})
+}).merge(learnerProfileUpdateSchema)
 
 export async function GET(request: NextRequest) {
   try {

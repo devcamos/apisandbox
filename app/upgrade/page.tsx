@@ -100,7 +100,7 @@ function UpgradePageInner() {
           <p className="text-xl text-gray-300 max-w-2xl mx-auto">
             {isPremium
               ? "Full access to Phases 2–9, Cloud, and AI is already unlocked on this account."
-              : "Master APIs, algorithms, and architecture with interactive tools and guided practice"}
+              : "Master APIs, algorithms, and architecture with stack-aware scenarios and question practice"}
           </p>
         </div>
 

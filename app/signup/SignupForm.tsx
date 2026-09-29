@@ -161,7 +161,7 @@ function SignupFormInner({ googleClientId }: Readonly<{ googleClientId: string }
       const redirectTo =
         plan === "pro" || (claimingDemo && payload.data.plan === "pro")
           ? "/upgrade?checkout=1"
-          : "/dashboard"
+          : "/onboarding"
 
       await completeClientAuthSession({
         authData: payload.data,
@@ -191,7 +191,7 @@ function SignupFormInner({ googleClientId }: Readonly<{ googleClientId: string }
         }
         await completeClientAuthSession({
           authData: payload.data,
-          redirectTo: plan === "pro" ? "/upgrade?checkout=1" : "/dashboard",
+          redirectTo: plan === "pro" ? "/upgrade?checkout=1" : "/onboarding",
           setSession: setSessionFromAuthResponse,
         })
         return
@@ -222,7 +222,7 @@ function SignupFormInner({ googleClientId }: Readonly<{ googleClientId: string }
     ? plan === "pro"
       ? "Convert this demo into your account, then continue to Stripe checkout for Pro."
       : "Convert this demo into a Free account. Your Phase 1 progress stays with you."
-    : "Free access to Phases 0 & 1 — upgrade anytime for full access"
+    : "Free access to API Foundations — upgrade anytime for full access"
 
   return (
     <AuthPageShell
