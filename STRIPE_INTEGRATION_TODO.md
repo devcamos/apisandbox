@@ -7,6 +7,10 @@ SDK: `stripe@22.3.0` (lockfile). `ui_mode` set to **`hosted_page`** (≥ 21.0.0)
 TypeScript types in this SDK already include `ui_mode: 'hosted_page'`,
 `integration_identifier`, and `origin_context` — no cast required.
 
+Display price: `resolvePremiumPricing()` / `GET /api/billing/price` reads
+`unit_amount` from the configured Stripe Price (`STRIPE_PRICE_ID`); UI falls back
+to **£2** when Stripe is unset.
+
 ## Values to Replace
 
 None. Line item price comes from `STRIPE_PRICE_ID` (env), not a hard-coded
