@@ -191,3 +191,58 @@ export async function importLearningProgressForUser(
 
   return getLearningProgressForUser(userId, courseId)
 }
+
+export async function listLearningCourseProgressForUser(userId: string) {
+  const enrollments = await prisma.learningEnrollment.findMany({
+    where: { userId },
+    orderBy: { lastActivityAt: "desc" },
+  })
+
+  const data = []
+  for (const enrollment of enrollments) {
+    const plan = getCoursePlan(enrollment.courseId)
+    if (!plan) {
+      data.push({
+        courseId: enrollment.courseId,
+        status: enrollment.status,
+        completed: 0,
+        total: 0,
+      })
+      continue
+    }
+
+    const progress = await getLearningProgressForUser(userId, enrollment.courseId)
+    data.push({
+      courseId: enrollment.courseId,
+      status: enrollment.status,
+      completed: progress.summary.completed,
+      total: progress.summary.total,
+    })
+  }
+
+  return data
+}
+
+/** Public v1 shape — strips internal enrollment ids and keeps summary lean. */
+export function toV1CourseProgressResponse(
+  progress: Awaited<ReturnType<typeof getLearningProgressForUser>>,
+) {
+  return {
+    courseId: progress.courseId,
+    enrollment: progress.enrollment
+      ? {
+          status: progress.enrollment.status,
+          startedAt: progress.enrollment.startedAt?.toISOString() ?? null,
+          completedAt: progress.enrollment.completedAt?.toISOString() ?? null,
+          lastActivityAt: progress.enrollment.lastActivityAt?.toISOString() ?? null,
+        }
+      : null,
+    progress: progress.progress,
+    summary: {
+      total: progress.summary.total,
+      completed: progress.summary.completed,
+      percent: progress.summary.percent,
+    },
+    lastActivityAt: progress.lastActivityAt,
+  }
+}
