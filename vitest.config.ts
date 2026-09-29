@@ -16,6 +16,7 @@ export default defineConfig({
       // thousands of 0%-covered lines in lcov.info; SonarCloud then fails Coverage on New Code.
       include: [
         "lib/assistant/access.ts",
+        "lib/assistant/limits.ts",
         "lib/assistant/redirect.ts",
         "lib/api-tokens/token-policy.ts",
         "lib/api/v1/handler.ts",
@@ -43,6 +44,7 @@ export default defineConfig({
         "lib/lessons/lesson-progress.ts",
         "lib/login-error-parser.ts",
         "lib/password-validation.ts",
+        "lib/progress/best-score-progress.ts",
         "lib/sanitize-mermaid-svg.ts",
         "lib/safe-redirect.ts",
         "lib/services/user-app-guide-service.ts",

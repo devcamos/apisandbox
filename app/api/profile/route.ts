@@ -2,7 +2,8 @@ import { NextRequest } from "next/server"
 import { z } from "zod"
 import { requireAuthenticatedUser } from "@/lib/auth/jwt-auth-middleware"
 import { getProfileByUserId, updateProfileByUserId } from "@/lib/services/profile/profile-service"
-import { errorResponse, handleRouteError, okResponse } from "@/lib/http/responses"
+import { parseJsonBody } from "@/lib/http/auth-route-helpers"
+import { handleRouteError, okResponse } from "@/lib/http/responses"
 
 const schema = z.object({
   firstName: z.string().trim().max(100).nullable().optional(),
@@ -25,11 +26,8 @@ export async function GET(request: NextRequest) {
 export async function PATCH(request: NextRequest) {
   try {
     const user = await requireAuthenticatedUser(request)
-    const body = await request.json()
-    const parsed = schema.safeParse(body)
-    if (!parsed.success) {
-      return errorResponse(400, "validation_error", "Invalid profile payload", parsed.error.issues)
-    }
+    const parsed = await parseJsonBody(request, schema, "Invalid profile payload")
+    if (!parsed.ok) return parsed.response
 
     const profile = await updateProfileByUserId(user.id, parsed.data)
     return okResponse({ profile })
@@ -37,4 +35,3 @@ export async function PATCH(request: NextRequest) {
     return handleRouteError(error)
   }
 }
-
