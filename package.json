@@ -36,6 +36,7 @@
     "sonar:local": "bash scripts/sonar-local.sh",
     "sonar:local:full": "npm run test:unit -- --coverage && bash scripts/sonar-local.sh",
     "sonar:status": "bash scripts/sonar-status.sh",
+    "openapi:v1": "node scripts/generate-openapi-v1.cjs",
     "postinstall": "env -u PRISMA_GENERATE_DATAPROXY prisma generate",
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev",

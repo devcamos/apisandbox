@@ -71,8 +71,15 @@ export function getClientIdentifier(request: Request): string {
 }
 
 export function rateLimitHeaders(result: RateLimitResult): HeadersInit {
-  return {
+  const headers: Record<string, string> = {
     "X-RateLimit-Remaining": String(result.remaining),
     "X-RateLimit-Reset": String(result.resetAt),
   }
+
+  if (!result.allowed && result.resetAt > 0) {
+    const retryAfterSec = Math.max(1, Math.ceil((result.resetAt - Date.now()) / 1000))
+    headers["Retry-After"] = String(retryAfterSec)
+  }
+
+  return headers
 }
