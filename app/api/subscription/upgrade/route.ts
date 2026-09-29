@@ -15,6 +15,7 @@
  */
 
 import { NextRequest, NextResponse } from "next/server"
+import { assertNotDemoUser } from "@/lib/auth/demo-guards"
 import { requireAuthenticatedUser } from "@/lib/auth/jwt-auth-middleware"
 import { applyPremiumSubscription } from "@/lib/subscription-provision"
 import { handleRouteError } from "@/lib/http/responses"
@@ -33,6 +34,10 @@ export async function POST(request: NextRequest) {
     }
 
     const user = await requireAuthenticatedUser(request)
+    assertNotDemoUser(
+      user.email,
+      "Demo accounts cannot upgrade. Create a free account to unlock Premium.",
+    )
 
     await applyPremiumSubscription(user.id)
 

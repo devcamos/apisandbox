@@ -15,7 +15,7 @@ import { awsCertificationTracks } from "@/lib/learning/aws-certification-course"
 
 export const metadata: Metadata = {
   title: "AWS Certification Journey | API Sandbox",
-  description: "Prepare for AWS Cloud Practitioner, AI Practitioner, Solutions Architect Associate, and Solutions Architect Professional through one connected API Sandbox course.",
+  description: "Learn transferable capabilities first, map them to AWS, and prepare for AIF-C01 and the wider AWS certification journey.",
 }
 
 const trackStyles = {
@@ -23,6 +23,26 @@ const trackStyles = {
   orange: { gradient: "from-orange-500 to-amber-400", border: "hover:border-orange-400/60", text: "text-orange-300", soft: "bg-orange-400/10" },
   violet: { gradient: "from-violet-500 to-fuchsia-400", border: "hover:border-violet-400/60", text: "text-violet-300", soft: "bg-violet-400/10" },
 } as const
+
+const totalCapabilityCount = awsCertificationTracks.reduce(
+  (total, track) => total + track.course.units.filter((unit) => unit.certification?.kind === "capability").length,
+  0,
+)
+const totalAssessmentQuestionCount = awsCertificationTracks.reduce(
+  (total, track) =>
+    total + track.course.units.reduce(
+      (courseTotal, unit) => courseTotal + unit.assessment.questions.length,
+      0,
+    ),
+  0,
+)
+
+const certificationStats = [
+  { icon: BookOpenCheck, value: String(totalCapabilityCount), label: "capability labs" },
+  { icon: BrainCircuit, value: String(totalAssessmentQuestionCount), label: "original assessment questions" },
+  { icon: Route, value: String(awsCertificationTracks.length), label: "capstone briefs" },
+  { icon: ShieldCheck, value: "80%", label: "scored checkpoint threshold" },
+]
 
 export default function AwsCertificationsPage() {
   return (
@@ -37,21 +57,16 @@ export default function AwsCertificationsPage() {
           <div className="mt-7 max-w-4xl">
             <div className="inline-flex items-center gap-2 rounded-full border border-orange-400/25 bg-orange-400/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.17em] text-orange-200">
               <Award className="h-3.5 w-3.5" />
-              Foundational paths → Associate → Professional
+              AWS → Certifications → Domains → Capabilities
             </div>
             <h1 className="mt-5 text-5xl font-bold tracking-tight text-white sm:text-6xl">AWS Certification Journey</h1>
             <p className="mt-5 text-xl leading-8 text-slate-300">
-              Choose a foundational path in cloud or AI, then progress into associate architecture and professional-level governance and transformation.
+              Learn the invariant capability first, prove it through active work, then map it to AWS. Start with AI or cloud foundations and grow toward architecture.
             </p>
           </div>
 
           <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {[
-              { icon: BookOpenCheck, value: "20", label: "connected modules" },
-              { icon: BrainCircuit, value: "60", label: "original assessment questions" },
-              { icon: Route, value: "3", label: "architecture capstones" },
-              { icon: ShieldCheck, value: "80%", label: "module mastery threshold" },
-            ].map((stat) => {
+            {certificationStats.map((stat) => {
               const Icon = stat.icon
               return (
                 <div key={stat.label} className="rounded-2xl border border-slate-800 bg-slate-950/45 p-5">
@@ -67,15 +82,18 @@ export default function AwsCertificationsPage() {
 
       <section className="container mx-auto max-w-7xl px-6 py-12 sm:py-16" aria-labelledby="choose-track">
         <div className="max-w-3xl">
-          <p className="text-sm font-semibold uppercase tracking-[0.18em] text-orange-300">Foundational paths, increasing responsibility</p>
+          <p className="text-sm font-semibold uppercase tracking-[0.18em] text-orange-300">Capability first, AWS second</p>
           <h2 id="choose-track" className="mt-2 text-3xl font-bold text-white">Choose your certification path</h2>
-          <p className="mt-3 leading-7 text-slate-400">Each level includes official domain weighting, original lessons, architecture decision labs, persistent signed-in assessments, a capstone, and external readiness requirements.</p>
+          <p className="mt-3 leading-7 text-slate-400">Every track includes official domain weighting, persistent scored checkpoints, a capstone brief, and external readiness requirements. AI Practitioner adds Java-first builds, failure drills, explanation, and AWS mapping.</p>
         </div>
 
         <div className="mt-8 grid gap-6 lg:grid-cols-2 xl:grid-cols-4">
           {awsCertificationTracks.map((track) => {
             const style = trackStyles[track.accent]
             const progressionLabel = track.level === "Foundational" ? "Foundational path" : track.level === "Associate" ? "Step 1" : "Step 2"
+            const capabilityCount = track.course.units.filter((unit) => unit.certification?.kind === "capability").length
+            const contentCount = capabilityCount > 0 ? capabilityCount : track.course.units.length
+            const contentLabel = capabilityCount > 0 ? "capabilities" : "question sets"
             return (
               <article key={track.slug} className={`group flex flex-col overflow-hidden rounded-2xl border border-slate-700 bg-slate-900/65 transition-all ${style.border}`}>
                 <div className={`h-1.5 bg-gradient-to-r ${style.gradient}`} />
@@ -93,8 +111,8 @@ export default function AwsCertificationsPage() {
 
                   <div className="mt-5 grid grid-cols-2 gap-3 text-sm">
                     <div className="rounded-xl border border-slate-800 bg-slate-950/40 p-3">
-                      <div className="font-semibold text-white">{track.course.units.length}</div>
-                      <div className="mt-1 text-xs text-slate-500">modules</div>
+                      <div className="font-semibold text-white">{contentCount}</div>
+                      <div className="mt-1 text-xs text-slate-500">{contentLabel}</div>
                     </div>
                     <div className="rounded-xl border border-slate-800 bg-slate-950/40 p-3">
                       <div className="font-semibold text-white">{track.domains.length}</div>

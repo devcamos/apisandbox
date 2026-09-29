@@ -5,6 +5,10 @@ import {
   AWS_SOLUTIONS_ARCHITECT_ASSOCIATE_COURSE_ID,
   AWS_SOLUTIONS_ARCHITECT_PROFESSIONAL_COURSE_ID,
 } from "@/lib/learning/course-ids"
+import {
+  AIF_C01_DOMAIN_ORDER,
+  aifC01CapabilityUnits,
+} from "@/lib/learning/aws-ai-practitioner-mastery"
 import type {
   AssessmentQuestion,
   LearningCourse,
@@ -60,6 +64,7 @@ interface UnitInput {
   assessmentDescription: string
   reflectionPrompt: string
   questions: AssessmentQuestion[]
+  certification?: LearningUnit["certification"]
 }
 
 function difficultyForSequence(sequence: number): LearningDifficulty {
@@ -87,6 +92,7 @@ function certificationUnit(input: UnitInput): LearningUnit {
       reflectionPrompt: input.reflectionPrompt,
       questions: input.questions,
     },
+    certification: input.certification,
   }
 }
 
@@ -789,11 +795,12 @@ const associateUnits: LearningUnit[] = [
   }),
 ]
 
-const aiPractitionerUnits: LearningUnit[] = [
+const aiPractitionerDomainExamUnits: LearningUnit[] = [
   certificationUnit({
     id: "ai-ml-fundamentals",
     sequence: 1,
-    title: "AI and machine learning fundamentals",
+    certification: { kind: "domain-exam", domainId: "ai-ml-fundamentals" },
+    title: "AI and ML fundamentals domain exam",
     subtitle: "Choose the right learning approach for the business problem.",
     principle: "Start with the problem, data, and success measure before choosing an AI or ML technique.",
     goal: "Distinguish AI, ML, deep learning, supervised learning, unsupervised learning, and common evaluation measures.",
@@ -855,7 +862,8 @@ const aiPractitionerUnits: LearningUnit[] = [
   certificationUnit({
     id: "generative-ai-fundamentals",
     sequence: 2,
-    title: "Generative AI and foundation models",
+    certification: { kind: "domain-exam", domainId: "genai-fundamentals" },
+    title: "Generative AI fundamentals domain exam",
     subtitle: "Understand how generative systems create useful but fallible outputs.",
     principle: "A foundation model is a capable starting point, not a guarantee that an answer is factual, safe, or fit for a business process.",
     goal: "Explain tokens, embeddings, transformers, inference, hallucinations, and the trade-offs among model capabilities and costs.",
@@ -917,7 +925,8 @@ const aiPractitionerUnits: LearningUnit[] = [
   certificationUnit({
     id: "foundation-model-applications",
     sequence: 3,
-    title: "Applications of foundation models",
+    certification: { kind: "domain-exam", domainId: "foundation-models" },
+    title: "Applications of foundation models domain exam",
     subtitle: "Design prompts, retrieval, fine-tuning, and evaluations around a real use case.",
     principle: "Reliable AI applications are systems around a model: context, instructions, tools, evaluation, guardrails, and observability all matter.",
     goal: "Choose prompt engineering, retrieval-augmented generation, fine-tuning, and evaluation techniques for a grounded assistant.",
@@ -979,7 +988,8 @@ const aiPractitionerUnits: LearningUnit[] = [
   certificationUnit({
     id: "responsible-ai",
     sequence: 4,
-    title: "Responsible AI and explainability",
+    certification: { kind: "domain-exam", domainId: "responsible-ai" },
+    title: "Responsible AI domain exam",
     subtitle: "Make AI behaviour fair, transparent, robust, and accountable.",
     principle: "Responsible AI is an ongoing product and governance practice, not a final checkbox after the model ships.",
     goal: "Recognise bias, fairness, transparency, explainability, human oversight, and model monitoring responsibilities.",
@@ -1041,7 +1051,8 @@ const aiPractitionerUnits: LearningUnit[] = [
   certificationUnit({
     id: "ai-security-governance",
     sequence: 5,
-    title: "Security, compliance, and governance for AI",
+    certification: { kind: "domain-exam", domainId: "ai-security" },
+    title: "Security, compliance and governance domain exam",
     subtitle: "Protect data, control access, and govern AI workloads across their lifecycle.",
     principle: "AI security extends familiar cloud controls with data lineage, prompt and output risks, model access, privacy, and continuous governance.",
     goal: "Apply least privilege, encryption, secure data handling, monitoring, and governance to an Amazon Bedrock-based assistant.",
@@ -1105,6 +1116,11 @@ const aiPractitionerUnits: LearningUnit[] = [
     ],
   }),
 ]
+
+const aiPractitionerUnits = AIF_C01_DOMAIN_ORDER.flatMap((domainId) => [
+  ...aifC01CapabilityUnits.filter((unit) => unit.certification?.domainId === domainId),
+  ...aiPractitionerDomainExamUnits.filter((unit) => unit.certification?.domainId === domainId),
+])
 
 const professionalUnits: LearningUnit[] = [
   certificationUnit({
@@ -1451,8 +1467,8 @@ const cloudPractitionerCourse: LearningCourse = {
 const aiPractitionerCourse: LearningCourse = {
   id: AWS_AI_PRACTITIONER_COURSE_ID,
   title: "AWS Certified AI Practitioner",
-  description: "Build practical AI and machine learning literacy through an AWS-powered learning assistant: fundamentals, generative AI, foundation-model applications, responsible AI, and governance.",
-  audience: "Developers, product professionals, and technical practitioners building foundational AI fluency before a deeper ML or AI engineering role.",
+  description: "Learn provider-independent AI capabilities through prediction, Java builds, failure drills, and explanation before mapping each capability to AWS and AIF-C01.",
+  audience: "Beginners through senior engineers who want transferable AI foundations, Java practice, and evidence-backed AIF-C01 preparation.",
   masteryThreshold: AWS_CERTIFICATION_MASTERY_THRESHOLD,
   units: aiPractitionerUnits,
 }
@@ -1507,7 +1523,7 @@ export const awsCertificationTracks: AwsCertificationTrack[] = [
     level: "Foundational",
     examCode: "AIF-C01",
     shortTitle: "AI Practitioner",
-    description: "Understand AI, ML, generative AI, foundation-model applications, responsible AI, and AI security on AWS.",
+    description: "Master invariant AI capabilities first, prove them with Java, then map the decisions to AWS and AIF-C01.",
     audience: aiPractitionerCourse.audience,
     examFormat: "65 questions · 90 minutes",
     experienceGuidance: "No prior AI or ML experience is required; basic AWS and software-development familiarity makes the examples easier to apply.",
@@ -1515,11 +1531,11 @@ export const awsCertificationTracks: AwsCertificationTrack[] = [
     officialExamGuideUrl: "https://docs.aws.amazon.com/aws-certification/latest/ai-practitioner-01.html",
     officialPrepUrl: "https://aws.amazon.com/certification/certified-ai-practitioner/",
     domains: [
-      { id: "ai-ml-fundamentals", title: "Fundamentals of AI and ML", weight: 20, focus: ["AI and ML concepts", "data", "model evaluation", "use cases"] },
-      { id: "genai-fundamentals", title: "Fundamentals of GenAI", weight: 24, focus: ["foundation models", "tokens", "embeddings", "capabilities and limitations"] },
-      { id: "foundation-models", title: "Applications of Foundation Models", weight: 28, focus: ["prompt engineering", "RAG", "fine-tuning", "evaluation"] },
-      { id: "responsible-ai", title: "Guidelines for Responsible AI", weight: 14, focus: ["bias", "fairness", "transparency", "explainability"] },
-      { id: "ai-security", title: "Security, Compliance, and Governance for AI Solutions", weight: 14, focus: ["data privacy", "access control", "guardrails", "auditability"] },
+      { id: "ai-ml-fundamentals", title: "AI and ML fundamentals", weight: 20, focus: ["AI and ML concepts", "data", "model evaluation", "use cases"] },
+      { id: "genai-fundamentals", title: "Generative AI fundamentals", weight: 24, focus: ["foundation models", "tokens", "embeddings", "capabilities and limitations"] },
+      { id: "foundation-models", title: "Applications of foundation models", weight: 28, focus: ["prompt engineering", "RAG", "fine-tuning", "evaluation"] },
+      { id: "responsible-ai", title: "Responsible AI", weight: 14, focus: ["bias", "fairness", "transparency", "explainability"] },
+      { id: "ai-security", title: "Security, compliance and governance", weight: 14, focus: ["data privacy", "access control", "guardrails", "auditability"] },
     ],
     readinessRequirements: [
       ...sharedReadinessRequirements,

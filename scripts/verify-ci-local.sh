@@ -33,6 +33,7 @@ fi
 
 log "lint-and-build (job: lint-and-build)"
 export DATABASE_URL="$BUILD_DATABASE_URL"
+export DIRECT_URL="${DIRECT_URL:-$BUILD_DATABASE_URL}"
 npm run typecheck
 npm run lint
 npm run build
@@ -73,15 +74,21 @@ if [[ "$ready" -ne 1 ]]; then
 fi
 
 export DATABASE_URL="$E2E_DATABASE_URL"
+export DIRECT_URL="$E2E_DATABASE_URL"
 npx prisma db push --accept-data-loss
 npx playwright install chromium --with-deps >/dev/null 2>&1 || npx playwright install chromium
 
 export CI_E2E_USE_PROD_SERVER=1
 export PLAYWRIGHT_WORKERS=3
+export VERCEL_ENV="${VERCEL_ENV:-preview}"
+export NEXT_PUBLIC_FF_STRIPE_CHECKOUT="${NEXT_PUBLIC_FF_STRIPE_CHECKOUT:-true}"
+export STRIPE_SECRET_KEY="${STRIPE_SECRET_KEY:-sk_test_e2e_premium_signup_placeholder}"
+export STRIPE_WEBHOOK_SECRET="${STRIPE_WEBHOOK_SECRET:-whsec_e2e_premium_signup_test_secret_32b}"
+export STRIPE_PRICE_ID="${STRIPE_PRICE_ID:-price_e2e_premium_signup}"
 bash scripts/prepare-smoke-standalone.sh
 PLAYWRIGHT_JSON_OUTPUT_NAME=reports/playwright-smoke.json \
 PLAYWRIGHT_JUNIT_OUTPUT_NAME=reports/playwright-smoke-junit.xml \
-  npx playwright test tests/ci-smoke.spec.ts --project=chromium --reporter=line
+  npx playwright test tests/ci-smoke.spec.ts tests/premium-signup.spec.ts --project=chromium --reporter=line
 
 ok "e2e smoke"
 

@@ -10,9 +10,10 @@
  * 5. Preview content (blurred/limited to entice signup)
  * 6. Trust indicators (security, guarantees)
  * 
- * This page is PUBLIC for unauthenticated users
- * Authenticated users are redirected to dashboard
- * All learning content is behind authentication
+ * This page is PUBLIC for unauthenticated users.
+ * PREMIUM signed-in users go to the dashboard; FREE signed-in users can still
+ * use Simple Pricing → Premium to continue to Stripe checkout.
+ * All learning content is behind authentication.
  */
 
 "use client";
@@ -22,23 +23,30 @@ import { useSession } from "@/components/providers/SessionProvider";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { ArrowRight, Check, Star, Shield, Zap, BookOpen, BarChart3, Lock, Layers3, Route, Drill, FlaskConical } from "lucide-react";
+import { PremiumPriceLabel } from "@/components/billing/PremiumPriceLabel";
 
 export default function Home() {
   const { data: session, status } = useSession();
   const router = useRouter();
+  const isPremium = session?.subscriptionTier === "PREMIUM";
 
-  // Redirect authenticated users to dashboard
   useEffect(() => {
-    if (status === "authenticated" && session) {
+    if (status === "authenticated" && isPremium) {
       router.replace("/dashboard");
     }
-  }, [status, session, router]);
+  }, [status, isPremium, router]);
 
-  if (status === "loading" || status === "authenticated") {
+  if (status === "loading" || (status === "authenticated" && isPremium)) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900" />
     );
   }
+
+  const premiumCtaHref = session ? "/upgrade?checkout=1" : "/signup?plan=pro";
+  const premiumCtaLabel = session ? "Upgrade to Premium" : "Explore Premium";
+  const freeCtaHref = session ? "/dashboard" : "/signup";
+  const freeCtaLabel = session ? "Go to dashboard" : "Explore Free";
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
       {/* Hero Section */}
@@ -74,7 +82,7 @@ export default function Home() {
               </Link>
             </div>
             <p className="text-sm text-gray-500 mt-4">
-              No credit card required • API Foundations free to explore
+              No credit card required • First-principles Phases 0 & 1 free to explore
             </p>
           </div>
         </div>
@@ -237,7 +245,7 @@ export default function Home() {
             <ul className="space-y-2 text-sm text-gray-300">
               <li className="flex items-center gap-2">
                 <Check className="w-4 h-4 text-green-400" />
-                API Foundations
+                Integration Mindset
               </li>
               <li className="flex items-center gap-2">
                 <Check className="w-4 h-4 text-green-400" />
@@ -382,9 +390,9 @@ export default function Home() {
 
           {/* Preview Content (blurred) */}
           <div className="bg-slate-800/50 backdrop-blur-sm rounded-2xl p-8 border border-slate-700 opacity-50 blur-sm">
-            <div className="text-sm font-semibold text-gray-400 mb-2">API Foundations</div>
-            <h3 className="text-2xl font-bold text-white mb-2">Program to Integration</h3>
-            <p className="text-gray-400 mb-4">Turn a program action into a dependable API integration</p>
+            <div className="text-sm font-semibold text-gray-400 mb-2">Phase 1</div>
+            <h3 className="text-2xl font-bold text-white mb-2">HTTP to Integration</h3>
+            <p className="text-gray-400 mb-4">Turn a network request into a dependable API integration</p>
             <div className="space-y-2">
               <div className="h-2 bg-slate-700 rounded"></div>
               <div className="h-2 bg-slate-700 rounded w-3/4"></div>
@@ -435,10 +443,11 @@ export default function Home() {
               </li>
             </ul>
             <Link
-              href="/signup"
+              href={freeCtaHref}
+              data-testid="home-explore-free"
               className="block w-full py-3 bg-gradient-to-r from-blue-500 to-cyan-500 text-white rounded-lg font-semibold text-center hover:shadow-lg transition-all"
             >
-              Explore Free
+              {freeCtaLabel}
             </Link>
           </div>
 
@@ -449,7 +458,9 @@ export default function Home() {
             </div>
             <div className="text-center mb-6">
               <h3 className="text-2xl font-bold text-white mb-2">Premium</h3>
-              <div className="text-4xl font-bold text-white mb-1">£5</div>
+              <div className="text-4xl font-bold text-white mb-1">
+                <PremiumPriceLabel />
+              </div>
               <p className="text-gray-400">per month · cancel anytime</p>
             </div>
             <ul className="space-y-3 mb-6">
@@ -475,10 +486,11 @@ export default function Home() {
               </li>
             </ul>
             <Link
-              href="/signup"
+              href={premiumCtaHref}
+              data-testid="home-explore-premium"
               className="block w-full py-3 bg-gradient-to-r from-blue-500 to-cyan-500 text-white rounded-lg font-semibold text-center hover:shadow-lg transition-all"
             >
-              Explore Premium
+              {premiumCtaLabel}
             </Link>
           </div>
         </div>
@@ -518,7 +530,7 @@ export default function Home() {
         <div className="text-center">
           <h2 className="text-3xl font-bold text-white mb-4">Ready to Explore?</h2>
           <p className="text-gray-300 mb-8 max-w-2xl mx-auto">
-            Join developers who are mastering API integrations with our comprehensive, interactive training program. Start with API Foundations for free!
+            Join developers who are mastering API integrations with our comprehensive, interactive training program. Start exploring Phase 0 & 1 for free!
           </p>
           <Link 
             href="/signup"

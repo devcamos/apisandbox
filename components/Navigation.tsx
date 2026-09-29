@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useSession, signOut } from "@/components/providers/SessionProvider";
-import { Menu, X, LogOut, User, ChevronDown, BookOpen, Compass, Settings, SlidersHorizontal, CreditCard, Sparkles, Lock, Heart } from "lucide-react";
+import { Menu, X, LogOut, User, ChevronDown, BookOpen, Compass, Settings, CreditCard, Sparkles, Lock, Heart } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import { PageSearch } from "./PageSearch";
 import { ManageSubscriptionButton } from "@/components/premium/ManageSubscriptionButton";
@@ -95,7 +95,8 @@ export default function Navigation() {
       title: "Phases",
       icon: BookOpen,
       items: [
-        { name: "API Foundations: Program to Integration", href: "/learn/api-foundations", badge: "Free" },
+        { name: "Phase 0: Program to Network", href: "/learn/api-foundations/programs-and-state", badge: "Free" },
+        { name: "Phase 1: HTTP to Integration", href: "/learn/api-foundations/http-messages", badge: "Free" },
         { name: "Phase 2: Third-Party Integrations", href: "/phase-2", badge: "Premium" },
         { name: "Phase 3: Inter-Service Communication", href: "/phase-3", badge: "Premium" },
         { name: "Phase 4: Principal-Level Architecture", href: "/phase-4", badge: "Premium" },
@@ -312,14 +313,6 @@ export default function Navigation() {
                           <span className="text-sm">Dashboard</span>
                         </Link>
                         <Link
-                          href="/onboarding"
-                          onClick={() => setProfileOpen(false)}
-                          className="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-300 hover:text-white hover:bg-slate-700 transition-all"
-                        >
-                          <SlidersHorizontal className="w-4 h-4" />
-                          <span className="text-sm">Learning profile</span>
-                        </Link>
-                        <Link
                           href="/settings"
                           onClick={() => setProfileOpen(false)}
                           className="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-300 hover:text-white hover:bg-slate-700 transition-all"
@@ -327,18 +320,20 @@ export default function Navigation() {
                           <Settings className="w-4 h-4" />
                           <span className="text-sm">Settings</span>
                         </Link>
-                        {subscription?.tier === "PREMIUM" && isBillingPortalEnabled() ? (
+                        {subscription?.tier === "PREMIUM" && isBillingPortalEnabled() && !session?.isDemo ? (
                           <ManageSubscriptionButton
                             onNavigate={() => setProfileOpen(false)}
                           />
                         ) : subscription?.tier !== "PREMIUM" ? (
                           <Link
-                            href="/upgrade"
+                            href={session?.isDemo ? "/signup" : "/upgrade"}
                             onClick={() => setProfileOpen(false)}
                             className="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-300 hover:text-white hover:bg-slate-700 transition-all"
                           >
                             <CreditCard className="w-4 h-4" />
-                            <span className="text-sm">Upgrade to Premium</span>
+                            <span className="text-sm">
+                              {session?.isDemo ? "Create a free account" : "Upgrade to Premium"}
+                            </span>
                           </Link>
                         ) : null}
                         <div className="border-t border-slate-700 my-2"></div>
@@ -510,14 +505,6 @@ export default function Navigation() {
                   Dashboard
                 </Link>
                 <Link
-                  href="/onboarding"
-                  onClick={() => setIsOpen(false)}
-                  className="flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-gray-300 hover:text-white hover:bg-slate-800 transition-all"
-                >
-                  <SlidersHorizontal className="w-4 h-4" />
-                  Learning profile
-                </Link>
-                <Link
                   href="/settings"
                   onClick={() => setIsOpen(false)}
                   className="flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-gray-300 hover:text-white hover:bg-slate-800 transition-all"
@@ -525,7 +512,7 @@ export default function Navigation() {
                   <Settings className="w-4 h-4" />
                   Settings
                 </Link>
-                {subscription?.tier === "PREMIUM" && isBillingPortalEnabled() ? (
+                {subscription?.tier === "PREMIUM" && isBillingPortalEnabled() && !session?.isDemo ? (
                   <div className="px-4">
                     <ManageSubscriptionButton
                       onNavigate={() => setIsOpen(false)}
@@ -534,11 +521,11 @@ export default function Navigation() {
                   </div>
                 ) : subscription?.tier !== "PREMIUM" ? (
                   <Link
-                    href="/upgrade"
+                    href={session?.isDemo ? "/signup" : "/upgrade"}
                     onClick={() => setIsOpen(false)}
                     className="block px-4 py-2 rounded-lg text-gray-300 hover:text-white hover:bg-slate-800 transition-all text-center"
                   >
-                    Upgrade to Premium
+                    {session?.isDemo ? "Create a free account" : "Upgrade to Premium"}
                   </Link>
                 ) : null}
                 <button

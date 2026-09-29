@@ -28,6 +28,16 @@ npm run dev
 
 Open [http://localhost:4000](http://localhost:4000). Or: `npm run local-lite`.
 
+## Public API (personal tokens)
+
+Create a token on [/settings](http://localhost:4000/settings), then call the versioned learner API:
+
+```bash
+curl -sS -H "Authorization: Bearer apisb_…" http://localhost:4000/api/v1/me
+```
+
+See [docs/API_V1.md](docs/API_V1.md) and `GET /api/v1/openapi.json`.
+
 ## Commands
 
 | Command | Description |

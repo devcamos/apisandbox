@@ -97,6 +97,9 @@ export async function revokeApiTokenForUser(input: {
   return redactApiTokenRecord(token)
 }
 
+/** Best-effort derived field — throttle DB writes (see redesign: lastUsedAt is derived). */
+export const API_TOKEN_LAST_USED_THROTTLE_MS = 5 * 60 * 1000
+
 export async function authenticateApiToken(rawToken: string, requiredScope?: ApiTokenScope) {
   const token = await prisma.apiToken.findUnique({
     where: { tokenHash: hashApiToken(rawToken) },
@@ -120,10 +123,17 @@ export async function authenticateApiToken(rawToken: string, requiredScope?: Api
     throw new AppError("API token does not have the required scope", 403, "auth_failure")
   }
 
-  await prisma.apiToken.update({
-    where: { id: token.id },
-    data: { lastUsedAt: new Date() },
-  })
+  const now = new Date()
+  const lastUsedAt = token.lastUsedAt
+  const shouldTouchLastUsed =
+    !lastUsedAt || now.getTime() - lastUsedAt.getTime() >= API_TOKEN_LAST_USED_THROTTLE_MS
+
+  if (shouldTouchLastUsed) {
+    await prisma.apiToken.update({
+      where: { id: token.id },
+      data: { lastUsedAt: now },
+    })
+  }
 
   return {
     tokenId: token.id,
@@ -131,5 +141,6 @@ export async function authenticateApiToken(rawToken: string, requiredScope?: Api
     userEmail: token.user.email,
     scopes: token.scopes,
     subscriptionTier: token.user.subscriptionTier,
+    expiresAt: token.expiresAt?.toISOString() ?? null,
   }
 }

@@ -1,5 +1,6 @@
 import { NextRequest } from "next/server"
 import { z } from "zod"
+import { assertLearningCourseAccessForUser } from "@/lib/auth/demo-guards"
 import { requireAuthenticatedUser } from "@/lib/auth/jwt-auth-middleware"
 import { parseJsonBody, withRouteErrorHandling } from "@/lib/http/auth-route-helpers"
 import { errorResponse, okResponse } from "@/lib/http/responses"
@@ -42,6 +43,7 @@ export const GET = withRouteErrorHandling(async (request: NextRequest) => {
     return errorResponse(400, "validation_error", "courseId is required")
   }
 
+  await assertLearningCourseAccessForUser(user, courseId)
   const progress = await getLearningProgressForUser(user.id, courseId)
   return okResponse(progress)
 })
@@ -51,6 +53,7 @@ export const PATCH = withRouteErrorHandling(async (request: NextRequest) => {
   const parsed = await parseJsonBody(request, checkpointProgressSchema, "Invalid learning progress payload")
   if (!parsed.ok) return parsed.response
 
+  await assertLearningCourseAccessForUser(user, parsed.data.courseId)
   const checkpoint = await upsertLearningCheckpointProgress({
     userId: user.id,
     ...parsed.data,
@@ -64,6 +67,7 @@ export const POST = withRouteErrorHandling(async (request: NextRequest) => {
   const parsed = await parseJsonBody(request, importProgressSchema, "Invalid learning progress import payload")
   if (!parsed.ok) return parsed.response
 
+  await assertLearningCourseAccessForUser(user, parsed.data.courseId)
   const progress = await importLearningProgressForUser(
     user.id,
     parsed.data.courseId,

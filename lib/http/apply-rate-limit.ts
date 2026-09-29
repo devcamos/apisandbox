@@ -8,6 +8,14 @@ import {
   type RateLimitResult,
 } from "@/lib/rate-limit"
 
+/** Human message for a 429, including how long to wait when known. */
+export function rateLimitedMessage(resetAt: number, now: number = Date.now()): string {
+  const minutes = resetAt > now ? Math.ceil((resetAt - now) / 60_000) : 0
+  if (minutes <= 0) return "Too many requests. Try again later."
+  const unit = minutes === 1 ? "minute" : "minutes"
+  return `Too many requests. Try again in ${minutes} ${unit}.`
+}
+
 /**
  * Apply a rate limit before running a route handler.
  * Returns a 429 response when exceeded, or null when allowed.
@@ -21,7 +29,7 @@ export async function applyRateLimit(
   const result = await checkRateLimit(id, limiter)
 
   if (!result.allowed) {
-    const res = errorResponse(429, "rate_limited", "Too many requests. Try again later.")
+    const res = errorResponse(429, "rate_limited", rateLimitedMessage(result.resetAt))
     const headers = new Headers(res.headers)
     for (const [k, v] of Object.entries(rateLimitHeaders(result))) {
       headers.set(k, String(v))

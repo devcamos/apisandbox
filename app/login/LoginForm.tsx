@@ -22,12 +22,21 @@ import { useGoogleSignInButton } from "@/hooks/useGoogleSignInButton"
 import { parseLoginErrorMessage, type LoginErrorInfo } from "@/lib/login-error-parser"
 import { authApiPostJson } from "@/lib/auth/client-fetch"
 import { completeClientAuthSession, type ClientAuthSessionPayload } from "@/lib/auth/client-session"
+import {
+  syncValueFromDom,
+  syncValueFromEvent,
+  useAutofillSync,
+  useLatestRef,
+} from "@/lib/auth/autofill-sync"
 import { validateEmailFormat } from "@/lib/validation/email"
 import AuthPageShell from "@/components/auth/AuthPageShell"
 import AuthSocialSection from "@/components/auth/AuthSocialSection"
 import { TryDemoButton } from "@/components/auth/TryDemoButton"
 
-function LoginForm({ googleClientId }: Readonly<{ googleClientId: string }>) {
+function LoginForm({
+  googleClientId,
+  demoEnabled = false,
+}: Readonly<{ googleClientId: string; demoEnabled?: boolean }>) {
   const searchParams = useSearchParams()
   const { setSessionFromAuthResponse } = useAuthSessionWriter()
   const [email, setEmail] = useState("")
@@ -39,10 +48,29 @@ function LoginForm({ googleClientId }: Readonly<{ googleClientId: string }>) {
   const [emailTouched, setEmailTouched] = useState(false)
   const [passwordTouched, setPasswordTouched] = useState(false)
   const googleButtonRef = useRef<HTMLDivElement>(null)
+  const emailInputRef = useRef<HTMLInputElement>(null)
+  const passwordInputRef = useRef<HTMLInputElement>(null)
+  const emailStateRef = useLatestRef(email)
+  const passwordStateRef = useLatestRef(password)
+  const emailTouchedRef = useLatestRef(emailTouched)
+  const passwordTouchedRef = useLatestRef(passwordTouched)
 
   // MENTOR NOTE: Get callbackUrl from query params
   // This is set by middleware when user tries to access protected route
   const callbackUrl = searchParams.get("callbackUrl") || "/dashboard"
+
+  const validateEmail = (emailValue: string) => validateEmailFormat(emailValue)
+
+  // Client-side password validation
+  const validatePassword = (passwordValue: string): string => {
+    if (!passwordValue) {
+      return "Password is required"
+    }
+    if (passwordValue.length < 6) {
+      return "Password must be at least 6 characters"
+    }
+    return ""
+  }
 
   // Show friendly message when NextAuth returns error=Configuration (e.g. AUTH_URL mismatch)
   useEffect(() => {
@@ -58,23 +86,29 @@ function LoginForm({ googleClientId }: Readonly<{ googleClientId: string }>) {
     }
   }, [searchParams])
 
-  const validateEmail = (emailValue: string) => validateEmailFormat(emailValue)
-
-  // Client-side password validation
-  const validatePassword = (passwordValue: string): string => {
-    if (!passwordValue) {
-      return "Password is required"
-    }
-    if (passwordValue.length < 6) {
-      return "Password must be at least 6 characters"
-    }
-    return ""
-  }
+  // Password managers / Chrome autofill often fill the DOM without onChange.
+  useAutofillSync([
+    {
+      ref: emailInputRef,
+      getCurrent: () => emailStateRef.current,
+      setValue: (next) => {
+        setEmail(next)
+        if (emailTouchedRef.current) setEmailError(validateEmailFormat(next))
+      },
+    },
+    {
+      ref: passwordInputRef,
+      getCurrent: () => passwordStateRef.current,
+      setValue: (next) => {
+        setPassword(next)
+        if (passwordTouchedRef.current) setPasswordError(validatePassword(next))
+      },
+    },
+  ])
 
   // Handle email change with validation
   const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value
-    setEmail(value)
+    const value = syncValueFromEvent(e, setEmail)
     if (emailTouched) {
       setEmailError(validateEmail(value))
     }
@@ -86,8 +120,7 @@ function LoginForm({ googleClientId }: Readonly<{ googleClientId: string }>) {
 
   // Handle password change with validation
   const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value
-    setPassword(value)
+    const value = syncValueFromEvent(e, setPassword)
     if (passwordTouched) {
       setPasswordError(validatePassword(value))
     }
@@ -95,6 +128,19 @@ function LoginForm({ googleClientId }: Readonly<{ googleClientId: string }>) {
     if (error) {
       setError(null)
     }
+  }
+
+  const handleEmailBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+    // Prefer live DOM value — Chrome autofill may blur before React state updates.
+    const value = syncValueFromEvent(e, setEmail)
+    setEmailTouched(true)
+    setEmailError(validateEmail(value))
+  }
+
+  const handlePasswordBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+    const value = syncValueFromEvent(e, setPassword)
+    setPasswordTouched(true)
+    setPasswordError(validatePassword(value))
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -105,9 +151,13 @@ function LoginForm({ googleClientId }: Readonly<{ googleClientId: string }>) {
     setEmailTouched(true)
     setPasswordTouched(true)
 
+    // Autofill may have updated the DOM without React state — sync before validate.
+    const emailValue = syncValueFromDom(emailInputRef.current, email, setEmail)
+    const passwordValue = syncValueFromDom(passwordInputRef.current, password, setPassword)
+
     // Client-side validation
-    const emailValidation = validateEmail(email)
-    const passwordValidation = validatePassword(password)
+    const emailValidation = validateEmail(emailValue)
+    const passwordValidation = validatePassword(passwordValue)
 
     if (emailValidation || passwordValidation) {
       setEmailError(emailValidation)
@@ -120,8 +170,8 @@ function LoginForm({ googleClientId }: Readonly<{ googleClientId: string }>) {
 
     try {
       const { ok, payload } = await authApiPostJson<ClientAuthSessionPayload>("/api/auth/login", {
-        email: email.trim().toLowerCase(),
-        password,
+        email: emailValue.trim().toLowerCase(),
+        password: passwordValue,
       })
       if (!ok || !payload.data) {
         const errorInfo = parseLoginErrorMessage(payload?.error?.message ?? "Login failed")
@@ -133,7 +183,7 @@ function LoginForm({ googleClientId }: Readonly<{ googleClientId: string }>) {
         authData: payload.data,
         redirectTo: callbackUrl,
         setSession: setSessionFromAuthResponse,
-        savePassword: { email, password },
+        savePassword: { email: emailValue, password: passwordValue },
       })
       return
     } catch (err) {
@@ -222,12 +272,11 @@ function LoginForm({ googleClientId }: Readonly<{ googleClientId: string }>) {
                   name="email"
                   type="email"
                   autoComplete="username"
+                  ref={emailInputRef}
                   value={email}
                   onChange={handleEmailChange}
-                  onBlur={() => {
-                    setEmailTouched(true)
-                    setEmailError(validateEmail(email))
-                  }}
+                  onInput={handleEmailChange}
+                  onBlur={handleEmailBlur}
                   required
                   className={`w-full pl-10 pr-10 py-3 bg-slate-900/50 border rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 transition-colors ${
                     emailError
@@ -270,12 +319,11 @@ function LoginForm({ googleClientId }: Readonly<{ googleClientId: string }>) {
                   name="password"
                   type="password"
                   autoComplete="current-password"
+                  ref={passwordInputRef}
                   value={password}
                   onChange={handlePasswordChange}
-                  onBlur={() => {
-                    setPasswordTouched(true)
-                    setPasswordError(validatePassword(password))
-                  }}
+                  onInput={handlePasswordChange}
+                  onBlur={handlePasswordBlur}
                   required
                   className={`w-full pl-10 pr-10 py-3 bg-slate-900/50 border rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 transition-colors ${
                     passwordError
@@ -373,9 +421,11 @@ function LoginForm({ googleClientId }: Readonly<{ googleClientId: string }>) {
             </button>
           </form>
 
-          <div className="mt-6 space-y-3">
-            <TryDemoButton nextPath={callbackUrl} />
-          </div>
+          {demoEnabled ? (
+            <div className="mt-6" data-testid="login-demo-panel">
+              <TryDemoButton nextPath={callbackUrl} enabled />
+            </div>
+          ) : null}
 
           {/* Sign Up Link */}
           <div className="mt-6 text-center text-sm text-gray-400">
