@@ -133,11 +133,7 @@ function UpgradePageInner() {
               <ul className="space-y-3 mb-6">
                 <li className="flex items-center gap-2 text-gray-300">
                   <Check className="w-5 h-5 text-green-400 shrink-0" />
-                  Phase 0: Program to Network
-                </li>
-                <li className="flex items-center gap-2 text-gray-300">
-                  <Check className="w-5 h-5 text-green-400 shrink-0" />
-                  Phase 1: HTTP to Integration
+                  API Foundations: Program to Integration
                 </li>
                 <li className="flex items-center gap-2 text-gray-300">
                   <Check className="w-5 h-5 text-green-400 shrink-0" />

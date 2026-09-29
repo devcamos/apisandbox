@@ -244,7 +244,15 @@ model UserProfile {
   lastName          String?
   avatarUrl         String?
   roleLabel         String?
-  identityStatement String?
+  identityStatement     String?
+  engineeringRole       String?
+  experienceLevel       String?
+  primaryLanguage       String?
+  primaryFramework      String?
+  runtimeEnvironment    String?
+  cloudProvider         String?
+  learningGoal          String?
+  onboardingCompletedAt DateTime?
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
 
