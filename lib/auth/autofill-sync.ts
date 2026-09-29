@@ -55,6 +55,15 @@ export function syncValueFromEvent(
   return next
 }
 
+/** Keep a ref aligned with the latest render value (updated in an effect). */
+export function useLatestRef<T>(value: T): RefObject<T> {
+  const ref = useRef(value)
+  useEffect(() => {
+    ref.current = value
+  }, [value])
+  return ref
+}
+
 type AutofillField = {
   ref: RefObject<HTMLInputElement | null>
   /** Latest React state for this field (read via ref so the effect stays stable). */
@@ -70,7 +79,9 @@ type AutofillField = {
  */
 export function useAutofillSync(fields: AutofillField[]): void {
   const fieldsRef = useRef(fields)
-  fieldsRef.current = fields
+  useEffect(() => {
+    fieldsRef.current = fields
+  }, [fields])
 
   useEffect(() => {
     const adoptAll = () => {
@@ -79,17 +90,17 @@ export function useAutofillSync(fields: AutofillField[]): void {
       }
     }
 
-    const frame = window.requestAnimationFrame(adoptAll)
+    const frame = globalThis.requestAnimationFrame(adoptAll)
     const listeners: Array<() => void> = []
 
     fieldsRef.current.forEach((_, index) => {
       const el = fieldsRef.current[index]?.ref.current
       if (!el) return
 
-      let pollId: number | undefined
+      let pollId: ReturnType<typeof globalThis.setInterval> | undefined
       const stopPoll = () => {
         if (pollId !== undefined) {
-          window.clearInterval(pollId)
+          globalThis.clearInterval(pollId)
           pollId = undefined
         }
       }
@@ -101,7 +112,7 @@ export function useAutofillSync(fields: AutofillField[]): void {
       const onFocus = () => {
         adoptThis()
         stopPoll()
-        pollId = window.setInterval(adoptThis, 50)
+        pollId = globalThis.setInterval(adoptThis, 50)
       }
       const onBlur = () => {
         stopPoll()
@@ -118,10 +129,8 @@ export function useAutofillSync(fields: AutofillField[]): void {
     })
 
     return () => {
-      window.cancelAnimationFrame(frame)
+      globalThis.cancelAnimationFrame(frame)
       for (const dispose of listeners) dispose()
     }
-    // Mount once; field setters are stable enough via fieldsRef.
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- autofill wiring on mount only
   }, [])
 }

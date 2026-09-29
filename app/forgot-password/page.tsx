@@ -8,6 +8,7 @@ import {
   syncValueFromDom,
   syncValueFromEvent,
   useAutofillSync,
+  useLatestRef,
 } from "@/lib/auth/autofill-sync"
 import { validateEmailFormat } from "@/lib/validation/email"
 
@@ -19,8 +20,7 @@ import { validateEmailFormat } from "@/lib/validation/email"
 export default function ForgotPasswordPage() {
   const emailInputRef = useRef<HTMLInputElement>(null)
   const [email, setEmail] = useState("")
-  const emailStateRef = useRef(email)
-  emailStateRef.current = email
+  const emailStateRef = useLatestRef(email)
   const [submitted, setSubmitted] = useState(false)
   const [emailError, setEmailError] = useState("")
 

@@ -26,6 +26,7 @@ import {
   syncValueFromDom,
   syncValueFromEvent,
   useAutofillSync,
+  useLatestRef,
 } from "@/lib/auth/autofill-sync"
 import { getPasswordRequirements } from "@/lib/password-validation"
 
@@ -48,8 +49,7 @@ function SignupFormInner({ googleClientId }: Readonly<{ googleClientId: string }
     password: "",
     confirmPassword: "",
   })
-  const formDataRef = useRef(formData)
-  formDataRef.current = formData
+  const formDataRef = useLatestRef(formData)
   const [errors, setErrors] = useState<string[]>([])
   const [isLoading, setIsLoading] = useState(false)
 

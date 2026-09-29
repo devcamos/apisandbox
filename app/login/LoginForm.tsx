@@ -26,6 +26,7 @@ import {
   syncValueFromDom,
   syncValueFromEvent,
   useAutofillSync,
+  useLatestRef,
 } from "@/lib/auth/autofill-sync"
 import { validateEmailFormat } from "@/lib/validation/email"
 import AuthPageShell from "@/components/auth/AuthPageShell"
@@ -50,14 +51,10 @@ function LoginForm({
   const googleButtonRef = useRef<HTMLDivElement>(null)
   const emailInputRef = useRef<HTMLInputElement>(null)
   const passwordInputRef = useRef<HTMLInputElement>(null)
-  const emailStateRef = useRef(email)
-  const passwordStateRef = useRef(password)
-  const emailTouchedRef = useRef(emailTouched)
-  const passwordTouchedRef = useRef(passwordTouched)
-  emailStateRef.current = email
-  passwordStateRef.current = password
-  emailTouchedRef.current = emailTouched
-  passwordTouchedRef.current = passwordTouched
+  const emailStateRef = useLatestRef(email)
+  const passwordStateRef = useLatestRef(password)
+  const emailTouchedRef = useLatestRef(emailTouched)
+  const passwordTouchedRef = useLatestRef(passwordTouched)
 
   // MENTOR NOTE: Get callbackUrl from query params
   // This is set by middleware when user tries to access protected route
