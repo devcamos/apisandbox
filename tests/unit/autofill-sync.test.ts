@@ -51,8 +51,7 @@ describe("autofill-sync", () => {
     const input = document.createElement("input")
     document.body.appendChild(input)
     const ref = createRef<HTMLInputElement>()
-    // @ts-expect-error assign test node
-    ref.current = input
+    Object.assign(ref, { current: input })
 
     let current = ""
     const setValue = vi.fn((next: string) => {
