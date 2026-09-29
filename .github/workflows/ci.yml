@@ -290,9 +290,15 @@ jobs:
           CI_E2E_USE_PROD_SERVER: "1"
           ALLOW_DEMO_LOGIN_IN_PRODUCTION: "true"
           PLAYWRIGHT_WORKERS: "3"
+          VERCEL_ENV: preview
+          NEXT_PUBLIC_FF_STRIPE_CHECKOUT: "true"
+          STRIPE_SECRET_KEY: sk_test_e2e_premium_signup_placeholder
+          STRIPE_WEBHOOK_SECRET: whsec_e2e_premium_signup_test_secret_32b
+          STRIPE_PRICE_ID: price_e2e_premium_signup
+          NEXT_PUBLIC_APP_URL: http://127.0.0.1:4000
         run: |
           mkdir -p reports
-          PLAYWRIGHT_JSON_OUTPUT_NAME=reports/playwright-smoke.json PLAYWRIGHT_JUNIT_OUTPUT_NAME=reports/playwright-smoke-junit.xml npx playwright test tests/ci-smoke.spec.ts --project=chromium --reporter=json,junit
+          PLAYWRIGHT_JSON_OUTPUT_NAME=reports/playwright-smoke.json PLAYWRIGHT_JUNIT_OUTPUT_NAME=reports/playwright-smoke-junit.xml npx playwright test tests/ci-smoke.spec.ts tests/premium-signup.spec.ts --project=chromium --reporter=json,junit
 
       - name: Publish smoke test summary
         if: always()

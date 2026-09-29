@@ -99,7 +99,7 @@ export async function POST(request: NextRequest) {
       client_reference_id: user.id,
       metadata: { userId: user.id },
       subscription_data: { metadata: { userId: user.id } },
-      // Product: £5/month Premium via STRIPE_PRICE_ID.
+      // Product: Premium monthly via STRIPE_PRICE_ID (UI amount from resolvePremiumPricing / Stripe Price).
       mode: "subscription",
       line_items: [{ price: priceId, quantity: 1 }],
       success_url: `${appUrl}/upgrade/success?session_id={CHECKOUT_SESSION_ID}`,

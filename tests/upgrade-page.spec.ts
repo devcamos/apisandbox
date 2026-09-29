@@ -4,6 +4,10 @@
 
 import { test, expect } from "@playwright/test"
 import { randomUUID } from "node:crypto"
+import {
+  injectAuthToken,
+  registerUser,
+} from "./helpers/premium-helpers"
 
 test.describe("Upgrade Page", () => {
   test("should display upgrade page", async ({ page }) => {
@@ -18,21 +22,20 @@ test.describe("Upgrade Page", () => {
     await expect(page.getByText(/£0/)).toBeVisible()
 
     await expect(page.getByRole("heading", { name: /^premium$/i })).toBeVisible()
-    await expect(page.getByText(/£5/)).toBeVisible()
+    await expect(page.getByTestId("premium-price").first()).toBeVisible()
   })
 
   test("should show feature comparison", async ({ page }) => {
     await page.goto("/upgrade")
 
-    await expect(page.getByText(/phase 0: how the internet works/i)).toBeVisible()
-    await expect(page.getByText(/phase 1: integration mindset/i)).toBeVisible()
+    await expect(page.getByText(/phase 0: program to network/i)).toBeVisible()
+    await expect(page.getByText(/phase 1: http to integration/i)).toBeVisible()
     await expect(page.getByText(/all learning phases/i)).toBeVisible()
   })
 
   test("should show upgrade button", async ({ page }) => {
     await page.goto("/upgrade")
-    const upgradeButton = page.getByRole("button", { name: /upgrade.*£5/i })
-    await expect(upgradeButton).toBeVisible()
+    await expect(page.getByTestId("upgrade-start-checkout")).toBeVisible()
   })
 
   test("should prompt login for unauthenticated users", async ({ page }) => {
@@ -42,22 +45,13 @@ test.describe("Upgrade Page", () => {
 
   test("should allow authenticated users to start upgrade", async ({ page, request }) => {
     const uniqueEmail = `test-${Date.now()}-${randomUUID()}@example.com`
-    await request.post("/api/auth/signup", {
-      data: {
-        email: uniqueEmail,
-        password: "Test1234!@#$",
-      },
-    })
-
-    await page.goto("/login")
-    await page.getByLabel(/email address/i).fill(uniqueEmail)
-    await page.getByLabel(/^password$/i).fill("Test1234!@#$")
-    await page.getByRole("button", { name: /sign in/i }).click()
-    await page.waitForURL(/\/dashboard/)
+    const { token } = await registerUser(request, uniqueEmail)
+    await injectAuthToken(page, token)
 
     await page.goto("/upgrade")
-    const upgradeButton = page.getByRole("button", { name: /upgrade.*£5/i })
+    const upgradeButton = page.getByTestId("upgrade-start-checkout")
     await expect(upgradeButton).toBeEnabled()
+    await expect(upgradeButton).toContainText(/upgrade/i)
   })
 
   test("should show trust indicators", async ({ page }) => {
@@ -72,6 +66,6 @@ test.describe("Upgrade Page", () => {
 
     const backLink = page.getByRole("link", { name: /back to free content/i })
     await expect(backLink).toBeVisible()
-    await expect(backLink).toHaveAttribute("href", "/phase-1")
+    await expect(backLink).toHaveAttribute("href", "/learn/api-foundations")
   })
 })

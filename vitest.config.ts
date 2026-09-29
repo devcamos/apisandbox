@@ -55,6 +55,7 @@ export default defineConfig({
         "lib/stripe-subscriptions.ts",
         "lib/subscription-provision.ts",
         "lib/stripe-client.ts",
+        "lib/premium-pricing.ts",
         "lib/user-name.ts",
         "lib/validation/email.ts",
         "config/featureFlags.ts",

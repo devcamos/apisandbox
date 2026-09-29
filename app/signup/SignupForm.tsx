@@ -132,8 +132,8 @@ function SignupFormInner({ googleClientId }: Readonly<{ googleClientId: string }
       }
 
       const redirectTo =
-        claimingDemo && (payload.data.plan === "pro" || plan === "pro")
-          ? "/upgrade"
+        plan === "pro" || (claimingDemo && payload.data.plan === "pro")
+          ? "/upgrade?checkout=1"
           : "/dashboard"
 
       await completeClientAuthSession({
@@ -164,7 +164,7 @@ function SignupFormInner({ googleClientId }: Readonly<{ googleClientId: string }
         }
         await completeClientAuthSession({
           authData: payload.data,
-          redirectTo: "/dashboard",
+          redirectTo: plan === "pro" ? "/upgrade?checkout=1" : "/dashboard",
           setSession: setSessionFromAuthResponse,
         })
         return
@@ -174,7 +174,7 @@ function SignupFormInner({ googleClientId }: Readonly<{ googleClientId: string }
         setIsLoading(false)
       }
     },
-    [setSessionFromAuthResponse],
+    [setSessionFromAuthResponse, plan],
   )
 
   useGoogleSignInButton({
@@ -216,7 +216,7 @@ function SignupFormInner({ googleClientId }: Readonly<{ googleClientId: string }
       {fromDemo && sessionStatus === "authenticated" && !session?.isDemo ? (
         <div className="mb-6 rounded-lg border border-slate-600 bg-slate-900/50 px-4 py-3 text-sm text-gray-300">
           You are already signed in with a real account.{" "}
-          <Link href={plan === "pro" ? "/upgrade" : "/dashboard"} className="text-blue-400 font-semibold">
+          <Link href={plan === "pro" ? "/upgrade?checkout=1" : "/dashboard"} className="text-blue-400 font-semibold">
             Continue
           </Link>
         </div>
