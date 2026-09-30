@@ -1,0 +1,82 @@
+name: Vercel Deployment E2E
+
+on:
+  repository_dispatch:
+    types:
+      - vercel.deployment.ready
+  workflow_dispatch:
+    inputs:
+      base_url:
+        description: Vercel deployment URL to test
+        required: true
+        type: string
+      git_sha:
+        description: Optional commit SHA to check out
+        required: false
+        type: string
+      environment:
+        description: Deployment environment
+        required: true
+        default: preview
+        type: choice
+        options:
+          - preview
+          - production
+
+permissions:
+  contents: read
+  statuses: write
+
+concurrency:
+  group: vercel-e2e-${{ github.event.client_payload.project.id || 'manual' }}-${{ github.event.client_payload.environment || inputs.environment || 'manual' }}-${{ github.event.client_payload.git.sha || inputs.git_sha || github.sha }}
+  cancel-in-progress: true
+
+jobs:
+  e2e:
+    name: API Sandbox deployed E2E
+    runs-on: ubuntu-latest
+    env:
+      BASE_URL: ${{ github.event.client_payload.url || inputs.base_url }}
+      DEPLOYMENT_ENVIRONMENT: ${{ github.event.client_payload.environment || inputs.environment }}
+      VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
+    steps:
+      - name: Check out deployed commit
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.client_payload.git.sha || inputs.git_sha || github.sha }}
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Verify deployed database and authentication
+        run: node scripts/vercel-deployment-e2e.mjs
+
+      - name: Install Playwright Chromium
+        if: env.DEPLOYMENT_ENVIRONMENT != 'production'
+        run: npx playwright install chromium --with-deps
+
+      - name: Run deployed registration and login E2E
+        if: env.DEPLOYMENT_ENVIRONMENT != 'production'
+        env:
+          PLAYWRIGHT_PROD_URL: ${{ env.BASE_URL }}
+        run: npm run test:prod
+
+      - name: Upload Playwright report
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: vercel-playwright-report
+          path: playwright-report/
+          if-no-files-found: ignore
+
+      - name: Report deployment check to Vercel
+        if: always() && github.event_name == 'repository_dispatch'
+        uses: vercel/repository-dispatch/actions/status@v1
+        with:
+          name: Vercel - API Sandbox E2E (${{ github.event.client_payload.environment || inputs.environment || 'manual' }})
