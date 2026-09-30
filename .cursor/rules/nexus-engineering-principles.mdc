@@ -1,0 +1,27 @@
+---
+description: Apply the Nexus Motivus and MotivusLabs engineering principles to every project change
+alwaysApply: true
+---
+
+# Nexus engineering standard
+
+The normative standard is `docs/NEXUS_ENGINEERING_PRINCIPLES.md`. Apply it to planning, implementation, review, testing, and operations.
+
+## Required behaviour
+
+- Start from an owned user or operational outcome, acceptance evidence, risks, and explicit non-goals.
+- Protect people, credentials, privacy, and data integrity before optimising delivery speed or cost.
+- Treat APIs, events, schemas, persisted data, environment variables, and URLs as versioned contracts.
+- Keep changes small, reversible, observable, accessible, and covered at the cheapest reliable test layer.
+- Preserve concurrent work and existing architecture unless evidence supports a scoped change.
+- Never bypass security, review, CI, deployment, or recovery gates to declare completion.
+
+## Shared resources
+
+Before presenting code, services, templates, workflows, datasets, or documentation as a MotivusLabs resource for Nexus, ensure it has:
+
+- purpose, consumers, non-goals, owner, and support path;
+- a documented contract, usage example, version policy, and compatibility range;
+- quality, security, data, operations, cost, and lifecycle evidence appropriate to its risk.
+
+Document time-bound exceptions with an owner, compensating control, review date, and removal plan.

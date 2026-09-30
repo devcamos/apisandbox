@@ -5,6 +5,7 @@ Essential docs for onboarding and shipping changes. Product learning content liv
 | Doc | Use when |
 |-----|----------|
 | [AGENT_ONBOARDING.md](./AGENT_ONBOARDING.md) | **Start here** — setup, URLs, verify, conventions |
+| [NEXUS_ENGINEERING_PRINCIPLES.md](./NEXUS_ENGINEERING_PRINCIPLES.md) | Normative Nexus/MotivusLabs engineering principles and reusable-resource contract |
 | [GITFLOW.md](./GITFLOW.md) | Branching (`main` trunk, `v1` release line, tags) |
 | [AGENT_PR_CHECKLIST.md](./AGENT_PR_CHECKLIST.md) | Before every PR (`npm run verify:ci`) |
 | [TEST_USERS.md](./TEST_USERS.md) | Test-user policy and login setup for Local, CI, Preview, staging, and production |

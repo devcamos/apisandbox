@@ -9,6 +9,7 @@ Next.js app for learning API integrations — phases, demos, auth, and subscript
 | Doc | Purpose |
 |-----|---------|
 | [docs/AGENT_ONBOARDING.md](docs/AGENT_ONBOARDING.md) | Setup, verify, project links |
+| [docs/NEXUS_ENGINEERING_PRINCIPLES.md](docs/NEXUS_ENGINEERING_PRINCIPLES.md) | Nexus/MotivusLabs engineering principles and reusable-resource standard |
 | [docs/GITFLOW.md](docs/GITFLOW.md) | Branching and releases |
 | [docs/AGENT_PR_CHECKLIST.md](docs/AGENT_PR_CHECKLIST.md) | Pre-PR checks |
 | [docs/TEST_USERS.md](docs/TEST_USERS.md) | Local test credentials |
