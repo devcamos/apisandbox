@@ -9,7 +9,7 @@ export default function QuickStartGuide() {
       <div className="text-center mb-12">
         <h2 className="text-3xl font-bold text-white mb-4">Quick Start Guide</h2>
         <p className="text-gray-300 max-w-2xl mx-auto">
-          New to API integrations? Start here for a guided introduction to the fundamentals.
+          New to API integrations? Start here for a structured first-principles foundation.
         </p>
       </div>
 

@@ -14,7 +14,7 @@ const inter = Inter({ subsets: ["latin"] });
 export const metadata: Metadata = {
   title: "API Sandbox — Learn API Development Interactively",
   description:
-    "Master API integrations, algorithms, and architecture patterns through interactive visualisers and guided practice. Free to start; Premium unlocks the full curriculum.",
+    "Master API integrations, algorithms, and architecture patterns through stack-aware scenarios and assessments. Free to start; Premium unlocks the full curriculum.",
   openGraph: {
     title: "API Sandbox — Learn API Development Interactively",
     description:

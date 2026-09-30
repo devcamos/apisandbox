@@ -101,9 +101,9 @@ test.describe('Auth Signup', () => {
     
     await page.getByRole('button', { name: /create account/i }).click();
     
-    // Should redirect to login page
-    await expect(page).toHaveURL(/\/login/);
-    await expect(page.getByText(/registered|welcome|sign in/i)).toBeVisible();
+    // New accounts define their stack before entering the dashboard.
+    await expect(page).toHaveURL(/\/onboarding/);
+    await expect(page.getByRole('heading', { name: /build your engineering path/i })).toBeVisible();
   });
 
   test('should successfully create account via API', async ({ request }) => {

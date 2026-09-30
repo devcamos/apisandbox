@@ -28,8 +28,7 @@ test.describe("Upgrade Page", () => {
   test("should show feature comparison", async ({ page }) => {
     await page.goto("/upgrade")
 
-    await expect(page.getByText(/phase 0: program to network/i)).toBeVisible()
-    await expect(page.getByText(/phase 1: http to integration/i)).toBeVisible()
+    await expect(page.getByText(/API Foundations: Program to Integration/i)).toBeVisible()
     await expect(page.getByText(/all learning phases/i)).toBeVisible()
   })
 

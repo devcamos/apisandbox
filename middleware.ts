@@ -6,7 +6,7 @@ import { isSafeRelativeCallbackPath } from "@/lib/safe-redirect"
 const PREMIUM_PHASE_PATTERN = /^\/phase-([2-6])(\/|$)/
 const PROTECTED_API_PATTERN = /^\/api\/(subscription|profile|phase-progress)/
 const PROTECTED_RESOURCE_PATTERN =
-  /^\/(dashboard|observability|phase-\d+|cloud|ai|docs\/(architecture|java))(\/|$)/
+  /^\/(dashboard|onboarding|observability|phase-\d+|cloud|ai|docs\/(architecture|java)|learn\/stack)(\/|$)/
 const PUBLIC_RESOURCE_PATHS = new Set(["/cloud/aws/certifications"])
 
 function redirectToLogin(request: NextRequest, callbackPath: string) {

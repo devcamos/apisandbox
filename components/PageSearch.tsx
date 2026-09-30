@@ -31,29 +31,37 @@ const searchData: SearchResult[] = [
     icon: BookOpen,
     keywords: ["dashboard", "progress", "achievements", "overview"]
   },
+  {
+    title: "Learning Profile",
+    description: "Choose your role, experience, language, framework, runtime, and goals",
+    href: "/onboarding",
+    category: "Personalized",
+    icon: BookOpen,
+    keywords: ["profile", "onboarding", "language", "framework", "role", "experience", "stack"]
+  },
+  {
+    title: "Stack Foundation",
+    description: "Map universal API concepts into your selected framework",
+    href: "/learn/stack",
+    category: "Personalized",
+    icon: Code,
+    keywords: ["stack", "framework", "language", "runtime", "implementation", "personalized"]
+  },
 
   // Phases
   {
-    title: "Phase 0: Program to Network",
-    description: "First principles: programs, processes, ports, DNS, TCP, and TLS",
-    href: "/learn/api-foundations/programs-and-state",
-    category: "Phase 0",
+    title: "API Foundations: Program to Integration",
+    description: "Follow one request through program state, the network, HTTP, contracts, and integration",
+    href: "/learn/api-foundations",
+    category: "Foundation",
     icon: BookOpen,
-    keywords: ["phase 0", "first principles", "programs", "async", "processes", "ports", "dns", "network", "fundamentals"]
+    keywords: ["api foundations", "first principles", "programs", "async", "processes", "ports", "dns", "network", "http", "contracts", "integration"]
   },
   {
-    title: "Phase 1: HTTP to Integration",
-    description: "HTTP messages, JSON contracts, and dependable API integrations",
-    href: "/learn/api-foundations/http-messages",
-    category: "Phase 1",
-    icon: Brain,
-    keywords: ["phase 1", "http", "json", "contract", "validation", "timeout", "retry", "integration"]
-  },
-  {
-    title: "Phase 1: Categories",
+    title: "API Categories",
     description: "Explore different API categories",
     href: "/phase-1/categories",
-    category: "Phase 1",
+    category: "Reference",
     icon: Brain,
     keywords: ["phase 1", "categories", "api types", "protocols"]
   },
@@ -409,8 +417,9 @@ export function PageSearch() {
   const getCategoryColor = (category: string) => {
     const colors: Record<string, string> = {
       'Main': 'bg-blue-100 text-blue-800',
-      'Phase 0': 'bg-green-100 text-green-800',
-      'Phase 1': 'bg-purple-100 text-purple-800',
+      'Foundation': 'bg-green-100 text-green-800',
+      'Reference': 'bg-slate-100 text-slate-800',
+      'Personalized': 'bg-violet-100 text-violet-800',
       'Phase 2': 'bg-yellow-100 text-yellow-800',
       'Phase 3': 'bg-red-100 text-red-800',
       'Phase 4': 'bg-indigo-100 text-indigo-800',
