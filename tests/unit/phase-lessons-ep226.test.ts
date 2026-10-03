@@ -5,12 +5,12 @@ describe("EP226 phase lessons", () => {
   it("registers design-decision modules on phase 1", () => {
     const plan = getPhaseLessonPlan(1)
     expect(plan).toBeDefined()
-    const ids = plan!.modules.map((module) => module.id)
+    const ids = plan!.modules.map((lesson) => lesson.id)
     expect(ids).toEqual(expect.arrayContaining(["resource-naming", "pagination", "api-documentation"]))
 
     for (const id of ["resource-naming", "pagination", "api-documentation"] as const) {
-      const module = plan!.modules.find((entry) => entry.id === id)
-      expect(module?.checkpoints.map((checkpoint) => checkpoint.id)).toEqual([
+      const lesson = plan!.modules.find((entry) => entry.id === id)
+      expect(lesson?.checkpoints.map((checkpoint) => checkpoint.id)).toEqual([
         "context",
         "model",
         "contrast",
@@ -22,18 +22,18 @@ describe("EP226 phase lessons", () => {
   it("registers security and webhook modules on phase 2 with /api/v1 worked examples", () => {
     const plan = getPhaseLessonPlan(2)
     expect(plan).toBeDefined()
-    const ids = plan!.modules.map((module) => module.id)
+    const ids = plan!.modules.map((lesson) => lesson.id)
     expect(ids).toEqual(expect.arrayContaining(["token-scopes", "permissions", "webhooks"]))
 
-    const scopes = plan!.modules.find((module) => module.id === "token-scopes")
+    const scopes = plan!.modules.find((lesson) => lesson.id === "token-scopes")
     expect(scopes?.checkpoints.some((checkpoint) => checkpoint.projectTask?.includes("/api/v1"))).toBe(true)
     expect(scopes?.checkpoints.some((checkpoint) => checkpoint.answerGuide?.includes("insufficient_scope"))).toBe(
       true,
     )
 
     for (const id of ["token-scopes", "permissions", "webhooks"] as const) {
-      const module = plan!.modules.find((entry) => entry.id === id)
-      expect(module?.checkpoints.map((checkpoint) => checkpoint.id)).toEqual([
+      const lesson = plan!.modules.find((entry) => entry.id === id)
+      expect(lesson?.checkpoints.map((checkpoint) => checkpoint.id)).toEqual([
         "integrity",
         "mechanics",
         "failure",
@@ -44,7 +44,7 @@ describe("EP226 phase lessons", () => {
 
   it("keeps existing phase-2 oauth module ids stable", () => {
     const plan = getPhaseLessonPlan(2)
-    expect(plan?.modules.some((module) => module.id === "oauth-flow")).toBe(true)
-    expect(plan?.modules.find((module) => module.id === "oauth-flow")?.checkpoints[0]?.id).toBe("integrity")
+    expect(plan?.modules.some((lesson) => lesson.id === "oauth-flow")).toBe(true)
+    expect(plan?.modules.find((lesson) => lesson.id === "oauth-flow")?.checkpoints[0]?.id).toBe("integrity")
   })
 })
