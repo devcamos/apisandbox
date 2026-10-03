@@ -26,10 +26,13 @@ describe("EP226 phase lessons", () => {
     expect(ids).toEqual(expect.arrayContaining(["token-scopes", "permissions", "webhooks"]))
 
     const scopes = plan!.modules.find((lesson) => lesson.id === "token-scopes")
-    expect(scopes?.checkpoints.some((checkpoint) => checkpoint.projectTask?.includes("/api/v1"))).toBe(true)
-    expect(scopes?.checkpoints.some((checkpoint) => checkpoint.answerGuide?.includes("insufficient_scope"))).toBe(
-      true,
-    )
+    const scopesText = scopes?.checkpoints
+      .flatMap((checkpoint) => [checkpoint.prompt, checkpoint.answerGuide, checkpoint.projectTask])
+      .filter(Boolean)
+      .join("\n")
+    expect(scopesText).toContain("/api/v1")
+    expect(scopesText).toContain("insufficient_scope")
+    expect(scopesText).toContain("profile:read")
 
     for (const id of ["token-scopes", "permissions", "webhooks"] as const) {
       const lesson = plan!.modules.find((entry) => entry.id === id)
