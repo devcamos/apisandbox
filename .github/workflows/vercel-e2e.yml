@@ -41,12 +41,12 @@ jobs:
       VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
     steps:
       - name: Check out deployed commit
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           ref: ${{ github.event.client_payload.git.sha || inputs.git_sha || github.sha }}
 
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           node-version: "22"
           cache: npm
@@ -65,11 +65,12 @@ jobs:
         if: env.DEPLOYMENT_ENVIRONMENT != 'production'
         env:
           PLAYWRIGHT_PROD_URL: ${{ env.BASE_URL }}
+          PLAYWRIGHT_BASE_URL: ${{ env.BASE_URL }}
         run: npm run test:prod
 
       - name: Upload Playwright report
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: vercel-playwright-report
           path: playwright-report/
@@ -77,6 +78,10 @@ jobs:
 
       - name: Report deployment check to Vercel
         if: always() && github.event_name == 'repository_dispatch'
-        uses: vercel/repository-dispatch/actions/status@v1
+        # Pin past v1 (node20) to the node24 runtime upgrade on main.
+        # repository_dispatch always loads this workflow from the default branch,
+        # so this pin (and the checkout/setup-node majors above) take effect for
+        # Vercel E2E only after this file is on main.
+        uses: vercel/repository-dispatch/actions/status@61881006269f0b5ac2cb186b198c54be6afe90e1 # node24
         with:
           name: Vercel - API Sandbox E2E (${{ github.event.client_payload.environment || inputs.environment || 'manual' }})

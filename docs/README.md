@@ -14,6 +14,7 @@ Essential docs for onboarding and shipping changes. Product learning content liv
 | [SAAS.md](./SAAS.md) | Production SaaS flags, Stripe, rate limits, health probe |
 | [STRIPE_LOCAL.md](./STRIPE_LOCAL.md) | Real Stripe Checkout in Test mode + webhook forwarding |
 | [EDUCATION_SYSTEM.md](./EDUCATION_SYSTEM.md) | Learning progress domain, premium model boundary, dependency integration map |
+| [EP226_API_CONCEPTS.md](./EP226_API_CONCEPTS.md) | ByteByteGo EP226 concept list mapped to in-app lessons |
 | [API_V1.md](./API_V1.md) | Public `/api/v1` personal API tokens, curl examples, OpenAPI |
 | [Self-hosted AI runner](../infra/self-hosted-ai-runner/README.md) | Linux host requirements, provisioning, registration, security, and operations |
 

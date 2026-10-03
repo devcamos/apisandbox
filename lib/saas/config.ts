@@ -1,4 +1,5 @@
 import { isFeatureEnabled, isBillingPortalEnabled } from "@/config/featureFlags"
+import { isAssistantEnabled } from "@/lib/assistant/enabled"
 import { isJwtSecretConfigured, jwtSecretSource } from "@/lib/auth/jwt-secret"
 
 export type SaasCheckStatus = "ok" | "warn" | "fail"
@@ -269,14 +270,23 @@ function billingPortalCheck(): SaasReadinessCheck {
 }
 
 function assistantCheck(): SaasReadinessCheck {
+  if (!isAssistantEnabled()) {
+    return {
+      id: "assistant",
+      label: "Learning assistant",
+      status: "ok",
+      detail: "Disabled on Production (Preview / local Development only)",
+    }
+  }
+
   const aiKey = envSet("OPENAI_API_KEY") || envSet("GEMINI_API_KEY")
   return {
     id: "assistant",
     label: "Learning assistant",
     status: aiKey ? "ok" : "warn",
     detail: aiKey
-      ? `Assistant provider configured; auth required in prod: ${isAssistantAuthRequired()}`
-      : "No OPENAI_API_KEY or GEMINI_API_KEY — assistant will error",
+      ? `Assistant provider configured for Preview/local; Premium auth required: ${isAssistantAuthRequired()}`
+      : "No OPENAI_API_KEY or GEMINI_API_KEY — assistant will error on Preview until configured",
   }
 }
 

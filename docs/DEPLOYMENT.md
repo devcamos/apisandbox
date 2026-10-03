@@ -44,15 +44,15 @@ There are two separate consumers with separate secret stores:
 | Consumer | Secret location |
 |----------|-----------------|
 | PR Architecture Intelligence workflow | GitHub repository secret `GEMINI_API_KEY` |
-| Deployed app assistant | Vercel environment variable for its configured provider |
+| Deployed app assistant (Preview / local only) | Vercel **Preview** (and Development) environment variables for the configured provider |
 
 The PR reviewer uses the Gemini Developer API free tier with `gemini-2.5-flash` by default. Create a key in Google AI Studio, then add it under repository **Settings → Secrets and variables → Actions → Repository secrets** as `GEMINI_API_KEY`. The optional repository variable `GEMINI_REVIEW_MODEL` overrides the model.
 
 The Gemini free tier has project-level limits and may use submitted content to improve Google's products. The workflow sends repository diffs and diagnostic output, so it must never collect or transmit credentials or private runtime data.
 
-For the app in Preview, add `OPENAI_API_KEY` in the `apisandbox` Vercel project, select **Preview** for the environment, and apply it to all preview branches unless branch isolation is intentional. Keep it server-only: never name it `NEXT_PUBLIC_OPENAI_API_KEY`.
+The in-app learning assistant is **Preview / local Development only**. `isAssistantEnabled()` returns false when `VERCEL_ENV=production`; Production builds omit the widget and `POST /api/assistant` responds with `404`. On Preview, Premium sign-in is still required. Add `OPENAI_API_KEY` and/or `GEMINI_API_KEY` in the `apisandbox` Vercel project for **Preview** (and optional Development). Keep them server-only: never name them `NEXT_PUBLIC_*`. Do not rely on Production Vercel env for the assistant.
 
-The equivalent interactive command is:
+The equivalent interactive command for Preview is:
 
 ```bash
 npx vercel env add OPENAI_API_KEY preview --sensitive --scope devonte-amos-projects
@@ -60,7 +60,7 @@ npx vercel env add OPENAI_API_KEY preview --sensitive --scope devonte-amos-proje
 
 Enter the key only at the secure prompt. After adding or changing it, redeploy the Preview deployment; existing deployments do not receive new environment-variable values.
 
-The GitHub `GEMINI_API_KEY` secret does not populate Vercel, and a Vercel environment variable does not populate GitHub Actions. Configure Production and Development separately if those environments also need the assistant.
+The GitHub `GEMINI_API_KEY` secret does not populate Vercel, and a Vercel environment variable does not populate GitHub Actions.
 
 **Do not set** `PRISMA_GENERATE_DATAPROXY=true`. Builds use `env -u PRISMA_GENERATE_DATAPROXY prisma generate` (binary engine + `postgresql://`).
 
@@ -174,6 +174,7 @@ manually against that Preview database when it is reachable.
 | 2026-08-10 | Added deployed-URL E2E for Vercel repository-dispatch events, including Preview database/auth checks and Playwright registration/login coverage |
 | 2026-09-27 | Vercel build runs `prisma migrate deploy` only for Production (`db:migrate:deploy:vercel`); Preview skips migrate so unreachable Preview DB cannot fail the build |
 | 2026-06-29 | Stripe production hardening: live-key validation, webhook idempotency ledger, status-driven entitlement reconciliation, and duplicate-subscription prevention |
+| 2026-10-03 | Learning assistant gated to Preview/local only (`isAssistantEnabled`); Production returns 404 and omits the widget. PR Architecture Intelligence remains on Gemini. |
 | 2026-06-29 | Switched PR Architecture Intelligence from OpenAI to the Gemini Developer API free tier |
 | 2026-06-29 | Documented environment-specific test users and separate OpenAI secret locations for GitHub Actions and Vercel Preview |
 | 2026-06-28 | Documented Neon preview branch capacity and added safe cleanup command (maximum five branches) |
