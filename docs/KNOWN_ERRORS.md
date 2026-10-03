@@ -11,7 +11,7 @@ Use `gh pr checks` to identify the failing job before applying a recovery. The s
 | `SonarQube Cloud` | new-code coverage, duplication, reliability, or security gate | [Inspect the quality gate](#sonarqube-cloud-quality-gate-fails) |
 | Vercel | Neon preview-branch capacity is exhausted | [Check provisioning](#vercel-preview-fails-before-build-neon-branch-limit) |
 | Vercel Preview build | `prisma migrate deploy` / unreachable Preview DB | [Preview build vs migrate](#vercel-preview-build-fails-on-prisma-migrate-deploy) |
-| Architecture review | Gemini configuration, quota, or PR comment permission | [Inspect review generation](#pr-architecture-intelligence-fails) |
+| Architecture review | Diagnostics step failure or PR comment permission | [Inspect architecture diagnostics](#pr-architecture-intelligence-fails) |
 
 ## Vercel Preview build fails on `prisma migrate deploy`
 
@@ -203,25 +203,11 @@ Fix the reported code or add meaningful tests. Do not lower the quality gate or 
 
 The workflow runs for PR `opened`, `synchronize`, and `reopened` events. A push to an open PR triggers `synchronize`. It also runs directly on pushes to `main`, `master`, `develop`, and `dev`, matching the CI/Sonar branch policy; push runs upload an artifact but do not post a PR comment.
 
-### Gemini request or secret
+The job name remains **Review architecture changes**. It no longer calls Gemini or any other LLM. It collects the PR diff, runs repository diagnostics when available (tests, build, audit, dependency-cruiser), writes `pr-review.md` as a diagnostics summary, uploads the artifact for seven days, and updates the sticky PR comment.
 
-`Generate architecture review` fails when the required `GEMINI_API_KEY` is absent or Gemini rejects the request. The workflow still uploads `pr-review.md` and updates the sticky PR comment. It also writes a safe error annotation and job summary with the recovery action. API keys and recognizable key fragments are redacted from those outputs.
+### Diagnostics summary step
 
-Successful responses use a constrained JSON schema and are rendered into compact Markdown tables. This keeps comments deterministic and prevents verbose model prose from dominating the PR conversation.
-
-The review is intentionally lightweight: it uses a three-line diff context, caps model input, lists only top-level dependencies, and limits output to the highest-value findings. Tests, build, audit, and dependency-cruiser still run when available; their full logs remain in the workflow artifact for seven days.
-
-Verify the repository Actions secret is named exactly `GEMINI_API_KEY`. The optional repository variable `GEMINI_REVIEW_MODEL` selects the model; otherwise the script uses `gemini-2.5-flash`.
-
-| Reported error | Recovery |
-|----------------|----------|
-| HTTP 400/401 authentication failure | Replace `GEMINI_API_KEY` with a valid Google AI Studio key. |
-| HTTP 403 permission failure | Confirm the Google AI project and key can use the configured model. |
-| HTTP 404 model unavailable | Correct or remove `GEMINI_REVIEW_MODEL`; removing it uses `gemini-2.5-flash`. |
-| HTTP 429 quota or rate limit | Check active limits in Google AI Studio, wait for reset, and rerun. |
-| HTTP 5xx service error | The script retries three times; rerun later and check Google AI service status if all attempts fail. |
-
-The PR metadata variables are supplied by GitHub and are not secret configuration. `GEMINI_REVIEW_MODEL` is optional, so do not add it to a required-variable check.
+If **Summarize architecture diagnostics** fails, inspect the preceding **Run repository diagnostics** step and the uploaded `.pr-architecture/` artifact. Non-zero exit codes from individual checks are recorded in the summary; they do not always fail the job because diagnostics are collected with `set +e`.
 
 ### Sticky comment permission
 

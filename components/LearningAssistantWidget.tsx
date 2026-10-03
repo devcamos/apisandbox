@@ -129,7 +129,7 @@ export function LearningAssistantWidget() {
           role: "assistant",
           content:
             msg ||
-            "I couldn’t reach the AI backend. If you’re running locally, set `OPENAI_API_KEY` (OpenAI) or `GEMINI_API_KEY` (Gemini) in `.env.local`, then reload.",
+            "I couldn’t reach the AI backend. If you’re running locally, set `OPENAI_API_KEY` in `.env.local`, then reload. Premium access is still required.",
         },
       ])
     } finally {

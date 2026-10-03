@@ -29,7 +29,7 @@ See [DEPLOYMENT.md](./DEPLOYMENT.md) plus:
 | `STRIPE_WEBHOOK_SECRET` | Verify `POST /api/webhooks/stripe` |
 | `STRIPE_PRICE_ID` | Premium monthly price |
 | `UPSTASH_REDIS_REST_URL` / `UPSTASH_REDIS_REST_TOKEN` | Rate limits |
-| `OPENAI_API_KEY` or `GEMINI_API_KEY` | Learning assistant |
+| `OPENAI_API_KEY` | Learning assistant (optional; Premium users) |
 
 ## Stripe setup
 

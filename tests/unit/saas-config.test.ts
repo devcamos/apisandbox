@@ -237,7 +237,7 @@ describe("saas config", () => {
     })
 
     it("warns when assistant has no AI provider key", async () => {
-      stubProductionSaasEnv({ OPENAI_API_KEY: "", GEMINI_API_KEY: "" })
+      stubProductionSaasEnv({ OPENAI_API_KEY: "" })
       const { evaluateSaasReadiness } = await import("@/lib/saas/config")
       const checks = evaluateSaasReadiness()
 
@@ -245,8 +245,8 @@ describe("saas config", () => {
       expect(checkById(checks, "assistant").detail).toContain("No OPENAI_API_KEY")
     })
 
-    it("uses GEMINI_API_KEY for assistant ok status", async () => {
-      stubProductionSaasEnv({ OPENAI_API_KEY: "", GEMINI_API_KEY: "gemini-key" })
+    it("uses OPENAI_API_KEY for assistant ok status", async () => {
+      stubProductionSaasEnv({ OPENAI_API_KEY: "openai-key" })
       const { evaluateSaasReadiness } = await import("@/lib/saas/config")
       const checks = evaluateSaasReadiness()
 

@@ -269,14 +269,14 @@ function billingPortalCheck(): SaasReadinessCheck {
 }
 
 function assistantCheck(): SaasReadinessCheck {
-  const aiKey = envSet("OPENAI_API_KEY") || envSet("GEMINI_API_KEY")
+  const aiKey = envSet("OPENAI_API_KEY")
   return {
     id: "assistant",
     label: "Learning assistant",
     status: aiKey ? "ok" : "warn",
     detail: aiKey
-      ? `Assistant provider configured; auth required in prod: ${isAssistantAuthRequired()}`
-      : "No OPENAI_API_KEY or GEMINI_API_KEY — assistant will error",
+      ? `OpenAI assistant configured; auth required in prod: ${isAssistantAuthRequired()}`
+      : "No OPENAI_API_KEY — assistant unavailable for Premium users until configured",
   }
 }
 

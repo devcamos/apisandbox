@@ -1,6 +1,5 @@
 import OpenAI from "openai"
 import { NextRequest, NextResponse } from "next/server"
-import { GoogleGenAI } from "@google/genai"
 import { inferAssistantRedirect } from "@/lib/assistant/redirect"
 import {
   ASSISTANT_LLM_TIMEOUT_MS,
@@ -70,21 +69,6 @@ function buildInstructions({ pathname, mode }: { pathname: string; mode: "guided
   ].join("\n")
 }
 
-function formatConversation({
-  history,
-  message,
-}: {
-  history: AssistantHistoryItem[]
-  message: string
-}) {
-  const lines: string[] = []
-  for (const m of history) {
-    lines.push(`${m.role.toUpperCase()}: ${m.content}`)
-  }
-  lines.push(`USER: ${message}`)
-  return lines.join("\n")
-}
-
 function bodyTooLargeResponse() {
   return NextResponse.json(
     { error: `Request body exceeds the ${ASSISTANT_MAX_BODY_BYTES} byte limit.` },
@@ -102,7 +86,7 @@ function timeoutResponse() {
 function successResponse(
   payload: {
     reply: string
-    provider: "gemini" | "openai"
+    provider: "openai"
     model: string
     redirect: ReturnType<typeof inferAssistantRedirect>
   },
@@ -147,56 +131,6 @@ async function parseAssistantBody(request: NextRequest) {
   return { data: validated }
 }
 
-async function generateGeminiReply(input: {
-  message: string
-  pathname: string
-  mode: "guided" | "expert"
-  history: AssistantHistoryItem[]
-  abortSignal: AbortSignal
-  redirect: ReturnType<typeof inferAssistantRedirect>
-  rateResult: RateLimitResult
-}) {
-  const apiKey = process.env.GEMINI_API_KEY
-  if (!apiKey) {
-    return NextResponse.json(
-      {
-        error:
-          "Missing GEMINI_API_KEY. Set it in your environment (e.g. .env.local) to enable Gemini responses.",
-      },
-      { status: 500 },
-    )
-  }
-
-  const model = process.env.GEMINI_MODEL || "gemini-2.5-flash"
-  const ai = new GoogleGenAI({ apiKey })
-  const prompt = [
-    buildInstructions({ pathname: input.pathname, mode: input.mode }),
-    "",
-    "Conversation:",
-    formatConversation({ history: input.history, message: input.message }),
-  ].join("\n")
-
-  try {
-    const result = await ai.models.generateContent({
-      model,
-      contents: prompt,
-      config: { abortSignal: input.abortSignal },
-    })
-    const reply =
-      (typeof result.text === "string" ? result.text : "")?.trim() ||
-      "I didn’t produce any text output. Try asking again."
-    return successResponse(
-      { reply, provider: "gemini", model, redirect: input.redirect },
-      input.rateResult,
-    )
-  } catch (error) {
-    if (isAbortError(error) || input.abortSignal.aborted) {
-      return timeoutResponse()
-    }
-    throw error
-  }
-}
-
 async function generateOpenAiReply(input: {
   message: string
   pathname: string
@@ -211,9 +145,9 @@ async function generateOpenAiReply(input: {
     return NextResponse.json(
       {
         error:
-          "Missing OPENAI_API_KEY. Set it in your environment (e.g. .env.local) to enable OpenAI responses, or set ASSISTANT_PROVIDER=gemini with GEMINI_API_KEY.",
+          "Learning assistant is unavailable. Set OPENAI_API_KEY in your environment (e.g. .env.local) to enable responses for Premium users.",
       },
-      { status: 500 },
+      { status: 503 },
     )
   }
 
@@ -251,13 +185,6 @@ async function generateOpenAiReply(input: {
   }
 }
 
-function resolveProvider(): "openai" | "gemini" {
-  return (
-    (process.env.ASSISTANT_PROVIDER as "openai" | "gemini" | undefined) ||
-    (process.env.GEMINI_API_KEY ? "gemini" : "openai")
-  )
-}
-
 export async function POST(request: NextRequest) {
   try {
     const user = await requirePremiumUser(request)
@@ -271,7 +198,8 @@ export async function POST(request: NextRequest) {
     const { message, pathname, mode, history } = parsed.data!
     const redirect = inferAssistantRedirect({ message, pathname })
     const abortSignal = AbortSignal.timeout(ASSISTANT_LLM_TIMEOUT_MS)
-    const providerInput = {
+
+    return await generateOpenAiReply({
       message,
       pathname,
       mode,
@@ -279,12 +207,7 @@ export async function POST(request: NextRequest) {
       abortSignal,
       redirect,
       rateResult: rate.result,
-    }
-
-    if (resolveProvider() === "gemini") {
-      return await generateGeminiReply(providerInput)
-    }
-    return await generateOpenAiReply(providerInput)
+    })
   } catch (error) {
     if (isAbortError(error)) {
       return timeoutResponse()

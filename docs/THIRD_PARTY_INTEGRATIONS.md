@@ -72,7 +72,7 @@ Audit of what API Sandbox teaches vs what is wired live. Use this when prioritis
 | **PostgreSQL** | Users, progress, billing | ✅ Required | `DATABASE_URL` |
 | **Stripe** | Subscriptions | ✅ When flagged | `STRIPE_*`, webhooks — see [STRIPE_LOCAL.md](./STRIPE_LOCAL.md) |
 | **Google OAuth** | Sign-in | ✅ When configured | `GOOGLE_CLIENT_ID` / secret |
-| **OpenAI / Gemini** | Learning assistant | ✅ Optional | `OPENAI_API_KEY` or `GEMINI_API_KEY` |
+| **OpenAI** | Learning assistant | ✅ Optional | `OPENAI_API_KEY` |
 | **Resend** | Email | ✅ Placeholder in CI | `RESEND_API_KEY` |
 | **Upstash Redis** | Rate limiting | ✅ When flagged | `UPSTASH_REDIS_*` |
 | **Vercel Analytics** | Usage | ✅ Optional | `NEXT_PUBLIC_FF_ANALYTICS` |
