@@ -28,11 +28,15 @@ describe("vercelAutomationBypassHeaders", () => {
 
 describe("waitForHealthy", () => {
   it("does not send set-bypass-cookie headers through fetch", async () => {
-    const fetchImpl = vi.fn(async () => ({
-      ok: true,
-      status: 200,
-      text: async () => '{"ok":true}',
-    }))
+    const calls: Array<RequestInit | undefined> = []
+    const fetchImpl = (async (_input: URL | RequestInfo, init?: RequestInit) => {
+      calls.push(init)
+      return {
+        ok: true,
+        status: 200,
+        text: async () => '{"ok":true}',
+      }
+    }) as unknown as typeof fetch
 
     const headers = vercelAutomationBypassHeaders("secret", { setCookie: false })
     await waitForHealthy("/api/health/db", {
@@ -42,22 +46,29 @@ describe("waitForHealthy", () => {
       attempts: 1,
     })
 
-    expect(fetchImpl).toHaveBeenCalledOnce()
-    const [, init] = fetchImpl.mock.calls[0]
-    expect(init.headers).toEqual({
+    expect(calls).toHaveLength(1)
+    expect(calls[0]?.headers).toEqual({
       "x-vercel-protection-bypass": "secret",
     })
-    expect(init.headers["x-vercel-set-bypass-cookie"]).toBeUndefined()
+    expect(
+      calls[0]?.headers && typeof calls[0].headers === "object"
+        ? (calls[0].headers as Record<string, string>)["x-vercel-set-bypass-cookie"]
+        : undefined,
+    ).toBeUndefined()
   })
 })
 
 describe("verifyDeployedDatabaseAndAuth", () => {
   it("uses header-only bypass for both health endpoints", async () => {
-    const fetchImpl = vi.fn(async () => ({
-      ok: true,
-      status: 200,
-      text: async () => '{"ok":true}',
-    }))
+    const calls: Array<RequestInit | undefined> = []
+    const fetchImpl = (async (_input: URL | RequestInfo, init?: RequestInit) => {
+      calls.push(init)
+      return {
+        ok: true,
+        status: 200,
+        text: async () => '{"ok":true}',
+      }
+    }) as unknown as typeof fetch
 
     await verifyDeployedDatabaseAndAuth({
       rawBaseUrl: "https://example.vercel.app",
@@ -65,12 +76,16 @@ describe("verifyDeployedDatabaseAndAuth", () => {
       fetchImpl,
     })
 
-    expect(fetchImpl).toHaveBeenCalledTimes(2)
-    for (const [, init] of fetchImpl.mock.calls) {
-      expect(init.headers).toEqual({
+    expect(calls).toHaveLength(2)
+    for (const init of calls) {
+      expect(init?.headers).toEqual({
         "x-vercel-protection-bypass": "secret",
       })
-      expect(Object.keys(init.headers)).not.toContain("x-vercel-set-bypass-cookie")
+      expect(
+        init?.headers && typeof init.headers === "object"
+          ? Object.keys(init.headers as Record<string, string>)
+          : [],
+      ).not.toContain("x-vercel-set-bypass-cookie")
     }
   })
 })
