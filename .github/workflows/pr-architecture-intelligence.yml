@@ -107,54 +107,20 @@ jobs:
 
           exit 0
 
-      - name: Summarize architecture diagnostics
+      - name: Generate architecture review
         env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GEMINI_MODEL: ${{ vars.GEMINI_REVIEW_MODEL || 'gemini-2.5-flash' }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
           PR_TITLE: ${{ github.event.pull_request.title }}
           PR_URL: ${{ github.event.pull_request.html_url }}
+          PR_AUTHOR: ${{ github.event.pull_request.user.login }}
+          BASE_REF: ${{ github.event.pull_request.base.ref }}
           HEAD_REF: ${{ github.event.pull_request.head.ref || github.ref_name }}
+          EVENT_NAME: ${{ github.event_name }}
           COMMIT_SHA: ${{ github.sha }}
-        run: |
-          set -euo pipefail
-          mkdir -p .pr-architecture
-
-          read_exit() {
-            local file=".pr-architecture/${1}.exit"
-            if [[ -f "$file" ]]; then
-              tr -d '[:space:]' < "$file"
-            else
-              printf 'n/a'
-            fi
-          }
-
-          changed_count=0
-          if [[ -f .pr-architecture/changed-files.txt ]]; then
-            changed_count="$(wc -l < .pr-architecture/changed-files.txt | tr -d '[:space:]')"
-          fi
-
-          {
-            printf '# PR Architecture Intelligence\n\n'
-            printf 'Automated diagnostics summary (no LLM). Full logs are in the workflow artifact.\n\n'
-            printf '| Field | Value |\n'
-            printf '|-------|-------|\n'
-            printf '| PR | %s |\n' "${PR_TITLE:-n/a}"
-            printf '| Branch | `%s` |\n' "${HEAD_REF:-n/a}"
-            printf '| Commit | `%s` |\n' "${COMMIT_SHA:-n/a}"
-            printf '| Changed files | %s |\n' "${changed_count}"
-            printf '\n## Check exits\n\n'
-            printf '| Check | Exit code |\n'
-            printf '|-------|-----------|\n'
-            printf '| npm audit | %s |\n' "$(read_exit npm-audit)"
-            printf '| npm ls | %s |\n' "$(read_exit npm-ls)"
-            printf '| tests | %s |\n' "$(read_exit tests)"
-            printf '| build | %s |\n' "$(read_exit build)"
-            printf '| dependency-cruiser | %s |\n' "$(read_exit dependency-cruiser)"
-            printf '\nInspect `.pr-architecture/*.txt` in the uploaded artifact for details.\n'
-          } > pr-review.md
-
-          if [[ -n "${GITHUB_STEP_SUMMARY:-}" ]]; then
-            cat pr-review.md >> "$GITHUB_STEP_SUMMARY"
-          fi
+          COMMIT_URL: ${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}
+        run: node scripts/ai-pr-review.mjs
 
       - name: Upload review artifact
         if: always()
@@ -177,7 +143,7 @@ jobs:
           script: |
             const fs = require("fs");
             const marker = "<!-- pr-architecture-intelligence -->";
-            const fallback = "## PR Architecture Intelligence\n\nThe diagnostics summary was not generated. Inspect the workflow logs for details.";
+            const fallback = "## PR Architecture Intelligence\n\nThe review file was not generated. Inspect the workflow logs for details.";
             const review = fs.existsSync(process.env.REVIEW_FILE)
               ? fs.readFileSync(process.env.REVIEW_FILE, "utf8")
               : fallback;

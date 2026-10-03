@@ -236,17 +236,38 @@ describe("saas config", () => {
       expect(checkById(checks, "demo_login").status).toBe("warn")
     })
 
-    it("warns when assistant has no AI provider key", async () => {
-      stubProductionSaasEnv({ OPENAI_API_KEY: "" })
+    it("marks assistant as ok-disabled on Production target", async () => {
+      stubProductionSaasEnv({
+        VERCEL_ENV: "production",
+        OPENAI_API_KEY: "",
+        GEMINI_API_KEY: "",
+      })
+      const { evaluateSaasReadiness } = await import("@/lib/saas/config")
+      const checks = evaluateSaasReadiness()
+
+      expect(checkById(checks, "assistant").status).toBe("ok")
+      expect(checkById(checks, "assistant").detail).toContain("Disabled on Production")
+    })
+
+    it("warns on Preview when assistant has no AI provider key", async () => {
+      stubProductionSaasEnv({
+        VERCEL_ENV: "preview",
+        OPENAI_API_KEY: "",
+        GEMINI_API_KEY: "",
+      })
       const { evaluateSaasReadiness } = await import("@/lib/saas/config")
       const checks = evaluateSaasReadiness()
 
       expect(checkById(checks, "assistant").status).toBe("warn")
-      expect(checkById(checks, "assistant").detail).toContain("No OPENAI_API_KEY")
+      expect(checkById(checks, "assistant").detail).toContain("No OPENAI_API_KEY or GEMINI_API_KEY")
     })
 
-    it("uses OPENAI_API_KEY for assistant ok status", async () => {
-      stubProductionSaasEnv({ OPENAI_API_KEY: "openai-key" })
+    it("uses GEMINI_API_KEY for assistant ok status on Preview", async () => {
+      stubProductionSaasEnv({
+        VERCEL_ENV: "preview",
+        OPENAI_API_KEY: "",
+        GEMINI_API_KEY: "gemini-key",
+      })
       const { evaluateSaasReadiness } = await import("@/lib/saas/config")
       const checks = evaluateSaasReadiness()
 
