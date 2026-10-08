@@ -65,6 +65,7 @@ jobs:
         if: env.DEPLOYMENT_ENVIRONMENT != 'production'
         env:
           PLAYWRIGHT_PROD_URL: ${{ env.BASE_URL }}
+          PLAYWRIGHT_BASE_URL: ${{ env.BASE_URL }}
         run: npm run test:prod
 
       - name: Upload Playwright report
