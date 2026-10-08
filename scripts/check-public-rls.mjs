@@ -160,8 +160,12 @@ export async function checkPublicRlsAgainstDatabase(opts) {
 }
 
 /**
+ * @typedef {Record<string, string | undefined>} EnvLike
+ */
+
+/**
  * @param {string[]} argv
- * @param {NodeJS.ProcessEnv} [env]
+ * @param {EnvLike} [env]
  * @returns {"static" | "database"}
  */
 export function resolveCheckMode(argv, env = process.env) {
@@ -173,7 +177,7 @@ export function resolveCheckMode(argv, env = process.env) {
 
 /**
  * @param {string[]} [argv]
- * @param {NodeJS.ProcessEnv} [env]
+ * @param {EnvLike} [env]
  * @param {{ log?: (msg: string) => void, err?: (msg: string) => void, checkDb?: typeof checkPublicRlsAgainstDatabase }} [deps]
  * @returns {Promise<number>}
  */
