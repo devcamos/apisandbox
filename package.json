@@ -42,6 +42,8 @@
     "db:migrate": "prisma migrate dev",
     "db:migrate:deploy": "bash scripts/prisma-migrate-deploy.sh",
     "db:migrate:deploy:vercel": "node scripts/migrate-on-production.mjs",
+    "db:check-rls": "node scripts/check-public-rls.mjs",
+    "db:check-rls:database": "node scripts/check-public-rls.mjs --database",
     "db:ensure-test-users": "node scripts/ensure-test-users.js",
     "db:ensure-demo-user": "node scripts/ensure-demo-user.js",
     "db:studio": "prisma studio",

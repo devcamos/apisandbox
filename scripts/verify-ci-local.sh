@@ -39,6 +39,10 @@ npm run lint
 npm run build
 ok "typecheck + lint + build"
 
+log "public RLS hardening migration (static guardrail)"
+npm run db:check-rls
+ok "public RLS migration present"
+
 log "unit-tests with coverage (job: unit-tests)"
 mkdir -p reports
 npx vitest run --coverage --reporter=default
@@ -76,6 +80,8 @@ fi
 export DATABASE_URL="$E2E_DATABASE_URL"
 export DIRECT_URL="$E2E_DATABASE_URL"
 npx prisma db push --accept-data-loss
+# db push syncs schema but does not run SQL migrations — apply RLS harden + assert.
+npm run db:check-rls:database
 npx playwright install chromium --with-deps >/dev/null 2>&1 || npx playwright install chromium
 
 export CI_E2E_USE_PROD_SERVER=1

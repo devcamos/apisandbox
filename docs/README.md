@@ -9,7 +9,7 @@ Essential docs for onboarding and shipping changes. Product learning content liv
 | [GITFLOW.md](./GITFLOW.md) | Branching (`main` trunk, `v1` release line, tags) |
 | [AGENT_PR_CHECKLIST.md](./AGENT_PR_CHECKLIST.md) | Before every PR (`npm run verify:ci`) |
 | [TEST_USERS.md](./TEST_USERS.md) | Test-user policy and login setup for Local, CI, Preview, staging, and production |
-| [DEPLOYMENT.md](./DEPLOYMENT.md) | Vercel env, Prisma on deploy, Google OAuth origins |
+| [DEPLOYMENT.md](./DEPLOYMENT.md) | Vercel env, Prisma on deploy, Google OAuth origins, public-schema RLS |
 | [KNOWN_ERRORS.md](./KNOWN_ERRORS.md) | Repeatable deployment failures and recovery runbooks |
 | [SAAS.md](./SAAS.md) | Production SaaS flags, Stripe, rate limits, health probe |
 | [STRIPE_LOCAL.md](./STRIPE_LOCAL.md) | Real Stripe Checkout in Test mode + webhook forwarding |

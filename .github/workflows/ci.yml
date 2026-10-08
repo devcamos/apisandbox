@@ -71,6 +71,9 @@ jobs:
       - name: Lint
         run: npm run lint
 
+      - name: Public RLS hardening migration (static)
+        run: npm run db:check-rls
+
       - name: Build
         run: npm run build
 
@@ -266,6 +269,10 @@ jobs:
       # environments only after a Postgres-native migration baseline exists.
       - name: Sync Prisma schema to Postgres (CI)
         run: npx prisma db push --accept-data-loss
+
+      # db push does not run SQL migrations — apply public RLS harden + assert.
+      - name: Harden public RLS and verify
+        run: npm run db:check-rls:database
 
       - name: Cache Playwright browsers
         uses: actions/cache@v4
