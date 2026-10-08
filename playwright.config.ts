@@ -12,6 +12,8 @@ const useStandaloneServer =
   useProdServer && existsSync(".next/standalone/server.js");
 
 const externalDeploymentUrl = process.env.PLAYWRIGHT_PROD_URL?.replace(/\/$/, "");
+// Playwright contexts keep a cookie jar, so set-bypass-cookie is safe here.
+// Node fetch health checks in scripts/vercel-deployment-e2e.mjs must NOT set it.
 const deploymentProtectionHeaders = process.env.VERCEL_AUTOMATION_BYPASS_SECRET
   ? {
       "x-vercel-protection-bypass": process.env.VERCEL_AUTOMATION_BYPASS_SECRET,
