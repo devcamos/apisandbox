@@ -1,6 +1,7 @@
 import OpenAI from "openai"
 import { NextRequest, NextResponse } from "next/server"
 import { GoogleGenAI } from "@google/genai"
+import { isAssistantEnabled } from "@/lib/assistant/enabled"
 import { inferAssistantRedirect } from "@/lib/assistant/redirect"
 import {
   ASSISTANT_LLM_TIMEOUT_MS,
@@ -260,6 +261,13 @@ function resolveProvider(): "openai" | "gemini" {
 
 export async function POST(request: NextRequest) {
   try {
+    if (!isAssistantEnabled()) {
+      return NextResponse.json(
+        { error: "Learning assistant is disabled in Production." },
+        { status: 404 },
+      )
+    }
+
     const user = await requirePremiumUser(request)
 
     const rate = await applyRateLimit(request, assistantLimiter, `assistant:${user.id}`)

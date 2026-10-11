@@ -16,6 +16,7 @@ export default defineConfig({
       // thousands of 0%-covered lines in lcov.info; SonarCloud then fails Coverage on New Code.
       include: [
         "lib/assistant/access.ts",
+        "lib/assistant/enabled.ts",
         "lib/assistant/limits.ts",
         "lib/assistant/redirect.ts",
         "lib/api-tokens/token-policy.ts",
@@ -36,14 +37,8 @@ export default defineConfig({
         "lib/saas/config.ts",
         "lib/auth/jwt-secret.ts",
         "lib/google-client-id.ts",
-        "lib/learning/app-guide.ts",
-        "lib/learning/aws-ai-practitioner-mastery.ts",
-        "lib/learning/aws-certification-course.ts",
-        "lib/learning/documentation-keywords.ts",
-        "lib/learning/learner-profile.ts",
-        "lib/learning/phase-quizzes.ts",
-        "lib/learning/progress-mapping.ts",
-        "lib/lessons/lesson-progress.ts",
+        // Omit lib/learning/** and lib/lessons/** — Sonar excludes them from sources,
+        // so LCOV entries for those paths produce "Could not resolve" warnings.
         "lib/login-error-parser.ts",
         "lib/password-validation.ts",
         "lib/premium-pricing.ts",
