@@ -20,6 +20,10 @@ Progress belongs to `User.id`. API routes derive `userId` from the authenticated
 unique(userId, courseId, moduleId, checkpointId)
 ```
 
+## EP226 concept map
+
+ByteByteGo EP226’s 28 API concepts map to phases, foundations units, and demos in [EP226_API_CONCEPTS.md](./EP226_API_CONCEPTS.md). Newer modules for naming, pagination, documentation, scopes, permissions, and webhooks live in `lib/lessons/phase-lessons.ts` (phases 1 and 2).
+
 ## Premium model
 
 Stripe remains the payment system of choice. Production premium access should use Stripe Checkout, verified webhooks, and the billing portal. Demo instant upgrade is only for non-production local flows.

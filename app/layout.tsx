@@ -8,6 +8,7 @@ import { isFeatureEnabled } from "@/config/featureFlags";
 import { CookieConsent } from "@/components/CookieConsent";
 import { AnalyticsProvider } from "@/components/AnalyticsProvider";
 import { LearningAssistantWidget } from "@/components/LearningAssistantWidget";
+import { isAssistantEnabled } from "@/lib/assistant/enabled";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -34,6 +35,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   const demoLoginEnabled = isFeatureEnabled("DEMO_LOGIN")
+  const assistantEnabled = isAssistantEnabled()
 
   return (
     <html lang="en" className="dark" suppressHydrationWarning>
@@ -44,7 +46,7 @@ export default function RootLayout({
           <main className="min-h-screen">
             {children}
           </main>
-          <LearningAssistantWidget />
+          {assistantEnabled ? <LearningAssistantWidget /> : null}
           <CookieConsent />
           <AnalyticsProvider />
           <footer className="border-t border-slate-800 py-8 px-6">
