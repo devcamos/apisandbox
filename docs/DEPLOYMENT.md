@@ -110,6 +110,31 @@ runtime routes that hit the DB will still fail until the Preview DB is restored.
 
 Use `db push` only for local development or intentionally disposable databases.
 
+### Public schema RLS (Supabase Data API)
+
+Supabase exposes Postgres through PostgREST using the `anon` / `authenticated`
+roles. This app does **not** use `@supabase/supabase-js` or the anon key to query
+tables — all persistence goes through **Prisma** with server-side `DATABASE_URL` /
+`DIRECT_URL` (owner/`postgres` role, which bypasses RLS).
+
+Migration `prisma/migrations/20261008120000_enable_public_rls` therefore:
+
+1. `ENABLE ROW LEVEL SECURITY` on every table in `public` (including
+   `_prisma_migrations` when present)
+2. `REVOKE ALL` on tables, sequences, and functions from `anon` and
+   `authenticated` when those roles exist
+3. `ALTER DEFAULT PRIVILEGES` so future objects created by the migrate role keep
+   the same revokes
+
+CI runs `npm run db:check-rls` (static migration guard) and, after e2e `db push`,
+`npm run db:check-rls:database` (applies the SQL and fails if any `public` table
+lacks RLS). Preview DBs still need a manual `npm run db:migrate:deploy` when the
+Preview database is reachable — Vercel Preview builds skip migrate by design.
+
+Do **not** set `FORCE ROW LEVEL SECURITY`: that would apply RLS to the Prisma
+connection and break the app (no policies are defined; deny-by-default is only
+for API roles).
+
 ---
 
 ## Google Sign-In (GSI)

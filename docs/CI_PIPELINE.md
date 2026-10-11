@@ -8,11 +8,13 @@ Every blocking GitHub Actions job on a pull request has a local equivalent. Run 
 |------------|---------------|-----------------|
 | **lint-and-build** → Typecheck | `npm run typecheck` | Unused locals/parameters, type errors (`tsc --noEmit`) |
 | **lint-and-build** → Lint | `npm run lint` | Sonar parity rules — see [SONAR_LINT_MAP.md](./SONAR_LINT_MAP.md) |
+| **lint-and-build** → Public RLS static | `npm run db:check-rls` | Hardening migration present (ENABLE RLS + REVOKE anon/authenticated) |
 | **lint-and-build** → Build | `npm run build` | Next.js production compile + Prisma generate |
 | **unit-tests** | `npm run test:unit:ci` | Vitest unit tests + LCOV coverage for Sonar |
 | **docker-compose-validate** | `npm run validate:compose` | Staging compose secrets / interpolation |
 | **dependency-review** | `npm audit --audit-level=critical` | Critical vulnerabilities in lockfile (PR also runs diff-based review, warn-only except critical) |
 | **e2e-smoke** | `verify:ci` (Docker postgres-ci on **5436**) | Playwright smoke: auth, signup, core routes against real Postgres |
+| **e2e-smoke** → Public RLS DB | `npm run db:check-rls:database` | After `db push`, apply RLS SQL and fail if any `public` table lacks RLS |
 | **SonarQube Cloud** | `npm run sonar:local:full` (needs `SONAR_TOKEN`) | Cognitive complexity, duplication, security hotspots, coverage on new code |
 | **Preview approved (Vercel)** | — | Human reviewer only |
 
