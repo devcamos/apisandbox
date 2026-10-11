@@ -67,4 +67,3 @@ Before requesting review:
 Do not merge, enable auto-merge, deploy directly, or bypass the repository's Git
 release path unless the repository instructions and an explicit owner decision
 authorize it.
-
