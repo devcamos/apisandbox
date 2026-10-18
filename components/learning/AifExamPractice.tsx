@@ -1,6 +1,7 @@
 "use client"
 
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { useMemo, useState, type FormEvent } from "react"
 import {
   ArrowLeft,
@@ -50,6 +51,7 @@ export function AifExamPractice({
   summary: AifQuestionBankSummary
   initialFilter: PracticeFilter
 }>) {
+  const router = useRouter()
   const [answers, setAnswers] = useState<Record<string, string[]>>({})
   const [result, setResult] = useState<AifExamPracticeSessionGrade | null>(null)
   const [loading, setLoading] = useState(false)
@@ -67,6 +69,22 @@ export function AifExamPractice({
     const selected = answers[question.id] ?? []
     return selected.length === question.selectCount
   })
+
+  function resetAnswers() {
+    setAnswers({})
+    setResult(null)
+    setError("")
+  }
+
+  function startNewSet() {
+    resetAnswers()
+    const set = String(Date.now())
+    const href =
+      initialFilter === "all"
+        ? `/cloud/aws/certifications/ai-practitioner/practice?set=${set}`
+        : `/cloud/aws/certifications/ai-practitioner/practice?filter=${encodeURIComponent(initialFilter)}&set=${set}`
+    router.push(href)
+  }
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -97,12 +115,6 @@ export function AifExamPractice({
     }
 
     setResult(payload.data)
-  }
-
-  function resetAnswers() {
-    setAnswers({})
-    setResult(null)
-    setError("")
   }
 
   return (
@@ -316,17 +328,13 @@ export function AifExamPractice({
                 Submit practice set
               </button>
               {result ? (
-                <Link
-                  href={
-                    initialFilter === "all"
-                      ? `/cloud/aws/certifications/ai-practitioner/practice?set=${Date.now()}`
-                      : `/cloud/aws/certifications/ai-practitioner/practice?filter=${encodeURIComponent(initialFilter)}&set=${Date.now()}`
-                  }
-                  onClick={resetAnswers}
+                <button
+                  type="button"
+                  onClick={startNewSet}
                   className="inline-flex rounded-lg border border-slate-600 px-4 py-2.5 text-sm font-semibold text-slate-200 hover:border-slate-400"
                 >
                   New set
-                </Link>
+                </button>
               ) : null}
             </div>
           </form>

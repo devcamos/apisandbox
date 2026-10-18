@@ -185,115 +185,153 @@ export interface AifQuestionBankValidationIssue {
   questionId?: string
 }
 
-export function validateAifQuestion(question: AifExamQuestion): AifQuestionBankValidationIssue[] {
-  const issues: AifQuestionBankValidationIssue[] = []
-  const prefix = `Question ${question.id}`
+function pushIssue(
+  issues: AifQuestionBankValidationIssue[],
+  questionId: string,
+  code: string,
+  message: string,
+) {
+  issues.push({ code, message, questionId })
+}
 
+function validateQuestionIdentity(
+  question: AifExamQuestion,
+  issues: AifQuestionBankValidationIssue[],
+) {
+  const prefix = `Question ${question.id}`
   if (!question.id.trim()) {
-    issues.push({ code: "missing-id", message: `${prefix}: id is required`, questionId: question.id })
+    pushIssue(issues, question.id, "missing-id", `${prefix}: id is required`)
   }
   if (question.bankVersion !== AIF_C01_QUESTION_BANK_VERSION) {
-    issues.push({
-      code: "bank-version",
-      message: `${prefix}: bankVersion must be ${AIF_C01_QUESTION_BANK_VERSION}`,
-      questionId: question.id,
-    })
+    pushIssue(
+      issues,
+      question.id,
+      "bank-version",
+      `${prefix}: bankVersion must be ${AIF_C01_QUESTION_BANK_VERSION}`,
+    )
   }
   if (!AIF_C01_DOMAIN_ORDER.includes(question.domainId)) {
-    issues.push({
-      code: "domain",
-      message: `${prefix}: unknown domainId ${question.domainId}`,
-      questionId: question.id,
-    })
+    pushIssue(issues, question.id, "domain", `${prefix}: unknown domainId ${question.domainId}`)
   }
   if (!VALID_TASK_STATEMENT_IDS.has(question.taskStatement)) {
-    issues.push({
-      code: "task-statement",
-      message: `${prefix}: unknown taskStatement ${question.taskStatement}`,
-      questionId: question.id,
-    })
-  } else if (!question.taskStatement.startsWith(DOMAIN_TO_TASK_PREFIX[question.domainId])) {
-    issues.push({
-      code: "task-domain-mismatch",
-      message: `${prefix}: taskStatement ${question.taskStatement} does not match domain ${question.domainId}`,
-      questionId: question.id,
-    })
+    pushIssue(
+      issues,
+      question.id,
+      "task-statement",
+      `${prefix}: unknown taskStatement ${question.taskStatement}`,
+    )
+    return
   }
+  if (!question.taskStatement.startsWith(DOMAIN_TO_TASK_PREFIX[question.domainId])) {
+    pushIssue(
+      issues,
+      question.id,
+      "task-domain-mismatch",
+      `${prefix}: taskStatement ${question.taskStatement} does not match domain ${question.domainId}`,
+    )
+  }
+}
+
+function validateQuestionContent(
+  question: AifExamQuestion,
+  issues: AifQuestionBankValidationIssue[],
+) {
+  const prefix = `Question ${question.id}`
   if (!question.topic.trim()) {
-    issues.push({ code: "topic", message: `${prefix}: topic is required`, questionId: question.id })
+    pushIssue(issues, question.id, "topic", `${prefix}: topic is required`)
   }
   if (!question.stem.trim()) {
-    issues.push({ code: "stem", message: `${prefix}: stem is required`, questionId: question.id })
+    pushIssue(issues, question.id, "stem", `${prefix}: stem is required`)
   }
+}
 
+function validateQuestionOptions(
+  question: AifExamQuestion,
+  issues: AifQuestionBankValidationIssue[],
+): string[] {
+  const prefix = `Question ${question.id}`
   const optionIds = question.options.map((option) => option.id)
   if (new Set(optionIds).size !== optionIds.length) {
-    issues.push({
-      code: "duplicate-option-id",
-      message: `${prefix}: option ids must be unique`,
-      questionId: question.id,
-    })
+    pushIssue(issues, question.id, "duplicate-option-id", `${prefix}: option ids must be unique`)
   }
 
   for (const option of question.options) {
     if (!option.id.trim() || !option.text.trim()) {
-      issues.push({
-        code: "option-empty",
-        message: `${prefix}: every option needs id and text`,
-        questionId: question.id,
-      })
+      pushIssue(issues, question.id, "option-empty", `${prefix}: every option needs id and text`)
     }
     if (!option.explanation.trim()) {
-      issues.push({
-        code: "option-explanation",
-        message: `${prefix}: option ${option.id} is missing an explanation`,
-        questionId: question.id,
-      })
+      pushIssue(
+        issues,
+        question.id,
+        "option-explanation",
+        `${prefix}: option ${option.id} is missing an explanation`,
+      )
     }
   }
 
+  return optionIds
+}
+
+function validateQuestionFormatAndKey(
+  question: AifExamQuestion,
+  optionIds: string[],
+  issues: AifQuestionBankValidationIssue[],
+) {
+  const prefix = `Question ${question.id}`
   if (question.format === "single-choice") {
     if (question.options.length !== 4) {
-      issues.push({
-        code: "single-choice-options",
-        message: `${prefix}: single-choice must have exactly 4 options`,
-        questionId: question.id,
-      })
+      pushIssue(
+        issues,
+        question.id,
+        "single-choice-options",
+        `${prefix}: single-choice must have exactly 4 options`,
+      )
     }
     if (question.correctOptionIds.length !== 1) {
-      issues.push({
-        code: "single-choice-key",
-        message: `${prefix}: single-choice must have exactly 1 correct option`,
-        questionId: question.id,
-      })
+      pushIssue(
+        issues,
+        question.id,
+        "single-choice-key",
+        `${prefix}: single-choice must have exactly 1 correct option`,
+      )
     }
   } else {
     if (question.options.length < 5) {
-      issues.push({
-        code: "multi-response-options",
-        message: `${prefix}: multi-response must have at least 5 options`,
-        questionId: question.id,
-      })
+      pushIssue(
+        issues,
+        question.id,
+        "multi-response-options",
+        `${prefix}: multi-response must have at least 5 options`,
+      )
     }
     if (question.correctOptionIds.length < 2) {
-      issues.push({
-        code: "multi-response-key",
-        message: `${prefix}: multi-response must have at least 2 correct options`,
-        questionId: question.id,
-      })
+      pushIssue(
+        issues,
+        question.id,
+        "multi-response-key",
+        `${prefix}: multi-response must have at least 2 correct options`,
+      )
     }
   }
 
   for (const correctId of question.correctOptionIds) {
     if (!optionIds.includes(correctId)) {
-      issues.push({
-        code: "answer-key",
-        message: `${prefix}: correctOptionId ${correctId} is not in options`,
-        questionId: question.id,
-      })
+      pushIssue(
+        issues,
+        question.id,
+        "answer-key",
+        `${prefix}: correctOptionId ${correctId} is not in options`,
+      )
     }
   }
+}
 
+export function validateAifQuestion(question: AifExamQuestion): AifQuestionBankValidationIssue[] {
+  const issues: AifQuestionBankValidationIssue[] = []
+  validateQuestionIdentity(question, issues)
+  validateQuestionContent(question, issues)
+  const optionIds = validateQuestionOptions(question, issues)
+  validateQuestionFormatAndKey(question, optionIds, issues)
   return issues
 }
 

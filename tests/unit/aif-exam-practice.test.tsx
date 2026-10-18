@@ -3,6 +3,10 @@ import { beforeEach, describe, expect, it, vi } from "vitest"
 import { AifExamPractice } from "@/components/learning/AifExamPractice"
 import type { SanitizedAifExamQuestion } from "@/lib/learning/aif-c01-question-bank"
 
+vi.mock("next/navigation", () => ({
+  useRouter: () => ({ push: vi.fn(), replace: vi.fn(), prefetch: vi.fn() }),
+}))
+
 const sampleQuestions: SanitizedAifExamQuestion[] = [
   {
     id: "aif-d1-001",
