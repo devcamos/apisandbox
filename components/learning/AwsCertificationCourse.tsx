@@ -168,6 +168,37 @@ export function AwsCertificationCourse({
             }))}
             accent={track.accent}
           />
+
+          {track.slug === "ai-practitioner" ? (
+            <div className={`mt-6 rounded-2xl border p-5 ${accent.border} ${accent.soft}`}>
+              <div className="flex flex-wrap items-start justify-between gap-4">
+                <div>
+                  <p className={`text-xs font-semibold uppercase tracking-[0.18em] ${accent.text}`}>
+                    Exam-style question bank
+                  </p>
+                  <h2 className="mt-2 text-xl font-bold text-white">Practice by domain</h2>
+                  <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-300">
+                    Original AIF-C01 multiple-choice and multiple-response questions with a plain-English
+                    explanation for every option. Start with Domain 1 metrics if that is your weak area.
+                  </p>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  <Link
+                    href="/cloud/aws/certifications/ai-practitioner/practice"
+                    className={`inline-flex items-center gap-2 rounded-lg bg-gradient-to-r px-4 py-2.5 text-sm font-semibold text-white ${accent.gradient}`}
+                  >
+                    Open practice <ArrowRight className="h-4 w-4" />
+                  </Link>
+                  <Link
+                    href="/cloud/aws/certifications/ai-practitioner/practice?filter=metrics"
+                    className="inline-flex items-center gap-2 rounded-lg border border-slate-600 bg-slate-950/40 px-4 py-2.5 text-sm font-semibold text-slate-200 hover:border-slate-400"
+                  >
+                    D1 metrics focus
+                  </Link>
+                </div>
+              </div>
+            </div>
+          ) : null}
         </div>
       </section>
 
