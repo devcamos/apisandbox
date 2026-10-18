@@ -107,7 +107,7 @@ function LoginForm({
   ])
 
   // Handle email change with validation
-  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleEmailChange = (e: React.SyntheticEvent<HTMLInputElement>) => {
     const value = syncValueFromEvent(e, setEmail)
     if (emailTouched) {
       setEmailError(validateEmail(value))
@@ -119,7 +119,7 @@ function LoginForm({
   }
 
   // Handle password change with validation
-  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handlePasswordChange = (e: React.SyntheticEvent<HTMLInputElement>) => {
     const value = syncValueFromEvent(e, setPassword)
     if (passwordTouched) {
       setPasswordError(validatePassword(value))

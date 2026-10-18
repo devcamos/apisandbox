@@ -80,7 +80,7 @@
     "isomorphic-dompurify": "^3.19.0",
     "lucide-react": "^0.562.0",
     "mermaid": "^10.9.8",
-    "next": "16.3.6",
+    "next": "^16.4.2",
     "next-auth": "^5.0.0-beta.32",
     "openai": "^6.37.0",
     "pg": "^8.21.0",
@@ -111,7 +111,7 @@
     "autoprefixer": "^10.4.23",
     "dotenv": "^17.2.3",
     "eslint": "^9.39.2",
-    "eslint-config-next": "16.3.1",
+    "eslint-config-next": "^16.4.2",
     "eslint-plugin-sonarjs": "^4.1.0",
     "eslint-plugin-unicorn": "^56.0.1",
     "jsdom": "^29.1.1",
@@ -123,6 +123,13 @@
     "vitest": "^4.1.5"
   },
   "overrides": {
-    "deepmerge-ts": "8.0.0"
+    "deepmerge-ts": "8.0.0",
+    "katex": "^0.18.2",
+    "postcss-nested": {
+      "postcss-selector-parser": "^7.1.6"
+    },
+    "tailwindcss": {
+      "postcss-selector-parser": "^7.1.6"
+    }
   }
 }
