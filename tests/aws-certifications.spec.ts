@@ -61,6 +61,32 @@ test.describe("AWS certification journey", () => {
     await expect(page.getByText("Java 21", { exact: true })).toBeVisible()
   })
 
+  test("serves AIF-C01 practice by domain with explanations after submit", async ({ page }) => {
+    const token = await createAuthenticatedSession(page.request)
+    await applySession(page, token)
+
+    await page.goto("/cloud/aws/certifications/ai-practitioner/practice?filter=metrics&limit=2")
+    await expect(page.getByRole("heading", { name: "Exam-style practice" })).toBeVisible()
+    await expect(page.getByText("D1 metrics focus")).toBeVisible()
+
+    const fieldsets = page.locator("fieldset")
+    await expect(fieldsets).toHaveCount(2)
+
+    for (let index = 0; index < 2; index += 1) {
+      const fieldset = fieldsets.nth(index)
+      const formatHint = await fieldset.locator("text=/Pick \\d+/").textContent()
+      const pickCount = Number.parseInt(formatHint?.match(/Pick (\d+)/)?.[1] ?? "1", 10)
+      const options = fieldset.locator("label")
+      for (let optionIndex = 0; optionIndex < pickCount; optionIndex += 1) {
+        await options.nth(optionIndex).click()
+      }
+    }
+
+    await page.getByRole("button", { name: "Submit practice set" }).click()
+    await expect(page.getByRole("heading", { name: "Practice result" })).toBeVisible()
+    await expect(page.locator("fieldset").first().locator("p").first()).toBeVisible()
+  })
+
   test("persists certification assessment mastery through the shared API", async ({ request }) => {
     const token = await createAuthenticatedSession(request)
     const headers = { Authorization: `Bearer ${token}` }
