@@ -32,7 +32,7 @@ export default function ForgotPasswordPage() {
     },
   ])
 
-  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleEmailChange = (e: React.SyntheticEvent<HTMLInputElement>) => {
     syncValueFromEvent(e, setEmail)
     if (emailError) setEmailError("")
   }

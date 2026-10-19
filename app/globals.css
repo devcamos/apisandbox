@@ -49,3 +49,21 @@ body {
   transform: scale(1.02);
 }
 
+
+/*
+ * Mobile navigation drawer (components/Navigation.tsx).
+ * Fixed height below the 4rem header so the list can scroll on iPhone Safari.
+ * 100vh is the fallback; 100dvh tracks Safari's collapsing toolbars.
+ */
+.mobile-nav-drawer {
+  height: calc(100vh - 4rem);
+  height: calc(100dvh - 4rem);
+}
+
+.mobile-nav-drawer__scroll {
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
+  padding-bottom: calc(1.5rem + env(safe-area-inset-bottom, 0px));
+}

@@ -9,6 +9,7 @@ import { PageSearch } from "./PageSearch";
 import { ManageSubscriptionButton } from "@/components/premium/ManageSubscriptionButton";
 import { SignOutProgressOverlay } from "@/components/auth/SignOutProgressOverlay";
 import { isBillingPortalEnabled } from "@/config/featureFlags";
+import { useBodyScrollLock } from "@/hooks/useBodyScrollLock";
 
 function mobileExploreBadgeClass(badge: string | undefined) {
   if (badge === "Free") return "bg-green-500/20 text-green-400";
@@ -61,14 +62,8 @@ export default function Navigation() {
     setProfileOpen(false);
   }, [pathname]);
 
-  useEffect(() => {
-    if (!isOpen) return;
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    return () => {
-      document.body.style.overflow = previousOverflow;
-    };
-  }, [isOpen]);
+  // Lock the page behind the drawer; the drawer list scrolls on its own.
+  useBodyScrollLock(isOpen);
 
   // Close explore dropdown when clicking outside
   useEffect(() => {
@@ -126,7 +121,13 @@ export default function Navigation() {
   ];
 
   return (
-    <nav className="bg-slate-900/80 backdrop-blur-md border-b border-slate-800 sticky top-0 z-50">
+    <nav
+      className={`border-b border-slate-800 sticky top-0 z-50 ${
+        // backdrop-filter makes <nav> the containing block for position:fixed children,
+        // so turn it off while the mobile drawer is open.
+        isOpen ? "bg-slate-900" : "bg-slate-900/80 backdrop-blur-md"
+      }`}
+    >
       <div className="container mx-auto px-6">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
@@ -389,7 +390,15 @@ export default function Navigation() {
 
         {/* Mobile Navigation */}
         {isOpen && (
-          <div id="mobile-navigation-menu" className="md:hidden py-4 space-y-2">
+          <div
+            id="mobile-navigation-menu"
+            data-testid="mobile-navigation-drawer"
+            className="mobile-nav-drawer md:hidden fixed inset-x-0 top-16 z-50 flex flex-col bg-slate-900 border-t border-slate-800"
+          >
+            <div
+              data-testid="mobile-navigation-scroll"
+              className="mobile-nav-drawer__scroll flex-1 min-h-0 py-4 space-y-2 px-[env(safe-area-inset-left,0px)]"
+            >
             <div className="px-4 py-2">
               <Link
                 href="/story"
@@ -570,6 +579,7 @@ export default function Navigation() {
                 </Link>
               </div>
             )}
+            </div>
           </div>
         )}
       </div>

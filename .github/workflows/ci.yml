@@ -280,13 +280,13 @@ jobs:
           path: ~/.cache/ms-playwright
           key: ${{ runner.os }}-playwright-${{ hashFiles('package-lock.json') }}
 
-      - name: Install Playwright Chromium (with system deps)
+      - name: Install Playwright Chromium + WebKit (with system deps)
         if: steps.playwright-cache.outputs.cache-hit != 'true'
-        run: npx playwright install chromium --with-deps
+        run: npx playwright install chromium webkit --with-deps
 
       - name: Install Playwright system deps (browser cache hit)
         if: steps.playwright-cache.outputs.cache-hit == 'true'
-        run: npx playwright install-deps chromium
+        run: npx playwright install-deps chromium webkit
 
       - name: Prepare standalone server for smoke
         run: bash scripts/prepare-smoke-standalone.sh
@@ -304,7 +304,15 @@ jobs:
           NEXT_PUBLIC_APP_URL: http://127.0.0.1:4000
         run: |
           mkdir -p reports
-          PLAYWRIGHT_JSON_OUTPUT_NAME=reports/playwright-smoke.json PLAYWRIGHT_JUNIT_OUTPUT_NAME=reports/playwright-smoke-junit.xml npx playwright test tests/ci-smoke.spec.ts tests/premium-signup.spec.ts --project=chromium --reporter=json,junit
+          PLAYWRIGHT_JSON_OUTPUT_NAME=reports/playwright-smoke.json PLAYWRIGHT_JUNIT_OUTPUT_NAME=reports/playwright-smoke-junit.xml npx playwright test tests/ci-smoke.spec.ts tests/premium-signup.spec.ts tests/mobile-drawer-scroll.spec.ts --project=chromium --reporter=json,junit
+
+      # iPhone Safari regression: mobile nav drawer must scroll (WebKit, iPhone 12 profile).
+      - name: Run mobile drawer E2E (Mobile Safari / WebKit)
+        env:
+          CI_E2E_USE_PROD_SERVER: "1"
+          VERCEL_ENV: preview
+          NEXT_PUBLIC_APP_URL: http://127.0.0.1:4000
+        run: npx playwright test tests/mobile-drawer-scroll.spec.ts --project="Mobile Safari" --reporter=list
 
       - name: Publish smoke test summary
         if: always()

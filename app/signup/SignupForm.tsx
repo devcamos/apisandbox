@@ -80,7 +80,7 @@ function SignupFormInner({ googleClientId }: Readonly<{ googleClientId: string }
     },
   ])
 
-  const updateField = (field: keyof typeof formData) => (e: React.ChangeEvent<HTMLInputElement>) => {
+  const updateField = (field: keyof typeof formData) => (e: React.SyntheticEvent<HTMLInputElement>) => {
     syncValueFromEvent(e, (value) => setField(field, value))
   }
 
