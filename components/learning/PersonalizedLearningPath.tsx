@@ -60,7 +60,7 @@ export default function PersonalizedLearningPath() {
   if (!complete) {
     return (
       <section className="container mx-auto px-6 py-8">
-        <div className="rounded-2xl border border-cyan-400/30 bg-gradient-to-r from-cyan-400/10 via-slate-800/70 to-violet-400/10 p-6 sm:p-8">
+        <div className="rounded-2xl border border-cyan-400/30 bg-linear-to-r from-cyan-400/10 via-slate-800/70 to-violet-400/10 p-6 sm:p-8">
           <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
             <div>
               <div className="inline-flex items-center gap-2 text-sm font-semibold text-cyan-200">

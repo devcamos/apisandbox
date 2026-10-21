@@ -41,12 +41,12 @@ export default function SpringTermModal({
       <button
         type="button"
         aria-label="Close spring term details"
-        className="absolute inset-0 bg-black/80 backdrop-blur-sm"
+        className="absolute inset-0 bg-black/80 backdrop-blur-xs"
         onClick={onClose}
       />
 
       <div className="relative z-10 w-full max-w-4xl max-h-[90vh] overflow-hidden rounded-2xl border border-slate-700 bg-slate-900 shadow-2xl">
-        <div className="relative bg-gradient-to-r from-green-600/80 to-emerald-600/70 px-6 py-5">
+        <div className="relative bg-linear-to-r from-green-600/80 to-emerald-600/70 px-6 py-5">
           <button
             type="button"
             onClick={onClose}

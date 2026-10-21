@@ -216,7 +216,7 @@ export default function ORMsPage() {
               </p>
             </div>
 
-            <div className="bg-gradient-to-r from-indigo-500 to-purple-600 rounded-lg shadow-md p-8 text-white">
+            <div className="bg-linear-to-r from-indigo-500 to-purple-600 rounded-lg shadow-md p-8 text-white">
               <h2 className="text-2xl font-bold mb-4">
                 🏆 Modern Recommendation
               </h2>
@@ -249,7 +249,7 @@ export default function ORMsPage() {
                 <p>✅ <strong>Same Code:</strong> Only the `DATABASE_URL` connection string changes - zero application code changes needed</p>
                 <p>✅ <strong>Same Schema:</strong> Your Prisma schema works identically across all environments</p>
               </div>
-              <div className="mt-4 p-3 bg-blue-100 rounded border border-blue-300">
+              <div className="mt-4 p-3 bg-blue-100 rounded-sm border border-blue-300">
                 <p className="text-sm text-blue-900">
                   <strong>The key principle:</strong> Configure through environment variables (`DATABASE_URL`), not code changes. 
                   Your Prisma queries, migrations, and type generation work the same everywhere.

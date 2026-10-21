@@ -31,7 +31,7 @@ export default function Phase3() {
       <LessonTracker phase={3} />
 
       {/* Pareto Principle Summary */}
-      <div className="bg-gradient-to-br from-yellow-500/10 to-orange-500/10 border-2 border-yellow-500/30 rounded-xl p-6 mb-12">
+      <div className="bg-linear-to-br from-yellow-500/10 to-orange-500/10 border-2 border-yellow-500/30 rounded-xl p-6 mb-12">
         <div className="flex items-start gap-4 mb-4">
           <div className="p-3 bg-yellow-500/20 rounded-lg">
             <span className="text-3xl">📊</span>
@@ -83,7 +83,7 @@ export default function Phase3() {
       <section className="mb-12">
         <h2 className="text-3xl font-bold text-white mb-6">Synchronous vs Asynchronous Communication</h2>
         <div className="grid md:grid-cols-2 gap-6">
-          <div className="bg-gradient-to-br from-blue-500/10 to-cyan-500/10 border border-blue-500/20 rounded-xl p-6">
+          <div className="bg-linear-to-br from-blue-500/10 to-cyan-500/10 border border-blue-500/20 rounded-xl p-6">
             <h3 className="text-2xl font-bold text-white mb-4">⚡ Synchronous (Request-Response)</h3>
             <p className="text-gray-300 mb-4">Immediate response required, blocking operation</p>
             <div className="space-y-3 mb-6">
@@ -116,7 +116,7 @@ const user = await userClient
             </div>
           </div>
 
-          <div className="bg-gradient-to-br from-purple-500/10 to-pink-500/10 border border-purple-500/20 rounded-xl p-6">
+          <div className="bg-linear-to-br from-purple-500/10 to-pink-500/10 border border-purple-500/20 rounded-xl p-6">
             <h3 className="text-2xl font-bold text-white mb-4">📨 Asynchronous (Event-Driven)</h3>
             <p className="text-gray-300 mb-4">Fire and forget, processed later, non-blocking</p>
             <div className="space-y-3 mb-6">
@@ -161,7 +161,7 @@ consumer.on('message', async (msg) => {
       {/* gRPC and Protobufs */}
       <section className="mb-12">
         <h2 className="text-3xl font-bold text-white mb-6">gRPC & Protocol Buffers</h2>
-        <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border border-slate-700 mb-6">
+        <div className="bg-slate-800/50 backdrop-blur-xs rounded-xl p-6 border border-slate-700 mb-6">
           <p className="text-gray-300 mb-4">
             gRPC is a high-performance RPC framework that uses HTTP/2 and Protocol Buffers for 
             efficient service-to-service communication.
@@ -191,7 +191,7 @@ consumer.on('message', async (msg) => {
         </div>
 
         <div className="grid md:grid-cols-2 gap-6 mb-6">
-          <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border border-slate-700">
+          <div className="bg-slate-800/50 backdrop-blur-xs rounded-xl p-6 border border-slate-700">
             <h3 className="text-xl font-bold text-white mb-4">Proto Definition</h3>
             <div className="bg-slate-900/50 p-4 rounded-lg font-mono text-xs text-gray-300 overflow-x-auto">
               <ExpandableCodeBlock code={`syntax = "proto3";
@@ -224,7 +224,7 @@ message CreateUserRequest {
             </div>
           </div>
 
-          <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border border-slate-700">
+          <div className="bg-slate-800/50 backdrop-blur-xs rounded-xl p-6 border border-slate-700">
             <h3 className="text-xl font-bold text-white mb-4">gRPC Server Implementation</h3>
             <div className="bg-slate-900/50 p-4 rounded-lg font-mono text-xs text-gray-300 overflow-x-auto">
               <ExpandableCodeBlock code={`import * as grpc from '@grpc/grpc-js';
@@ -267,7 +267,7 @@ server.bindAsync(
         </div>
 
         {/* Java gRPC Examples */}
-        <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border border-slate-700">
+        <div className="bg-slate-800/50 backdrop-blur-xs rounded-xl p-6 border border-slate-700">
           <h3 className="text-xl font-bold text-white mb-4">Java gRPC Implementation</h3>
           <div className="grid md:grid-cols-2 gap-6">
             <div>
@@ -435,7 +435,7 @@ public class UserClientService {
           />
         </div>
 
-        <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border border-slate-700 mb-6">
+        <div className="bg-slate-800/50 backdrop-blur-xs rounded-xl p-6 border border-slate-700 mb-6">
           <h3 className="text-xl font-bold text-white mb-4">Kafka Implementation Example</h3>
           <div className="grid md:grid-cols-2 gap-6">
             <div>
@@ -601,7 +601,7 @@ public class KafkaConfig {
         </div>
 
         {/* Docker Examples */}
-        <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border border-slate-700">
+        <div className="bg-slate-800/50 backdrop-blur-xs rounded-xl p-6 border border-slate-700">
           <h3 className="text-xl font-bold text-white mb-4">🐳 Docker Containerization</h3>
           <div className="grid md:grid-cols-2 gap-6">
             <div>
@@ -674,7 +674,7 @@ services:
       <section className="mb-12">
         <h2 className="text-3xl font-bold text-white mb-6">API Gateway & Service Mesh</h2>
         <div className="grid md:grid-cols-2 gap-6">
-          <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border border-slate-700">
+          <div className="bg-slate-800/50 backdrop-blur-xs rounded-xl p-6 border border-slate-700">
             <h3 className="text-2xl font-bold text-white mb-4">API Gateway</h3>
             <p className="text-gray-400 mb-4">Single entry point for all client requests</p>
             <ul className="space-y-2 mb-4">
@@ -704,7 +704,7 @@ services:
             </div>
           </div>
 
-          <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border border-slate-700">
+          <div className="bg-slate-800/50 backdrop-blur-xs rounded-xl p-6 border border-slate-700">
             <h3 className="text-2xl font-bold text-white mb-4">Service Mesh</h3>
             <p className="text-gray-400 mb-4">Infrastructure layer for service-to-service communication</p>
             <ul className="space-y-2 mb-4">
@@ -739,27 +739,27 @@ services:
       {/* Observability */}
       <section className="mb-12">
         <h2 className="text-3xl font-bold text-white mb-6">Distributed Tracing & Observability</h2>
-        <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border border-slate-700 mb-6">
+        <div className="bg-slate-800/50 backdrop-blur-xs rounded-xl p-6 border border-slate-700 mb-6">
           <p className="text-gray-300 mb-4">
             OpenTelemetry provides standardized instrumentation for distributed tracing across microservices.
           </p>
           <div className="grid md:grid-cols-3 gap-4 text-sm">
-            <div className="bg-gradient-to-br from-blue-500/10 to-cyan-500/10 border border-blue-500/20 p-4 rounded-lg">
+            <div className="bg-linear-to-br from-blue-500/10 to-cyan-500/10 border border-blue-500/20 p-4 rounded-lg">
               <div className="font-semibold text-white mb-2">📊 Traces</div>
               <p className="text-gray-400">End-to-end request flow across services</p>
             </div>
-            <div className="bg-gradient-to-br from-purple-500/10 to-pink-500/10 border border-purple-500/20 p-4 rounded-lg">
+            <div className="bg-linear-to-br from-purple-500/10 to-pink-500/10 border border-purple-500/20 p-4 rounded-lg">
               <div className="font-semibold text-white mb-2">📈 Metrics</div>
               <p className="text-gray-400">Performance counters and aggregated stats</p>
             </div>
-            <div className="bg-gradient-to-br from-orange-500/10 to-red-500/10 border border-orange-500/20 p-4 rounded-lg">
+            <div className="bg-linear-to-br from-orange-500/10 to-red-500/10 border border-orange-500/20 p-4 rounded-lg">
               <div className="font-semibold text-white mb-2">📝 Logs</div>
               <p className="text-gray-400">Structured logging with correlation IDs</p>
             </div>
           </div>
         </div>
 
-        <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border border-slate-700">
+        <div className="bg-slate-800/50 backdrop-blur-xs rounded-xl p-6 border border-slate-700">
           <h3 className="text-xl font-bold text-white mb-4">OpenTelemetry Implementation</h3>
           <div className="bg-slate-900/50 p-4 rounded-lg font-mono text-xs text-gray-300 overflow-x-auto">
             <ExpandableCodeBlock code={`import { trace } from '@opentelemetry/api';

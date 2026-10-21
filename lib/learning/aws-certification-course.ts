@@ -14,7 +14,7 @@ import type {
   LearningCourse,
   LearningDifficulty,
   LearningUnit,
-} from "@/lib/learning/api-foundations-course"
+} from "@/lib/learning/course-types"
 
 export type AwsCertificationTrackSlug = "practitioner" | "ai-practitioner" | "associate" | "professional"
 

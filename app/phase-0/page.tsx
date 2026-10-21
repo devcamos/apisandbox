@@ -34,7 +34,7 @@ export default function Phase0() {
       <LessonTracker phase={0} />
 
       {/* Pareto Principle Summary */}
-      <div className="bg-gradient-to-br from-yellow-500/10 to-orange-500/10 border-2 border-yellow-500/30 rounded-xl p-6 mb-12">
+      <div className="bg-linear-to-br from-yellow-500/10 to-orange-500/10 border-2 border-yellow-500/30 rounded-xl p-6 mb-12">
         <div className="flex items-start gap-4 mb-4">
           <div className="p-3 bg-yellow-500/20 rounded-lg">
             <span className="text-3xl">📊</span>
@@ -443,7 +443,7 @@ export default function Phase0() {
 
       {/* Notable Technologies Using Core Concepts */}
       <section className="mb-12">
-        <div className="bg-gradient-to-r from-indigo-500/10 to-purple-500/10 border-2 border-indigo-500/30 rounded-xl p-6 mb-12">
+        <div className="bg-linear-to-r from-indigo-500/10 to-purple-500/10 border-2 border-indigo-500/30 rounded-xl p-6 mb-12">
           <h2 className="text-3xl font-bold text-white mb-6">🔗 Notable Technologies Using Core Concepts</h2>
           <p className="text-gray-300 mb-6 text-lg">
             These fundamentals power real-world technologies you'll use every day. Understanding the core concepts helps you master these technologies faster.
@@ -653,7 +653,7 @@ export default function Phase0() {
 
       {/* Spring Framework Perspective — tabbed */}
       <section className="mb-12">
-        <div className="bg-gradient-to-br from-green-900/30 to-emerald-900/20 border-2 border-green-500/30 rounded-xl overflow-hidden">
+        <div className="bg-linear-to-br from-green-900/30 to-emerald-900/20 border-2 border-green-500/30 rounded-xl overflow-hidden">
           <div className="flex items-center gap-3 px-6 pt-5 pb-3">
             <span className="text-2xl">☕</span>
             <h2 className="text-xl font-bold text-white">Spring Framework Perspective</h2>
@@ -689,7 +689,7 @@ export default function Phase0() {
                   onClick={() => setSelectedSpringTerm(item)}
                   className="flex w-full items-start gap-3 px-4 py-3 text-left transition-colors hover:bg-slate-700/40"
                 >
-                  <code className="mt-0.5 shrink-0 rounded bg-green-500/10 px-2 py-0.5 text-xs font-bold text-green-300">{item.term}</code>
+                  <code className="mt-0.5 shrink-0 rounded-sm bg-green-500/10 px-2 py-0.5 text-xs font-bold text-green-300">{item.term}</code>
                   <div className="min-w-0 flex-1">
                     <div className="text-sm text-gray-300">{item.desc}</div>
                     <div className="mt-2 text-xs font-medium text-emerald-300">

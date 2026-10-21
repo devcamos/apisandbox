@@ -129,7 +129,7 @@ export default function ProblemDetailPage() {
                   <Link
                     key={mapped.id}
                     href={`/phase-5/problems/${pattern.id}/${problem.id}/mapped/${mapped.id}`}
-                    className="block rounded border border-slate-700 bg-slate-900/60 p-3 transition-colors hover:border-cyan-400/60"
+                    className="block rounded-sm border border-slate-700 bg-slate-900/60 p-3 transition-colors hover:border-cyan-400/60"
                   >
                     <div className="text-sm font-semibold text-cyan-200 underline">{mapped.title}</div>
                     <div className="text-xs text-gray-300 mt-1">
@@ -185,7 +185,7 @@ export default function ProblemDetailPage() {
                   <Link
                     key={p.id}
                     href={`/phase-5/problems/${pattern.id}/${p.id}`}
-                    className="text-xs px-2 py-1 rounded border border-slate-600 text-gray-200 hover:border-cyan-400/50"
+                    className="text-xs px-2 py-1 rounded-sm border border-slate-600 text-gray-200 hover:border-cyan-400/50"
                   >
                     {p.title}
                   </Link>

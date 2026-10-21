@@ -40,9 +40,9 @@ export default function PhaseLayout({
   const finalBreadcrumbs = breadcrumbs || defaultBreadcrumbs;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+    <div className="min-h-screen bg-linear-to-br from-slate-900 via-slate-800 to-slate-900">
       {/* Header */}
-      <div className={`bg-gradient-to-r ${color} py-10 sm:py-16`}>
+      <div className={`bg-linear-to-r ${color} py-10 sm:py-16`}>
         <div className="container mx-auto px-4 sm:px-6">
           {/* Breadcrumbs */}
           <nav className="mb-6 overflow-x-auto text-sm">
@@ -67,7 +67,7 @@ export default function PhaseLayout({
           </nav>
 
           <div className="flex flex-col sm:flex-row sm:items-center gap-4 mb-4">
-            <div className="p-4 bg-white/20 backdrop-blur-sm rounded-xl shrink-0 self-start">
+            <div className="p-4 bg-white/20 backdrop-blur-xs rounded-xl shrink-0 self-start">
               <Icon className="w-10 h-10 text-white" />
             </div>
             <div>

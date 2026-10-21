@@ -35,7 +35,7 @@ export function PhaseRoutePreview({
       <div className="flex items-start gap-4 mb-4">
         {Icon ? (
           <div
-            className={`p-3 rounded-lg bg-gradient-to-r ${entry?.color ?? "from-purple-500 to-pink-500"}`}
+            className={`p-3 rounded-lg bg-linear-to-r ${entry?.color ?? "from-purple-500 to-pink-500"}`}
           >
             <Icon className="w-8 h-8 text-white" />
           </div>
@@ -72,7 +72,7 @@ export function PhaseRoutePreview({
 
       <Link
         href="/upgrade"
-        className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg font-semibold hover:shadow-lg transition-all text-sm"
+        className="inline-flex items-center gap-2 px-5 py-2.5 bg-linear-to-r from-purple-500 to-pink-500 text-white rounded-lg font-semibold hover:shadow-lg transition-all text-sm"
       >
         Unlock full access
         <ArrowRight className="w-4 h-4" />

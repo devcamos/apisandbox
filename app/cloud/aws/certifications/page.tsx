@@ -46,7 +46,7 @@ const certificationStats = [
 
 export default function AwsCertificationsPage() {
   return (
-    <main className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-indigo-950/30">
+    <main className="min-h-screen bg-linear-to-br from-slate-950 via-slate-900 to-indigo-950/30">
       <section className="relative overflow-hidden border-b border-slate-800">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(249,115,22,0.12),transparent_35%),radial-gradient(circle_at_top_left,rgba(14,165,233,0.12),transparent_35%)]" />
         <div className="container relative mx-auto max-w-7xl px-6 py-16 sm:py-20">
@@ -96,7 +96,7 @@ export default function AwsCertificationsPage() {
             const contentLabel = capabilityCount > 0 ? "capabilities" : "question sets"
             return (
               <article key={track.slug} className={`group flex flex-col overflow-hidden rounded-2xl border border-slate-700 bg-slate-900/65 transition-all ${style.border}`}>
-                <div className={`h-1.5 bg-gradient-to-r ${style.gradient}`} />
+                <div className={`h-1.5 bg-linear-to-r ${style.gradient}`} />
                 <div className="flex flex-1 flex-col p-6">
                   <div className="flex items-start justify-between gap-4">
                     <div className={`rounded-xl p-3 ${style.soft}`}>
@@ -136,7 +136,7 @@ export default function AwsCertificationsPage() {
                     </div>
                   </div>
 
-                  <Link href={`/cloud/aws/certifications/${track.slug}`} className={`mt-6 inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r px-4 py-3 text-sm font-bold text-white shadow-lg transition-transform group-hover:-translate-y-0.5 ${style.gradient}`}>
+                  <Link href={`/cloud/aws/certifications/${track.slug}`} className={`mt-6 inline-flex items-center justify-center gap-2 rounded-xl bg-linear-to-r px-4 py-3 text-sm font-bold text-white shadow-lg transition-transform group-hover:-translate-y-0.5 ${style.gradient}`}>
                     Start {track.examCode} course <ArrowRight className="h-4 w-4" />
                   </Link>
                 </div>

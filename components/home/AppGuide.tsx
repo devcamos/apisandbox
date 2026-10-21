@@ -113,7 +113,7 @@ export default function AppGuide() {
             return (
               <div
                 key={stepId}
-                className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border border-slate-700"
+                className="bg-slate-800/50 backdrop-blur-xs rounded-xl p-6 border border-slate-700"
               >
                 <div className="flex items-start justify-between gap-3 mb-3">
                   <Icon className={`w-10 h-10 ${color}`} aria-hidden />
@@ -156,7 +156,7 @@ export default function AppGuide() {
           <button
             type="button"
             onClick={() => void completeGuide()}
-            className="px-6 py-3 rounded-lg bg-gradient-to-r from-blue-500 to-cyan-500 text-white font-semibold hover:shadow-lg transition-all"
+            className="px-6 py-3 rounded-lg bg-linear-to-r from-blue-500 to-cyan-500 text-white font-semibold hover:shadow-lg transition-all"
           >
             Finish quick start
           </button>

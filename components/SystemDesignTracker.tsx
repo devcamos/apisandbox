@@ -161,7 +161,7 @@ export default function SystemDesignTracker() {
 
   return (
     <div className="space-y-8">
-      <div className="bg-gradient-to-br from-emerald-500/10 via-cyan-500/10 to-blue-500/10 border border-emerald-500/20 rounded-2xl p-8">
+      <div className="bg-linear-to-br from-emerald-500/10 via-cyan-500/10 to-blue-500/10 border border-emerald-500/20 rounded-2xl p-8">
         <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
           <div className="max-w-3xl">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-300 text-sm font-semibold mb-4">
@@ -195,7 +195,7 @@ export default function SystemDesignTracker() {
         </div>
       </div>
 
-      <div className="bg-slate-800/50 backdrop-blur-sm rounded-2xl p-6 border border-slate-700">
+      <div className="bg-slate-800/50 backdrop-blur-xs rounded-2xl p-6 border border-slate-700">
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div>
             <h3 className="text-xl font-bold text-white">Priority order</h3>
@@ -223,12 +223,12 @@ export default function SystemDesignTracker() {
         {visibleItems.map((item) => {
           const state = trackerState[item.id];
           return (
-            <div key={item.id} className="bg-slate-800/50 backdrop-blur-sm rounded-2xl border border-slate-700 overflow-hidden">
+            <div key={item.id} className="bg-slate-800/50 backdrop-blur-xs rounded-2xl border border-slate-700 overflow-hidden">
               <div className="p-6">
                 <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
                   <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap items-center gap-3 mb-3">
-                      <div className="inline-flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-r from-emerald-500 to-cyan-500 text-white font-bold">
+                      <div className="inline-flex items-center justify-center w-10 h-10 rounded-xl bg-linear-to-r from-emerald-500 to-cyan-500 text-white font-bold">
                         {item.step}
                       </div>
                       <div>
@@ -299,7 +299,7 @@ export default function SystemDesignTracker() {
                         type="checkbox"
                         checked={state.builtIt}
                         onChange={() => updateItem(item.id, { builtIt: !state.builtIt })}
-                        className="w-5 h-5 rounded border-slate-600"
+                        className="w-5 h-5 rounded-sm border-slate-600"
                       />
                     </label>
 

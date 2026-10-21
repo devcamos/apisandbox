@@ -131,7 +131,7 @@ export default function OAuth2Simulator({ title, description }: OAuth2SimulatorP
               }`}
             >
               <div className="flex items-start gap-3">
-                <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${
+                <div className={`shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${
                   step.completed
                     ? "bg-green-500"
                     : step.active
@@ -154,14 +154,14 @@ export default function OAuth2Simulator({ title, description }: OAuth2SimulatorP
                   
                   {/* Show code/token when available */}
                   {step.step === "redirect" && authCode && (
-                    <div className="mt-2 p-2 bg-slate-900 rounded border border-slate-700">
+                    <div className="mt-2 p-2 bg-slate-900 rounded-sm border border-slate-700">
                       <span className="text-xs text-gray-400">Authorization Code:</span>
                       <p className="text-xs font-mono text-green-400">{authCode}</p>
                     </div>
                   )}
                   
                   {step.step === "complete" && accessToken && (
-                    <div className="mt-2 p-2 bg-slate-900 rounded border border-slate-700">
+                    <div className="mt-2 p-2 bg-slate-900 rounded-sm border border-slate-700">
                       <span className="text-xs text-gray-400">Access Token:</span>
                       <p className="text-xs font-mono text-green-400 break-all">{accessToken}</p>
                     </div>

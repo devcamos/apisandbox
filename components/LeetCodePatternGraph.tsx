@@ -99,11 +99,11 @@ export default function LeetCodePatternGraph() {
         </p>
 
         <div className="flex flex-wrap items-center gap-2 mb-5 text-xs">
-          <span className="px-2 py-1 rounded border bg-emerald-500/20 text-emerald-200 border-emerald-400/40">Easy</span>
-          <span className="px-2 py-1 rounded border bg-blue-500/20 text-blue-200 border-blue-400/40">Medium</span>
-          <span className="px-2 py-1 rounded border bg-red-500/20 text-red-200 border-red-400/40">Hard</span>
-          <span className="px-2 py-1 rounded border bg-cyan-500/20 text-cyan-200 border-cyan-400/40">Selected / related path</span>
-          <span className="px-2 py-1 rounded border bg-yellow-500/20 text-yellow-200 border-yellow-400/40">Locked</span>
+          <span className="px-2 py-1 rounded-sm border bg-emerald-500/20 text-emerald-200 border-emerald-400/40">Easy</span>
+          <span className="px-2 py-1 rounded-sm border bg-blue-500/20 text-blue-200 border-blue-400/40">Medium</span>
+          <span className="px-2 py-1 rounded-sm border bg-red-500/20 text-red-200 border-red-400/40">Hard</span>
+          <span className="px-2 py-1 rounded-sm border bg-cyan-500/20 text-cyan-200 border-cyan-400/40">Selected / related path</span>
+          <span className="px-2 py-1 rounded-sm border bg-yellow-500/20 text-yellow-200 border-yellow-400/40">Locked</span>
         </div>
 
         <div className="flex flex-col gap-6">
@@ -139,7 +139,7 @@ export default function LeetCodePatternGraph() {
                       >
                         <div className="flex items-center justify-between gap-2">
                           <span className="text-sm font-semibold">{node.label}</span>
-                          <span className={`text-[10px] px-1.5 py-0.5 rounded border ${badgeClasses(node.difficulty)}`}>
+                          <span className={`text-[10px] px-1.5 py-0.5 rounded-sm border ${badgeClasses(node.difficulty)}`}>
                             {node.difficulty}
                           </span>
                         </div>
@@ -161,8 +161,8 @@ export default function LeetCodePatternGraph() {
             <div className="text-xs uppercase tracking-wide text-gray-400 mb-2">Selected node</div>
             <h4 className="text-xl font-bold text-white mb-2">{selected.label}</h4>
             <div className="flex items-center gap-2 mb-3">
-              <span className="text-xs px-2 py-1 rounded border border-cyan-400/40 text-cyan-200 bg-cyan-500/15">Level {selected.level}</span>
-              <span className={`text-xs px-2 py-1 rounded border ${badgeClasses(selected.difficulty)}`}>{selected.difficulty}</span>
+              <span className="text-xs px-2 py-1 rounded-sm border border-cyan-400/40 text-cyan-200 bg-cyan-500/15">Level {selected.level}</span>
+              <span className={`text-xs px-2 py-1 rounded-sm border ${badgeClasses(selected.difficulty)}`}>{selected.difficulty}</span>
             </div>
 
             <div className="mb-4">
@@ -205,7 +205,7 @@ export default function LeetCodePatternGraph() {
                       <button
                         key={id}
                         onClick={() => setSelectedId(id)}
-                        className="text-xs px-2 py-1 rounded border border-slate-600 text-gray-200 hover:border-cyan-400/50"
+                        className="text-xs px-2 py-1 rounded-sm border border-slate-600 text-gray-200 hover:border-cyan-400/50"
                       >
                         {node.label}
                       </button>
@@ -228,7 +228,7 @@ export default function LeetCodePatternGraph() {
                       <button
                         key={id}
                         onClick={() => setSelectedId(id)}
-                        className="text-xs px-2 py-1 rounded border border-slate-600 text-gray-200 hover:border-cyan-400/50"
+                        className="text-xs px-2 py-1 rounded-sm border border-slate-600 text-gray-200 hover:border-cyan-400/50"
                       >
                         {node.label}
                       </button>

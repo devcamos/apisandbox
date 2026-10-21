@@ -16,7 +16,7 @@ const sonarSourceGlobs = [
   "app/api/**/*.{ts,tsx}",
   "config/**/*.{ts,tsx}",
   "lib/**/*.{ts,tsx}",
-  "middleware.ts",
+  "proxy.ts",
 ];
 
 /**
