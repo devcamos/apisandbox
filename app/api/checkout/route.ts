@@ -7,6 +7,7 @@ import { prisma } from "@/lib/prisma"
 import { isFeatureEnabled } from "@/config/featureFlags"
 import { logger } from "@/lib/logger"
 import { blocksNewStripeSubscription } from "@/lib/stripe-subscriptions"
+import { checkoutIdempotencyKey, resolveBillingOrigin } from "@/lib/billing/checkout-origin"
 
 export async function POST(request: NextRequest) {
   try {
@@ -18,9 +19,8 @@ export async function POST(request: NextRequest) {
     }
 
     const priceId = PLANS.PREMIUM_MONTHLY.priceId?.trim()
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL?.trim()
-    if (!priceId || !appUrl) {
-      logger.error("Stripe checkout misconfigured: missing STRIPE_PRICE_ID or NEXT_PUBLIC_APP_URL")
+    if (!priceId) {
+      logger.error("Stripe checkout misconfigured: missing STRIPE_PRICE_ID")
       return NextResponse.json(
         { error: "Billing is not configured" },
         { status: 503 }
@@ -28,10 +28,12 @@ export async function POST(request: NextRequest) {
     }
 
     let stripe
+    let appUrl: string
     try {
+      appUrl = resolveBillingOrigin(process.env, request.nextUrl.origin)
       stripe = requireStripeClient()
     } catch {
-      logger.error("Stripe checkout: STRIPE_SECRET_KEY not set")
+      logger.error("Stripe checkout configuration is invalid")
       return NextResponse.json(
         { error: "Billing is not configured" },
         { status: 503 }
@@ -115,7 +117,7 @@ export async function POST(request: NextRequest) {
       origin_context: "web",
       // submit_type omitted: Stripe rejects it for subscription-mode sessions (see STRIPE_INTEGRATION_TODO.md).
     }, {
-      idempotencyKey: `checkout:${user.id}:${priceId}:${Math.floor(Date.now() / 300_000)}`,
+      idempotencyKey: checkoutIdempotencyKey(user.id, priceId, appUrl),
     })
 
     logger.info({ userId: user.id, sessionId: session.id }, "Checkout session created")

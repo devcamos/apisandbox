@@ -39,12 +39,14 @@ export async function registerUser(
   }
 }
 
-export async function injectAuthToken(page: Page, token: string) {
+/** Scope new external-deployment tests to their app origin, never Stripe frames. */
+export async function injectAuthToken(page: Page, token: string, origin?: string) {
   await page.addInitScript(
-    ([key, value]) => {
+    ([key, value, allowedOrigin]) => {
+      if (allowedOrigin !== null && globalThis.location.origin !== allowedOrigin) return
       window.localStorage.setItem(key, value)
     },
-    [AUTH_JWT_STORAGE_KEY, token] as const,
+    [AUTH_JWT_STORAGE_KEY, token, origin ?? null] as const,
   )
 }
 

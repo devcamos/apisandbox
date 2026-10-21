@@ -6,6 +6,9 @@ import Stripe from "stripe"
  */
 export function getStripeClient(): Stripe | null {
   const key = process.env.STRIPE_SECRET_KEY?.trim()
+  if (process.env.VERCEL_ENV === "preview" && /^(?:sk|rk)_live_/.test(key ?? "")) {
+    throw new Error("Preview billing must use a Stripe test-mode key")
+  }
   if (!key) {
     return null
   }

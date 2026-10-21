@@ -144,14 +144,17 @@ function stripeCheck(): SaasReadinessCheck {
   const productionUsingNonLiveStripeKey =
     isProductionTarget() && !envStartsWith("STRIPE_SECRET_KEY", "sk_live_")
   const stripeConfigured =
-    stripeMissing.length === 0 && stripeMalformed.length === 0 && !productionUsingNonLiveStripeKey
+    stripeMissing.length === 0 && stripeMalformed.length === 0 && !productionUsingNonLiveStripeKey &&
+    !(process.env.VERCEL_ENV === "preview" && !envStartsWith("STRIPE_SECRET_KEY", "sk_test_"))
 
   if (!stripeCheckout) {
     return {
       id: "stripe",
       label: "Stripe billing",
-      status: "warn",
-      detail: "Stripe checkout disabled (demo instant-upgrade allowed in non-prod)",
+      status: process.env.VERCEL_ENV === "preview" ? "fail" : "warn",
+      detail: process.env.VERCEL_ENV === "preview"
+        ? "Preview requires Stripe TEST checkout for premium-upgrade testing"
+        : "Stripe checkout disabled (demo instant-upgrade allowed in non-prod)",
     }
   }
 
@@ -168,7 +171,9 @@ function stripeCheck(): SaasReadinessCheck {
     id: "stripe",
     label: "Stripe billing",
     status: "fail",
-    detail: stripeFailureDetail(stripeMissing, productionUsingNonLiveStripeKey, stripeMalformed),
+    detail: process.env.VERCEL_ENV === "preview" && envSet("STRIPE_SECRET_KEY") && !envStartsWith("STRIPE_SECRET_KEY", "sk_test_")
+      ? "Preview Stripe checkout must use a test secret key (sk_test_...)"
+      : stripeFailureDetail(stripeMissing, productionUsingNonLiveStripeKey, stripeMalformed),
   }
 }
 
