@@ -102,13 +102,15 @@ test("FREE Preview user completes hosted TEST payment and receives PREMIUM from 
     await route.continue({ headers })
   })
 
+  // Upgrade redirects with window.location as soon as /api/checkout resolves, so the
+  // response body can vanish before response.json(). Status is still available; the
+  // TEST-mode session URL is asserted from the Stripe page (and again before card entry).
   const checkoutResponsePromise = page.waitForResponse((response) =>
     response.url() === `${origin}/api/checkout` && response.request().method() === "POST",
   )
   await page.goto("/upgrade?checkout=1", { waitUntil: "domcontentloaded" })
   const checkoutResponse = await checkoutResponsePromise
   expect(checkoutResponse.status(), "Real Preview checkout must be enabled").toBe(200)
-  assertTestCheckoutUrl(new URL((await checkoutResponse.json()).url))
   await page.waitForURL((url) => url.origin === "https://checkout.stripe.com", { timeout: 30_000 })
   assertTestCheckoutUrl(new URL(page.url()))
 
