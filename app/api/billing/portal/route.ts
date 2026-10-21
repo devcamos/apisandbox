@@ -5,6 +5,7 @@ import { handleRouteError } from "@/lib/http/responses"
 import { requireStripeClient } from "@/lib/stripe"
 import { prisma } from "@/lib/prisma"
 import { isBillingPortalEnabled } from "@/config/featureFlags"
+import { resolveBillingOrigin } from "@/lib/billing/checkout-origin"
 
 export async function POST(request: NextRequest) {
   try {
@@ -16,7 +17,9 @@ export async function POST(request: NextRequest) {
     }
 
     let stripe
+    let appUrl: string
     try {
+      appUrl = resolveBillingOrigin(process.env, request.nextUrl.origin)
       stripe = requireStripeClient()
     } catch {
       return NextResponse.json(
@@ -40,14 +43,6 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { error: "No billing account found" },
         { status: 400 }
-      )
-    }
-
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL?.trim()
-    if (!appUrl) {
-      return NextResponse.json(
-        { error: "Application URL is not configured" },
-        { status: 503 }
       )
     }
 

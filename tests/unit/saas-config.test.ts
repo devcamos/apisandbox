@@ -148,6 +148,18 @@ describe("saas config", () => {
       expect(stripe.detail).toContain("live secret key")
     })
 
+    it("fails Preview readiness when checkout is disabled", async () => {
+      stubProductionSaasEnv({ VERCEL_ENV: "preview", STRIPE_SECRET_KEY: "sk_test_x", NEXT_PUBLIC_FF_STRIPE_CHECKOUT: "false" })
+      const { evaluateSaasReadiness } = await import("@/lib/saas/config")
+      expect(checkById(evaluateSaasReadiness(), "stripe").status).toBe("fail")
+    })
+
+    it("fails Preview readiness for live Stripe credentials", async () => {
+      stubProductionSaasEnv({ VERCEL_ENV: "preview", STRIPE_SECRET_KEY: "sk_live_x" })
+      const { evaluateSaasReadiness } = await import("@/lib/saas/config")
+      expect(checkById(evaluateSaasReadiness(), "stripe")).toMatchObject({ status: "fail", detail: expect.stringContaining("test secret key") })
+    })
+
     it("allows Stripe TEST keys on Vercel Preview (NODE_ENV=production)", async () => {
       stubProductionSaasEnv({
         VERCEL_ENV: "preview",

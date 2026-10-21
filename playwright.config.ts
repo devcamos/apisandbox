@@ -37,7 +37,7 @@ const ciWorkers = process.env.PLAYWRIGHT_WORKERS
 export default defineConfig({
   testDir: "./tests",
   /* Opt-in live Stripe Preview checkout (set STRIPE_E2E_LIVE=1). */
-  testIgnore: process.env.STRIPE_E2E_LIVE === "1" ? undefined : ["**/premium-signup-live.spec.ts"],
+  testIgnore: ["**/preview-billing.spec.ts", "**/preview-premium-upgrade.spec.ts", ...(process.env.STRIPE_E2E_LIVE === "1" ? [] : ["**/premium-signup-live.spec.ts"])],
   /* Run tests in files in parallel */
   fullyParallel: true,
   /* Fail the build on CI if you accidentally left test.only in the source code. */

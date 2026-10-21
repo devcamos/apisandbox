@@ -196,6 +196,7 @@ manually against that Preview database when it is reachable.
 
 | Date | Change |
 |------|--------|
+| 2026-10-21 | Shared Preview Stripe TEST baseline and deployed premium-upgrade E2E; trusted branch return URLs and cross-branch idempotency. See PREVIEW_BILLING.md. |
 | 2026-08-10 | Added deployed-URL E2E for Vercel repository-dispatch events, including Preview database/auth checks and Playwright registration/login coverage |
 | 2026-09-27 | Vercel build runs `prisma migrate deploy` only for Production (`db:migrate:deploy:vercel`); Preview skips migrate so unreachable Preview DB cannot fail the build |
 | 2026-06-29 | Stripe production hardening: live-key validation, webhook idempotency ledger, status-driven entitlement reconciliation, and duplicate-subscription prevention |
