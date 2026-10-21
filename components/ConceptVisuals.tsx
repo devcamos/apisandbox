@@ -44,7 +44,7 @@ export default function ConceptVisuals({ conceptId }: ConceptVisualsProps) {
 
   return (
     <section className="mb-12">
-      <div className="bg-gradient-to-br from-cyan-500/10 via-blue-500/10 to-emerald-500/10 border border-cyan-500/20 rounded-2xl p-8">
+      <div className="bg-linear-to-br from-cyan-500/10 via-blue-500/10 to-emerald-500/10 border border-cyan-500/20 rounded-2xl p-8">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between mb-8">
           <div className="max-w-3xl">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-900 border border-slate-700 text-sm text-cyan-300 mb-4">
@@ -63,7 +63,7 @@ export default function ConceptVisuals({ conceptId }: ConceptVisualsProps) {
               <div className="h-2 bg-slate-800 rounded-full overflow-hidden">
                 <motion.div
                   key={activeStage.id}
-                  className="h-full bg-gradient-to-r from-cyan-400 to-emerald-400"
+                  className="h-full bg-linear-to-r from-cyan-400 to-emerald-400"
                   initial={{ width: "0%" }}
                   animate={{ width: `${((activeStageIndex + 1) / visual.stages.length) * 100}%` }}
                   transition={{ duration: 0.55, ease: "easeOut" }}

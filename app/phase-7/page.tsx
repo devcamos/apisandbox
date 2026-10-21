@@ -87,7 +87,7 @@ function PathDetail({ path }: Readonly<{ path: MonetisationPath }>) {
                   <div key={rm.type} className="bg-slate-900/60 border border-slate-700 rounded-lg px-4 py-3">
                     <div className="flex items-center justify-between mb-1">
                       <span className="text-sm font-bold text-white">{rm.type}</span>
-                      <code className="text-xs text-emerald-300 bg-emerald-500/10 px-2 py-0.5 rounded">{rm.example}</code>
+                      <code className="text-xs text-emerald-300 bg-emerald-500/10 px-2 py-0.5 rounded-sm">{rm.example}</code>
                     </div>
                     <p className="text-xs text-gray-400">{rm.description}</p>
                   </div>
@@ -107,7 +107,7 @@ function PathDetail({ path }: Readonly<{ path: MonetisationPath }>) {
               </ul>
             </div>
 
-            <details className="group border-2 border-green-500/20 rounded-xl overflow-hidden bg-gradient-to-br from-green-900/20 to-emerald-900/10 hover:border-green-500/30 transition-colors">
+            <details className="group border-2 border-green-500/20 rounded-xl overflow-hidden bg-linear-to-br from-green-900/20 to-emerald-900/10 hover:border-green-500/30 transition-colors">
               <summary className="flex items-center gap-2.5 px-5 py-3 cursor-pointer select-none">
                 <span className="text-base">☕</span>
                 <span className="text-xs uppercase tracking-wide text-green-400 font-bold">Spring Perspective</span>
@@ -133,7 +133,7 @@ function PathDetail({ path }: Readonly<{ path: MonetisationPath }>) {
             <p className="text-sm text-gray-400 mb-4">Follow these steps in order. Each one is designed to validate before you invest more time.</p>
             {path.startHere.map((step) => (
               <div key={step.step} className="flex gap-4">
-                <div className={`w-8 h-8 rounded-full bg-gradient-to-r ${path.color} flex items-center justify-center text-sm font-bold text-white shrink-0`}>
+                <div className={`w-8 h-8 rounded-full bg-linear-to-r ${path.color} flex items-center justify-center text-sm font-bold text-white shrink-0`}>
                   {step.step}
                 </div>
                 <div className="flex-1 pb-4 border-b border-slate-700/50 last:border-0">
@@ -219,7 +219,7 @@ export default function Phase7() {
       icon={DollarSign}
       color="from-amber-500 to-orange-500"
     >
-      <div className="bg-gradient-to-r from-amber-500/10 to-orange-500/10 border border-amber-500/20 rounded-xl p-6 mb-8">
+      <div className="bg-linear-to-r from-amber-500/10 to-orange-500/10 border border-amber-500/20 rounded-xl p-6 mb-8">
         <h2 className="text-2xl font-bold text-white mb-3 flex items-center gap-2">
           <Flame className="w-6 h-6 text-amber-400" />
           The 80/20 of Making Money with Software

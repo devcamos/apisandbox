@@ -27,7 +27,7 @@ interface UpgradePromptProps {
 
 export function UpgradePrompt({ lockedContent }: UpgradePromptProps) {
   return (
-    <div className="bg-gradient-to-r from-purple-500/20 via-pink-500/20 to-orange-500/20 border-2 border-purple-500/30 rounded-2xl p-8 mb-8">
+    <div className="bg-linear-to-r from-purple-500/20 via-pink-500/20 to-orange-500/20 border-2 border-purple-500/30 rounded-2xl p-8 mb-8">
       <div className="flex items-start gap-4">
         <div className="p-3 bg-purple-500/20 rounded-lg">
           <Lock className="w-8 h-8 text-purple-400" />
@@ -68,7 +68,7 @@ export function UpgradePrompt({ lockedContent }: UpgradePromptProps) {
 
           <Link
             href="/upgrade"
-            className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg font-semibold hover:shadow-lg hover:scale-105 transition-all"
+            className="inline-flex items-center gap-2 px-6 py-3 bg-linear-to-r from-purple-500 to-pink-500 text-white rounded-lg font-semibold hover:shadow-lg hover:scale-105 transition-all"
           >
             <Sparkles className="w-5 h-5" />
             Upgrade to Premium

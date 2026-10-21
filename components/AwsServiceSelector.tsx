@@ -93,7 +93,7 @@ export default function AwsServiceSelector() {
             {selectedServices.map((id) => {
               const service = services.find(s => s.id === id);
               return service ? (
-                <span key={id} className="px-3 py-1 bg-purple-500/20 text-purple-300 rounded text-sm">
+                <span key={id} className="px-3 py-1 bg-purple-500/20 text-purple-300 rounded-sm text-sm">
                   {service.name}
                 </span>
               ) : null;

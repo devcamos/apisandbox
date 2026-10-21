@@ -233,7 +233,7 @@ export default function ArchitecturePage() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+    <div className="min-h-screen bg-linear-to-br from-slate-900 via-slate-800 to-slate-900">
       <div className="container mx-auto px-6 py-12">
         <div className="mb-12">
           <h1 className="text-4xl font-bold text-white mb-4">System Architecture</h1>
@@ -245,7 +245,7 @@ export default function ArchitecturePage() {
 
         <div className="space-y-12">
           {diagrams.map((item, index) => (
-            <div key={index} className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border border-slate-700">
+            <div key={index} className="bg-slate-800/50 backdrop-blur-xs rounded-xl p-6 border border-slate-700">
               <h2 className="text-2xl font-bold text-white mb-6">{item.title}</h2>
               <div className="bg-slate-900/50 p-6 rounded-lg overflow-x-auto">
                 <div 

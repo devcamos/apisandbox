@@ -118,9 +118,9 @@ export function AifExamPractice({
   }
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
+    <main className="min-h-screen bg-linear-to-br from-slate-950 via-slate-900 to-slate-950">
       <section className="relative overflow-hidden border-b border-slate-800">
-        <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-violet-500 to-fuchsia-400" />
+        <div className="absolute inset-x-0 top-0 h-1 bg-linear-to-r from-violet-500 to-fuchsia-400" />
         <div className="container mx-auto max-w-5xl px-6 py-10 sm:py-12">
           <Link
             href="/cloud/aws/certifications/ai-practitioner"

@@ -69,7 +69,7 @@ export default function ObservabilityDashboard() {
 
         {/* Key Metrics */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border border-slate-700">
+          <div className="bg-slate-800/50 backdrop-blur-xs rounded-xl p-6 border border-slate-700">
             <div className="flex items-center gap-3 mb-2">
               <Activity className="w-5 h-5 text-blue-400" />
               <span className="text-sm text-gray-400">Requests/min</span>
@@ -78,7 +78,7 @@ export default function ObservabilityDashboard() {
             <div className="text-xs text-gray-500">Last 5 minutes</div>
           </div>
 
-          <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border border-slate-700">
+          <div className="bg-slate-800/50 backdrop-blur-xs rounded-xl p-6 border border-slate-700">
             <div className="flex items-center gap-3 mb-2">
               <AlertTriangle className="w-5 h-5 text-red-400" />
               <span className="text-sm text-gray-400">Error Rate</span>
@@ -87,7 +87,7 @@ export default function ObservabilityDashboard() {
             <div className="text-xs text-gray-500">{errorMetrics.length} errors</div>
           </div>
 
-          <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border border-slate-700">
+          <div className="bg-slate-800/50 backdrop-blur-xs rounded-xl p-6 border border-slate-700">
             <div className="flex items-center gap-3 mb-2">
               <Clock className="w-5 h-5 text-green-400" />
               <span className="text-sm text-gray-400">Avg Latency</span>
@@ -96,7 +96,7 @@ export default function ObservabilityDashboard() {
             <div className="text-xs text-gray-500">P95: {stats.p95Latency}ms</div>
           </div>
 
-          <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border border-slate-700">
+          <div className="bg-slate-800/50 backdrop-blur-xs rounded-xl p-6 border border-slate-700">
             <div className="flex items-center gap-3 mb-2">
               <TrendingUp className="w-5 h-5 text-purple-400" />
               <span className="text-sm text-gray-400">Total Requests</span>
@@ -109,7 +109,7 @@ export default function ObservabilityDashboard() {
         {/* Recent Activity */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* HTTP Requests */}
-          <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border border-slate-700">
+          <div className="bg-slate-800/50 backdrop-blur-xs rounded-xl p-6 border border-slate-700">
             <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
               <Activity className="w-5 h-5 text-blue-400" />
               Recent HTTP Requests
@@ -118,7 +118,7 @@ export default function ObservabilityDashboard() {
               {recentMetrics.filter(m => m.type === 'http_request').map((metric) => (
                 <div key={metric.id} className="flex items-center justify-between p-3 bg-slate-900/50 rounded-lg">
                   <div className="flex items-center gap-3">
-                    <span className={`px-2 py-1 rounded text-xs font-mono ${getStatusColor(metric.data.status)}`}>
+                    <span className={`px-2 py-1 rounded-sm text-xs font-mono ${getStatusColor(metric.data.status)}`}>
                       {metric.data.status}
                     </span>
                     <span className="text-sm text-gray-300 font-mono">{metric.data.method}</span>
@@ -139,7 +139,7 @@ export default function ObservabilityDashboard() {
           </div>
 
           {/* Circuit Breaker & Retries */}
-          <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border border-slate-700">
+          <div className="bg-slate-800/50 backdrop-blur-xs rounded-xl p-6 border border-slate-700">
             <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
               <Zap className="w-5 h-5 text-orange-400" />
               Circuit Breaker & Retries

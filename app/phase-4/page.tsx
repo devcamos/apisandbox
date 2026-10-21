@@ -34,7 +34,7 @@ export default function Phase4() {
       <LessonTracker phase={4} />
 
       <section className="mb-12">
-        <div className="bg-gradient-to-br from-cyan-500/10 via-emerald-500/10 to-blue-500/10 border border-cyan-500/30 rounded-2xl p-6">
+        <div className="bg-linear-to-br from-cyan-500/10 via-emerald-500/10 to-blue-500/10 border border-cyan-500/30 rounded-2xl p-6">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
             <div>
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-300 text-sm font-semibold mb-3">
@@ -49,7 +49,7 @@ export default function Phase4() {
             </div>
             <Link
               href="/phase-5"
-              className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-gradient-to-r from-cyan-500 to-emerald-500 text-white font-semibold hover:opacity-95 transition-opacity"
+              className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-linear-to-r from-cyan-500 to-emerald-500 text-white font-semibold hover:opacity-95 transition-opacity"
             >
               Open Phase 5
               <ArrowRight className="w-4 h-4" />
@@ -61,7 +61,7 @@ export default function Phase4() {
       <ConceptVisuals conceptId="caching" />
 
       {/* Pareto Principle Summary */}
-      <div className="bg-gradient-to-br from-yellow-500/10 to-orange-500/10 border-2 border-yellow-500/30 rounded-xl p-6 mb-12">
+      <div className="bg-linear-to-br from-yellow-500/10 to-orange-500/10 border-2 border-yellow-500/30 rounded-xl p-6 mb-12">
         <div className="flex items-start gap-4 mb-4">
           <div className="p-3 bg-yellow-500/20 rounded-lg">
             <span className="text-3xl">📊</span>
@@ -111,7 +111,7 @@ export default function Phase4() {
 
       {/* Constraint-Driven Thinking */}
       <section className="mb-12">
-        <div className="bg-gradient-to-br from-emerald-500/10 via-cyan-500/10 to-blue-500/10 border-2 border-emerald-500/30 rounded-2xl p-8">
+        <div className="bg-linear-to-br from-emerald-500/10 via-cyan-500/10 to-blue-500/10 border-2 border-emerald-500/30 rounded-2xl p-8">
           <div className="flex items-start gap-4 mb-6">
             <div className="p-3 bg-emerald-500/20 rounded-lg">
               <Target className="w-8 h-8 text-emerald-300" />
@@ -244,7 +244,7 @@ export default function Phase4() {
         <div className="grid md:grid-cols-2 gap-6">
           <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-6">
             <div className="flex items-start gap-3 mb-4">
-              <AlertTriangle className="w-6 h-6 text-red-400 flex-shrink-0 mt-1" />
+              <AlertTriangle className="w-6 h-6 text-red-400 shrink-0 mt-1" />
               <div>
                 <h3 className="text-xl font-bold text-white mb-2">Chatty APIs</h3>
                 <p className="text-gray-300 mb-3">Making too many small requests instead of batching</p>
@@ -258,7 +258,7 @@ export default function Phase4() {
 
           <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-6">
             <div className="flex items-start gap-3 mb-4">
-              <AlertTriangle className="w-6 h-6 text-red-400 flex-shrink-0 mt-1" />
+              <AlertTriangle className="w-6 h-6 text-red-400 shrink-0 mt-1" />
               <div>
                 <h3 className="text-xl font-bold text-white mb-2">Cascading Failures</h3>
                 <p className="text-gray-300 mb-3">One service failure brings down entire system</p>
@@ -272,7 +272,7 @@ export default function Phase4() {
 
           <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-6">
             <div className="flex items-start gap-3 mb-4">
-              <AlertTriangle className="w-6 h-6 text-red-400 flex-shrink-0 mt-1" />
+              <AlertTriangle className="w-6 h-6 text-red-400 shrink-0 mt-1" />
               <div>
                 <h3 className="text-xl font-bold text-white mb-2">No Backpressure</h3>
                 <p className="text-gray-300 mb-3">System overwhelmed by too many requests</p>
@@ -286,7 +286,7 @@ export default function Phase4() {
 
           <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-6">
             <div className="flex items-start gap-3 mb-4">
-              <AlertTriangle className="w-6 h-6 text-red-400 flex-shrink-0 mt-1" />
+              <AlertTriangle className="w-6 h-6 text-red-400 shrink-0 mt-1" />
               <div>
                 <h3 className="text-xl font-bold text-white mb-2">Breaking Changes</h3>
                 <p className="text-gray-300 mb-3">Deploying incompatible API versions</p>
@@ -303,7 +303,7 @@ export default function Phase4() {
       {/* Backpressure */}
       <section className="mb-12">
         <h2 className="text-3xl font-bold text-white mb-6">Backpressure & Flow Control</h2>
-        <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border border-slate-700">
+        <div className="bg-slate-800/50 backdrop-blur-xs rounded-xl p-6 border border-slate-700">
           <p className="text-gray-300 mb-6">
             Backpressure mechanisms prevent system overload by controlling the rate of data flow.
           </p>
@@ -336,13 +336,13 @@ export default function Phase4() {
       {/* Contract Testing */}
       <section className="mb-12">
         <h2 className="text-3xl font-bold text-white mb-6">Contract Testing with Pact</h2>
-        <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border border-slate-700 mb-6">
+        <div className="bg-slate-800/50 backdrop-blur-xs rounded-xl p-6 border border-slate-700 mb-6">
           <p className="text-gray-300 mb-4">
             Consumer-driven contract testing ensures API compatibility between services.
           </p>
         </div>
         <div className="grid md:grid-cols-2 gap-6 mb-6">
-          <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border border-slate-700">
+          <div className="bg-slate-800/50 backdrop-blur-xs rounded-xl p-6 border border-slate-700">
             <h3 className="text-xl font-bold text-white mb-4">Consumer Contract</h3>
             <div className="bg-slate-900/50 p-4 rounded-lg font-mono text-xs text-gray-300 overflow-x-auto">
               <ExpandableCodeBlock code={`const { Pact } = require('@pact-foundation/pact');
@@ -377,7 +377,7 @@ describe('User API', () => {
             </div>
           </div>
 
-          <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border border-slate-700">
+          <div className="bg-slate-800/50 backdrop-blur-xs rounded-xl p-6 border border-slate-700">
             <h3 className="text-xl font-bold text-white mb-4">Provider Verification</h3>
             <div className="bg-slate-900/50 p-4 rounded-lg font-mono text-xs text-gray-300 overflow-x-auto">
               <ExpandableCodeBlock code={`const { Verifier } = require('@pact-foundation/pact');
@@ -405,7 +405,7 @@ describe('Pact Verification', () => {
         </div>
 
         {/* Java Pact Examples */}
-        <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border border-slate-700">
+        <div className="bg-slate-800/50 backdrop-blur-xs rounded-xl p-6 border border-slate-700">
           <h3 className="text-xl font-bold text-white mb-4">Java Contract Testing with Pact</h3>
           <div className="grid md:grid-cols-2 gap-6">
             <div>
@@ -494,7 +494,7 @@ public class UserServiceProviderTest {
       <section className="mb-12">
         <h2 className="text-3xl font-bold text-white mb-6">API Versioning Strategies</h2>
         <div className="grid md:grid-cols-3 gap-6 mb-6">
-          <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border border-slate-700">
+          <div className="bg-slate-800/50 backdrop-blur-xs rounded-xl p-6 border border-slate-700">
             <h3 className="text-xl font-bold text-white mb-3">URL Versioning</h3>
             <ExpandableCodeBlock
               label="URL versioning example"
@@ -505,7 +505,7 @@ public class UserServiceProviderTest {
             <p className="text-sm text-gray-400">Most explicit and widely used</p>
           </div>
 
-          <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border border-slate-700">
+          <div className="bg-slate-800/50 backdrop-blur-xs rounded-xl p-6 border border-slate-700">
             <h3 className="text-xl font-bold text-white mb-3">Header Versioning</h3>
             <ExpandableCodeBlock
               label="Header versioning example"
@@ -516,7 +516,7 @@ public class UserServiceProviderTest {
             <p className="text-sm text-gray-400">Clean URLs, follows REST principles</p>
           </div>
 
-          <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border border-slate-700">
+          <div className="bg-slate-800/50 backdrop-blur-xs rounded-xl p-6 border border-slate-700">
             <h3 className="text-xl font-bold text-white mb-3">Query Param</h3>
             <ExpandableCodeBlock
               label="Query param versioning example"
@@ -528,7 +528,7 @@ public class UserServiceProviderTest {
         </div>
 
         {/* Java API Versioning Examples */}
-        <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border border-slate-700">
+        <div className="bg-slate-800/50 backdrop-blur-xs rounded-xl p-6 border border-slate-700">
           <h3 className="text-xl font-bold text-white mb-4">Java Spring Boot API Versioning</h3>
           <div className="grid md:grid-cols-2 gap-6">
             <div>
@@ -622,7 +622,7 @@ public class UserController {
             color="from-green-500 to-emerald-500"
           />
 
-          <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border border-slate-700">
+          <div className="bg-slate-800/50 backdrop-blur-xs rounded-xl p-6 border border-slate-700">
             <h3 className="text-xl font-bold text-white mb-4">Anti-Corruption Layer</h3>
             <p className="text-gray-300 mb-4">
               Create an adapter layer to translate between legacy and modern systems, protecting your new code from legacy constraints.

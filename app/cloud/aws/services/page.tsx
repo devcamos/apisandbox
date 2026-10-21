@@ -9,9 +9,9 @@ import { ExpandableCodeBlock } from "@/components/HighlightedCodeBlock"
 export default function AwsServicesPage() {
   return (
     <SubscriptionGate phaseNumber="cloud" lockedContentName="AWS Cloud Services">
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+    <div className="min-h-screen bg-linear-to-br from-slate-900 via-slate-800 to-slate-900">
       {/* Header */}
-      <div className="bg-gradient-to-r from-orange-500 to-red-500 py-16">
+      <div className="bg-linear-to-r from-orange-500 to-red-500 py-16">
         <div className="container mx-auto px-6">
           <nav className="flex items-center gap-2 mb-6 text-sm">
             <Link href="/" className="text-white/70 hover:text-white transition-colors flex items-center gap-1">
@@ -26,7 +26,7 @@ export default function AwsServicesPage() {
             <span className="text-white font-semibold">Services</span>
           </nav>
           <div className="flex items-center gap-4 mb-4">
-            <div className="p-4 bg-white/20 backdrop-blur-sm rounded-xl">
+            <div className="p-4 bg-white/20 backdrop-blur-xs rounded-xl">
               <Server className="w-10 h-10 text-white" />
             </div>
             <div>
@@ -379,8 +379,8 @@ export default function AwsServicesPage() {
         {/* Service Selection Guide */}
         <section>
           <h2 className="text-3xl font-bold text-white mb-6">When to Use What?</h2>
-          <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-8 border border-slate-700 overflow-x-auto">
-            <table className="w-full text-left min-w-[32rem]">
+          <div className="bg-slate-800/50 backdrop-blur-xs rounded-xl p-8 border border-slate-700 overflow-x-auto">
+            <table className="w-full text-left min-w-lg">
               <thead>
                 <tr className="border-b border-slate-600">
                   <th className="pb-4 text-white font-semibold">Use Case</th>
@@ -429,7 +429,7 @@ export default function AwsServicesPage() {
           <h2 className="text-3xl font-bold text-white mb-6">Java + AWS Implementation Examples</h2>
           
           {/* AWS Lambda with Java */}
-          <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border border-slate-700 mb-6">
+          <div className="bg-slate-800/50 backdrop-blur-xs rounded-xl p-6 border border-slate-700 mb-6">
             <h3 className="text-xl font-bold text-white mb-4">☕ AWS Lambda with Java</h3>
             <div className="bg-slate-900/50 p-4 rounded-lg font-mono text-xs text-gray-300 overflow-x-auto">
               <ExpandableCodeBlock code={`import com.amazonaws.services.lambda.runtime.Context;
@@ -485,7 +485,7 @@ public class User {
           </div>
 
           {/* Docker + ECS Deployment */}
-          <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border border-slate-700 mb-6">
+          <div className="bg-slate-800/50 backdrop-blur-xs rounded-xl p-6 border border-slate-700 mb-6">
             <h3 className="text-xl font-bold text-white mb-4">🐳 Docker + AWS ECS Deployment</h3>
             <div className="grid md:grid-cols-2 gap-6">
               <div>
@@ -533,7 +533,7 @@ ENTRYPOINT ["java", "-jar", "app.jar"]`} />
           </div>
 
           {/* API Gateway + Java Backend */}
-          <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border border-slate-700 mb-6">
+          <div className="bg-slate-800/50 backdrop-blur-xs rounded-xl p-6 border border-slate-700 mb-6">
             <h3 className="text-xl font-bold text-white mb-4">🔌 API Gateway + Java Spring Boot</h3>
             <div className="grid md:grid-cols-2 gap-6">
               <div>
@@ -596,7 +596,7 @@ public class UserController {
           </div>
 
           {/* React + S3 + CloudFront */}
-          <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border border-slate-700">
+          <div className="bg-slate-800/50 backdrop-blur-xs rounded-xl p-6 border border-slate-700">
             <h3 className="text-xl font-bold text-white mb-4">⚛️ React Frontend + AWS S3 + CloudFront</h3>
             <div className="grid md:grid-cols-2 gap-6">
               <div>

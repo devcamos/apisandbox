@@ -82,7 +82,7 @@ function CategoryDetail({ cat }: Readonly<{ cat: DSCategory }>) {
               </div>
             </div>
 
-            <details className="group border-2 border-green-500/20 rounded-xl overflow-hidden bg-gradient-to-br from-green-900/20 to-emerald-900/10 hover:border-green-500/30 transition-colors">
+            <details className="group border-2 border-green-500/20 rounded-xl overflow-hidden bg-linear-to-br from-green-900/20 to-emerald-900/10 hover:border-green-500/30 transition-colors">
               <summary className="flex items-center gap-2.5 px-5 py-3 cursor-pointer select-none">
                 <span className="text-base">☕</span>
                 <span className="text-xs uppercase tracking-wide text-green-400 font-bold">Spring Perspective</span>
@@ -113,7 +113,7 @@ function CategoryDetail({ cat }: Readonly<{ cat: DSCategory }>) {
             <p className="text-sm text-gray-400 mb-4">Follow these steps in order. Each builds on the previous one.</p>
             {cat.pipeline.map((step, i) => (
               <div key={step.step} className="flex gap-4">
-                <div className={`w-8 h-8 rounded-full bg-gradient-to-r ${cat.color} flex items-center justify-center text-sm font-bold text-white shrink-0`}>
+                <div className={`w-8 h-8 rounded-full bg-linear-to-r ${cat.color} flex items-center justify-center text-sm font-bold text-white shrink-0`}>
                   {i + 1}
                 </div>
                 <div className="flex-1 pb-4 border-b border-slate-700/50 last:border-0">
@@ -174,7 +174,7 @@ export default function Phase8() {
       icon={Database}
       color="from-purple-500 to-violet-500"
     >
-      <div className="bg-gradient-to-r from-purple-500/10 to-violet-500/10 border border-purple-500/20 rounded-xl p-6 mb-8">
+      <div className="bg-linear-to-r from-purple-500/10 to-violet-500/10 border border-purple-500/20 rounded-xl p-6 mb-8">
         <h2 className="text-2xl font-bold text-white mb-3 flex items-center gap-2">
           <Flame className="w-6 h-6 text-purple-400" />
           The Bridge Between Notebooks and Revenue
@@ -234,7 +234,7 @@ export default function Phase8() {
               className="bg-slate-900/60 border border-slate-700 rounded-lg px-4 py-3 hover:border-purple-500/40 transition-colors"
             >
               <div className="flex items-center gap-2 mb-1">
-                <span className="text-xs font-bold bg-purple-500/20 text-purple-300 px-2 py-0.5 rounded">
+                <span className="text-xs font-bold bg-purple-500/20 text-purple-300 px-2 py-0.5 rounded-sm">
                   Phase {conn.phase}
                 </span>
                 <span className="text-sm font-bold text-white">{conn.title}</span>

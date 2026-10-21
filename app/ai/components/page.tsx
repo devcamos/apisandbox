@@ -8,9 +8,9 @@ import { Heart, Brain, FileText, Sparkles, Home, Lightbulb, Target, Zap } from "
 export default function AIComponentsPage() {
   return (
     <SubscriptionGate phaseNumber="ai" lockedContentName="AI Components Deep Dive">
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+      <div className="min-h-screen bg-linear-to-br from-slate-900 via-slate-800 to-slate-900">
         {/* Header */}
-        <div className="bg-gradient-to-r from-purple-500 via-pink-500 to-orange-500 py-16">
+        <div className="bg-linear-to-r from-purple-500 via-pink-500 to-orange-500 py-16">
           <div className="container mx-auto px-6">
             <nav className="flex items-center gap-2 mb-6 text-sm">
               <Link href="/" className="text-white/70 hover:text-white transition-colors flex items-center gap-1">
@@ -23,7 +23,7 @@ export default function AIComponentsPage() {
               <span className="text-white font-semibold">Components</span>
             </nav>
             <div className="flex items-center gap-4 mb-4">
-              <div className="p-4 bg-white/20 backdrop-blur-sm rounded-xl">
+              <div className="p-4 bg-white/20 backdrop-blur-xs rounded-xl">
                 <Target className="w-10 h-10 text-white" />
               </div>
               <div>
@@ -36,7 +36,7 @@ export default function AIComponentsPage() {
 
         <div className="container mx-auto px-6 py-12">
           {/* Goal Section */}
-          <div className="bg-gradient-to-r from-purple-500/10 to-pink-500/10 border border-purple-500/20 rounded-xl p-6 mb-12">
+          <div className="bg-linear-to-r from-purple-500/10 to-pink-500/10 border border-purple-500/20 rounded-xl p-6 mb-12">
             <h2 className="text-2xl font-bold text-white mb-3">🎯 Learning Goal</h2>
             <p className="text-gray-300 text-lg">
               Master each of the four core AI components. Understand how Heart (ethics), Brain (intelligence), Context (understanding), and Instructions (guidance) work individually and together to create effective AI systems.
@@ -290,7 +290,7 @@ export default function AIComponentsPage() {
 
           {/* Integration Section */}
           <section className="mb-12">
-            <div className="bg-gradient-to-r from-slate-800/50 to-slate-700/50 rounded-xl p-8 border border-slate-600">
+            <div className="bg-linear-to-r from-slate-800/50 to-slate-700/50 rounded-xl p-8 border border-slate-600">
               <h2 className="text-3xl font-bold text-white mb-6">How Components Integrate</h2>
               <div className="space-y-6">
                 <div className="bg-slate-900/50 rounded-lg p-6">
@@ -339,7 +339,7 @@ export default function AIComponentsPage() {
 
           {/* Learning Tips */}
           <section>
-            <div className="bg-gradient-to-r from-purple-500/20 to-pink-500/20 rounded-xl p-6 border border-purple-500/30">
+            <div className="bg-linear-to-r from-purple-500/20 to-pink-500/20 rounded-xl p-6 border border-purple-500/30">
               <h3 className="text-2xl font-bold text-white mb-4 flex items-center gap-2">
                 <Lightbulb className="w-6 h-6 text-amber-400" />
                 Learning Tips

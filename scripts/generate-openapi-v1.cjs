@@ -26,7 +26,7 @@ console.log("Wrote", out)
 
 const result = spawnSync(
   "npx",
-  ["vite-node", "--config", "vitest.config.ts", tmpScript],
+  ["vite-node", "--config", "vitest.config.mts", tmpScript],
   { cwd: root, encoding: "utf8", env: process.env },
 )
 

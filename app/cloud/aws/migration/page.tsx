@@ -82,9 +82,9 @@ export default function AwsMigrationPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+    <div className="min-h-screen bg-linear-to-br from-slate-900 via-slate-800 to-slate-900">
       {/* Header */}
-      <div className="bg-gradient-to-r from-purple-500 to-pink-500 py-16">
+      <div className="bg-linear-to-r from-purple-500 to-pink-500 py-16">
         <div className="container mx-auto px-6">
           <nav className="flex items-center gap-2 mb-6 text-sm">
             <Link href="/" className="text-white/70 hover:text-white transition-colors flex items-center gap-1">
@@ -99,7 +99,7 @@ export default function AwsMigrationPage() {
             <span className="text-white font-semibold">Migration</span>
           </nav>
           <div className="flex items-center gap-4 mb-4">
-            <div className="p-4 bg-white/20 backdrop-blur-sm rounded-xl">
+            <div className="p-4 bg-white/20 backdrop-blur-xs rounded-xl">
               <Cloud className="w-10 h-10 text-white" />
             </div>
             <div>
@@ -119,7 +119,7 @@ export default function AwsMigrationPage() {
               <div
                 key={strategy.id}
                 onClick={() => setSelectedStrategy(strategy.id)}
-                className={`bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border-2 cursor-pointer transition-all ${
+                className={`bg-slate-800/50 backdrop-blur-xs rounded-xl p-6 border-2 cursor-pointer transition-all ${
                   selectedStrategy === strategy.id
                     ? "border-purple-500 bg-purple-500/10"
                     : "border-slate-700 hover:border-slate-600"
@@ -153,7 +153,7 @@ export default function AwsMigrationPage() {
 
         {/* Cost Calculator */}
         <section className="mb-12">
-          <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-8 border border-slate-700">
+          <div className="bg-slate-800/50 backdrop-blur-xs rounded-xl p-8 border border-slate-700">
             <div className="flex items-center gap-3 mb-6">
               <Calculator className="w-8 h-8 text-purple-400" />
               <h2 className="text-3xl font-bold text-white">Cost Calculator</h2>
@@ -182,7 +182,7 @@ export default function AwsMigrationPage() {
             </div>
             <button
               onClick={calculateCost}
-              className="mt-6 px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg font-semibold hover:shadow-lg transition-all"
+              className="mt-6 px-6 py-3 bg-linear-to-r from-purple-500 to-pink-500 text-white rounded-lg font-semibold hover:shadow-lg transition-all"
             >
               Calculate Estimated Cost
             </button>
@@ -198,7 +198,7 @@ export default function AwsMigrationPage() {
 
         {/* Migration Checklist */}
         <section className="mb-12">
-          <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-8 border border-slate-700">
+          <div className="bg-slate-800/50 backdrop-blur-xs rounded-xl p-8 border border-slate-700">
             <div className="flex items-center gap-3 mb-6">
               <CheckCircle className="w-8 h-8 text-blue-400" />
               <h2 className="text-3xl font-bold text-white">Migration Checklist</h2>
@@ -213,7 +213,7 @@ export default function AwsMigrationPage() {
                     type="checkbox"
                     checked={item.completed}
                     onChange={() => toggleChecklistItem(item.id)}
-                    className="w-5 h-5 rounded border-slate-600"
+                    className="w-5 h-5 rounded-sm border-slate-600"
                   />
                   <span className={`flex-1 ${item.completed ? "line-through text-gray-500" : "text-gray-300"}`}>
                     {item.task}
@@ -226,7 +226,7 @@ export default function AwsMigrationPage() {
 
         {/* Architecture Generator */}
         <section>
-          <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-8 border border-slate-700">
+          <div className="bg-slate-800/50 backdrop-blur-xs rounded-xl p-8 border border-slate-700">
             <h2 className="text-3xl font-bold text-white mb-6">Architecture Generator</h2>
             <div className="grid md:grid-cols-3 gap-6">
               <div className="bg-slate-900/50 rounded-lg p-6 border border-slate-700">
@@ -245,7 +245,7 @@ export default function AwsMigrationPage() {
                 <p className="text-gray-400 text-sm">S3, EBS, EFS</p>
               </div>
             </div>
-            <button className="mt-6 px-6 py-3 bg-gradient-to-r from-blue-500 to-cyan-500 text-white rounded-lg font-semibold hover:shadow-lg transition-all">
+            <button className="mt-6 px-6 py-3 bg-linear-to-r from-blue-500 to-cyan-500 text-white rounded-lg font-semibold hover:shadow-lg transition-all">
               Generate Architecture Diagram
             </button>
           </div>

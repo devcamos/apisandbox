@@ -3,7 +3,7 @@ import type {
   CapabilityMasteryJourney,
   LearningDifficulty,
   LearningUnit,
-} from "@/lib/learning/api-foundations-course"
+} from "@/lib/learning/course-types"
 
 export const AIF_C01_DOMAIN_ORDER = [
   "ai-ml-fundamentals",

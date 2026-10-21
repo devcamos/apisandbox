@@ -293,7 +293,7 @@ export default function OnboardingPage() {
                   <select
                     value={form.primaryLanguage}
                     onChange={(event) => updateLanguage(event.target.value)}
-                    className="mt-2 w-full rounded-lg border border-slate-700 bg-slate-950 px-4 py-3 text-white outline-none focus:border-cyan-400"
+                    className="mt-2 w-full rounded-lg border border-slate-700 bg-slate-950 px-4 py-3 text-white outline-hidden focus:border-cyan-400"
                   >
                     <option value="">Select a language</option>
                     {LANGUAGE_OPTIONS.map((option) => <option key={option.id} value={option.id}>{option.label}</option>)}
@@ -306,7 +306,7 @@ export default function OnboardingPage() {
                     value={form.primaryFramework}
                     onChange={(event) => updateField("primaryFramework", event.target.value)}
                     disabled={!form.primaryLanguage}
-                    className="mt-2 w-full rounded-lg border border-slate-700 bg-slate-950 px-4 py-3 text-white outline-none focus:border-cyan-400 disabled:cursor-not-allowed disabled:opacity-50"
+                    className="mt-2 w-full rounded-lg border border-slate-700 bg-slate-950 px-4 py-3 text-white outline-hidden focus:border-cyan-400 disabled:cursor-not-allowed disabled:opacity-50"
                   >
                     <option value="">Select a framework</option>
                     {frameworks.map((option) => <option key={option.id} value={option.id}>{option.label}</option>)}
@@ -318,7 +318,7 @@ export default function OnboardingPage() {
                   <select
                     value={form.runtimeEnvironment}
                     onChange={(event) => updateField("runtimeEnvironment", event.target.value)}
-                    className="mt-2 w-full rounded-lg border border-slate-700 bg-slate-950 px-4 py-3 text-white outline-none focus:border-cyan-400"
+                    className="mt-2 w-full rounded-lg border border-slate-700 bg-slate-950 px-4 py-3 text-white outline-hidden focus:border-cyan-400"
                   >
                     {RUNTIME_ENVIRONMENT_OPTIONS.map((option) => <option key={option.id} value={option.id}>{option.label}</option>)}
                   </select>
@@ -329,7 +329,7 @@ export default function OnboardingPage() {
                   <select
                     value={form.cloudProvider}
                     onChange={(event) => updateField("cloudProvider", event.target.value)}
-                    className="mt-2 w-full rounded-lg border border-slate-700 bg-slate-950 px-4 py-3 text-white outline-none focus:border-cyan-400"
+                    className="mt-2 w-full rounded-lg border border-slate-700 bg-slate-950 px-4 py-3 text-white outline-hidden focus:border-cyan-400"
                   >
                     {CLOUD_PROVIDER_OPTIONS.map((option) => <option key={option.id} value={option.id}>{option.label}</option>)}
                   </select>
@@ -366,7 +366,7 @@ export default function OnboardingPage() {
                 ))}
               </fieldset>
 
-              <div className="mt-8 rounded-xl border border-cyan-400/25 bg-gradient-to-r from-cyan-400/10 to-violet-400/10 p-5">
+              <div className="mt-8 rounded-xl border border-cyan-400/25 bg-linear-to-r from-cyan-400/10 to-violet-400/10 p-5">
                 <h3 className="font-bold text-cyan-100">Your first learning path</h3>
                 <div className="mt-4 grid gap-3 md:grid-cols-3">
                   {path.map((item) => (

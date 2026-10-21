@@ -88,7 +88,7 @@ export default function WebSocketTester({ title, description }: WebSocketTesterP
         <div className="flex items-center gap-3 flex-1">
           <Activity className={`w-5 h-5 ${connected ? 'text-green-400 animate-pulse' : 'text-gray-400'}`} />
           <span className="text-green-400 font-semibold text-sm">{title}</span>
-          <span className={`text-xs px-2 py-1 rounded ${connected ? 'bg-green-500/20 text-green-400' : 'bg-gray-500/20 text-gray-400'}`}>
+          <span className={`text-xs px-2 py-1 rounded-sm ${connected ? 'bg-green-500/20 text-green-400' : 'bg-gray-500/20 text-gray-400'}`}>
             {connected ? 'Connected' : 'Disconnected'}
           </span>
         </div>

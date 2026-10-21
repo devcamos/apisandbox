@@ -21,7 +21,7 @@ function LayerRow({ layer, isLast, accentColor }: LayerRowProps) {
     <div>
       <div className="flex items-stretch gap-3">
         <div className="flex flex-col items-center w-6 shrink-0">
-          <div className={`w-3 h-3 rounded-full bg-gradient-to-r ${accentColor} shrink-0 mt-3`} />
+          <div className={`w-3 h-3 rounded-full bg-linear-to-r ${accentColor} shrink-0 mt-3`} />
           {!isLast && <div className="w-px flex-1 bg-slate-600 my-0.5" />}
         </div>
 
@@ -37,7 +37,7 @@ function LayerRow({ layer, isLast, accentColor }: LayerRowProps) {
             <div className="flex items-center gap-2 flex-wrap">
               <span className="text-sm font-bold text-white">{layer.name}</span>
               {layer.annotation && (
-                <code className={`text-xs px-1.5 py-0.5 rounded bg-gradient-to-r ${accentColor} bg-opacity-20 text-white/90`}>
+                <code className={`text-xs px-1.5 py-0.5 rounded-sm bg-linear-to-r ${accentColor} bg-opacity-20 text-white/90`}>
                   {layer.annotation}
                 </code>
               )}
@@ -99,7 +99,7 @@ export default function ApiArchitecturePattern({
                 onClick={() => setActiveFramework(i)}
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
                   activeFramework === i
-                    ? `bg-gradient-to-r ${accentColor} text-white`
+                    ? `bg-linear-to-r ${accentColor} text-white`
                     : "text-gray-400 hover:text-gray-200 hover:bg-slate-700/60"
                 }`}
               >

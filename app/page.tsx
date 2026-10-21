@@ -38,7 +38,7 @@ export default function Home() {
 
   if (status === "loading" || (status === "authenticated" && isPremium)) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900" />
+      <div className="min-h-screen bg-linear-to-br from-slate-900 via-slate-800 to-slate-900" />
     );
   }
 
@@ -48,13 +48,13 @@ export default function Home() {
   const freeCtaLabel = session ? "Go to dashboard" : "Explore Free";
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+    <div className="min-h-screen bg-linear-to-br from-slate-900 via-slate-800 to-slate-900">
       {/* Hero Section */}
       <section className="relative overflow-hidden">
         <div className="absolute inset-0 bg-grid-pattern opacity-10"></div>
         <div className="container mx-auto px-6 py-24 relative z-10">
           <div className="text-center max-w-4xl mx-auto">
-            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-2 bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 text-transparent bg-clip-text">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-2 bg-linear-to-r from-blue-400 via-purple-400 to-pink-400 text-transparent bg-clip-text">
               API Integration Training
             </h1>
             <h2 className="text-3xl font-semibold mb-6 text-gray-300">
@@ -69,7 +69,7 @@ export default function Home() {
             <div className="flex justify-center gap-4 flex-wrap">
               <Link 
                 href="/signup"
-                className="px-12 py-4 bg-gradient-to-r from-blue-500 to-cyan-500 text-white rounded-xl font-bold text-lg hover:shadow-lg hover:scale-105 transition-all duration-200 flex items-center gap-2"
+                className="px-12 py-4 bg-linear-to-r from-blue-500 to-cyan-500 text-white rounded-xl font-bold text-lg hover:shadow-lg hover:scale-105 transition-all duration-200 flex items-center gap-2"
               >
                 Explore Free
                 <ArrowRight className="w-5 h-5" />
@@ -90,7 +90,7 @@ export default function Home() {
 
       {/* How It Works Section */}
       <section className="container mx-auto px-6 py-16">
-        <div className="bg-gradient-to-br from-cyan-500/15 via-slate-800 to-orange-500/15 border border-cyan-500/20 rounded-3xl p-8 md:p-12 mb-16 shadow-[0_20px_80px_rgba(15,23,42,0.35)]">
+        <div className="bg-linear-to-br from-cyan-500/15 via-slate-800 to-orange-500/15 border border-cyan-500/20 rounded-3xl p-8 md:p-12 mb-16 shadow-[0_20px_80px_rgba(15,23,42,0.35)]">
           <div className="max-w-4xl mx-auto">
             <div className="flex items-center gap-4 mb-6">
               <div className="p-4 bg-cyan-500/15 rounded-2xl border border-cyan-400/20">
@@ -169,7 +169,7 @@ export default function Home() {
             </div>
 
             <div className="grid lg:grid-cols-[1.2fr_0.8fr] gap-6">
-              <div className="bg-gradient-to-r from-slate-900/80 to-slate-800/80 rounded-2xl p-6 border border-slate-700">
+              <div className="bg-linear-to-r from-slate-900/80 to-slate-800/80 rounded-2xl p-6 border border-slate-700">
                 <h3 className="text-lg font-bold text-white mb-4">Example path: from concept to production instinct</h3>
                 <div className="flex flex-col md:flex-row md:items-center gap-3 text-sm">
                   <div className="rounded-xl border border-cyan-500/20 bg-cyan-500/10 px-4 py-3 text-cyan-100 font-semibold">
@@ -193,7 +193,7 @@ export default function Home() {
                 </p>
               </div>
 
-              <div className="bg-gradient-to-br from-cyan-500/10 to-purple-500/10 rounded-2xl p-6 border border-cyan-500/20">
+              <div className="bg-linear-to-br from-cyan-500/10 to-purple-500/10 rounded-2xl p-6 border border-cyan-500/20">
                 <h3 className="text-lg font-bold text-white mb-3">What you get before signup</h3>
                 <ul className="space-y-3 text-sm text-gray-300">
                   <li className="flex items-start gap-3">
@@ -234,8 +234,8 @@ export default function Home() {
         </div>
         
         <div className="grid md:grid-cols-3 gap-8">
-          <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-8 border border-slate-700">
-            <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-lg flex items-center justify-center mb-4">
+          <div className="bg-slate-800/50 backdrop-blur-xs rounded-xl p-8 border border-slate-700">
+            <div className="w-12 h-12 bg-linear-to-r from-blue-500 to-cyan-500 rounded-lg flex items-center justify-center mb-4">
               <BookOpen className="w-6 h-6 text-white" />
             </div>
             <h3 className="text-xl font-bold text-white mb-3">5 Progressive Phases</h3>
@@ -266,8 +266,8 @@ export default function Home() {
             </ul>
           </div>
           
-          <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-8 border border-slate-700">
-            <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg flex items-center justify-center mb-4">
+          <div className="bg-slate-800/50 backdrop-blur-xs rounded-xl p-8 border border-slate-700">
+            <div className="w-12 h-12 bg-linear-to-r from-purple-500 to-pink-500 rounded-lg flex items-center justify-center mb-4">
               <Zap className="w-6 h-6 text-white" />
             </div>
             <h3 className="text-xl font-bold text-white mb-3">Interactive Demos</h3>
@@ -294,8 +294,8 @@ export default function Home() {
             </ul>
           </div>
           
-          <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-8 border border-slate-700">
-            <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-emerald-500 rounded-lg flex items-center justify-center mb-4">
+          <div className="bg-slate-800/50 backdrop-blur-xs rounded-xl p-8 border border-slate-700">
+            <div className="w-12 h-12 bg-linear-to-r from-green-500 to-emerald-500 rounded-lg flex items-center justify-center mb-4">
               <BarChart3 className="w-6 h-6 text-white" />
             </div>
             <h3 className="text-xl font-bold text-white mb-3">Real-time Metrics</h3>
@@ -326,7 +326,7 @@ export default function Home() {
 
       {/* Stats Section */}
       <section className="container mx-auto px-6 py-16">
-        <div className="bg-gradient-to-r from-slate-800 to-slate-700 rounded-2xl p-12 border border-slate-600">
+        <div className="bg-linear-to-r from-slate-800 to-slate-700 rounded-2xl p-12 border border-slate-600">
           <h2 className="text-3xl font-bold text-white mb-8 text-center">What You&apos;ll Master</h2>
           <div className="grid md:grid-cols-4 gap-8">
             <div className="text-center">
@@ -373,14 +373,14 @@ export default function Home() {
         {/* Blurred Preview Cards */}
         <div className="grid md:grid-cols-2 gap-8 mb-8 relative">
           {/* Blur Overlay */}
-          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-slate-900/50 to-slate-900 backdrop-blur-sm z-10 flex items-center justify-center rounded-2xl">
+          <div className="absolute inset-0 bg-linear-to-b from-transparent via-slate-900/50 to-slate-900 backdrop-blur-xs z-10 flex items-center justify-center rounded-2xl">
             <div className="text-center">
               <Lock className="w-16 h-16 text-gray-400 mx-auto mb-4" />
               <p className="text-xl font-semibold text-white mb-2">Explore to unlock</p>
               <p className="text-gray-400 mb-4">Get full access to all learning phases</p>
               <Link
                 href="/signup"
-                className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-500 to-cyan-500 text-white rounded-lg font-semibold hover:shadow-lg transition-all"
+                className="inline-flex items-center px-6 py-3 bg-linear-to-r from-blue-500 to-cyan-500 text-white rounded-lg font-semibold hover:shadow-lg transition-all"
               >
                 Explore Free
                 <ArrowRight className="w-4 h-4 ml-2" />
@@ -389,23 +389,23 @@ export default function Home() {
           </div>
 
           {/* Preview Content (blurred) */}
-          <div className="bg-slate-800/50 backdrop-blur-sm rounded-2xl p-8 border border-slate-700 opacity-50 blur-sm">
+          <div className="bg-slate-800/50 backdrop-blur-xs rounded-2xl p-8 border border-slate-700 opacity-50 blur-xs">
             <div className="text-sm font-semibold text-gray-400 mb-2">API Foundations</div>
             <h3 className="text-2xl font-bold text-white mb-2">Program to Integration</h3>
             <p className="text-gray-400 mb-4">Turn a program action into a dependable API integration</p>
             <div className="space-y-2">
-              <div className="h-2 bg-slate-700 rounded"></div>
-              <div className="h-2 bg-slate-700 rounded w-3/4"></div>
+              <div className="h-2 bg-slate-700 rounded-sm"></div>
+              <div className="h-2 bg-slate-700 rounded-sm w-3/4"></div>
             </div>
           </div>
 
-          <div className="bg-slate-800/50 backdrop-blur-sm rounded-2xl p-8 border border-slate-700 opacity-50 blur-sm">
+          <div className="bg-slate-800/50 backdrop-blur-xs rounded-2xl p-8 border border-slate-700 opacity-50 blur-xs">
             <div className="text-sm font-semibold text-gray-400 mb-2">Phase 2</div>
             <h3 className="text-2xl font-bold text-white mb-2">Third-Party Integrations</h3>
             <p className="text-gray-400 mb-4">Master OAuth2, JWTs, and resilience patterns</p>
             <div className="space-y-2">
-              <div className="h-2 bg-slate-700 rounded"></div>
-              <div className="h-2 bg-slate-700 rounded w-3/4"></div>
+              <div className="h-2 bg-slate-700 rounded-sm"></div>
+              <div className="h-2 bg-slate-700 rounded-sm w-3/4"></div>
             </div>
           </div>
         </div>
@@ -422,7 +422,7 @@ export default function Home() {
 
         <div className="max-w-4xl mx-auto grid md:grid-cols-2 gap-8">
           {/* Free Trial */}
-          <div className="bg-slate-800/50 backdrop-blur-sm rounded-2xl p-8 border border-slate-700">
+          <div className="bg-slate-800/50 backdrop-blur-xs rounded-2xl p-8 border border-slate-700">
             <div className="text-center mb-6">
               <h3 className="text-2xl font-bold text-white mb-2">Free</h3>
               <div className="text-4xl font-bold text-white mb-1">£0</div>
@@ -445,14 +445,14 @@ export default function Home() {
             <Link
               href={freeCtaHref}
               data-testid="home-explore-free"
-              className="block w-full py-3 bg-gradient-to-r from-blue-500 to-cyan-500 text-white rounded-lg font-semibold text-center hover:shadow-lg transition-all"
+              className="block w-full py-3 bg-linear-to-r from-blue-500 to-cyan-500 text-white rounded-lg font-semibold text-center hover:shadow-lg transition-all"
             >
               {freeCtaLabel}
             </Link>
           </div>
 
           {/* Premium */}
-          <div className="bg-gradient-to-br from-blue-500/20 to-purple-500/20 backdrop-blur-sm rounded-2xl p-8 border-2 border-blue-500 relative">
+          <div className="bg-linear-to-br from-blue-500/20 to-purple-500/20 backdrop-blur-xs rounded-2xl p-8 border-2 border-blue-500 relative">
             <div className="absolute top-4 right-4 bg-blue-500 text-white text-xs font-semibold px-3 py-1 rounded-full">
               POPULAR
             </div>
@@ -488,7 +488,7 @@ export default function Home() {
             <Link
               href={premiumCtaHref}
               data-testid="home-explore-premium"
-              className="block w-full py-3 bg-gradient-to-r from-blue-500 to-cyan-500 text-white rounded-lg font-semibold text-center hover:shadow-lg transition-all"
+              className="block w-full py-3 bg-linear-to-r from-blue-500 to-cyan-500 text-white rounded-lg font-semibold text-center hover:shadow-lg transition-all"
             >
               {premiumCtaLabel}
             </Link>
@@ -498,7 +498,7 @@ export default function Home() {
 
       {/* Trust Indicators */}
       <section className="container mx-auto px-6 py-16">
-        <div className="bg-slate-800/50 backdrop-blur-sm rounded-2xl p-8 border border-slate-700">
+        <div className="bg-slate-800/50 backdrop-blur-xs rounded-2xl p-8 border border-slate-700">
           <div className="grid md:grid-cols-3 gap-8 text-center">
             <div>
               <Shield className="w-12 h-12 text-green-400 mx-auto mb-4" />
@@ -534,7 +534,7 @@ export default function Home() {
           </p>
           <Link 
             href="/signup"
-            className="inline-flex items-center px-12 py-4 bg-gradient-to-r from-blue-500 to-cyan-500 text-white rounded-xl font-bold text-lg hover:shadow-lg hover:scale-105 transition-all duration-200"
+            className="inline-flex items-center px-12 py-4 bg-linear-to-r from-blue-500 to-cyan-500 text-white rounded-xl font-bold text-lg hover:shadow-lg hover:scale-105 transition-all duration-200"
           >
             Explore Free
             <ArrowRight className="w-5 h-5 ml-2" />
