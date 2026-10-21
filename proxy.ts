@@ -17,7 +17,7 @@ function redirectToLogin(request: NextRequest, callbackPath: string) {
   return NextResponse.redirect(loginUrl)
 }
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl
   const paywallEnabled =
     process.env.NEXT_PUBLIC_FF_PREMIUM_PAYWALL === "true"
