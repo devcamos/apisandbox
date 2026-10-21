@@ -64,7 +64,7 @@ export default function DependencyIntegrationsPage() {
                         <h3 className="text-lg font-semibold">{integration.name}</h3>
                         <p className="mt-1 text-sm text-slate-300">{integration.purpose}</p>
                       </div>
-                      <div className="inline-flex shrink-0 items-center gap-1 rounded border border-slate-700 px-2 py-1 text-xs text-slate-300">
+                      <div className="inline-flex shrink-0 items-center gap-1 rounded-sm border border-slate-700 px-2 py-1 text-xs text-slate-300">
                         <PackageCheck className="h-3.5 w-3.5 text-cyan-300" />
                         {integration.type}
                       </div>
@@ -81,7 +81,7 @@ export default function DependencyIntegrationsPage() {
 
                     <div className="mt-4 flex flex-wrap gap-2">
                       {integration.learningAreas.map((area) => (
-                        <span key={area} className="rounded bg-cyan-500/10 px-2 py-1 text-xs text-cyan-100">
+                        <span key={area} className="rounded-sm bg-cyan-500/10 px-2 py-1 text-xs text-cyan-100">
                           {area}
                         </span>
                       ))}
@@ -103,7 +103,7 @@ function DetailList({ title, items }: Readonly<{ title: string; items: string[] 
       <div className="mb-1 text-xs font-semibold uppercase tracking-wide text-slate-500">{title}</div>
       <ul className="space-y-1">
         {items.map((item) => (
-          <li key={item} className="rounded border border-slate-800 bg-slate-950 px-2 py-1 text-xs text-slate-300">
+          <li key={item} className="rounded-sm border border-slate-800 bg-slate-950 px-2 py-1 text-xs text-slate-300">
             {item}
           </li>
         ))}

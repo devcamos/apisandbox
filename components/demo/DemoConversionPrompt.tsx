@@ -35,7 +35,7 @@ export function DemoConversionPrompt({
       data-variant={variant}
       className={
         className ??
-        "rounded-2xl border-2 border-amber-500/30 bg-gradient-to-br from-amber-500/15 via-orange-500/10 to-slate-900/50 p-8 md:p-10"
+        "rounded-2xl border-2 border-amber-500/30 bg-linear-to-br from-amber-500/15 via-orange-500/10 to-slate-900/50 p-8 md:p-10"
       }
     >
       <div className="flex items-start gap-4 mb-6">
@@ -84,7 +84,7 @@ export function DemoConversionPrompt({
           </Link>
         </div>
 
-        <div className="rounded-xl border border-violet-500/40 bg-gradient-to-br from-violet-500/15 to-fuchsia-500/10 p-6 flex flex-col">
+        <div className="rounded-xl border border-violet-500/40 bg-linear-to-br from-violet-500/15 to-fuchsia-500/10 p-6 flex flex-col">
           <h3 className="text-xl font-bold text-white mb-1 flex items-center gap-2">
             <Sparkles className="w-5 h-5 text-violet-300" />
             Pro
@@ -103,7 +103,7 @@ export function DemoConversionPrompt({
           <Link
             href={signupHref("pro")}
             data-testid="demo-convert-pro"
-            className="inline-flex items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-violet-500 to-fuchsia-500 px-5 py-3 text-sm font-semibold text-white hover:shadow-lg hover:scale-[1.02] transition-all"
+            className="inline-flex items-center justify-center gap-2 rounded-lg bg-linear-to-r from-violet-500 to-fuchsia-500 px-5 py-3 text-sm font-semibold text-white hover:shadow-lg hover:scale-[1.02] transition-all"
           >
             Continue with Pro
             <ArrowRight className="w-4 h-4" />

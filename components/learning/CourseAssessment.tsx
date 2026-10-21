@@ -153,7 +153,7 @@ export function CourseAssessment({
           <div>
             <label htmlFor={`${unitId}-reflection`} className="text-sm font-semibold text-white">Explain it back <span className="font-normal text-slate-400">(not graded or saved)</span></label>
             <p className="mt-1 text-sm text-slate-400">{assessment.reflectionPrompt}</p>
-            <textarea id={`${unitId}-reflection`} value={reflection} onChange={(event) => setReflection(event.target.value)} rows={4} className="mt-3 w-full rounded-xl border border-slate-700 bg-slate-950/50 p-3 text-sm text-white placeholder:text-slate-600 focus:border-violet-300 focus:outline-none" placeholder="Teach the idea back in your own words…" />
+            <textarea id={`${unitId}-reflection`} value={reflection} onChange={(event) => setReflection(event.target.value)} rows={4} className="mt-3 w-full rounded-xl border border-slate-700 bg-slate-950/50 p-3 text-sm text-white placeholder:text-slate-600 focus:border-violet-300 focus:outline-hidden" placeholder="Teach the idea back in your own words…" />
           </div>
         ) : null}
 

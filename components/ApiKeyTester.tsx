@@ -155,11 +155,11 @@ export default function ApiKeyTester({ title, description }: ApiKeyTesterProps) 
                     value={apiKey}
                     onChange={(e) => setApiKey(e.target.value)}
                     placeholder="Enter your API key"
-                    className="flex-1 bg-black text-gray-300 border border-slate-600 rounded px-3 py-2 text-sm"
+                    className="flex-1 bg-black text-gray-300 border border-slate-600 rounded-sm px-3 py-2 text-sm"
                   />
                   <button
                     onClick={saveApiKey}
-                    className="px-3 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded text-sm font-semibold"
+                    className="px-3 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-sm text-sm font-semibold"
                   >
                     Save
                   </button>
@@ -194,7 +194,7 @@ export default function ApiKeyTester({ title, description }: ApiKeyTesterProps) 
                 </div>
               </div>
 
-              <div className="p-3 bg-blue-500/10 border border-blue-500/20 rounded">
+              <div className="p-3 bg-blue-500/10 border border-blue-500/20 rounded-sm">
                 <p className="text-xs text-gray-300">
                   <Key className="w-3 h-3 inline mr-1" />
                   <strong>Privacy:</strong> Your API key is stored in session storage for this tab only.
@@ -242,7 +242,7 @@ export default function ApiKeyTester({ title, description }: ApiKeyTesterProps) 
             </span>
             <button
               onClick={copyResponse}
-              className="flex items-center gap-1 px-2 py-1 text-xs text-gray-400 hover:text-white hover:bg-slate-700 rounded transition-all"
+              className="flex items-center gap-1 px-2 py-1 text-xs text-gray-400 hover:text-white hover:bg-slate-700 rounded-sm transition-all"
             >
               {copied ? (
                 <>

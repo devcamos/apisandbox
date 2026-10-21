@@ -102,7 +102,7 @@ export default function ForgotPasswordPage() {
               onChange={handleEmailChange}
               onInput={handleEmailChange}
               required
-              className="w-full rounded-lg border border-slate-700 bg-slate-900/50 py-3 pl-10 pr-4 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full rounded-lg border border-slate-700 bg-slate-900/50 py-3 pl-10 pr-4 text-white placeholder-gray-500 focus:outline-hidden focus:ring-2 focus:ring-blue-500"
               placeholder="you@example.com"
             />
           </div>
@@ -115,7 +115,7 @@ export default function ForgotPasswordPage() {
           ) : null}
           <button
             type="submit"
-            className="w-full rounded-lg bg-gradient-to-r from-blue-500 to-cyan-500 px-4 py-3 text-sm font-semibold text-white hover:shadow-lg"
+            className="w-full rounded-lg bg-linear-to-r from-blue-500 to-cyan-500 px-4 py-3 text-sm font-semibold text-white hover:shadow-lg"
           >
             Continue
           </button>
@@ -128,7 +128,7 @@ export default function ForgotPasswordPage() {
         <div className="flex flex-col gap-3 pt-2 sm:flex-row">
           <Link
             href="/login"
-            className="inline-flex flex-1 items-center justify-center rounded-lg bg-gradient-to-r from-blue-500 to-cyan-500 px-4 py-3 text-center text-sm font-semibold text-white hover:shadow-lg"
+            className="inline-flex flex-1 items-center justify-center rounded-lg bg-linear-to-r from-blue-500 to-cyan-500 px-4 py-3 text-center text-sm font-semibold text-white hover:shadow-lg"
           >
             Back to sign in
           </Link>

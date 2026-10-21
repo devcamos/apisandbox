@@ -137,7 +137,7 @@ export default function ApiEndpointTester({
     <div className={`bg-slate-900 p-4 rounded-lg border ${methodColors[method]}`}>
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-3 flex-1">
-          <span className={`font-mono text-sm font-bold px-3 py-1 rounded border ${methodColors[method]}`}>
+          <span className={`font-mono text-sm font-bold px-3 py-1 rounded-sm border ${methodColors[method]}`}>
             {method}
           </span>
           <span className="text-blue-400 font-mono text-sm">{path}</span>
@@ -200,12 +200,12 @@ export default function ApiEndpointTester({
           <div className="p-3 space-y-2 animate-slideDown">
             {Object.entries(headers).map(([key, value]) => (
               <div key={key} className="flex items-center gap-2 text-xs">
-                <span className="text-gray-400 font-mono w-32 flex-shrink-0">{key}:</span>
+                <span className="text-gray-400 font-mono w-32 shrink-0">{key}:</span>
                 <input
                   type="text"
                   value={value}
                   onChange={(e) => setHeaders({ ...headers, [key]: e.target.value })}
-                  className="flex-1 bg-black text-gray-300 border border-slate-600 rounded px-2 py-1 font-mono"
+                  className="flex-1 bg-black text-gray-300 border border-slate-600 rounded-sm px-2 py-1 font-mono"
                 />
                 <button
                   onClick={() => removeHeader(key)}
@@ -254,7 +254,7 @@ export default function ApiEndpointTester({
             </button>
             <button
               onClick={copyToClipboard}
-              className="flex items-center gap-1 px-2 py-1 text-xs text-gray-400 hover:text-white hover:bg-slate-700 rounded transition-all"
+              className="flex items-center gap-1 px-2 py-1 text-xs text-gray-400 hover:text-white hover:bg-slate-700 rounded-sm transition-all"
               title="Copy response"
             >
               {copied ? (

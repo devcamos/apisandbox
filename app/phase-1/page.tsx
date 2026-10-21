@@ -32,7 +32,7 @@ export default function Phase1() {
         learn={
           <>
       {/* Pareto Principle Summary */}
-      <div className="bg-gradient-to-br from-yellow-500/10 to-orange-500/10 border-2 border-yellow-500/30 rounded-xl p-6 mb-12">
+      <div className="bg-linear-to-br from-yellow-500/10 to-orange-500/10 border-2 border-yellow-500/30 rounded-xl p-6 mb-12">
         <div className="flex items-start gap-4 mb-4">
           <div className="p-3 bg-yellow-500/20 rounded-lg">
             <span className="text-3xl">📊</span>
@@ -93,7 +93,7 @@ export default function Phase1() {
         <h2 className="text-3xl font-bold text-white mb-6">Universal Standards: The Foundation of Modern APIs</h2>
         
         {/* Introduction */}
-        <div className="bg-gradient-to-br from-indigo-500/10 to-purple-500/10 border-2 border-indigo-500/30 rounded-xl p-6 mb-6">
+        <div className="bg-linear-to-br from-indigo-500/10 to-purple-500/10 border-2 border-indigo-500/30 rounded-xl p-6 mb-6">
           <div className="flex items-start gap-4 mb-4">
             <div className="p-3 bg-indigo-500/20 rounded-lg">
               <span className="text-3xl">🌍</span>
@@ -114,7 +114,7 @@ export default function Phase1() {
         {/* Core Universal Technologies */}
         <div className="grid md:grid-cols-2 gap-6 mb-6">
           {/* HTTP */}
-          <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border border-slate-700">
+          <div className="bg-slate-800/50 backdrop-blur-xs rounded-xl p-6 border border-slate-700">
             <div className="flex items-center gap-3 mb-4">
               <div className="p-2 bg-blue-500/20 rounded-lg">
                 <span className="text-2xl">🌐</span>
@@ -141,7 +141,7 @@ export default function Phase1() {
           </div>
 
           {/* JSON */}
-          <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border border-slate-700">
+          <div className="bg-slate-800/50 backdrop-blur-xs rounded-xl p-6 border border-slate-700">
             <div className="flex items-center gap-3 mb-4">
               <div className="p-2 bg-green-500/20 rounded-lg">
                 <span className="text-2xl">📦</span>
@@ -169,7 +169,7 @@ export default function Phase1() {
         </div>
 
         {/* HTTP + JSON Together */}
-        <div className="bg-gradient-to-r from-blue-500/10 to-green-500/10 border border-blue-500/20 rounded-xl p-6 mb-6">
+        <div className="bg-linear-to-r from-blue-500/10 to-green-500/10 border border-blue-500/20 rounded-xl p-6 mb-6">
           <h3 className="text-2xl font-bold text-white mb-4">
             🔗 HTTP + JSON = Universal API Communication
           </h3>
@@ -198,7 +198,7 @@ export default function Phase1() {
             <div className="grid md:grid-cols-2 gap-4">
               <div>
                 <p className="text-gray-400 text-xs mb-2">Java Backend (Spring Boot):</p>
-                <div className="bg-slate-900/50 p-3 rounded font-mono text-xs text-gray-300 overflow-x-auto">
+                <div className="bg-slate-900/50 p-3 rounded-sm font-mono text-xs text-gray-300 overflow-x-auto">
                   <ExpandableCodeBlock code={`@RestController
 @RequestMapping("/api/users")
 public class UserController {
@@ -214,7 +214,7 @@ public class UserController {
               </div>
               <div>
                 <p className="text-gray-400 text-xs mb-2">React Frontend:</p>
-                <div className="bg-slate-900/50 p-3 rounded font-mono text-xs text-gray-300 overflow-x-auto">
+                <div className="bg-slate-900/50 p-3 rounded-sm font-mono text-xs text-gray-300 overflow-x-auto">
                   <ExpandableCodeBlock code={`function UserProfile({ userId }) {
   const [user, setUser] = useState(null);
   
@@ -238,10 +238,10 @@ public class UserController {
         </div>
 
         {/* JSON Communicator Subsection */}
-        <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border border-slate-700 mb-6">
+        <div className="bg-slate-800/50 backdrop-blur-xs rounded-xl p-6 border border-slate-700 mb-6">
           <h3 className="text-xl font-bold text-white mb-4">📡 JSON Communicator: The Universal Data Interchange Format</h3>
           
-          <div className="bg-gradient-to-br from-green-500/10 to-emerald-500/10 border-2 border-green-500/30 rounded-xl p-4 mb-4">
+          <div className="bg-linear-to-br from-green-500/10 to-emerald-500/10 border-2 border-green-500/30 rounded-xl p-4 mb-4">
             <p className="text-gray-300 text-sm">
               <strong>JSON Communicator</strong> refers to JSON's role as the <strong>universal data interchange format</strong> 
               that enables different systems, languages, and infrastructures to exchange data seamlessly. 
@@ -288,7 +288,7 @@ public class UserController {
                 In microservices architectures, JSON enables services written in different 
                 languages to communicate:
               </p>
-              <div className="bg-slate-800/50 p-3 rounded font-mono text-xs text-gray-300 overflow-x-auto">
+              <div className="bg-slate-800/50 p-3 rounded-sm font-mono text-xs text-gray-300 overflow-x-auto">
                 <ExpandableCodeBlock code={`Service A (Java) → HTTP + JSON → Service B (Python)
 Service B (Python) → HTTP + JSON → Service C (Node.js)
 Service C (Node.js) → HTTP + JSON → Service D (Go)`} />
@@ -300,7 +300,7 @@ Service C (Node.js) → HTTP + JSON → Service D (Go)`} />
               <p className="text-gray-300 text-xs mb-3">
                 JSON allows frontend and backend teams to work independently:
               </p>
-              <div className="bg-slate-800/50 p-3 rounded font-mono text-xs text-gray-300 overflow-x-auto">
+              <div className="bg-slate-800/50 p-3 rounded-sm font-mono text-xs text-gray-300 overflow-x-auto">
                 <ExpandableCodeBlock code={`React Team → Defines expected JSON structure
 Java Team → Implements API returning that JSON structure
 Both teams agree on the contract, work independently`} />
@@ -312,7 +312,7 @@ Both teams agree on the contract, work independently`} />
               <p className="text-gray-300 text-xs mb-3">
                 JSON is the standard for integrating with external services:
               </p>
-              <div className="bg-slate-800/50 p-3 rounded font-mono text-xs text-gray-300 overflow-x-auto">
+              <div className="bg-slate-800/50 p-3 rounded-sm font-mono text-xs text-gray-300 overflow-x-auto">
                 <ExpandableCodeBlock code={`Your Java App → JSON → Stripe API (Ruby)
 Your Java App → JSON → GitHub API (Go)
 Your Java App → JSON → AWS API (Various)`} />
@@ -324,7 +324,7 @@ Your Java App → JSON → AWS API (Various)`} />
               <p className="text-gray-300 text-xs mb-3">
                 JSON messages flow through message queues and event streams:
               </p>
-              <div className="bg-slate-800/50 p-3 rounded font-mono text-xs text-gray-300 overflow-x-auto">
+              <div className="bg-slate-800/50 p-3 rounded-sm font-mono text-xs text-gray-300 overflow-x-auto">
                 <ExpandableCodeBlock code={`Kafka Topic: "user.created"
 Message: {"userId": "123", "email": "user@example.com"}
 
@@ -373,7 +373,7 @@ Any service can consume this JSON message, regardless of language`} />
         </div>
 
         {/* Other Universal Technologies */}
-        <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border border-slate-700 mb-6">
+        <div className="bg-slate-800/50 backdrop-blur-xs rounded-xl p-6 border border-slate-700 mb-6">
           <h3 className="text-xl font-bold text-white mb-4">Other Universal Technologies</h3>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
             <div className="bg-slate-900/50 p-4 rounded-lg">
@@ -914,7 +914,7 @@ Any service can consume this JSON message, regardless of language`} />
       {/* Decision Framework */}
       <section>
         <h2 className="text-3xl font-bold text-white mb-6">When to Use What?</h2>
-        <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-8 border border-slate-700">
+        <div className="bg-slate-800/50 backdrop-blur-xs rounded-xl p-8 border border-slate-700">
           <table className="w-full text-left">
             <thead>
               <tr className="border-b border-slate-600">

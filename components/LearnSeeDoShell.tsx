@@ -63,7 +63,7 @@ export function LearnSeeDoShell({
               onClick={() => setActive(tab.id)}
               className={`flex-1 flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-all ${
                 isActive
-                  ? `bg-gradient-to-r ${accentClass} text-white shadow-lg`
+                  ? `bg-linear-to-r ${accentClass} text-white shadow-lg`
                   : "text-gray-400 hover:text-white hover:bg-slate-800"
               }`}
             >

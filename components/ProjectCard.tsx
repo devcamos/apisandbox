@@ -20,7 +20,7 @@ export default function ProjectCard({
   };
 
   return (
-    <div className={`bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border ${statusColors[status]} transition-all`}>
+    <div className={`bg-slate-800/50 backdrop-blur-xs rounded-xl p-6 border ${statusColors[status]} transition-all`}>
       <div className="flex items-start justify-between mb-4">
         <h3 className="text-2xl font-bold text-white">{title}</h3>
         {status === "completed" && (
@@ -33,7 +33,7 @@ export default function ProjectCard({
         <h4 className="font-semibold text-white text-sm">Requirements:</h4>
         {requirements.map((req, idx) => (
           <div key={idx} className="flex items-start gap-3 text-gray-300">
-            <Circle className="w-4 h-4 mt-0.5 flex-shrink-0" />
+            <Circle className="w-4 h-4 mt-0.5 shrink-0" />
             <span className="text-sm">{req}</span>
           </div>
         ))}

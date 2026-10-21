@@ -14,7 +14,7 @@ export default function QuickStartGuide() {
       </div>
 
       <div className="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto">
-        <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border border-slate-700 text-center">
+        <div className="bg-slate-800/50 backdrop-blur-xs rounded-xl p-6 border border-slate-700 text-center">
           <BookOpen className="w-12 h-12 text-blue-400 mx-auto mb-4" />
           <h3 className="text-xl font-bold text-white mb-2">Build the Mental Model</h3>
           <p className="text-gray-400 text-sm mb-4">
@@ -25,7 +25,7 @@ export default function QuickStartGuide() {
           </Link>
         </div>
 
-        <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border border-slate-700 text-center">
+        <div className="bg-slate-800/50 backdrop-blur-xs rounded-xl p-6 border border-slate-700 text-center">
           <Play className="w-12 h-12 text-purple-400 mx-auto mb-4" />
           <h3 className="text-xl font-bold text-white mb-2">Trace a Request</h3>
           <p className="text-gray-400 text-sm mb-4">
@@ -36,7 +36,7 @@ export default function QuickStartGuide() {
           </Link>
         </div>
 
-        <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border border-slate-700 text-center">
+        <div className="bg-slate-800/50 backdrop-blur-xs rounded-xl p-6 border border-slate-700 text-center">
           <Network className="w-12 h-12 text-green-400 mx-auto mb-4" />
           <h3 className="text-xl font-bold text-white mb-2">Monitor Progress</h3>
           <p className="text-gray-400 text-sm mb-4">

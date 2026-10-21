@@ -8,7 +8,7 @@ import { OntologyBreakdownTable } from "@/components/java/OntologyBreakdownTable
 
 export default function JavaTrackPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-850 to-slate-900">
+    <div className="min-h-screen bg-linear-to-br from-slate-900 via-slate-850 to-slate-900">
       <div className="container mx-auto px-6 py-16">
         <div className="max-w-4xl">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-200 text-xs font-semibold">

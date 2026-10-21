@@ -30,7 +30,7 @@ export default function DetailTabsShell({
 }: Readonly<DetailTabsShellProps>) {
   return (
     <div className="bg-slate-800/50 border border-slate-700 rounded-xl overflow-hidden animate-slideDown">
-      <div className={`bg-gradient-to-r ${color} px-6 py-4`}>
+      <div className={`bg-linear-to-r ${color} px-6 py-4`}>
         <div className="flex items-center gap-3">
           <span className="text-3xl">{icon}</span>
           <div>

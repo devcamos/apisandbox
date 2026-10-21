@@ -82,14 +82,14 @@ export default function DocumentationModal({
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       {/* Backdrop */}
       <div
-        className="absolute inset-0 bg-black/80 backdrop-blur-sm"
+        className="absolute inset-0 bg-black/80 backdrop-blur-xs"
         onClick={onClose}
       />
 
       {/* Modal */}
       <div className="relative bg-slate-900 rounded-2xl border border-slate-700 max-w-4xl w-full max-h-[90vh] overflow-hidden shadow-2xl animate-slideDown">
         {/* Header */}
-        <div className={`bg-gradient-to-r ${color} p-6 relative`}>
+        <div className={`bg-linear-to-r ${color} p-6 relative`}>
           <button
             onClick={onClose}
             className="absolute top-4 right-4 p-2 bg-white/20 hover:bg-white/30 rounded-lg transition-all"
@@ -138,7 +138,7 @@ export default function DocumentationModal({
             <div className="space-y-3">
               {documentation.description.map((desc, idx) => (
                 <div key={idx} className="flex items-start gap-3 bg-slate-800/50 p-4 rounded-lg border border-slate-700">
-                  <span className={`w-2 h-2 rounded-full bg-gradient-to-r ${color} mt-2 flex-shrink-0`}></span>
+                  <span className={`w-2 h-2 rounded-full bg-linear-to-r ${color} mt-2 shrink-0`}></span>
                   <p className="text-gray-300">{desc}</p>
                 </div>
               ))}
@@ -161,7 +161,7 @@ export default function DocumentationModal({
           </section>
 
           {documentation.transientFailureCauses && (
-            <section className="bg-gradient-to-r from-amber-500/10 to-orange-500/10 border border-amber-500/20 rounded-xl p-6">
+            <section className="bg-linear-to-r from-amber-500/10 to-orange-500/10 border border-amber-500/20 rounded-xl p-6">
               <h3 className="text-2xl font-bold text-white mb-4 flex items-center gap-2">
                 <Lightbulb className="w-6 h-6 text-amber-400" />
                 {documentation.transientFailureCauses.title}
@@ -177,7 +177,7 @@ export default function DocumentationModal({
           )}
 
           {documentation.retryConfigs && (
-            <section className="bg-gradient-to-r from-cyan-500/10 to-blue-500/10 border border-cyan-500/20 rounded-xl p-6">
+            <section className="bg-linear-to-r from-cyan-500/10 to-blue-500/10 border border-cyan-500/20 rounded-xl p-6">
               <h3 className="text-2xl font-bold text-white mb-4 flex items-center gap-2">
                 <Target className="w-6 h-6 text-cyan-400" />
                 {documentation.retryConfigs.title}
@@ -194,7 +194,7 @@ export default function DocumentationModal({
               <div className="mt-5 space-y-2">
                 {documentation.retryConfigs.rules.map((rule, idx) => (
                   <div key={idx} className="flex items-start gap-3">
-                    <span className="bg-cyan-500/20 text-cyan-300 font-bold rounded-full w-6 h-6 flex items-center justify-center flex-shrink-0 text-sm">
+                    <span className="bg-cyan-500/20 text-cyan-300 font-bold rounded-full w-6 h-6 flex items-center justify-center shrink-0 text-sm">
                       {idx + 1}
                     </span>
                     <p className="text-gray-200 text-sm">{rule}</p>
@@ -206,7 +206,7 @@ export default function DocumentationModal({
 
           {/* Core Principles */}
           {documentation.corePrinciples && (
-            <section className="bg-gradient-to-r from-blue-500/10 to-cyan-500/10 border border-blue-500/20 rounded-xl p-6">
+            <section className="bg-linear-to-r from-blue-500/10 to-cyan-500/10 border border-blue-500/20 rounded-xl p-6">
               <h3 className="text-2xl font-bold text-white mb-4 flex items-center gap-2">
                 <CheckCircle className="w-6 h-6 text-blue-400" />
                 {documentation.corePrinciples.title}
@@ -223,7 +223,7 @@ export default function DocumentationModal({
 
           {/* Contract Styles */}
           {documentation.contractStyles && (
-            <section className="bg-gradient-to-r from-green-500/10 to-emerald-500/10 border border-green-500/20 rounded-xl p-6">
+            <section className="bg-linear-to-r from-green-500/10 to-emerald-500/10 border border-green-500/20 rounded-xl p-6">
               <h3 className="text-2xl font-bold text-white mb-4 flex items-center gap-2">
                 <BookOpen className="w-6 h-6 text-green-400" />
                 {documentation.contractStyles.title}
@@ -239,7 +239,7 @@ export default function DocumentationModal({
           )}
 
           {/* Pareto Knowledge (80/20 Rule) */}
-          <section className="bg-gradient-to-r from-yellow-500/10 to-orange-500/10 border border-yellow-500/20 rounded-xl p-6">
+          <section className="bg-linear-to-r from-yellow-500/10 to-orange-500/10 border border-yellow-500/20 rounded-xl p-6">
             <h3 className="text-2xl font-bold text-white mb-3 flex items-center gap-2">
               <Lightbulb className="w-6 h-6 text-yellow-400" />
               {documentation.paretoKnowledge.title}
@@ -250,7 +250,7 @@ export default function DocumentationModal({
             <div className="space-y-3">
               {documentation.paretoKnowledge.points.map((point, idx) => (
                 <div key={idx} className="flex items-start gap-3">
-                  <span className="bg-yellow-500/20 text-yellow-400 font-bold rounded-full w-6 h-6 flex items-center justify-center flex-shrink-0 text-sm">
+                  <span className="bg-yellow-500/20 text-yellow-400 font-bold rounded-full w-6 h-6 flex items-center justify-center shrink-0 text-sm">
                     {idx + 1}
                   </span>
                   <p className="text-gray-200 font-medium">{point}</p>
@@ -292,7 +292,7 @@ export default function DocumentationModal({
                 <Lightbulb className="w-6 h-6 text-yellow-400" />
                 Notable Technologies Using {title}
               </h3>
-              <div className="bg-gradient-to-r from-purple-500/10 to-pink-500/10 border border-purple-500/20 rounded-xl p-6">
+              <div className="bg-linear-to-r from-purple-500/10 to-pink-500/10 border border-purple-500/20 rounded-xl p-6">
                 <h4 className="text-lg font-bold text-purple-400 mb-4">
                   {documentation.notableTechnologies.title}
                 </h4>

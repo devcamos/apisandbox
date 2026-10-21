@@ -23,12 +23,12 @@ export default function InteractiveCategory({
   const [isExpanded, setIsExpanded] = useState(false);
 
   return (
-    <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl border border-slate-700 hover:border-slate-600 transition-all">
+    <div className="bg-slate-800/50 backdrop-blur-xs rounded-xl border border-slate-700 hover:border-slate-600 transition-all">
       <button
         onClick={() => setIsExpanded(!isExpanded)}
         className="w-full p-6 text-left hover:bg-slate-800/30 transition-all rounded-xl"
       >
-        <div className={`inline-flex p-3 rounded-lg bg-gradient-to-r ${color} mb-4`}>
+        <div className={`inline-flex p-3 rounded-lg bg-linear-to-r ${color} mb-4`}>
           <Icon className="w-6 h-6 text-white" />
         </div>
         <div className="flex items-center justify-between mb-3">
@@ -41,7 +41,7 @@ export default function InteractiveCategory({
         <ul className="space-y-2">
           {items.map((item, idx) => (
             <li key={idx} className="flex items-start text-sm text-gray-300">
-              <span className={`w-1.5 h-1.5 rounded-full bg-gradient-to-r ${color} mr-2 mt-2`}></span>
+              <span className={`w-1.5 h-1.5 rounded-full bg-linear-to-r ${color} mr-2 mt-2`}></span>
               <span>{item}</span>
             </li>
           ))}

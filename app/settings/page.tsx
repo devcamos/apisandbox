@@ -254,7 +254,7 @@ export default function SettingsPage() {
                 maxLength={80}
                 required
                 placeholder="CRM sync"
-                className="mt-2 w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-white outline-none focus:border-cyan-400"
+                className="mt-2 w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-white outline-hidden focus:border-cyan-400"
               />
             </label>
 
@@ -264,7 +264,7 @@ export default function SettingsPage() {
                 value={expiresAt}
                 onChange={(event) => setExpiresAt(event.target.value)}
                 type="datetime-local"
-                className="mt-2 w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-white outline-none focus:border-cyan-400"
+                className="mt-2 w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-white outline-hidden focus:border-cyan-400"
               />
             </label>
 
@@ -313,7 +313,7 @@ export default function SettingsPage() {
                       <div className="min-w-0">
                         <div className="flex flex-wrap items-center gap-2">
                           <h3 className="font-semibold text-white">{token.name}</h3>
-                          <span className="rounded border border-slate-700 px-2 py-0.5 text-xs text-slate-300">
+                          <span className="rounded-sm border border-slate-700 px-2 py-0.5 text-xs text-slate-300">
                             {statusLabel}
                           </span>
                         </div>
@@ -326,7 +326,7 @@ export default function SettingsPage() {
                         </div>
                         <div className="mt-3 flex flex-wrap gap-2">
                           {token.scopes.map((scope) => (
-                            <span key={scope} className="rounded bg-slate-800 px-2 py-1 text-xs text-cyan-100">
+                            <span key={scope} className="rounded-sm bg-slate-800 px-2 py-1 text-xs text-cyan-100">
                               {scopeLabels[scope]}
                             </span>
                           ))}

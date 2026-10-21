@@ -105,7 +105,7 @@ export function SubscriptionGate({
 
   if (status === "loading" || isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center">
+      <div className="min-h-screen bg-linear-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center">
         <div className="text-white text-xl">Loading...</div>
       </div>
     )
@@ -124,7 +124,7 @@ export function SubscriptionGate({
       freePreview ?? defaultFreePreview(phaseNumber, lockedContentName)
 
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+      <div className="min-h-screen bg-linear-to-br from-slate-900 via-slate-800 to-slate-900">
         <div className="container mx-auto px-6 py-12">
           {isDemo ? (
             <DemoConversionPrompt

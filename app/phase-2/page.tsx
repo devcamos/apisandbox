@@ -31,7 +31,7 @@ export default function Phase2() {
       <LessonTracker phase={2} />
 
       {/* Pareto Principle Summary */}
-      <div className="bg-gradient-to-br from-yellow-500/10 to-orange-500/10 border-2 border-yellow-500/30 rounded-xl p-6 mb-12">
+      <div className="bg-linear-to-br from-yellow-500/10 to-orange-500/10 border-2 border-yellow-500/30 rounded-xl p-6 mb-12">
         <div className="flex items-start gap-4 mb-4">
           <div className="p-3 bg-yellow-500/20 rounded-lg">
             <span className="text-3xl">📊</span>
@@ -257,7 +257,7 @@ export default function Phase2() {
         <div className="mb-6">
           <h3 className="text-2xl font-bold text-white mb-4">OAuth2 Flow</h3>
           <div className="grid md:grid-cols-2 gap-6">
-            <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border border-slate-700">
+            <div className="bg-slate-800/50 backdrop-blur-xs rounded-xl p-6 border border-slate-700">
               <div className="flex items-center gap-2 mb-3">
                 <span className="text-lg">⚛️</span>
                 <h4 className="text-lg font-bold text-white">TypeScript/Node.js</h4>
@@ -289,7 +289,7 @@ const { access_token, refresh_token } =
               </div>
             </div>
 
-            <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border border-slate-700">
+            <div className="bg-slate-800/50 backdrop-blur-xs rounded-xl p-6 border border-slate-700">
               <div className="flex items-center gap-2 mb-3">
                 <span className="text-lg">☕</span>
                 <h4 className="text-lg font-bold text-white">Java Spring Boot</h4>
@@ -336,7 +336,7 @@ public class OAuth2Controller {
         <div>
           <h3 className="text-2xl font-bold text-white mb-4">JWT Validation</h3>
           <div className="grid md:grid-cols-2 gap-6">
-            <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border border-slate-700">
+            <div className="bg-slate-800/50 backdrop-blur-xs rounded-xl p-6 border border-slate-700">
               <div className="flex items-center gap-2 mb-3">
                 <span className="text-lg">⚛️</span>
                 <h4 className="text-lg font-bold text-white">TypeScript/Node.js</h4>
@@ -374,7 +374,7 @@ app.use((req, res, next) => {
               </div>
             </div>
 
-            <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border border-slate-700">
+            <div className="bg-slate-800/50 backdrop-blur-xs rounded-xl p-6 border border-slate-700">
               <div className="flex items-center gap-2 mb-3">
                 <span className="text-lg">☕</span>
                 <h4 className="text-lg font-bold text-white">Java Spring Boot</h4>
@@ -435,7 +435,7 @@ public class JwtAuthenticationFilter
         </h2>
         
         {/* Introduction */}
-        <div className="bg-gradient-to-br from-purple-500/10 to-pink-500/10 border-2 border-purple-500/30 rounded-xl p-6 mb-6">
+        <div className="bg-linear-to-br from-purple-500/10 to-pink-500/10 border-2 border-purple-500/30 rounded-xl p-6 mb-6">
           <div className="flex items-start gap-4">
             <div className="p-3 bg-purple-500/20 rounded-lg">
               <span className="text-3xl">🤝</span>
@@ -453,7 +453,7 @@ public class JwtAuthenticationFilter
         </div>
 
         {/* The Contract - Visual Representation */}
-        <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border border-slate-700 mb-6">
+        <div className="bg-slate-800/50 backdrop-blur-xs rounded-xl p-6 border border-slate-700 mb-6">
           <h3 className="text-xl font-bold text-white mb-4">📋 The API Contract</h3>
           <div className="grid md:grid-cols-3 gap-4 mb-4">
             <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-4 text-center">
@@ -485,7 +485,7 @@ public class JwtAuthenticationFilter
         </div>
 
         {/* Complete Example: Get User */}
-        <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border border-slate-700 mb-6">
+        <div className="bg-slate-800/50 backdrop-blur-xs rounded-xl p-6 border border-slate-700 mb-6">
           <h3 className="text-xl font-bold text-white mb-4">Complete Example: Fetching a User</h3>
           
           <div className="grid md:grid-cols-2 gap-6">
@@ -539,7 +539,7 @@ function UserProfile({ userId }) {
   );
 }`} />
               </div>
-              <div className="mt-3 p-3 bg-blue-500/10 border border-blue-500/20 rounded text-xs text-gray-300">
+              <div className="mt-3 p-3 bg-blue-500/10 border border-blue-500/20 rounded-sm text-xs text-gray-300">
                 <strong className="text-blue-400">Key Point:</strong> React doesn't care if the backend 
                 is Java, Python, or Node.js. It only cares about the HTTP + JSON contract.
               </div>
@@ -598,7 +598,7 @@ public class User {
     // ...
 }`} />
               </div>
-              <div className="mt-3 p-3 bg-orange-500/10 border border-orange-500/20 rounded text-xs text-gray-300">
+              <div className="mt-3 p-3 bg-orange-500/10 border border-orange-500/20 rounded-sm text-xs text-gray-300">
                 <strong className="text-orange-400">Key Point:</strong> Java doesn't care if the frontend 
                 is React, Vue, or Angular. It only needs to fulfill the HTTP + JSON contract.
               </div>
@@ -607,7 +607,7 @@ public class User {
         </div>
 
         {/* The JSON Contract */}
-        <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border border-slate-700 mb-6">
+        <div className="bg-slate-800/50 backdrop-blur-xs rounded-xl p-6 border border-slate-700 mb-6">
           <h3 className="text-xl font-bold text-white mb-4">📦 The JSON Contract Structure</h3>
           <div className="grid md:grid-cols-2 gap-6">
             <div>
@@ -633,7 +633,7 @@ public class User {
               </div>
             </div>
           </div>
-          <div className="mt-4 p-4 bg-green-500/10 border border-green-500/20 rounded">
+          <div className="mt-4 p-4 bg-green-500/10 border border-green-500/20 rounded-sm">
             <p className="text-gray-300 text-sm">
               <strong className="text-green-400">This JSON structure is the contract.</strong> As long as 
               both React and Java agree on this structure, they can work together regardless of their 
@@ -645,7 +645,7 @@ public class User {
         {/* More Examples */}
         <div className="grid md:grid-cols-2 gap-6 mb-6">
           {/* Create User Example */}
-          <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border border-slate-700">
+          <div className="bg-slate-800/50 backdrop-blur-xs rounded-xl p-6 border border-slate-700">
             <h3 className="text-xl font-bold text-white mb-4">Creating a User</h3>
             
             <div className="space-y-4">
@@ -682,7 +682,7 @@ public ResponseEntity<User> createUser(
           </div>
 
           {/* Error Handling Example */}
-          <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border border-slate-700">
+          <div className="bg-slate-800/50 backdrop-blur-xs rounded-xl p-6 border border-slate-700">
             <h3 className="text-xl font-bold text-white mb-4">Error Handling</h3>
             
             <div className="space-y-4">
@@ -771,7 +771,7 @@ public ResponseEntity<?> getUser(@PathVariable String id) {
               <p className="text-gray-300">Works with SQLite locally, PostgreSQL in production - only `DATABASE_URL` changes, zero code changes.</p>
             </div>
           </div>
-          <div className="mt-4 p-3 bg-blue-500/20 rounded border border-blue-500/30">
+          <div className="mt-4 p-3 bg-blue-500/20 rounded-sm border border-blue-500/30">
             <p className="text-gray-300 text-sm">
               <strong>The key principle:</strong> Configure through environment variables, not code changes. 
               This enables seamless local development and flexible deployment options.
@@ -974,7 +974,7 @@ public ResponseEntity<?> getUser(@PathVariable String id) {
         <div className="mb-6">
           <h3 className="text-2xl font-bold text-white mb-4">Retry with Exponential Backoff</h3>
           <div className="grid md:grid-cols-2 gap-6">
-            <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border border-slate-700">
+            <div className="bg-slate-800/50 backdrop-blur-xs rounded-xl p-6 border border-slate-700">
               <div className="flex items-center gap-2 mb-3">
                 <span className="text-lg">⚛️</span>
                 <h4 className="text-lg font-bold text-white">TypeScript/Node.js</h4>
@@ -1021,7 +1021,7 @@ public ResponseEntity<?> getUser(@PathVariable String id) {
               </div>
             </div>
 
-            <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border border-slate-700">
+            <div className="bg-slate-800/50 backdrop-blur-xs rounded-xl p-6 border border-slate-700">
               <div className="flex items-center gap-2 mb-3">
                 <span className="text-lg">☕</span>
                 <h4 className="text-lg font-bold text-white">Java Spring Boot (Resilience4j)</h4>
@@ -1073,7 +1073,7 @@ public class RetryConfig {
         <div>
           <h3 className="text-2xl font-bold text-white mb-4">Circuit Breaker Pattern</h3>
           <div className="grid md:grid-cols-2 gap-6">
-            <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border border-slate-700">
+            <div className="bg-slate-800/50 backdrop-blur-xs rounded-xl p-6 border border-slate-700">
               <div className="flex items-center gap-2 mb-3">
                 <span className="text-lg">⚛️</span>
                 <h4 className="text-lg font-bold text-white">TypeScript/Node.js</h4>
@@ -1125,7 +1125,7 @@ public class RetryConfig {
               </div>
             </div>
 
-            <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border border-slate-700">
+            <div className="bg-slate-800/50 backdrop-blur-xs rounded-xl p-6 border border-slate-700">
               <div className="flex items-center gap-2 mb-3">
                 <span className="text-lg">☕</span>
                 <h4 className="text-lg font-bold text-white">Java Spring Boot (Resilience4j)</h4>
@@ -1178,7 +1178,7 @@ public class CircuitBreakerConfig {
       {/* Data Transformation */}
       <section className="mb-12">
         <h2 className="text-3xl font-bold text-white mb-6">Data Transformation</h2>
-        <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border border-slate-700">
+        <div className="bg-slate-800/50 backdrop-blur-xs rounded-xl p-6 border border-slate-700">
           <p className="text-gray-300 mb-6">
             Transform external API responses into internal domain models to maintain clean architecture
             and protect against external changes.
@@ -1289,7 +1289,7 @@ function mapToUser(external: any): User {
         
         {/* Stripe Code Examples */}
         <div className="mt-6 grid md:grid-cols-2 gap-6">
-          <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border border-slate-700">
+          <div className="bg-slate-800/50 backdrop-blur-xs rounded-xl p-6 border border-slate-700">
             <h4 className="text-lg font-bold text-white mb-3">Create Checkout Session</h4>
             <div className="bg-slate-900/50 p-4 rounded-lg font-mono text-xs text-gray-300 overflow-x-auto">
               <ExpandableCodeBlock code={`import Stripe from 'stripe'
@@ -1311,7 +1311,7 @@ const session = await stripe.checkout.sessions.create({
 // Redirect user to session.url`} />
             </div>
           </div>
-          <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border border-slate-700">
+          <div className="bg-slate-800/50 backdrop-blur-xs rounded-xl p-6 border border-slate-700">
             <h4 className="text-lg font-bold text-white mb-3">Webhook Handler</h4>
             <div className="bg-slate-900/50 p-4 rounded-lg font-mono text-xs text-gray-300 overflow-x-auto">
               <ExpandableCodeBlock code={`// app/api/stripe/webhook/route.ts
@@ -1400,7 +1400,7 @@ export async function POST(request: Request) {
         
         {/* Resend Code Examples */}
         <div className="mt-6 grid md:grid-cols-2 gap-6">
-          <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border border-slate-700">
+          <div className="bg-slate-800/50 backdrop-blur-xs rounded-xl p-6 border border-slate-700">
             <h4 className="text-lg font-bold text-white mb-3">Send Email</h4>
             <div className="bg-slate-900/50 p-4 rounded-lg font-mono text-xs text-gray-300 overflow-x-auto">
               <ExpandableCodeBlock code={`import { Resend } from 'resend'
@@ -1415,7 +1415,7 @@ await resend.emails.send({
 })`} />
             </div>
           </div>
-          <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border border-slate-700">
+          <div className="bg-slate-800/50 backdrop-blur-xs rounded-xl p-6 border border-slate-700">
             <h4 className="text-lg font-bold text-white mb-3">Email Service Wrapper</h4>
             <div className="bg-slate-900/50 p-4 rounded-lg font-mono text-xs text-gray-300 overflow-x-auto">
               <ExpandableCodeBlock code={`// lib/email.ts

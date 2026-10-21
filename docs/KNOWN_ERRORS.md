@@ -156,7 +156,7 @@ npm run test:unit -- tests/unit/<affected-test>.test.ts
 npm run test:unit:ci
 ```
 
-Add focused tests for changed modules already included by `vitest.config.ts`. Do not hide production files from coverage solely to clear the quality gate.
+Add focused tests for changed modules already included by `vitest.config.mts`. Do not hide production files from coverage solely to clear the quality gate.
 
 ## E2E smoke fails
 

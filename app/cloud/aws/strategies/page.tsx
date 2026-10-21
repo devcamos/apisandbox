@@ -119,9 +119,9 @@ export default function MigrationPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+    <div className="min-h-screen bg-linear-to-br from-slate-900 via-slate-800 to-slate-900">
       {/* Header */}
-      <div className="bg-gradient-to-r from-blue-500 to-cyan-500 py-16">
+      <div className="bg-linear-to-r from-blue-500 to-cyan-500 py-16">
         <div className="container mx-auto px-6">
           <nav className="flex items-center gap-2 mb-6 text-sm">
             <Link href="/" className="text-white/70 hover:text-white transition-colors flex items-center gap-1">
@@ -136,7 +136,7 @@ export default function MigrationPage() {
             <span className="text-white font-semibold">Strategies</span>
           </nav>
           <div className="flex items-center gap-4 mb-4">
-            <div className="p-4 bg-white/20 backdrop-blur-sm rounded-xl">
+            <div className="p-4 bg-white/20 backdrop-blur-xs rounded-xl">
               <RefreshCw className="w-10 h-10 text-white" />
             </div>
             <div>
@@ -175,9 +175,9 @@ export default function MigrationPage() {
           {strategies.map((strategy) => {
             const Icon = strategy.icon;
             return (
-              <div key={strategy.id} className="bg-slate-800/50 backdrop-blur-sm rounded-2xl p-8 border border-slate-700">
+              <div key={strategy.id} className="bg-slate-800/50 backdrop-blur-xs rounded-2xl p-8 border border-slate-700">
                 <div className="flex items-start gap-6 mb-6">
-                  <div className={`p-4 rounded-xl bg-gradient-to-r ${strategy.color}`}>
+                  <div className={`p-4 rounded-xl bg-linear-to-r ${strategy.color}`}>
                     <Icon className="w-8 h-8 text-white" />
                   </div>
                   <div className="flex-1">
@@ -210,7 +210,7 @@ export default function MigrationPage() {
                     <ol className="space-y-3">
                       {strategy.steps.map((step, idx) => (
                         <li key={idx} className="flex items-start gap-3 text-gray-300">
-                          <span className="flex-shrink-0 w-6 h-6 bg-slate-700 rounded-full flex items-center justify-center text-sm font-semibold">
+                          <span className="shrink-0 w-6 h-6 bg-slate-700 rounded-full flex items-center justify-center text-sm font-semibold">
                             {idx + 1}
                           </span>
                           <span>{step}</span>
@@ -270,7 +270,7 @@ export default function MigrationPage() {
 
         {/* Decision Framework */}
         <section className="mt-12">
-          <div className="bg-gradient-to-r from-slate-800 to-slate-700 rounded-2xl p-8 border border-slate-600">
+          <div className="bg-linear-to-r from-slate-800 to-slate-700 rounded-2xl p-8 border border-slate-600">
             <h2 className="text-3xl font-bold text-white mb-6 text-center">Decision Framework</h2>
             <div className="grid md:grid-cols-3 gap-6">
               <div className="bg-slate-900/50 rounded-xl p-6">
@@ -308,7 +308,7 @@ export default function MigrationPage() {
         <div className="mt-12 text-center">
           <Link
             href="/cloud/aws/migration"
-            className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-blue-500 to-cyan-500 text-white rounded-xl font-bold text-lg hover:shadow-lg transition-all"
+            className="inline-flex items-center gap-2 px-8 py-4 bg-linear-to-r from-blue-500 to-cyan-500 text-white rounded-xl font-bold text-lg hover:shadow-lg transition-all"
           >
             Use Migration Dashboard
             <ArrowRight className="w-5 h-5" />

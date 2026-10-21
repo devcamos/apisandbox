@@ -12,7 +12,7 @@ export default function PostgreSQLPage() {
     <div className="min-h-screen bg-gray-50 py-12">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="bg-white rounded-lg shadow-lg overflow-hidden">
-          <div className="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-8">
+          <div className="bg-linear-to-r from-blue-600 to-blue-700 px-6 py-8">
             <div className="flex items-center">
               <Database className="w-12 h-12 text-white mr-4" />
               <div>
@@ -141,7 +141,7 @@ console.log(user.posts[0].title) // ✅ No runtime errors`} />
                     <p className="text-sm text-gray-600 mb-3">
                       Store and query complex nested data structures
                     </p>
-                    <div className="bg-gray-800 rounded p-3 text-green-400 font-mono text-xs">
+                    <div className="bg-gray-800 rounded-sm p-3 text-green-400 font-mono text-xs">
                       <ExpandableCodeBlock code={`// Store flexible metadata
 {
   "preferences": {
@@ -157,7 +157,7 @@ console.log(user.posts[0].title) // ✅ No runtime errors`} />
                     <p className="text-sm text-gray-600 mb-3">
                       Powerful text search with ranking and highlighting
                     </p>
-                    <div className="bg-gray-800 rounded p-3 text-blue-400 font-mono text-xs">
+                    <div className="bg-gray-800 rounded-sm p-3 text-blue-400 font-mono text-xs">
                       <ExpandableCodeBlock code={`// Search posts by content
 WHERE to_tsvector(content)
 @@ to_tsquery('database & query')`} />
@@ -169,7 +169,7 @@ WHERE to_tsvector(content)
                     <p className="text-sm text-gray-600 mb-3">
                       Store and query arrays of data efficiently
                     </p>
-                    <div className="bg-gray-800 rounded p-3 text-purple-400 font-mono text-xs">
+                    <div className="bg-gray-800 rounded-sm p-3 text-purple-400 font-mono text-xs">
                       <ExpandableCodeBlock code={`// Check array membership
 WHERE 'javascript' = ANY(tags)
 WHERE tags && ARRAY['react', 'nextjs']`} />
@@ -181,7 +181,7 @@ WHERE tags && ARRAY['react', 'nextjs']`} />
                     <p className="text-sm text-gray-600 mb-3">
                       Automate data processing and validation
                     </p>
-                    <div className="bg-gray-800 rounded p-3 text-yellow-400 font-mono text-xs">
+                    <div className="bg-gray-800 rounded-sm p-3 text-yellow-400 font-mono text-xs">
                       <ExpandableCodeBlock code={`CREATE OR REPLACE FUNCTION
 update_updated_at() RETURNS TRIGGER AS $$
 BEGIN
@@ -225,7 +225,7 @@ $$ LANGUAGE plpgsql;`} />
                     <p>✅ <strong>Same Code:</strong> Only the `DATABASE_URL` connection string changes - zero application code changes needed</p>
                     <p>✅ <strong>Same Schema:</strong> Your Prisma schema works identically across all environments</p>
                   </div>
-                  <div className="mt-4 p-3 bg-blue-100 rounded border border-blue-300">
+                  <div className="mt-4 p-3 bg-blue-100 rounded-sm border border-blue-300">
                     <p className="text-sm text-blue-900">
                       <strong>The key principle:</strong> Configure through environment variables (`DATABASE_URL`), not code changes. 
                       Your Prisma queries, migrations, and type generation work the same everywhere.

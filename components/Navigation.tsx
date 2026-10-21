@@ -132,7 +132,7 @@ export default function Navigation() {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link href="/" className="flex items-center space-x-2 group">
-            <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-lg shadow-lg shadow-blue-500/20 group-hover:shadow-blue-500/40 transition-shadow" />
+            <div className="w-8 h-8 bg-linear-to-r from-blue-500 to-cyan-500 rounded-lg shadow-lg shadow-blue-500/20 group-hover:shadow-blue-500/40 transition-shadow" />
             <div className="flex flex-col leading-tight">
               <span className="font-bold text-white text-lg sm:text-xl">API Sandbox</span>
               <span className="hidden sm:block text-[10px] uppercase tracking-wider text-gray-500">Learn · Build · Ship</span>
@@ -183,7 +183,7 @@ export default function Navigation() {
                                 >
                                   <div className="flex items-center justify-between">
                                     <span className="text-sm">{item.name}</span>
-                                    <span className={`text-xs px-2 py-0.5 rounded ${mobileExploreBadgeClass(item.badge)}`}>
+                                    <span className={`text-xs px-2 py-0.5 rounded-sm ${mobileExploreBadgeClass(item.badge)}`}>
                                       {item.badge}
                                     </span>
                                   </div>
@@ -198,7 +198,7 @@ export default function Navigation() {
                       <Link
                         href="/dashboard"
                         onClick={() => setExploreOpen(false)}
-                        className="block text-center px-4 py-2 bg-gradient-to-r from-blue-500 to-cyan-500 text-white rounded-lg font-semibold hover:shadow-lg transition-all text-sm"
+                        className="block text-center px-4 py-2 bg-linear-to-r from-blue-500 to-cyan-500 text-white rounded-lg font-semibold hover:shadow-lg transition-all text-sm"
                       >
                         View All in Dashboard
                       </Link>
@@ -256,7 +256,7 @@ export default function Navigation() {
                     className="flex items-center gap-2 px-3 py-2 rounded-lg text-gray-300 hover:text-white hover:bg-slate-800 transition-all"
                   >
                     <div className="flex items-center gap-2">
-                      <div className="w-8 h-8 rounded-full bg-gradient-to-r from-blue-500 to-cyan-500 flex items-center justify-center text-white font-semibold text-sm">
+                      <div className="w-8 h-8 rounded-full bg-linear-to-r from-blue-500 to-cyan-500 flex items-center justify-center text-white font-semibold text-sm">
                         {(session.user?.name || session.user?.email || "U")[0].toUpperCase()}
                       </div>
                       <span className="text-sm font-medium hidden lg:block">
@@ -270,9 +270,9 @@ export default function Navigation() {
                   {profileOpen && (
                     <div className="absolute top-full right-0 mt-2 w-80 bg-slate-800 border border-slate-700 rounded-xl shadow-2xl z-50 overflow-hidden">
                       {/* Profile Header */}
-                      <div className="p-4 bg-gradient-to-r from-slate-800 to-slate-700 border-b border-slate-700">
+                      <div className="p-4 bg-linear-to-r from-slate-800 to-slate-700 border-b border-slate-700">
                         <div className="flex items-center gap-3 mb-3">
-                          <div className="w-12 h-12 rounded-full bg-gradient-to-r from-blue-500 to-cyan-500 flex items-center justify-center text-white font-bold text-lg">
+                          <div className="w-12 h-12 rounded-full bg-linear-to-r from-blue-500 to-cyan-500 flex items-center justify-center text-white font-bold text-lg">
                             {(session.user?.name || session.user?.email || "U")[0].toUpperCase()}
                           </div>
                           <div className="flex-1 min-w-0">
@@ -288,7 +288,7 @@ export default function Navigation() {
                         {subscription && (
                           <div className="flex items-center gap-2">
                             {subscription.tier === "PREMIUM" ? (
-                              <div className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-gradient-to-r from-purple-500/20 to-pink-500/20 border border-purple-500/30 rounded-lg">
+                              <div className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-linear-to-r from-purple-500/20 to-pink-500/20 border border-purple-500/30 rounded-lg">
                                 <Sparkles className="w-3.5 h-3.5 text-purple-400" />
                                 <span className="text-purple-300 text-xs font-semibold">Premium Member</span>
                               </div>
@@ -368,7 +368,7 @@ export default function Navigation() {
                 </Link>
                 <Link
                   href="/signup"
-                  className="px-4 py-2 rounded-lg bg-gradient-to-r from-blue-500 to-cyan-500 text-white font-semibold hover:shadow-lg transition-all"
+                  className="px-4 py-2 rounded-lg bg-linear-to-r from-blue-500 to-cyan-500 text-white font-semibold hover:shadow-lg transition-all"
                 >
                   Sign Up
                 </Link>
@@ -437,7 +437,7 @@ export default function Navigation() {
                               >
                                 <div className="flex items-center justify-between gap-2">
                                   <span className="text-sm">{item.name}</span>
-                                  <span className={`shrink-0 text-xs px-2 py-0.5 rounded ${mobileExploreBadgeClass(item.badge)}`}>
+                                  <span className={`shrink-0 text-xs px-2 py-0.5 rounded-sm ${mobileExploreBadgeClass(item.badge)}`}>
                                     {item.badge}
                                   </span>
                                 </div>
@@ -485,7 +485,7 @@ export default function Navigation() {
                 {/* Mobile Profile Section */}
                 <div className="bg-slate-800/50 rounded-lg p-3 mb-3">
                   <div className="flex items-center gap-3 mb-2">
-                    <div className="w-10 h-10 rounded-full bg-gradient-to-r from-blue-500 to-cyan-500 flex items-center justify-center text-white font-semibold">
+                    <div className="w-10 h-10 rounded-full bg-linear-to-r from-blue-500 to-cyan-500 flex items-center justify-center text-white font-semibold">
                       {(session.user?.name || session.user?.email || "U")[0].toUpperCase()}
                     </div>
                     <div className="flex-1 min-w-0">
@@ -500,12 +500,12 @@ export default function Navigation() {
                   {subscription && (
                     <div className="flex items-center gap-2">
                       {subscription.tier === "PREMIUM" ? (
-                        <div className="inline-flex items-center gap-1.5 px-2 py-0.5 bg-gradient-to-r from-purple-500/20 to-pink-500/20 border border-purple-500/30 rounded text-xs">
+                        <div className="inline-flex items-center gap-1.5 px-2 py-0.5 bg-linear-to-r from-purple-500/20 to-pink-500/20 border border-purple-500/30 rounded-sm text-xs">
                           <Sparkles className="w-3 h-3 text-purple-400" />
                           <span className="text-purple-300 font-semibold">Premium</span>
                         </div>
                       ) : (
-                        <div className="inline-flex items-center gap-1.5 px-2 py-0.5 bg-slate-700/50 border border-slate-600 rounded text-xs">
+                        <div className="inline-flex items-center gap-1.5 px-2 py-0.5 bg-slate-700/50 border border-slate-600 rounded-sm text-xs">
                           <Lock className="w-3 h-3 text-gray-400" />
                           <span className="text-gray-400 font-semibold">Free</span>
                         </div>
@@ -573,7 +573,7 @@ export default function Navigation() {
                 <Link
                   href="/signup"
                   onClick={() => setIsOpen(false)}
-                  className="block px-4 py-2 rounded-lg bg-gradient-to-r from-blue-500 to-cyan-500 text-white font-semibold hover:shadow-lg transition-all text-center"
+                  className="block px-4 py-2 rounded-lg bg-linear-to-r from-blue-500 to-cyan-500 text-white font-semibold hover:shadow-lg transition-all text-center"
                 >
                   Sign Up
                 </Link>

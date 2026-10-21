@@ -295,7 +295,7 @@ export default function PhaseQuiz({ phaseNumber, accentClass }: PhaseQuizProps) 
           </p>
           <Link
             href="/login"
-            className={`inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-gradient-to-r ${accentClass} text-white font-semibold`}
+            className={`inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-linear-to-r ${accentClass} text-white font-semibold`}
           >
             Sign in to track progress
           </Link>
@@ -379,7 +379,7 @@ export default function PhaseQuiz({ phaseNumber, accentClass }: PhaseQuizProps) 
             disabled={answeredCount !== quiz.totalQuestions || submitting}
             className={`px-6 py-3 rounded-xl text-white font-semibold transition-all ${
               answeredCount === quiz.totalQuestions && !submitting
-                ? `bg-gradient-to-r ${accentClass}`
+                ? `bg-linear-to-r ${accentClass}`
                 : "bg-slate-700 cursor-not-allowed"
             }`}
           >
@@ -443,7 +443,7 @@ export default function PhaseQuiz({ phaseNumber, accentClass }: PhaseQuizProps) 
             {showDemoCompletion ? (
               <DemoConversionPrompt variant="completion" />
             ) : nextStep ? (
-              <div className="rounded-xl border border-green-500/30 bg-gradient-to-r from-green-500/15 to-emerald-500/15 p-6">
+              <div className="rounded-xl border border-green-500/30 bg-linear-to-r from-green-500/15 to-emerald-500/15 p-6">
                 <h3 className="text-2xl font-bold text-white mb-3">✅ What&apos;s Next?</h3>
                 <p className="text-gray-300 mb-4">
                   {mastery?.label === "Ready for the next phase"
@@ -453,7 +453,7 @@ export default function PhaseQuiz({ phaseNumber, accentClass }: PhaseQuizProps) 
                 <div className="flex flex-col gap-3 lg:flex-row lg:items-center">
                   <Link
                     href={nextStep.href}
-                    className={`inline-flex items-center justify-center gap-2 rounded-lg bg-gradient-to-r px-6 py-3 text-white font-semibold transition-all ${accentClass}`}
+                    className={`inline-flex items-center justify-center gap-2 rounded-lg bg-linear-to-r px-6 py-3 text-white font-semibold transition-all ${accentClass}`}
                   >
                     {nextStep.cta}
                   </Link>
