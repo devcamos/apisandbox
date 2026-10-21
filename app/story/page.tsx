@@ -99,7 +99,7 @@ export default function StoryPage() {
       {/* Close button */}
       <motion.button
         onClick={() => router.back()}
-        className="fixed top-6 right-6 z-50 p-2.5 rounded-xl bg-white/5 border border-white/10 text-gray-400 hover:text-white hover:bg-white/10 transition-all backdrop-blur-sm"
+        className="fixed top-6 right-6 z-50 p-2.5 rounded-xl bg-white/5 border border-white/10 text-gray-400 hover:text-white hover:bg-white/10 transition-all backdrop-blur-xs"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.5 }}
@@ -125,7 +125,7 @@ export default function StoryPage() {
 
       {/* Bottom navigation */}
       <motion.div
-        className="fixed bottom-0 inset-x-0 z-50 pb-8 pt-16 bg-gradient-to-t from-slate-950 via-slate-950/80 to-transparent pointer-events-none"
+        className="fixed bottom-0 inset-x-0 z-50 pb-8 pt-16 bg-linear-to-t from-slate-950 via-slate-950/80 to-transparent pointer-events-none"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.3 }}

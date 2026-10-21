@@ -43,7 +43,7 @@ export function GsapToolbar(props: Readonly<{
           <select
             value={target}
             onChange={(e) => onTargetChange(Number(e.target.value))}
-            className="text-xs bg-slate-800 border border-slate-700 rounded-lg px-2 py-1 text-green-300 focus:outline-none focus:border-green-500/50"
+            className="text-xs bg-slate-800 border border-slate-700 rounded-lg px-2 py-1 text-green-300 focus:outline-hidden focus:border-green-500/50"
           >
             {arr.map((v) => (
               <option key={v} value={v}>{v}</option>
@@ -123,7 +123,7 @@ export function GsapGridSection(props: Readonly<{
         ))}
       </div>
       <div ref={pointerRef} className="absolute -bottom-5 w-3 h-3 opacity-0" style={{ left: 0 }}>
-        <div className="w-0 h-0 border-l-[6px] border-r-[6px] border-b-[8px] border-l-transparent border-r-transparent border-b-amber-400" />
+        <div className="w-0 h-0 border-l-[6px] border-r-[6px] border-b-8 border-l-transparent border-r-transparent border-b-amber-400" />
       </div>
     </div>
   )

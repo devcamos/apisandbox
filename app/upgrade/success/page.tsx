@@ -54,7 +54,7 @@ export default function UpgradeSuccessPage() {
   }, [status])
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center px-6">
+    <div className="min-h-screen bg-linear-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center px-6">
       <div className="text-center max-w-md">
         {status === "activating" ? (
           <>
@@ -93,7 +93,7 @@ export default function UpgradeSuccessPage() {
             <div className="flex flex-col items-center gap-4">
               <Link
                 href="/phase-2"
-                className="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white font-medium hover:shadow-lg hover:shadow-violet-500/25 transition-all"
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-linear-to-r from-violet-600 to-fuchsia-600 text-white font-medium hover:shadow-lg hover:shadow-violet-500/25 transition-all"
               >
                 <Sparkles className="w-5 h-5" />
                 Start Phase 2

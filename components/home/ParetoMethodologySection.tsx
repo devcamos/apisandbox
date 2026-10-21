@@ -6,7 +6,7 @@ export default function ParetoMethodologySection() {
       className="container mx-auto px-6 py-8"
       data-testid="pareto-methodology-section"
     >
-      <div className="bg-gradient-to-br from-yellow-500/10 via-orange-500/10 to-red-500/10 border-2 border-yellow-500/30 rounded-2xl p-8 mb-12">
+      <div className="bg-linear-to-br from-yellow-500/10 via-orange-500/10 to-red-500/10 border-2 border-yellow-500/30 rounded-2xl p-8 mb-12">
         <div className="max-w-4xl mx-auto">
           <div className="flex items-center gap-4 mb-6">
             <div className="p-3 bg-yellow-500/20 rounded-lg">
@@ -53,7 +53,7 @@ export default function ParetoMethodologySection() {
             </div>
           </div>
 
-          <div className="mt-6 p-4 bg-gradient-to-r from-yellow-500/10 to-orange-500/10 border border-yellow-500/20 rounded-lg">
+          <div className="mt-6 p-4 bg-linear-to-r from-yellow-500/10 to-orange-500/10 border border-yellow-500/20 rounded-lg">
             <p className="text-sm text-gray-300 text-center">
               <strong className="text-yellow-300">Result:</strong> You master the vital 20% that unlocks 80% of API
               integration scenarios, then deep dive to ensure you can apply it confidently in production.

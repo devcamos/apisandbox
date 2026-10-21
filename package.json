@@ -96,6 +96,7 @@
   },
   "devDependencies": {
     "@playwright/test": "^1.57.0",
+    "@tailwindcss/postcss": "^4.3.3",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
     "@types/bcryptjs": "^2.4.6",
@@ -108,7 +109,6 @@
     "@types/ws": "^8.18.1",
     "@vitejs/plugin-react": "^6.0.1",
     "@vitest/coverage-v8": "^4.1.5",
-    "autoprefixer": "^10.4.23",
     "dependency-cruiser": "^18.7.0",
     "dotenv": "^17.2.3",
     "eslint": "^9.39.2",
@@ -118,7 +118,7 @@
     "jsdom": "^29.1.1",
     "postcss": "^8.5.26",
     "prisma": "^6.19.3",
-    "tailwindcss": "^3.4.19",
+    "tailwindcss": "^4.3.3",
     "typescript": "^5",
     "typescript-eslint": "^8.62.1",
     "vitest": "^4.1.5"
@@ -126,11 +126,8 @@
   "overrides": {
     "deepmerge-ts": "8.0.0",
     "katex": "^0.18.2",
-    "postcss-nested": {
-      "postcss-selector-parser": "^7.1.6"
-    },
-    "tailwindcss": {
-      "postcss-selector-parser": "^7.1.6"
+    "@next/eslint-plugin-next": {
+      "fast-glob": "npm:tinyglobby@^0.2.17"
     }
   }
 }

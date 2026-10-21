@@ -41,7 +41,7 @@ export function FirstPrinciplesCourse({
   const next = activeIndex < course.units.length - 1 ? course.units[activeIndex + 1] : null
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-cyan-950/40">
+    <main className="min-h-screen bg-linear-to-br from-slate-950 via-slate-900 to-cyan-950/40">
       <section className="border-b border-slate-800 bg-slate-950/45">
         <div className="container mx-auto max-w-6xl px-6 py-10 sm:py-14">
           <Link href="/dashboard" className="inline-flex items-center gap-2 text-sm text-slate-400 hover:text-white">

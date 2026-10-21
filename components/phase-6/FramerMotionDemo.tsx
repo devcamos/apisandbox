@@ -316,7 +316,7 @@ export default function FramerMotionDemo({ algorithm = "bubble" }: Readonly<{ al
             <motion.div
               key={bar.id}
               layout
-              className={`relative rounded-t-lg bg-gradient-to-t ${barColors[bar.status]} min-w-[28px] flex-1`}
+              className={`relative rounded-t-lg bg-linear-to-t ${barColors[bar.status]} min-w-[28px] flex-1`}
               style={{ height: `${(bar.value / maxValue) * 100}%` }}
               transition={{ type: "spring" as const, stiffness: 400, damping: 28 }}
             >

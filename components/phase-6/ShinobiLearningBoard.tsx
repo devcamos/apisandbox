@@ -29,7 +29,7 @@ export default function ShinobiLearningBoard({ shinobi }: Readonly<Props>) {
   if (!hydrated || !state) {
     return (
       <div className="mb-8 rounded-2xl border border-orange-500/20 bg-orange-950/20 p-6 animate-pulse">
-        <div className="h-6 w-48 bg-slate-700 rounded mb-4" />
+        <div className="h-6 w-48 bg-slate-700 rounded-sm mb-4" />
         <div className="h-24 bg-slate-800/80 rounded-xl" />
       </div>
     )
@@ -37,7 +37,7 @@ export default function ShinobiLearningBoard({ shinobi }: Readonly<Props>) {
 
   return (
     <>
-      <section className="mb-8 rounded-2xl border-2 border-orange-500/30 bg-gradient-to-br from-orange-950/40 via-slate-900/80 to-amber-950/30 overflow-hidden shadow-lg shadow-orange-900/20">
+      <section className="mb-8 rounded-2xl border-2 border-orange-500/30 bg-linear-to-br from-orange-950/40 via-slate-900/80 to-amber-950/30 overflow-hidden shadow-lg shadow-orange-900/20">
         <button
           type="button"
           onClick={() => setExpanded((e) => !e)}
@@ -98,7 +98,7 @@ export default function ShinobiLearningBoard({ shinobi }: Readonly<Props>) {
                             <td className="py-2.5 w-[140px]">
                               <div className="h-2 rounded-full bg-slate-800 overflow-hidden border border-slate-600">
                                 <div
-                                  className="h-full rounded-full bg-gradient-to-r from-orange-500 to-amber-400 transition-all duration-500"
+                                  className="h-full rounded-full bg-linear-to-r from-orange-500 to-amber-400 transition-all duration-500"
                                   style={{ width: `${Math.round(bar * 100)}%` }}
                                 />
                               </div>
@@ -209,7 +209,7 @@ function QuizModal({
   if (!open) return null
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-xs">
       <motion.div
         initial={{ opacity: 0, scale: 0.96 }}
         animate={{ opacity: 1, scale: 1 }}

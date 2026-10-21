@@ -27,7 +27,7 @@ const childVariants = {
 export default function StorySlide({ bg, children }: StorySlideProps) {
   return (
     <motion.div
-      className={`min-h-screen w-full flex flex-col items-center justify-center px-6 py-20 bg-gradient-to-br ${bg}`}
+      className={`min-h-screen w-full flex flex-col items-center justify-center px-6 py-20 bg-linear-to-br ${bg}`}
       variants={containerVariants}
       initial="hidden"
       animate="visible"
