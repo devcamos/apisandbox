@@ -27,6 +27,29 @@ export function resolveHardeningMigrationPath(root = ROOT) {
   return path.join(root, HARDENING_MIGRATION_SQL)
 }
 
+/** Follow-up: deny-all policies for API roles + default privileges for postgres. */
+export const POLICY_MIGRATION_SQL =
+  "prisma/migrations/20261021120000_public_rls_deny_policies_and_grants/migration.sql"
+
+/** @returns {string} */
+export function resolvePolicyMigrationPath(root = ROOT) {
+  return path.join(root, POLICY_MIGRATION_SQL)
+}
+
+/**
+ * @param {string} sql
+ * @returns {string[]}
+ */
+export function findPolicyMigrationGaps(sql) {
+  const required = [
+    { label: "RESTRICTIVE deny policy", pattern: /AS RESTRICTIVE[\s\S]*USING \(false\) WITH CHECK \(false\)/i },
+    { label: "sensitive column revoke (passwordHash)", pattern: /'User',\s*'passwordHash'/ },
+    { label: "default privileges FOR ROLE postgres", pattern: /ALTER DEFAULT PRIVILEGES FOR ROLE/i },
+    { label: "no grants to anon/authenticated", pattern: /^(?![\s\S]*^\s*GRANT\b[^\n]*\b(anon|authenticated)\b)/im },
+  ]
+  return required.filter((item) => !item.pattern.test(sql)).map((item) => item.label)
+}
+
 /**
  * @param {string} sql
  * @returns {string[]}
@@ -93,6 +116,12 @@ export function checkHardeningMigrationStatic(root = ROOT) {
 
   const sql = fs.readFileSync(migrationPath, "utf8")
   const gaps = findHardeningMigrationGaps(sql)
+  const policyPath = resolvePolicyMigrationPath(root)
+  if (fs.existsSync(policyPath)) {
+    gaps.push(...findPolicyMigrationGaps(fs.readFileSync(policyPath, "utf8")))
+  } else {
+    gaps.push(`missing ${POLICY_MIGRATION_SQL}`)
+  }
   return {
     ok: gaps.length === 0,
     path: migrationPath,
@@ -142,6 +171,10 @@ export async function checkPublicRlsAgainstDatabase(opts) {
   try {
     await client.connect()
     await client.query(sql)
+    const policyPath = resolvePolicyMigrationPath(root)
+    if (fs.existsSync(policyPath)) {
+      await client.query(fs.readFileSync(policyPath, "utf8"))
+    }
     const unprotected = await listPublicTablesWithoutRls(client)
     return {
       ok: unprotected.length === 0,
