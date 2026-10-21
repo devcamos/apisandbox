@@ -8,6 +8,7 @@ import {
   isLearningCheckpointStatus,
   recordsToLessonProgressState,
   summarizeLearningProgress,
+  type LearningCheckpointRecord,
   type LearningCheckpointStatus,
 } from "@/lib/learning/progress-mapping"
 
@@ -96,9 +97,7 @@ export async function getLearningProgressForUser(userId: string, courseId: strin
   }
 }
 
-export async function upsertLearningCheckpointProgress(input: CheckpointInput) {
-  requireCheckpoint(input.courseId, input.moduleId, input.checkpointId)
-
+function checkpointWriteData(input: CheckpointInput) {
   const state: CheckpointProgress = {
     done: input.done,
     answer: input.answer,
@@ -115,7 +114,23 @@ export async function upsertLearningCheckpointProgress(input: CheckpointInput) {
     throw new AppError("Invalid learning checkpoint status", 400, "validation_error")
   }
 
-  const completedAt = status === "completed" ? new Date() : null
+  return {
+    status,
+    answer: input.answer,
+    evidence: input.evidence,
+    serviceName: input.serviceName,
+    endpointName: input.endpointName,
+    criticalPathStep: input.criticalPathStep,
+    auditEvidence: input.auditEvidence,
+    retrievalStep: input.retrievalStep,
+    retrievalDueAt: dateOrNull(input.retrievalDueAt),
+    completedAt: status === "completed" ? new Date() : null,
+  }
+}
+
+export async function upsertLearningCheckpointProgress(input: CheckpointInput) {
+  requireCheckpoint(input.courseId, input.moduleId, input.checkpointId)
+  const data = checkpointWriteData(input)
   const record = await prisma.learningCheckpointProgress.upsert({
     where: {
       userId_courseId_moduleId_checkpointId: {
@@ -125,33 +140,13 @@ export async function upsertLearningCheckpointProgress(input: CheckpointInput) {
         checkpointId: input.checkpointId,
       },
     },
-    update: {
-      status,
-      answer: input.answer,
-      evidence: input.evidence,
-      serviceName: input.serviceName,
-      endpointName: input.endpointName,
-      criticalPathStep: input.criticalPathStep,
-      auditEvidence: input.auditEvidence,
-      retrievalStep: input.retrievalStep,
-      retrievalDueAt: dateOrNull(input.retrievalDueAt),
-      completedAt,
-    },
+    update: data,
     create: {
       userId: input.userId,
       courseId: input.courseId,
       moduleId: input.moduleId,
       checkpointId: input.checkpointId,
-      status,
-      answer: input.answer,
-      evidence: input.evidence,
-      serviceName: input.serviceName,
-      endpointName: input.endpointName,
-      criticalPathStep: input.criticalPathStep,
-      auditEvidence: input.auditEvidence,
-      retrievalStep: input.retrievalStep,
-      retrievalDueAt: dateOrNull(input.retrievalDueAt),
-      completedAt,
+      ...data,
     },
   })
 
@@ -198,29 +193,35 @@ export async function listLearningCourseProgressForUser(userId: string) {
     orderBy: { lastActivityAt: "desc" },
   })
 
-  const data = []
-  for (const enrollment of enrollments) {
-    const plan = getCoursePlan(enrollment.courseId)
-    if (!plan) {
-      data.push({
-        courseId: enrollment.courseId,
-        status: enrollment.status,
-        completed: 0,
-        total: 0,
+  const courses = enrollments.map((enrollment) => ({
+    enrollment,
+    plan: getCoursePlan(enrollment.courseId),
+  }))
+  const courseIds = courses.filter(({ plan }) => plan !== null).map(({ enrollment }) => enrollment.courseId)
+  const records = courseIds.length === 0
+    ? []
+    : await prisma.learningCheckpointProgress.findMany({
+        where: { userId, courseId: { in: courseIds } },
+        orderBy: [{ moduleId: "asc" }, { checkpointId: "asc" }],
       })
-      continue
-    }
-
-    const progress = await getLearningProgressForUser(userId, enrollment.courseId)
-    data.push({
-      courseId: enrollment.courseId,
-      status: enrollment.status,
-      completed: progress.summary.completed,
-      total: progress.summary.total,
-    })
+  const recordsByCourse = new Map<string, LearningCheckpointRecord[]>()
+  for (const record of records) {
+    const courseRecords = recordsByCourse.get(record.courseId) ?? []
+    courseRecords.push(record)
+    recordsByCourse.set(record.courseId, courseRecords)
   }
 
-  return data
+  return courses.map(({ enrollment, plan }) => {
+    const summary = plan
+      ? summarizeLearningProgress(plan, recordsToLessonProgressState(recordsByCourse.get(enrollment.courseId) ?? []))
+      : { completed: 0, total: 0 }
+    return {
+      courseId: enrollment.courseId,
+      status: enrollment.status,
+      completed: summary.completed,
+      total: summary.total,
+    }
+  })
 }
 
 /** Public v1 shape — strips internal enrollment ids and keeps summary lean. */

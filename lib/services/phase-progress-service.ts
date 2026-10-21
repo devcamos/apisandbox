@@ -1,4 +1,4 @@
-import { Prisma } from "@prisma/client"
+import { Prisma, type UserPhaseProgress } from "@prisma/client"
 import { prisma } from "@/lib/prisma"
 import { mergePhaseProgress } from "@/lib/progress/best-score-progress"
 
@@ -16,143 +16,91 @@ function isUniqueConflict(error: unknown): boolean {
   )
 }
 
+async function lockPhaseProgress(
+  tx: Prisma.TransactionClient,
+  userId: string,
+  phaseNumber: number,
+): Promise<UserPhaseProgress | null> {
+  const rows = await tx.$queryRaw<UserPhaseProgress[]>`
+    SELECT
+      id,
+      "userId",
+      "phaseNumber",
+      "xpEarned",
+      "totalQuestions",
+      "correctAnswers",
+      attempts,
+      "completedAt",
+      "lastAttemptAt",
+      "createdAt",
+      "updatedAt"
+    FROM "UserPhaseProgress"
+    WHERE "userId" = ${userId} AND "phaseNumber" = ${phaseNumber}
+    FOR UPDATE
+  `
+  return rows[0] ?? null
+}
+
+function phaseAttemptData(
+  existing: UserPhaseProgress | null,
+  attempt: RecordPhaseQuizAttemptInput,
+  attemptedAt: Date,
+) {
+  return {
+    ...mergePhaseProgress(existing, { ...attempt, attemptedAt }),
+    lastAttemptAt: attemptedAt,
+  }
+}
+
+function phaseAttemptResult(progress: UserPhaseProgress, xpEarned: number, previousXp: number) {
+  return {
+    progress,
+    bestXp: progress.xpEarned,
+    improved: xpEarned > previousXp,
+  }
+}
+
+async function updatePhaseProgress(
+  tx: Prisma.TransactionClient,
+  existing: UserPhaseProgress,
+  attempt: RecordPhaseQuizAttemptInput,
+  attemptedAt: Date,
+) {
+  const progress = await tx.userPhaseProgress.update({
+    where: { id: existing.id },
+    data: phaseAttemptData(existing, attempt, attemptedAt),
+  })
+  return phaseAttemptResult(progress, attempt.xpEarned, existing.xpEarned)
+}
+
 /**
  * Persist a phase quiz attempt with only-goes-up scores and incrementing attempts.
  * Uses SELECT FOR UPDATE so concurrent submissions cannot regress best scores
  * or lose attempt counts.
  */
-export async function recordPhaseQuizAttempt({
-  userId,
-  phaseNumber,
-  correctAnswers,
-  xpEarned,
-  totalQuestions,
-}: RecordPhaseQuizAttemptInput) {
+export async function recordPhaseQuizAttempt(attempt: RecordPhaseQuizAttemptInput) {
+  const { userId, phaseNumber, xpEarned } = attempt
   return prisma.$transaction(async (tx) => {
-    const locked = await tx.$queryRaw<
-      Array<{
-        id: string
-        userId: string
-        phaseNumber: number
-        xpEarned: number
-        totalQuestions: number
-        correctAnswers: number
-        attempts: number
-        completedAt: Date | null
-        lastAttemptAt: Date | null
-        createdAt: Date
-        updatedAt: Date
-      }>
-    >`
-      SELECT
-        id,
-        "userId",
-        "phaseNumber",
-        "xpEarned",
-        "totalQuestions",
-        "correctAnswers",
-        attempts,
-        "completedAt",
-        "lastAttemptAt",
-        "createdAt",
-        "updatedAt"
-      FROM "UserPhaseProgress"
-      WHERE "userId" = ${userId} AND "phaseNumber" = ${phaseNumber}
-      FOR UPDATE
-    `
-
-    const existing = locked[0] ?? null
+    const existing = await lockPhaseProgress(tx, userId, phaseNumber)
     const now = new Date()
-    const merged = mergePhaseProgress(existing, {
-      xpEarned,
-      correctAnswers,
-      totalQuestions,
-      attemptedAt: now,
-    })
-    const previousXp = existing?.xpEarned ?? 0
 
-    if (!existing) {
-      try {
-        const progress = await tx.userPhaseProgress.create({
-          data: {
-            userId,
-            phaseNumber,
-            xpEarned: merged.xpEarned,
-            totalQuestions: merged.totalQuestions,
-            correctAnswers: merged.correctAnswers,
-            attempts: merged.attempts,
-            completedAt: merged.completedAt,
-            lastAttemptAt: now,
-          },
-        })
-        return {
-          progress,
-          bestXp: progress.xpEarned,
-          improved: xpEarned > previousXp,
-        }
-      } catch (error) {
-        if (!isUniqueConflict(error)) throw error
-        // Concurrent insert won — lock the winner and apply only-goes-up merge.
-        const retryLocked = await tx.$queryRaw<typeof locked>`
-          SELECT
-            id,
-            "userId",
-            "phaseNumber",
-            "xpEarned",
-            "totalQuestions",
-            "correctAnswers",
-            attempts,
-            "completedAt",
-            "lastAttemptAt",
-            "createdAt",
-            "updatedAt"
-          FROM "UserPhaseProgress"
-          WHERE "userId" = ${userId} AND "phaseNumber" = ${phaseNumber}
-          FOR UPDATE
-        `
-        const winner = retryLocked[0]
-        if (!winner) throw error
-        const retryMerged = mergePhaseProgress(winner, {
-          xpEarned,
-          correctAnswers,
-          totalQuestions,
-          attemptedAt: now,
-        })
-        const progress = await tx.userPhaseProgress.update({
-          where: { id: winner.id },
-          data: {
-            xpEarned: retryMerged.xpEarned,
-            totalQuestions: retryMerged.totalQuestions,
-            correctAnswers: retryMerged.correctAnswers,
-            attempts: retryMerged.attempts,
-            completedAt: retryMerged.completedAt,
-            lastAttemptAt: now,
-          },
-        })
-        return {
-          progress,
-          bestXp: progress.xpEarned,
-          improved: xpEarned > (winner.xpEarned ?? 0),
-        }
-      }
-    }
+    if (existing) return updatePhaseProgress(tx, existing, attempt, now)
 
-    const progress = await tx.userPhaseProgress.update({
-      where: { id: existing.id },
-      data: {
-        xpEarned: merged.xpEarned,
-        totalQuestions: merged.totalQuestions,
-        correctAnswers: merged.correctAnswers,
-        attempts: merged.attempts,
-        completedAt: merged.completedAt,
-        lastAttemptAt: now,
-      },
-    })
-
-    return {
-      progress,
-      bestXp: progress.xpEarned,
-      improved: xpEarned > previousXp,
+    try {
+      const progress = await tx.userPhaseProgress.create({
+        data: {
+          userId,
+          phaseNumber,
+          ...phaseAttemptData(null, attempt, now),
+        },
+      })
+      return phaseAttemptResult(progress, xpEarned, 0)
+    } catch (error) {
+      if (!isUniqueConflict(error)) throw error
+      // Concurrent insert won — lock the winner and apply only-goes-up merge.
+      const winner = await lockPhaseProgress(tx, userId, phaseNumber)
+      if (!winner) throw error
+      return updatePhaseProgress(tx, winner, attempt, now)
     }
   })
 }

@@ -48,6 +48,8 @@ export default defineConfig({
         "lib/sanitize-mermaid-svg.ts",
         "lib/safe-redirect.ts",
         "lib/services/user-app-guide-service.ts",
+        "lib/services/phase-progress-service.ts",
+        "lib/services/learning-progress-service.ts",
         "lib/stripe-webhook-handlers.ts",
         "lib/stripe-webhook-idempotency.ts",
         "lib/stripe-subscriptions.ts",
