@@ -40,7 +40,7 @@ export function PremiumCatalogPreview({
                   <Lock className="w-3.5 h-3.5 text-purple-400" />
                   <span className="text-xs text-gray-400">Phase {phase.id}</span>
                 </div>
-                <div className={`inline-flex p-2 rounded-lg bg-gradient-to-r ${phase.color} mb-2`}>
+                <div className={`inline-flex p-2 rounded-lg bg-linear-to-r ${phase.color} mb-2`}>
                   <Icon className="w-5 h-5 text-white" />
                 </div>
                 <h4 className="font-semibold text-white text-sm mb-1">{phase.title}</h4>
@@ -65,7 +65,7 @@ export function PremiumCatalogPreview({
                   href={section.href}
                   className="rounded-xl border border-slate-700 bg-slate-800/40 p-4 hover:border-purple-500/40 transition-all"
                 >
-                  <div className={`inline-flex p-2 rounded-lg bg-gradient-to-r ${section.color} mb-2`}>
+                  <div className={`inline-flex p-2 rounded-lg bg-linear-to-r ${section.color} mb-2`}>
                     <Icon className="w-5 h-5 text-white" />
                   </div>
                   <h4 className="font-semibold text-white text-sm mb-1">{section.title}</h4>
@@ -109,7 +109,7 @@ export function PremiumCatalogCta() {
   return (
     <Link
       href="/upgrade"
-      className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white rounded-lg font-semibold hover:shadow-lg hover:shadow-violet-500/25 transition-all"
+      className="inline-flex items-center gap-2 px-6 py-3 bg-linear-to-r from-violet-600 to-fuchsia-600 text-white rounded-lg font-semibold hover:shadow-lg hover:shadow-violet-500/25 transition-all"
     >
       View plans &amp; upgrade
       <ArrowRight className="w-4 h-4" />

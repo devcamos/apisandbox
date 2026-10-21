@@ -131,7 +131,7 @@ export default function PhaseProgressOverview() {
 
   return (
     <section className="container mx-auto px-6 py-8">
-      <div className="bg-slate-800/50 backdrop-blur-sm rounded-2xl p-8 border border-slate-700">
+      <div className="bg-slate-800/50 backdrop-blur-xs rounded-2xl p-8 border border-slate-700">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between mb-6">
           <div>
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-900 border border-slate-700 text-sm text-gray-300 mb-3">
@@ -202,7 +202,7 @@ export default function PhaseProgressOverview() {
 
         <Link
           href="/learn/api-foundations"
-          className="mb-6 block rounded-xl border border-emerald-400/25 bg-gradient-to-r from-emerald-400/10 to-cyan-400/10 p-5 transition-colors hover:border-emerald-300/50"
+          className="mb-6 block rounded-xl border border-emerald-400/25 bg-linear-to-r from-emerald-400/10 to-cyan-400/10 p-5 transition-colors hover:border-emerald-300/50"
         >
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>

@@ -91,10 +91,10 @@ function UpgradePageInner() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+    <div className="min-h-screen bg-linear-to-br from-slate-900 via-slate-800 to-slate-900">
       <div className="container mx-auto px-6 py-16">
         <div className="text-center mb-12">
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-violet-400 via-fuchsia-400 to-pink-400 text-transparent bg-clip-text">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 bg-linear-to-r from-violet-400 via-fuchsia-400 to-pink-400 text-transparent bg-clip-text">
             {isPremium ? "You have Premium" : "Unlock Full Access"}
           </h1>
           <p className="text-xl text-gray-300 max-w-2xl mx-auto">
@@ -116,7 +116,7 @@ function UpgradePageInner() {
             </p>
             <Link
               href="/dashboard"
-              className="inline-flex items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-violet-600 to-fuchsia-600 px-6 py-3 font-semibold text-white hover:shadow-lg transition-all"
+              className="inline-flex items-center justify-center gap-2 rounded-lg bg-linear-to-r from-violet-600 to-fuchsia-600 px-6 py-3 font-semibold text-white hover:shadow-lg transition-all"
             >
               Go to dashboard
               <ArrowRight className="w-4 h-4" />
@@ -124,7 +124,7 @@ function UpgradePageInner() {
           </div>
         ) : (
           <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto mb-16">
-            <div className="bg-slate-800/50 backdrop-blur-sm rounded-2xl p-8 border border-slate-700">
+            <div className="bg-slate-800/50 backdrop-blur-xs rounded-2xl p-8 border border-slate-700">
               <div className="text-center mb-6">
                 <h3 className="text-2xl font-bold text-white mb-2">Free</h3>
                 <div className="text-4xl font-bold text-white mb-1">£0</div>
@@ -156,7 +156,7 @@ function UpgradePageInner() {
               </Link>
             </div>
 
-            <div className="bg-gradient-to-br from-violet-500/20 via-fuchsia-500/20 to-pink-500/20 backdrop-blur-sm rounded-2xl p-8 border-2 border-violet-500/50 relative">
+            <div className="bg-linear-to-br from-violet-500/20 via-fuchsia-500/20 to-pink-500/20 backdrop-blur-xs rounded-2xl p-8 border-2 border-violet-500/50 relative">
               <div className="absolute top-4 right-4 bg-violet-600 text-white text-xs font-semibold px-3 py-1 rounded-full">
                 FULL ACCESS
               </div>
@@ -194,7 +194,7 @@ function UpgradePageInner() {
                 data-testid="upgrade-start-checkout"
                 onClick={handleUpgrade}
                 disabled={isUpgrading}
-                className="w-full py-3 bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white rounded-lg font-semibold hover:shadow-lg hover:shadow-violet-500/25 hover:scale-[1.02] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                className="w-full py-3 bg-linear-to-r from-violet-600 to-fuchsia-600 text-white rounded-lg font-semibold hover:shadow-lg hover:shadow-violet-500/25 hover:scale-[1.02] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
                 {!session ? (
                   <>
@@ -261,7 +261,7 @@ export default function UpgradePage() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900" />
+        <div className="min-h-screen bg-linear-to-br from-slate-900 via-slate-800 to-slate-900" />
       }
     >
       <UpgradePageInner />

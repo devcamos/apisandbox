@@ -18,7 +18,7 @@ const confettiColors = [
 function ConfettiParticle({ delay, x, color, size, spin }: Readonly<{ delay: number; x: string; color: string; size: number; spin: number }>) {
   return (
     <motion.div
-      className={`absolute rounded-sm ${color}`}
+      className={`absolute rounded-xs ${color}`}
       style={{ left: x, top: "-5%", width: size, height: size * 0.6 }}
       animate={{
         y: ["0vh", "105vh"],
@@ -78,7 +78,7 @@ export default function SendoffSlide() {
         >
           <Link
             href={slide.ctaHref ?? "/phase-5"}
-            className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-cyan-500 to-blue-500 text-white rounded-xl font-bold text-lg hover:shadow-lg hover:shadow-cyan-500/25 transition-all"
+            className="inline-flex items-center gap-2 px-8 py-4 bg-linear-to-r from-cyan-500 to-blue-500 text-white rounded-xl font-bold text-lg hover:shadow-lg hover:shadow-cyan-500/25 transition-all"
           >
             <Sparkles className="w-5 h-5" />
             {slide.ctaLabel ?? "Begin Phase 5"}

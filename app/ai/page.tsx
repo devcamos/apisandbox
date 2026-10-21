@@ -129,9 +129,9 @@ export default function AIPage() {
 
   return (
     <SubscriptionGate phaseNumber="ai" lockedContentName="AI Learning Section">
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+      <div className="min-h-screen bg-linear-to-br from-slate-900 via-slate-800 to-slate-900">
         {/* Header */}
-        <div className="bg-gradient-to-r from-purple-500 via-pink-500 to-orange-500 py-16">
+        <div className="bg-linear-to-r from-purple-500 via-pink-500 to-orange-500 py-16">
           <div className="container mx-auto px-6">
             <nav className="flex items-center gap-2 mb-6 text-sm">
               <Link href="/" className="text-white/70 hover:text-white transition-colors flex items-center gap-1">
@@ -142,7 +142,7 @@ export default function AIPage() {
               <span className="text-white font-semibold">AI Learning</span>
             </nav>
             <div className="flex items-center gap-4 mb-4">
-              <div className="p-4 bg-white/20 backdrop-blur-sm rounded-xl">
+              <div className="p-4 bg-white/20 backdrop-blur-xs rounded-xl">
                 <Brain className="w-10 h-10 text-white" />
               </div>
               <div>
@@ -155,7 +155,7 @@ export default function AIPage() {
 
         <div className="container mx-auto px-6 py-12">
           {/* Goal Section */}
-          <div className="bg-gradient-to-r from-purple-500/10 to-pink-500/10 border border-purple-500/20 rounded-xl p-6 mb-12">
+          <div className="bg-linear-to-r from-purple-500/10 to-pink-500/10 border border-purple-500/20 rounded-xl p-6 mb-12">
             <h2 className="text-2xl font-bold text-white mb-3">🎯 Learning Goal</h2>
             <p className="text-gray-300 text-lg">
               Understand AI through its four core components. Learn how Heart (ethics), Brain (intelligence), Context (understanding), and Instructions (guidance) work together to create effective AI systems. Master the 20% of concepts that cover 80% of practical AI applications.
@@ -177,10 +177,10 @@ export default function AIPage() {
                 return (
                   <div
                     key={component.title}
-                    className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border border-slate-700 hover:border-slate-600 transition-all"
+                    className="bg-slate-800/50 backdrop-blur-xs rounded-xl p-6 border border-slate-700 hover:border-slate-600 transition-all"
                   >
                     <div className="flex items-start gap-4 mb-4">
-                      <div className={`p-3 rounded-lg bg-gradient-to-r ${component.color}`}>
+                      <div className={`p-3 rounded-lg bg-linear-to-r ${component.color}`}>
                         <Icon className="w-6 h-6 text-white" />
                       </div>
                       <div className="flex-1">
@@ -196,7 +196,7 @@ export default function AIPage() {
                         <ul className="space-y-1">
                           {component.keyAreas.map((area, idx) => (
                             <li key={idx} className="text-sm text-gray-400 flex items-center gap-2">
-                              <span className={`w-1.5 h-1.5 rounded-full bg-gradient-to-r ${component.color}`}></span>
+                              <span className={`w-1.5 h-1.5 rounded-full bg-linear-to-r ${component.color}`}></span>
                               {area}
                             </li>
                           ))}
@@ -230,10 +230,10 @@ export default function AIPage() {
                   <Link
                     key={path.title}
                     href={path.href}
-                    className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border border-slate-700 hover:border-slate-600 transition-all group"
+                    className="bg-slate-800/50 backdrop-blur-xs rounded-xl p-6 border border-slate-700 hover:border-slate-600 transition-all group"
                   >
                     <div className="flex items-start gap-4">
-                      <div className={`p-3 rounded-lg bg-gradient-to-r ${path.color}`}>
+                      <div className={`p-3 rounded-lg bg-linear-to-r ${path.color}`}>
                         <PathIcon className="w-6 h-6 text-white" />
                       </div>
                       <div className="flex-1">
@@ -255,7 +255,7 @@ export default function AIPage() {
 
           {/* How Components Work Together */}
           <section className="mb-12">
-            <div className="bg-gradient-to-r from-slate-800/50 to-slate-700/50 rounded-xl p-8 border border-slate-600">
+            <div className="bg-linear-to-r from-slate-800/50 to-slate-700/50 rounded-xl p-8 border border-slate-600">
               <h2 className="text-3xl font-bold text-white mb-6">How Components Work Together</h2>
               <div className="space-y-4 text-gray-300">
                 <p className="text-lg">
@@ -287,7 +287,7 @@ export default function AIPage() {
 
           {/* Quick Start */}
           <section>
-            <div className="bg-gradient-to-r from-purple-500/20 to-pink-500/20 rounded-xl p-6 border border-purple-500/30">
+            <div className="bg-linear-to-r from-purple-500/20 to-pink-500/20 rounded-xl p-6 border border-purple-500/30">
               <h3 className="text-2xl font-bold text-white mb-3">🚀 Quick Start</h3>
               <p className="text-gray-300 mb-4">
                 New to AI? Start with the fundamentals to understand how AI works, then dive into each component. 
@@ -295,7 +295,7 @@ export default function AIPage() {
               </p>
               <Link
                 href="/ai/components"
-                className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg font-semibold hover:shadow-lg transition-all"
+                className="inline-flex items-center gap-2 px-6 py-3 bg-linear-to-r from-purple-500 to-pink-500 text-white rounded-lg font-semibold hover:shadow-lg transition-all"
               >
                 Explore AI Components
                 <ArrowRight className="w-5 h-5" />

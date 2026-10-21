@@ -37,7 +37,7 @@ function TopicCard({
             {topic.keywords.slice(0, 4).map((kw) => (
               <span
                 key={kw}
-                className="text-[10px] uppercase tracking-wide px-1.5 py-0.5 rounded bg-slate-900/80 text-gray-400 border border-slate-700"
+                className="text-[10px] uppercase tracking-wide px-1.5 py-0.5 rounded-sm bg-slate-900/80 text-gray-400 border border-slate-700"
               >
                 {kw}
               </span>
@@ -119,7 +119,7 @@ export default function Phase9() {
         icon={Database}
         color="from-teal-500 to-cyan-600"
       >
-        <div className="bg-gradient-to-r from-teal-500/10 to-cyan-500/10 border border-teal-500/20 rounded-xl p-6 mb-8">
+        <div className="bg-linear-to-r from-teal-500/10 to-cyan-500/10 border border-teal-500/20 rounded-xl p-6 mb-8">
           <h2 className="text-2xl font-bold text-white mb-3 flex items-center gap-2">
             <Layers className="w-6 h-6 text-teal-400" />
             Software engineer skills: database mastery map

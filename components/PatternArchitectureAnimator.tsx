@@ -56,7 +56,7 @@ export default function PatternArchitectureAnimator({ lessonId, title }: Readonl
     <div className={`rounded-xl border p-4 mb-4 ${palette.lane}`}>
       <div className="flex items-center justify-between mb-3">
         <div className="text-xs uppercase tracking-wide text-gray-300">Animated pattern view</div>
-        <div className={`text-[11px] px-2 py-1 rounded border border-slate-600 bg-gradient-to-r ${palette.accent} text-slate-900 font-semibold`}>
+        <div className={`text-[11px] px-2 py-1 rounded-sm border border-slate-600 bg-linear-to-r ${palette.accent} text-slate-900 font-semibold`}>
           {title}
         </div>
       </div>
@@ -76,7 +76,7 @@ export default function PatternArchitectureAnimator({ lessonId, title }: Readonl
 
       <div className="relative h-8 rounded-lg border border-slate-700 bg-slate-900/70 overflow-hidden">
         <motion.div
-          className={`absolute top-1/2 -translate-y-1/2 h-2 w-24 rounded-full bg-gradient-to-r ${palette.accent}`}
+          className={`absolute top-1/2 -translate-y-1/2 h-2 w-24 rounded-full bg-linear-to-r ${palette.accent}`}
           initial={{ x: -120 }}
           animate={{ x: ["0%", "85%"] }}
           transition={{ duration: 2.8, repeat: Infinity, ease: "easeInOut", delay: delayBase }}

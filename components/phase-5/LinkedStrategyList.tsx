@@ -30,7 +30,7 @@ export default function LinkedStrategyList({
           <Link
             key={strategy.id}
             href={`/phase-5/strategies/${strategy.id}`}
-            className="block rounded border border-slate-700 bg-slate-900/60 p-3 transition-colors hover:border-cyan-400/60"
+            className="block rounded-sm border border-slate-700 bg-slate-900/60 p-3 transition-colors hover:border-cyan-400/60"
           >
             <div className="text-sm font-semibold text-cyan-200 underline">{strategy.title}</div>
             <div className="text-xs text-cyan-100 mt-1">{strategy.summary}</div>

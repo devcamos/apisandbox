@@ -81,7 +81,7 @@ export default function StrategyDetailPage() {
                   <Link
                     key={`${link.patternId}-${link.problemId}-${link.mappedId || "base"}`}
                     href={href}
-                    className="block rounded border border-slate-700 bg-slate-900/60 p-3 transition-colors hover:border-cyan-400/60"
+                    className="block rounded-sm border border-slate-700 bg-slate-900/60 p-3 transition-colors hover:border-cyan-400/60"
                   >
                     <div className="text-sm font-semibold text-cyan-200 underline">{title}</div>
                     <div className="text-xs text-gray-300 mt-1">{subtitle}</div>

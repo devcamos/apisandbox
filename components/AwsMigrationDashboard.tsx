@@ -72,7 +72,7 @@ export default function AwsMigrationDashboard() {
   return (
     <div className="space-y-8">
       {/* Strategy Selector */}
-      <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border border-slate-700">
+      <div className="bg-slate-800/50 backdrop-blur-xs rounded-xl p-6 border border-slate-700">
         <h3 className="text-2xl font-bold text-white mb-4">Migration Strategy</h3>
         <div className="grid md:grid-cols-3 gap-4">
           {migrationStrategies.map((strategy) => (
@@ -93,14 +93,14 @@ export default function AwsMigrationDashboard() {
       </div>
 
       {/* Cost Calculator */}
-      <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border border-slate-700">
+      <div className="bg-slate-800/50 backdrop-blur-xs rounded-xl p-6 border border-slate-700">
         <div className="flex items-center gap-3 mb-4">
           <Calculator className="w-6 h-6 text-purple-400" />
           <h3 className="text-2xl font-bold text-white">Cost Calculator</h3>
         </div>
         <button
           onClick={calculateCost}
-          className="px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg font-semibold hover:shadow-lg transition-all"
+          className="px-6 py-3 bg-linear-to-r from-purple-500 to-pink-500 text-white rounded-lg font-semibold hover:shadow-lg transition-all"
         >
           Calculate Estimated Cost
         </button>
@@ -114,7 +114,7 @@ export default function AwsMigrationDashboard() {
       </div>
 
       {/* Checklist */}
-      <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border border-slate-700">
+      <div className="bg-slate-800/50 backdrop-blur-xs rounded-xl p-6 border border-slate-700">
         <div className="flex items-center gap-3 mb-4">
           <CheckCircle className="w-6 h-6 text-blue-400" />
           <h3 className="text-2xl font-bold text-white">Migration Checklist</h3>
@@ -129,7 +129,7 @@ export default function AwsMigrationDashboard() {
                 type="checkbox"
                 checked={item.completed}
                 onChange={() => toggleChecklistItem(item.id)}
-                className="w-5 h-5 rounded border-slate-600"
+                className="w-5 h-5 rounded-sm border-slate-600"
               />
               <span className={`flex-1 ${item.completed ? "line-through text-gray-500" : "text-gray-300"}`}>
                 {item.task}

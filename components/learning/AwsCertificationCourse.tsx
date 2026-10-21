@@ -105,9 +105,9 @@ export function AwsCertificationCourse({
   const loginCallbackUrl = unitHref(track, activeUnit)
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
+    <main className="min-h-screen bg-linear-to-br from-slate-950 via-slate-900 to-slate-950">
       <section className="relative overflow-hidden border-b border-slate-800">
-        <div className={`absolute inset-x-0 top-0 h-1 bg-gradient-to-r ${accent.gradient}`} />
+        <div className={`absolute inset-x-0 top-0 h-1 bg-linear-to-r ${accent.gradient}`} />
         <div className="container mx-auto max-w-7xl px-6 py-10 sm:py-14">
           <Link href="/cloud/aws/certifications" className="inline-flex items-center gap-2 text-sm text-slate-400 hover:text-white">
             <ArrowLeft className="h-4 w-4" />
@@ -185,7 +185,7 @@ export function AwsCertificationCourse({
                 <div className="flex flex-wrap gap-2">
                   <Link
                     href="/cloud/aws/certifications/ai-practitioner/practice"
-                    className={`inline-flex items-center gap-2 rounded-lg bg-gradient-to-r px-4 py-2.5 text-sm font-semibold text-white ${accent.gradient}`}
+                    className={`inline-flex items-center gap-2 rounded-lg bg-linear-to-r px-4 py-2.5 text-sm font-semibold text-white ${accent.gradient}`}
                   >
                     Open practice <ArrowRight className="h-4 w-4" />
                   </Link>

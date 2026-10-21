@@ -47,7 +47,7 @@ export default function DashboardPage() {
 
   if (status === "loading") {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+      <div className="min-h-screen bg-linear-to-br from-slate-900 via-slate-800 to-slate-900">
         <div className="container mx-auto px-6 py-16 animate-pulse space-y-8">
           <div className="h-12 max-w-lg mx-auto rounded-xl bg-slate-800/80" />
           <div className="h-6 max-w-2xl mx-auto rounded-lg bg-slate-800/60" />
@@ -64,13 +64,13 @@ export default function DashboardPage() {
   const phases = getPremiumCatalogPhases()
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+    <div className="min-h-screen bg-linear-to-br from-slate-900 via-slate-800 to-slate-900">
             {/* Welcome Section */}
             <section className="relative overflow-hidden">
               <div className="absolute inset-0 bg-grid-pattern opacity-10"></div>
               <div className="container mx-auto px-6 py-12 relative z-10">
                 <div className="text-center max-w-4xl mx-auto">
-                  <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 text-transparent bg-clip-text">
+                  <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 bg-linear-to-r from-blue-400 via-purple-400 to-pink-400 text-transparent bg-clip-text">
                     {session ? `Welcome back, ${session.user?.name || session.user?.email}!` : "Explore your learning path"}
                   </h1>
                   <p className="text-xl text-gray-300 mb-4">
@@ -78,7 +78,7 @@ export default function DashboardPage() {
                   </p>
                   
                   {/* Pareto Principle Badge */}
-                  <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-yellow-500/20 to-orange-500/20 border border-yellow-500/30 rounded-lg mb-4">
+                  <div className="inline-flex items-center gap-2 px-4 py-2 bg-linear-to-r from-yellow-500/20 to-orange-500/20 border border-yellow-500/30 rounded-lg mb-4">
                     <span className="text-2xl">📊</span>
                     <span className="text-yellow-300 font-semibold">First-Principles Training</span>
                     <span className="text-gray-400 text-sm">• Build the model before choosing the tools</span>
@@ -88,7 +88,7 @@ export default function DashboardPage() {
             {subscription && (
               <div className="flex items-center justify-center gap-3 mb-4">
                 {subscription.tier === "PREMIUM" ? (
-                  <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-500/20 to-pink-500/20 border border-purple-500/30 rounded-lg">
+                  <div className="inline-flex items-center gap-2 px-4 py-2 bg-linear-to-r from-purple-500/20 to-pink-500/20 border border-purple-500/30 rounded-lg">
                     <Sparkles className="w-4 h-4 text-purple-400" />
                     <span className="text-purple-300 font-semibold">Premium Member</span>
                   </div>
@@ -143,12 +143,12 @@ export default function DashboardPage() {
             const href = phase.href
             return (
               <Link key={phase.id} href={href}>
-                <div className="group bg-slate-800/50 backdrop-blur-sm rounded-2xl p-8 border border-slate-700 hover:border-slate-600 transition-all hover:shadow-2xl hover:scale-105 cursor-pointer relative overflow-hidden">
-                  <div className="absolute inset-0 bg-gradient-to-br from-transparent via-transparent to-slate-700/20 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                <div className="group bg-slate-800/50 backdrop-blur-xs rounded-2xl p-8 border border-slate-700 hover:border-slate-600 transition-all hover:shadow-2xl hover:scale-105 cursor-pointer relative overflow-hidden">
+                  <div className="absolute inset-0 bg-linear-to-br from-transparent via-transparent to-slate-700/20 opacity-0 group-hover:opacity-100 transition-opacity"></div>
                   
                   <div className="relative z-10">
                     <div className="flex items-start justify-between mb-4">
-                      <div className={`inline-flex p-3 rounded-lg bg-gradient-to-r ${phase.color} mb-4`}>
+                      <div className={`inline-flex p-3 rounded-lg bg-linear-to-r ${phase.color} mb-4`}>
                         <Icon className="w-8 h-8 text-white" />
                       </div>
                       <div className="flex items-center gap-2">
@@ -168,7 +168,7 @@ export default function DashboardPage() {
                           Phase {phase.id}
                         </span>
                         {premiumOnly && !isPremium && (
-                          <span className="px-2 py-0.5 bg-yellow-500/20 border border-yellow-500/30 rounded text-xs text-yellow-400 font-semibold">
+                          <span className="px-2 py-0.5 bg-yellow-500/20 border border-yellow-500/30 rounded-sm text-xs text-yellow-400 font-semibold">
                             Premium
                           </span>
                         )}
@@ -183,7 +183,7 @@ export default function DashboardPage() {
 
                     <div className="flex flex-wrap gap-2 mb-4">
                       {phase.skills.map((skill, idx) => (
-                        <span key={idx} className="px-2 py-1 bg-slate-700/50 text-xs text-gray-300 rounded">
+                        <span key={idx} className="px-2 py-1 bg-slate-700/50 text-xs text-gray-300 rounded-sm">
                           {skill}
                         </span>
                       ))}
@@ -192,7 +192,7 @@ export default function DashboardPage() {
                     <div className="space-y-2 mb-6">
                       {phase.topics.map((topic, idx) => (
                         <div key={idx} className="flex items-center text-sm text-gray-300">
-                          <span className={`w-1.5 h-1.5 rounded-full bg-gradient-to-r ${phase.color} mr-2`}></span>
+                          <span className={`w-1.5 h-1.5 rounded-full bg-linear-to-r ${phase.color} mr-2`}></span>
                           {topic}
                         </div>
                       ))}
@@ -230,8 +230,8 @@ export default function DashboardPage() {
           </p>
         </div>
         <Link href={isPremium ? "/ai" : "/upgrade"}>
-          <div className="group bg-slate-800/50 backdrop-blur-sm rounded-2xl p-8 border-2 border-slate-700 hover:border-purple-500 transition-all hover:shadow-2xl hover:scale-105 cursor-pointer relative overflow-hidden max-w-4xl mx-auto">
-            <div className="absolute inset-0 bg-gradient-to-br from-transparent via-transparent to-purple-500/20 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+          <div className="group bg-slate-800/50 backdrop-blur-xs rounded-2xl p-8 border-2 border-slate-700 hover:border-purple-500 transition-all hover:shadow-2xl hover:scale-105 cursor-pointer relative overflow-hidden max-w-4xl mx-auto">
+            <div className="absolute inset-0 bg-linear-to-br from-transparent via-transparent to-purple-500/20 opacity-0 group-hover:opacity-100 transition-opacity"></div>
             {!isPremium && (
               <div className="absolute top-4 right-4">
                 <Lock className="w-5 h-5 text-yellow-400" />
@@ -239,7 +239,7 @@ export default function DashboardPage() {
             )}
             <div className="relative z-10">
               <div className="flex items-start justify-between mb-4">
-                <div className="inline-flex p-3 rounded-lg bg-gradient-to-r from-purple-500 to-pink-500 mb-4">
+                <div className="inline-flex p-3 rounded-lg bg-linear-to-r from-purple-500 to-pink-500 mb-4">
                   <Brain className="w-8 h-8 text-white" />
                 </div>
                 <div className="flex items-center gap-2">
@@ -263,35 +263,35 @@ export default function DashboardPage() {
               </div>
 
               <div className="flex flex-wrap gap-2 mb-4">
-                <span className="px-2 py-1 bg-slate-700/50 text-xs text-gray-300 rounded">
+                <span className="px-2 py-1 bg-slate-700/50 text-xs text-gray-300 rounded-sm">
                   Heart
                 </span>
-                <span className="px-2 py-1 bg-slate-700/50 text-xs text-gray-300 rounded">
+                <span className="px-2 py-1 bg-slate-700/50 text-xs text-gray-300 rounded-sm">
                   Brain
                 </span>
-                <span className="px-2 py-1 bg-slate-700/50 text-xs text-gray-300 rounded">
+                <span className="px-2 py-1 bg-slate-700/50 text-xs text-gray-300 rounded-sm">
                   Context
                 </span>
-                <span className="px-2 py-1 bg-slate-700/50 text-xs text-gray-300 rounded">
+                <span className="px-2 py-1 bg-slate-700/50 text-xs text-gray-300 rounded-sm">
                   Instructions
                 </span>
               </div>
 
               <div className="space-y-2 mb-6">
                 <div className="flex items-center text-sm text-gray-300">
-                  <span className="w-1.5 h-1.5 rounded-full bg-gradient-to-r from-pink-500 to-rose-500 mr-2"></span>
+                  <span className="w-1.5 h-1.5 rounded-full bg-linear-to-r from-pink-500 to-rose-500 mr-2"></span>
                   Ethics, Human-Centered Design, Bias Mitigation
                 </div>
                 <div className="flex items-center text-sm text-gray-300">
-                  <span className="w-1.5 h-1.5 rounded-full bg-gradient-to-r from-blue-500 to-indigo-500 mr-2"></span>
+                  <span className="w-1.5 h-1.5 rounded-full bg-linear-to-r from-blue-500 to-indigo-500 mr-2"></span>
                   Machine Learning, Neural Networks, NLP
                 </div>
                 <div className="flex items-center text-sm text-gray-300">
-                  <span className="w-1.5 h-1.5 rounded-full bg-gradient-to-r from-purple-500 to-violet-500 mr-2"></span>
+                  <span className="w-1.5 h-1.5 rounded-full bg-linear-to-r from-purple-500 to-violet-500 mr-2"></span>
                   Data Processing, Contextual Understanding
                 </div>
                 <div className="flex items-center text-sm text-gray-300">
-                  <span className="w-1.5 h-1.5 rounded-full bg-gradient-to-r from-amber-500 to-orange-500 mr-2"></span>
+                  <span className="w-1.5 h-1.5 rounded-full bg-linear-to-r from-amber-500 to-orange-500 mr-2"></span>
                   Prompt Engineering, Instruction Design
                 </div>
               </div>

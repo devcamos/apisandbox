@@ -445,7 +445,7 @@ export function PageSearch() {
             setIsOpen(true);
           }}
           onFocus={() => setIsOpen(true)}
-          className="w-full max-w-sm pl-10 pr-4 py-2 bg-slate-800/50 border border-slate-700 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          className="w-full max-w-sm pl-10 pr-4 py-2 bg-slate-800/50 border border-slate-700 rounded-lg text-white placeholder-gray-400 focus:outline-hidden focus:ring-2 focus:ring-blue-500 focus:border-transparent"
         />
         {query && (
           <button
@@ -472,7 +472,7 @@ export function PageSearch() {
                     index === selectedIndex ? 'bg-slate-700' : ''
                   }`}
                 >
-                  <result.icon className="w-5 h-5 text-blue-400 mt-0.5 flex-shrink-0" />
+                  <result.icon className="w-5 h-5 text-blue-400 mt-0.5 shrink-0" />
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center space-x-2 mb-1">
                       <span className="text-white font-medium truncate">{result.title}</span>

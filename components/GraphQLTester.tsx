@@ -73,7 +73,7 @@ export default function GraphQLTester({ title, defaultQuery, description }: Grap
     <div className="bg-slate-900 p-4 rounded-lg border border-purple-500/30 bg-purple-500/10">
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-3 flex-1">
-          <span className="font-mono text-sm font-bold px-3 py-1 rounded border border-purple-500/30 bg-purple-500/10 text-purple-400">
+          <span className="font-mono text-sm font-bold px-3 py-1 rounded-sm border border-purple-500/30 bg-purple-500/10 text-purple-400">
             QUERY
           </span>
           <span className="text-purple-400 font-semibold text-sm">{title}</span>
@@ -123,7 +123,7 @@ export default function GraphQLTester({ title, defaultQuery, description }: Grap
               <span className="text-green-400 text-xs font-semibold">Response: 200 OK</span>
               {isResponseExpanded ? <ChevronUp className="w-4 h-4 text-gray-400" /> : <ChevronDown className="w-4 h-4 text-gray-400" />}
             </button>
-            <button onClick={copyToClipboard} className="flex items-center gap-1 px-2 py-1 text-xs text-gray-400 hover:text-white hover:bg-slate-700 rounded transition-all">
+            <button onClick={copyToClipboard} className="flex items-center gap-1 px-2 py-1 text-xs text-gray-400 hover:text-white hover:bg-slate-700 rounded-sm transition-all">
               {copied ? <><Check className="w-3 h-3 text-green-400" /><span className="text-green-400">Copied!</span></> : <><Copy className="w-3 h-3" /><span>Copy</span></>}
             </button>
           </div>

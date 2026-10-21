@@ -65,7 +65,7 @@ export function AwsReadinessChecklist({
       </div>
 
       <div className="mt-5 h-2 overflow-hidden rounded-full bg-slate-800" role="progressbar" aria-label="External readiness progress" aria-valuemin={0} aria-valuemax={100} aria-valuenow={percent}>
-        <div className="h-full bg-gradient-to-r from-emerald-500 to-cyan-400 transition-[width]" style={{ width: `${percent}%` }} />
+        <div className="h-full bg-linear-to-r from-emerald-500 to-cyan-400 transition-[width]" style={{ width: `${percent}%` }} />
       </div>
 
       <div className="mt-5 grid gap-3">

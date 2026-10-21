@@ -74,7 +74,7 @@ export default function EventDrivenTester({ title, description, eventType }: Eve
       <div className="flex items-center justify-between mb-3">
         <div className="flex-1">
           <div className="flex items-center gap-3">
-            <span className="font-mono text-sm font-bold px-3 py-1 rounded border border-yellow-500/30 bg-yellow-500/10 text-yellow-400">
+            <span className="font-mono text-sm font-bold px-3 py-1 rounded-sm border border-yellow-500/30 bg-yellow-500/10 text-yellow-400">
               EVENT
             </span>
             <span className="text-yellow-400 font-semibold text-sm">{title}</span>

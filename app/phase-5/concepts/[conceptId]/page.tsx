@@ -65,7 +65,7 @@ export default function Phase5ConceptDetailPage() {
             <ul className="flex flex-wrap gap-2">
               {concept.relatedAlgorithmIds.map((id) => (
                 <li key={id}>
-                  <code className="text-[11px] px-2 py-1 rounded bg-slate-900 border border-slate-700 text-fuchsia-200">
+                  <code className="text-[11px] px-2 py-1 rounded-sm bg-slate-900 border border-slate-700 text-fuchsia-200">
                     {id}
                   </code>
                 </li>
