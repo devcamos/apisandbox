@@ -107,8 +107,8 @@ test("Preview checkout creates a real test session and signed webhook grants PRE
     const checkoutResponse = await checkoutResponsePromise
     // A disabled flag/missing billing configuration returns 503 and fails here.
     expect(checkoutResponse.status(), "Real Preview checkout must be enabled and configured").toBe(200)
-    const checkout = await checkoutResponse.json()
-    const checkoutUrl = new URL(checkout.url)
+    await page.waitForURL((url) => url.origin === "https://checkout.stripe.com", { timeout: 30_000 })
+    const checkoutUrl = new URL(page.url())
     expect(checkoutUrl.origin).toBe("https://checkout.stripe.com")
     const sessionId = /^\/c\/pay\/(cs_test_[A-Za-z0-9_]+)/.exec(checkoutUrl.pathname)?.[1]
     expect(typeof sessionId, "Checkout must return a Stripe TEST session URL").toBe("string")
