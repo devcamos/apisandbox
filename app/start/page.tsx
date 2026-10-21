@@ -11,13 +11,13 @@ export default function StartPage() {
       const phases = getLearningPhases(false);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+    <div className="min-h-screen bg-linear-to-br from-slate-900 via-slate-800 to-slate-900">
       {/* Hero Section */}
       <section className="relative overflow-hidden">
         <div className="absolute inset-0 bg-grid-pattern opacity-10"></div>
         <div className="container mx-auto px-6 py-24 relative z-10">
           <div className="text-center max-w-4xl mx-auto">
-            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-6 bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 text-transparent bg-clip-text">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-6 bg-linear-to-r from-blue-400 via-purple-400 to-pink-400 text-transparent bg-clip-text">
               API Integration Training
             </h1>
             <p className="text-xl text-gray-300 mb-8">
@@ -26,7 +26,7 @@ export default function StartPage() {
             <div className="flex flex-col sm:flex-row justify-center items-stretch sm:items-center gap-4 max-w-xl mx-auto">
               <Link 
                 href="#phases"
-                className="px-12 py-4 bg-gradient-to-r from-blue-500 to-cyan-500 text-white rounded-xl font-bold text-lg hover:shadow-lg hover:scale-102 transition-all duration-200 text-center"
+                className="px-12 py-4 bg-linear-to-r from-blue-500 to-cyan-500 text-white rounded-xl font-bold text-lg hover:shadow-lg hover:scale-102 transition-all duration-200 text-center"
               >
                 Start Learning
               </Link>
@@ -68,13 +68,13 @@ export default function StartPage() {
                 const LevelIcon = phase.levelIcon;
                 return (
                   <Link key={phase.id} href={phase.href}>
-                    <div className="group bg-slate-800/50 backdrop-blur-sm rounded-2xl p-8 border border-slate-700 hover:border-slate-600 transition-all hover:shadow-2xl hover:scale-105 cursor-pointer relative overflow-hidden">
+                    <div className="group bg-slate-800/50 backdrop-blur-xs rounded-2xl p-8 border border-slate-700 hover:border-slate-600 transition-all hover:shadow-2xl hover:scale-105 cursor-pointer relative overflow-hidden">
                       {/* Character Selection Style Background */}
-                      <div className="absolute inset-0 bg-gradient-to-br from-transparent via-transparent to-slate-700/20 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                      <div className="absolute inset-0 bg-linear-to-br from-transparent via-transparent to-slate-700/20 opacity-0 group-hover:opacity-100 transition-opacity"></div>
                       
                       <div className="relative z-10">
                         <div className="flex items-start justify-between mb-4">
-                          <div className={`inline-flex p-3 rounded-lg bg-gradient-to-r ${phase.color} mb-4`}>
+                          <div className={`inline-flex p-3 rounded-lg bg-linear-to-r ${phase.color} mb-4`}>
                             <Icon className="w-8 h-8 text-white" />
                           </div>
                           <div className="flex items-center gap-2">
@@ -100,7 +100,7 @@ export default function StartPage() {
                         {/* Skills Tags */}
                         <div className="flex flex-wrap gap-2 mb-4">
                           {phase.skills.map((skill, idx) => (
-                            <span key={idx} className="px-2 py-1 bg-slate-700/50 text-xs text-gray-300 rounded">
+                            <span key={idx} className="px-2 py-1 bg-slate-700/50 text-xs text-gray-300 rounded-sm">
                               {skill}
                             </span>
                           ))}
@@ -110,7 +110,7 @@ export default function StartPage() {
                         <div className="space-y-2 mb-6">
                           {phase.topics.map((topic, idx) => (
                             <div key={idx} className="flex items-center text-sm text-gray-300">
-                              <span className={`w-1.5 h-1.5 rounded-full bg-gradient-to-r ${phase.color} mr-2`}></span>
+                              <span className={`w-1.5 h-1.5 rounded-full bg-linear-to-r ${phase.color} mr-2`}></span>
                               {topic}
                             </div>
                           ))}
@@ -143,8 +143,8 @@ export default function StartPage() {
           </div>
           <div className="grid md:grid-cols-2 gap-6 max-w-5xl mx-auto">
             <Link href="/docs/java">
-              <div className="group bg-slate-800/50 backdrop-blur-sm rounded-2xl p-6 border border-slate-700 hover:border-emerald-500/40 transition-all hover:shadow-2xl hover:scale-[1.02] cursor-pointer relative overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+              <div className="group bg-slate-800/50 backdrop-blur-xs rounded-2xl p-6 border border-slate-700 hover:border-emerald-500/40 transition-all hover:shadow-2xl hover:scale-[1.02] cursor-pointer relative overflow-hidden">
+                <div className="absolute inset-0 bg-linear-to-br from-emerald-500/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
                 <div className="relative z-10">
                   <div className="flex items-start justify-between gap-4">
                     <div>
@@ -181,7 +181,7 @@ export default function StartPage() {
 
       {/* Learning Path */}
       <section className="container mx-auto px-6 py-16">
-        <div className="bg-gradient-to-r from-slate-800 to-slate-700 rounded-2xl p-12 border border-slate-600">
+        <div className="bg-linear-to-r from-slate-800 to-slate-700 rounded-2xl p-12 border border-slate-600">
           <h2 className="text-3xl font-bold text-white mb-8 text-center">Your Learning Journey</h2>
           <div className="grid md:grid-cols-4 gap-8">
             <div className="text-center">

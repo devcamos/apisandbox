@@ -151,7 +151,7 @@ export function LearningAssistantWidget() {
           <MessageCircle className="h-4 w-4 text-emerald-200 opacity-80 group-hover:opacity-100" />
         </button>
       ) : (
-        <div className="w-[92vw] max-w-md overflow-hidden rounded-2xl border border-slate-700 bg-slate-950/90 shadow-2xl shadow-black/40 backdrop-blur">
+        <div className="w-[92vw] max-w-md overflow-hidden rounded-2xl border border-slate-700 bg-slate-950/90 shadow-2xl shadow-black/40 backdrop-blur-sm">
           <div className="flex items-center justify-between gap-3 border-b border-slate-800 px-4 py-3">
             <div className="min-w-0">
               <div className="text-sm font-semibold text-white">Learning Assistant</div>
@@ -266,7 +266,7 @@ export function LearningAssistantWidget() {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               placeholder="Ask about APIs, Java, auth, retries, testing…"
-              className="w-full rounded-xl border border-slate-800 bg-slate-900/40 px-3 py-2 text-sm text-white placeholder:text-slate-500 outline-none focus:border-emerald-500/40"
+              className="w-full rounded-xl border border-slate-800 bg-slate-900/40 px-3 py-2 text-sm text-white placeholder:text-slate-500 outline-hidden focus:border-emerald-500/40"
             />
             <button
               type="submit"

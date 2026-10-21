@@ -381,7 +381,7 @@ export function LessonTracker({ phase }: LessonTrackerProps) {
                 </span>
               </div>
               <div className="h-2.5 bg-slate-700 rounded-full overflow-hidden mb-4" role="progressbar" aria-valuenow={percent} aria-valuemin={0} aria-valuemax={100}>
-                <div className="h-full bg-gradient-to-r from-green-500 to-emerald-500 transition-all duration-500" style={{ width: `${percent}%` }} />
+                <div className="h-full bg-linear-to-r from-green-500 to-emerald-500 transition-all duration-500" style={{ width: `${percent}%` }} />
               </div>
 
               {/* Per-module breakdown */}
@@ -397,7 +397,7 @@ export function LessonTracker({ phase }: LessonTrackerProps) {
                     </div>
                     <div className="h-1.5 bg-slate-700/70 rounded-full overflow-hidden">
                       <div
-                        className={`h-full transition-all duration-500 ${stat.percent === 100 ? "bg-emerald-500" : "bg-gradient-to-r from-cyan-500 to-emerald-500"}`}
+                        className={`h-full transition-all duration-500 ${stat.percent === 100 ? "bg-emerald-500" : "bg-linear-to-r from-cyan-500 to-emerald-500"}`}
                         style={{ width: `${stat.percent}%` }}
                       />
                     </div>
@@ -429,7 +429,7 @@ export function LessonTracker({ phase }: LessonTrackerProps) {
 
               <button
                 onClick={lessonComplete ? () => setIsOpen(true) : resumeAtNext}
-                className="w-full inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-gradient-to-r from-green-500 to-emerald-500 text-white font-semibold hover:shadow-lg hover:shadow-emerald-500/20 transition-all"
+                className="w-full inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-linear-to-r from-green-500 to-emerald-500 text-white font-semibold hover:shadow-lg hover:shadow-emerald-500/20 transition-all"
               >
                 {lessonComplete ? <CheckCircle2 className="w-5 h-5" /> : <ArrowRight className="w-5 h-5" />}
                 {lessonComplete ? "Review completed lesson" : completed > 0 ? "Resume lesson" : "Start lesson"}
@@ -443,7 +443,7 @@ export function LessonTracker({ phase }: LessonTrackerProps) {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <button
             type="button"
-            className="absolute inset-0 bg-black/80 backdrop-blur-sm cursor-default border-0 p-0 appearance-none"
+            className="absolute inset-0 bg-black/80 backdrop-blur-xs cursor-default border-0 p-0 appearance-none"
             aria-label="Close lesson dialog"
             onClick={() => setIsOpen(false)}
             onKeyDown={(e) => {
@@ -455,7 +455,7 @@ export function LessonTracker({ phase }: LessonTrackerProps) {
           />
 
           <div className="relative bg-slate-900 rounded-2xl border border-slate-700 max-w-6xl w-full max-h-[90vh] overflow-hidden shadow-2xl animate-slideDown">
-            <div className="bg-gradient-to-r from-green-500 to-emerald-500 p-6 relative">
+            <div className="bg-linear-to-r from-green-500 to-emerald-500 p-6 relative">
               <button
                 onClick={() => setIsOpen(false)}
                 className="absolute top-4 right-4 p-2 bg-white/20 hover:bg-white/30 rounded-lg transition-all"
@@ -511,7 +511,7 @@ export function LessonTracker({ phase }: LessonTrackerProps) {
                 </div>
 
                 <div className="mt-4 h-3 bg-slate-900 rounded-full overflow-hidden mb-4">
-                  <div className="h-full bg-gradient-to-r from-green-500 to-emerald-500" style={{ width: `${percent}%` }} />
+                  <div className="h-full bg-linear-to-r from-green-500 to-emerald-500" style={{ width: `${percent}%` }} />
                 </div>
 
                 <div className="grid md:grid-cols-3 gap-2 text-xs">
@@ -548,14 +548,14 @@ export function LessonTracker({ phase }: LessonTrackerProps) {
                       <button
                         onClick={() => setFocusIndex((i) => Math.max(0, i - 1))}
                         disabled={focusIndex === 0}
-                        className="text-xs px-3 py-1.5 rounded border border-cyan-500/40 text-cyan-200 disabled:opacity-40"
+                        className="text-xs px-3 py-1.5 rounded-sm border border-cyan-500/40 text-cyan-200 disabled:opacity-40"
                       >
                         Previous
                       </button>
                       <button
                         onClick={() => setFocusIndex((i) => Math.min(flatCheckpoints.length - 1, i + 1))}
                         disabled={focusIndex >= flatCheckpoints.length - 1}
-                        className="text-xs px-3 py-1.5 rounded border border-cyan-500/40 text-cyan-200 disabled:opacity-40"
+                        className="text-xs px-3 py-1.5 rounded-sm border border-cyan-500/40 text-cyan-200 disabled:opacity-40"
                       >
                         Next
                       </button>
@@ -589,7 +589,7 @@ export function LessonTracker({ phase }: LessonTrackerProps) {
                           </div>
                         </button>
                         <div className="mt-3 h-2 bg-slate-800 rounded-full overflow-hidden">
-                          <div className="h-full bg-gradient-to-r from-cyan-500 to-emerald-500" style={{ width: `${mp.percent}%` }} />
+                          <div className="h-full bg-linear-to-r from-cyan-500 to-emerald-500" style={{ width: `${mp.percent}%` }} />
                         </div>
                       </div>
 
@@ -628,7 +628,7 @@ export function LessonTracker({ phase }: LessonTrackerProps) {
                                       <Target className="w-3.5 h-3.5 text-cyan-400" />
                                       <span className="text-sm font-semibold text-cyan-300">{checkpoint.label}</span>
                                       {isRetrieval && (
-                                        <span className="text-[11px] px-2 py-0.5 rounded border border-amber-400/40 text-amber-300">
+                                        <span className="text-[11px] px-2 py-0.5 rounded-sm border border-amber-400/40 text-amber-300">
                                           {retrievalDue}
                                         </span>
                                       )}
@@ -648,7 +648,7 @@ export function LessonTracker({ phase }: LessonTrackerProps) {
                                     <div className="text-xs text-gray-300">Self-grade against rubric:</div>
                                     <div className="grid sm:grid-cols-2 gap-2 text-xs">
                                       {checks.map((check) => (
-                                        <div key={check.id} className={`px-2 py-1 rounded border ${check.pass ? "border-emerald-500/40 text-emerald-300" : "border-slate-700 text-gray-400"}`}>
+                                        <div key={check.id} className={`px-2 py-1 rounded-sm border ${check.pass ? "border-emerald-500/40 text-emerald-300" : "border-slate-700 text-gray-400"}`}>
                                           {check.label}
                                         </div>
                                       ))}
@@ -677,7 +677,7 @@ export function LessonTracker({ phase }: LessonTrackerProps) {
                                       <button
                                         type="button"
                                         onClick={() => patchState(module.id, checkpoint.id, { answer: checkpointTemplate(checkpoint) })}
-                                        className="text-[11px] px-2 py-1 rounded border border-slate-600 text-gray-300 hover:text-white"
+                                        className="text-[11px] px-2 py-1 rounded-sm border border-slate-600 text-gray-300 hover:text-white"
                                       >
                                         Use template
                                       </button>

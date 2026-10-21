@@ -22,7 +22,7 @@ export function SectionRoutePreview({
   return (
     <div className="rounded-2xl border border-purple-500/30 bg-slate-800/50 p-8 mb-8">
       <div className="flex items-start gap-4 mb-4">
-        <div className={`p-3 rounded-lg bg-gradient-to-r ${section.color}`}>
+        <div className={`p-3 rounded-lg bg-linear-to-r ${section.color}`}>
           <Icon className="w-8 h-8 text-white" />
         </div>
         <div className="flex-1">
@@ -46,7 +46,7 @@ export function SectionRoutePreview({
       </ul>
       <Link
         href="/upgrade"
-        className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg font-semibold hover:shadow-lg transition-all text-sm"
+        className="inline-flex items-center gap-2 px-5 py-2.5 bg-linear-to-r from-purple-500 to-pink-500 text-white rounded-lg font-semibold hover:shadow-lg transition-all text-sm"
       >
         Unlock full access
         <ArrowRight className="w-4 h-4" />

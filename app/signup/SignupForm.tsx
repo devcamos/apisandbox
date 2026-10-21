@@ -270,7 +270,7 @@ function SignupFormInner({ googleClientId }: Readonly<{ googleClientId: string }
                 value={formData.name}
                 onChange={updateField("name")}
                 onInput={updateField("name")}
-                className="w-full pl-10 pr-4 py-3 bg-slate-900/50 border border-slate-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full pl-10 pr-4 py-3 bg-slate-900/50 border border-slate-700 rounded-lg text-white placeholder-gray-500 focus:outline-hidden focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 placeholder="Your name"
               />
             </div>
@@ -292,7 +292,7 @@ function SignupFormInner({ googleClientId }: Readonly<{ googleClientId: string }
                 onChange={updateField("email")}
                 onInput={updateField("email")}
                 required
-                className="w-full pl-10 pr-4 py-3 bg-slate-900/50 border border-slate-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full pl-10 pr-4 py-3 bg-slate-900/50 border border-slate-700 rounded-lg text-white placeholder-gray-500 focus:outline-hidden focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 placeholder="you@example.com"
               />
             </div>
@@ -314,7 +314,7 @@ function SignupFormInner({ googleClientId }: Readonly<{ googleClientId: string }
                 onChange={updateField("password")}
                 onInput={updateField("password")}
                 required
-                className="w-full pl-10 pr-4 py-3 bg-slate-900/50 border border-slate-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full pl-10 pr-4 py-3 bg-slate-900/50 border border-slate-700 rounded-lg text-white placeholder-gray-500 focus:outline-hidden focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 placeholder="Create a strong password"
               />
             </div>
@@ -366,7 +366,7 @@ function SignupFormInner({ googleClientId }: Readonly<{ googleClientId: string }
                 onChange={updateField("confirmPassword")}
                 onInput={updateField("confirmPassword")}
                 required
-                className="w-full pl-10 pr-4 py-3 bg-slate-900/50 border border-slate-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full pl-10 pr-4 py-3 bg-slate-900/50 border border-slate-700 rounded-lg text-white placeholder-gray-500 focus:outline-hidden focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 placeholder="Confirm your password"
               />
             </div>
@@ -389,7 +389,7 @@ function SignupFormInner({ googleClientId }: Readonly<{ googleClientId: string }
           <button
             type="submit"
             disabled={isLoading || passwordErrors.length > 0}
-            className="w-full py-3 bg-gradient-to-r from-blue-500 to-cyan-500 text-white rounded-lg font-semibold hover:shadow-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            className="w-full py-3 bg-linear-to-r from-blue-500 to-cyan-500 text-white rounded-lg font-semibold hover:shadow-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
           >
             {isLoading ? (
               claimingDemo ? "Saving account…" : "Creating account..."

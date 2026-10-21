@@ -23,7 +23,7 @@ COPY prisma ./prisma
 COPY public ./public
 COPY scripts ./scripts
 COPY tests ./tests
-COPY middleware.ts ./
+COPY proxy.ts ./
 COPY next.config.mjs ./
 COPY package.json ./
 COPY tsconfig.json ./
@@ -31,7 +31,7 @@ COPY postcss.config.mjs ./
 COPY tailwind.config.ts ./
 COPY eslint.config.mjs ./
 COPY playwright.config.ts ./
-COPY vitest.config.ts ./
+COPY vitest.config.mts ./
 RUN mkdir -p public
 ENV NEXT_TELEMETRY_DISABLED=1
 RUN npx prisma generate

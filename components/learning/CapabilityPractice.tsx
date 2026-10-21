@@ -139,7 +139,7 @@ export function CapabilityExplanationDraft({
         onChange={(event) => updateDraft(event.target.value)}
         rows={6}
         placeholder="Teach the mechanism, decision boundary, and failure mode back in your own words…"
-        className="mt-4 w-full rounded-xl border border-slate-700 bg-slate-950/40 p-4 text-sm leading-6 text-white placeholder:text-slate-600 focus:border-violet-300 focus:outline-none"
+        className="mt-4 w-full rounded-xl border border-slate-700 bg-slate-950/40 p-4 text-sm leading-6 text-white placeholder:text-slate-600 focus:border-violet-300 focus:outline-hidden"
       />
       <div className="mt-3 flex flex-wrap items-center justify-between gap-3 text-xs">
         <span className={readyForReview ? "text-emerald-300" : "text-slate-400"}>

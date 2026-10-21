@@ -163,7 +163,7 @@ export default function Phase5Page() {
                 </div>
               </div>
 
-              <details className="group border-2 border-green-500/20 rounded-xl overflow-hidden bg-gradient-to-br from-green-900/20 to-emerald-900/10 hover:border-green-500/30 transition-colors">
+              <details className="group border-2 border-green-500/20 rounded-xl overflow-hidden bg-linear-to-br from-green-900/20 to-emerald-900/10 hover:border-green-500/30 transition-colors">
                 <summary className="flex items-center gap-2.5 px-5 py-3 cursor-pointer select-none">
                   <span className="text-base">☕</span>
                   <span className="text-xs uppercase tracking-wide text-green-400 font-bold">Spring Perspective</span>

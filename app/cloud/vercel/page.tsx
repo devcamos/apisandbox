@@ -14,9 +14,9 @@ import {
 export default function VercelPage() {
   return (
     <SubscriptionGate phaseNumber="cloud" lockedContentName="Vercel Platform">
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+      <div className="min-h-screen bg-linear-to-br from-slate-900 via-slate-800 to-slate-900">
         {/* Header */}
-        <div className="bg-gradient-to-r from-black to-gray-900 py-16">
+        <div className="bg-linear-to-r from-black to-gray-900 py-16">
           <div className="container mx-auto px-6">
             <nav className="flex items-center gap-2 mb-6 text-sm">
               <Link href="/" className="text-white/70 hover:text-white transition-colors flex items-center gap-1">
@@ -29,7 +29,7 @@ export default function VercelPage() {
               <span className="text-white font-semibold">Vercel Platform</span>
             </nav>
             <div className="flex items-center gap-4 mb-4">
-              <div className="p-4 bg-white/20 backdrop-blur-sm rounded-xl">
+              <div className="p-4 bg-white/20 backdrop-blur-xs rounded-xl">
                 <Zap className="w-10 h-10 text-white" />
               </div>
               <div>
@@ -226,7 +226,7 @@ export default function VercelPage() {
           {/* Integration Guide */}
           <section className="mb-12">
             <h2 className="text-3xl font-bold text-white mb-6">How They Work Together</h2>
-            <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-8 border border-slate-700">
+            <div className="bg-slate-800/50 backdrop-blur-xs rounded-xl p-8 border border-slate-700">
               <div className="space-y-6">
                 <div>
                   <h3 className="text-xl font-bold text-white mb-3">1. Vercel (Deployment)</h3>
@@ -278,7 +278,7 @@ export const prisma = new PrismaClient({
           {/* Connection Pooling Explanation */}
           <section className="mb-12">
             <h2 className="text-3xl font-bold text-white mb-6">Why Connection Pooling Matters</h2>
-            <div className="bg-gradient-to-r from-slate-800 to-slate-700 rounded-xl p-8 border border-slate-600">
+            <div className="bg-linear-to-r from-slate-800 to-slate-700 rounded-xl p-8 border border-slate-600">
               <div className="grid md:grid-cols-2 gap-8">
                 <div>
                   <h3 className="text-xl font-bold text-white mb-4">The Problem</h3>
@@ -312,7 +312,7 @@ export const prisma = new PrismaClient({
           {/* Key Technology Benefits */}
           <section className="mb-12">
             <h2 className="text-3xl font-bold text-white mb-6">💡 Key Technology Benefits for Local Development</h2>
-            <div className="bg-gradient-to-r from-blue-500/20 to-purple-500/20 border border-blue-500/30 rounded-xl p-8">
+            <div className="bg-linear-to-r from-blue-500/20 to-purple-500/20 border border-blue-500/30 rounded-xl p-8">
               <p className="text-white mb-6 font-semibold text-lg">
                 One of the major benefits of using modern, standardized technologies: <strong>your application code doesn't care where services live.</strong> This makes local development seamless and deployment flexible.
               </p>
@@ -346,7 +346,7 @@ export const prisma = new PrismaClient({
                   </ul>
                 </div>
 
-                <div className="bg-gradient-to-r from-green-500/20 to-blue-500/20 rounded-lg p-4 border border-green-500/30">
+                <div className="bg-linear-to-r from-green-500/20 to-blue-500/20 rounded-lg p-4 border border-green-500/30">
                   <p className="text-white text-sm">
                     <strong>Why This Matters:</strong> Use SQLite locally, PostgreSQL in production - same code. 
                     Deploy to any platform without code changes. Configure through environment variables, not code changes.
@@ -359,7 +359,7 @@ export const prisma = new PrismaClient({
           {/* Complete Example */}
           <section className="mb-12">
             <h2 className="text-3xl font-bold text-white mb-6">Complete SaaS Stack Example</h2>
-            <div className="bg-gradient-to-r from-slate-800 to-slate-700 rounded-xl p-8 border border-slate-600">
+            <div className="bg-linear-to-r from-slate-800 to-slate-700 rounded-xl p-8 border border-slate-600">
               <div className="grid md:grid-cols-2 gap-8">
                 <div>
                   <h3 className="text-xl font-bold text-white mb-4">Architecture</h3>
@@ -419,7 +419,7 @@ export const prisma = new PrismaClient({
 
           {/* Quick Start */}
           <section>
-            <div className="bg-gradient-to-r from-black/50 to-gray-800/50 rounded-xl p-6 border border-gray-700">
+            <div className="bg-linear-to-r from-black/50 to-gray-800/50 rounded-xl p-6 border border-gray-700">
               <h3 className="text-2xl font-bold text-white mb-3">🚀 Quick Start</h3>
               <p className="text-gray-300 mb-4">
                 Ready to build? Here's how to set up the complete stack:

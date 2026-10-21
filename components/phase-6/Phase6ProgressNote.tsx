@@ -6,7 +6,7 @@ import { Sparkles, Brain, BarChart3 } from "lucide-react"
  */
 export default function Phase6ProgressNote() {
   return (
-    <div className="mb-8 rounded-xl border border-fuchsia-500/25 bg-gradient-to-br from-fuchsia-500/10 to-violet-500/10 p-6">
+    <div className="mb-8 rounded-xl border border-fuchsia-500/25 bg-linear-to-br from-fuchsia-500/10 to-violet-500/10 p-6">
       <div className="flex items-start gap-4">
         <div className="p-3 rounded-xl bg-fuchsia-500/15 border border-fuchsia-400/20 shrink-0">
           <Sparkles className="w-6 h-6 text-fuchsia-300" />

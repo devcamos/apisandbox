@@ -98,7 +98,7 @@ export default function PatternProblemsPage() {
                   <Link
                     key={problem.id}
                     href={`/phase-5/problems/${pattern.id}/${problem.id}`}
-                    className="block rounded border border-slate-700 bg-slate-900/60 p-3 transition-colors hover:border-cyan-400/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/70"
+                    className="block rounded-sm border border-slate-700 bg-slate-900/60 p-3 transition-colors hover:border-cyan-400/60 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-cyan-400/70"
                   >
                     <div className="text-sm font-semibold text-cyan-200 hover:text-cyan-100 underline">
                       {problem.title}
@@ -130,7 +130,7 @@ export default function PatternProblemsPage() {
                     <Link
                       key={id}
                       href={`/phase-5/problems/${id}`}
-                      className="text-xs px-2 py-1 rounded border border-slate-600 text-gray-200 hover:border-cyan-400/50"
+                      className="text-xs px-2 py-1 rounded-sm border border-slate-600 text-gray-200 hover:border-cyan-400/50"
                     >
                       {node.label}
                     </Link>
@@ -151,7 +151,7 @@ export default function PatternProblemsPage() {
                     <Link
                       key={id}
                       href={`/phase-5/problems/${id}`}
-                      className="text-xs px-2 py-1 rounded border border-slate-600 text-gray-200 hover:border-cyan-400/50"
+                      className="text-xs px-2 py-1 rounded-sm border border-slate-600 text-gray-200 hover:border-cyan-400/50"
                     >
                       {node.label}
                     </Link>
