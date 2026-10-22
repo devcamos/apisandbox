@@ -108,12 +108,12 @@ test.describe("CI smoke", () => {
     await email.evaluate((el) => {
       const input = el as HTMLInputElement;
       input.focus();
-      input.value = "devonteyeah@gmail.com";
+      input.value = "user@example.com";
       input.dispatchEvent(new FocusEvent("blur", { bubbles: true }));
     });
 
     await expect(page.getByText(/email is required/i)).toHaveCount(0);
-    await expect(email).toHaveValue("devonteyeah@gmail.com");
+    await expect(email).toHaveValue("user@example.com");
 
     await password.evaluate((el) => {
       const input = el as HTMLInputElement;
