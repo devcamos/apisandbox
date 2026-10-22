@@ -1,6 +1,15 @@
-# API Integration Training Platform
+# API Sandbox
 
-Next.js app for learning API integrations — phases, demos, auth, and subscriptions.
+An API integration training platform by **NEXUS MOTIVUS LTD**. Learners work through guided phases (0–8) with live demos covering REST, auth, webhooks and subscriptions, and can call a versioned learner API with personal tokens.
+
+**Live:** https://apisandbox-coral.vercel.app
+
+## Stack
+
+- Next.js 16 (App Router), React 19, TypeScript, Tailwind CSS 4
+- PostgreSQL (Neon) via Prisma; Auth.js (NextAuth v5)
+- Stripe (test mode) for subscriptions
+- Vitest (unit) and Playwright (E2E, smoke, visual); CI on GitHub Actions, previews on Vercel
 
 ## Developers
 
@@ -47,6 +56,8 @@ See [docs/API_V1.md](docs/API_V1.md) and `GET /api/v1/openapi.json`.
 | `npm run build` | Production build |
 | `npm run verify:ci` | Local CI parity before PR |
 | `npm run test:unit` | Vitest unit tests |
+| `npm test` | Playwright E2E tests |
+| `npm run typecheck` | TypeScript |
 | `npm run lint` | ESLint |
 | `npm run openai:key:test` | Safely validate an OpenAI API key |
 
@@ -81,6 +92,10 @@ Do not put a literal key in the command, source code, `.env` files committed to 
 
 Learning material is in the UI: `/dashboard`, `/phase-0` … `/phase-8`, `/docs/java`, `/docs/architecture`.
 
+## Security
+
+Please report vulnerabilities privately. See [SECURITY.md](SECURITY.md).
+
 ## License
 
-MIT
+Proprietary. Copyright NEXUS MOTIVUS LTD, all rights reserved. See [LICENSE](LICENSE).
