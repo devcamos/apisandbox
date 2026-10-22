@@ -8,6 +8,8 @@ import {
   HARDENING_MIGRATION_SQL,
   checkHardeningMigrationStatic,
   findHardeningMigrationGaps,
+  findPolicyMigrationGaps,
+  resolvePolicyMigrationPath,
   listPublicTablesWithoutRls,
   main,
   resolveCheckMode,
@@ -28,6 +30,25 @@ describe("findHardeningMigrationGaps", () => {
       true
     )
     expect(gaps.some((gap) => gap.includes("REVOKE from anon"))).toBe(true)
+  })
+})
+
+describe("findPolicyMigrationGaps", () => {
+  const POLICY_SQL = fs.readFileSync(resolvePolicyMigrationPath(), "utf8")
+
+  it("accepts the committed deny-policy migration", () => {
+    expect(findPolicyMigrationGaps(POLICY_SQL)).toEqual([])
+  })
+
+  it("reports missing pieces on empty SQL", () => {
+    const gaps = findPolicyMigrationGaps("-- empty")
+    expect(gaps).toContain("RESTRICTIVE deny policy")
+    expect(gaps).toContain("default privileges FOR ROLE postgres")
+  })
+
+  it("rejects a migration that grants to API roles", () => {
+    const gaps = findPolicyMigrationGaps(`${POLICY_SQL}\nGRANT SELECT ON public."User" TO anon;`)
+    expect(gaps).toContain("no grants to anon/authenticated")
   })
 })
 
