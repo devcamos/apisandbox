@@ -8,7 +8,7 @@ type PlaceholderScreenProps = {
   navigation: NativeStackNavigationProp<RootStackParamList, any>;
   title: string;
   subtitle: string;
-  colors: string[];
+  colors: readonly [string, string, ...string[]];
 };
 
 export default function PlaceholderScreen({ 
