@@ -51,7 +51,6 @@ export default [
       "coverage/**",
       "playwright-report/**",
       "test-results/**",
-      "mobile/**",
       "*.config.mjs",
     ],
   },
