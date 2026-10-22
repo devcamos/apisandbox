@@ -99,13 +99,13 @@ describe("auth form autofill state sync", () => {
 
     // Chrome dropdown pick: DOM value updates, then blur — often without a prior React onChange.
     fireEvent.focus(email)
-    setNativeValue(email, "devonteyeah@gmail.com")
+    setNativeValue(email, "user@example.com")
     fireEvent.blur(email)
 
     await waitFor(() => {
       expect(screen.queryByText(/email is required/i)).not.toBeInTheDocument()
     })
-    expect(email).toHaveValue("devonteyeah@gmail.com")
+    expect(email).toHaveValue("user@example.com")
 
     setNativeValue(password, "Test1234!@#$")
     fireEvent.blur(password)
