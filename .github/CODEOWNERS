@@ -1,0 +1,12 @@
+# Changes to these paths always need review by Devonte (@devcamos).
+/.github/ @devcamos
+/prisma/ @devcamos
+/.env.example @devcamos
+/vercel.json @devcamos
+/proxy.ts @devcamos
+/lib/auth/ @devcamos
+/lib/auth.ts @devcamos
+/lib/auth-config.ts @devcamos
+/lib/stripe*.ts @devcamos
+/app/api/webhooks/stripe/ @devcamos
+/sonar-project.properties @devcamos
