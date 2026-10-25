@@ -2,7 +2,7 @@
 
 See **[docs/AGENT_ONBOARDING.md](docs/AGENT_ONBOARDING.md)** for setup, verification, and conventions.
 
-The [principles entry](docs/NEXUS_ENGINEERING_PRINCIPLES.md) points to the shared engineering foundation.
+All human and coding agents must follow the repository-owned **[Nexus Motivus engineering principles](docs/NEXUS_ENGINEERING_PRINCIPLES.md)**. Resources created by MotivusLabs for Nexus must satisfy the document's reusable-resource contract. The shared engineering foundation is an additive reference; it does not replace this repository's local safeguards.
 
 **Cursor Cloud:** PostgreSQL via `npm run dev:db:up` (port 5435), app on port 4000, test users in [docs/TEST_USERS.md](docs/TEST_USERS.md).
 
