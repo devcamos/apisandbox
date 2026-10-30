@@ -63,6 +63,21 @@ export interface SanitizedAifExamQuestion {
   selectCount: number
 }
 
+/** Study card derived from an exam question; answers are intentionally revealed on flip. */
+export interface AifFlashcard {
+  id: string
+  domainId: AifC01DomainId
+  taskStatement: AifC01TaskStatementId
+  topic: string
+  difficulty: AifExamDifficulty
+  front: string
+  answers: Array<{
+    optionId: string
+    text: string
+    explanation: string
+  }>
+}
+
 export interface AifExamOptionResult {
   optionId: string
   text: string

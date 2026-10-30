@@ -11,24 +11,15 @@ import {
   LoaderCircle,
   Target,
 } from "lucide-react"
-import type { AifC01DomainId } from "@/lib/learning/aws-ai-practitioner-mastery"
+import {
+  AifStudyControls,
+  type AifPracticeFilter,
+} from "@/components/learning/AifStudyControls"
 import type {
   AifExamPracticeSessionGrade,
   AifQuestionBankSummary,
   SanitizedAifExamQuestion,
 } from "@/lib/learning/aif-c01-question-bank"
-
-type PracticeFilter = "all" | "metrics" | AifC01DomainId
-
-const DOMAIN_FILTERS: Array<{ id: PracticeFilter; label: string }> = [
-  { id: "all", label: "All domains" },
-  { id: "metrics", label: "D1 metrics focus" },
-  { id: "ai-ml-fundamentals", label: "Domain 1 · AI/ML" },
-  { id: "genai-fundamentals", label: "Domain 2 · GenAI" },
-  { id: "foundation-models", label: "Domain 3 · Foundation models" },
-  { id: "responsible-ai", label: "Domain 4 · Responsible AI" },
-  { id: "ai-security", label: "Domain 5 · Security" },
-]
 
 function toggleSelection(
   current: string[] | undefined,
@@ -49,7 +40,7 @@ export function AifExamPractice({
 }: Readonly<{
   questions: SanitizedAifExamQuestion[]
   summary: AifQuestionBankSummary
-  initialFilter: PracticeFilter
+  initialFilter: AifPracticeFilter
 }>) {
   const router = useRouter()
   const [answers, setAnswers] = useState<Record<string, string[]>>({})
@@ -139,7 +130,7 @@ export function AifExamPractice({
           </h1>
           <p className="mt-4 max-w-3xl text-lg leading-8 text-slate-300">
             Original multiple-choice and multiple-response questions mapped to the five official
-            AIF-C01 domains. Submit a set to see plain-English explanations for every option.
+            AIF-C01 domains. Submit a set to see a plain-English explanation for every option.
           </p>
 
           <div className="mt-6 flex flex-wrap gap-2 text-xs text-slate-300">
@@ -160,41 +151,7 @@ export function AifExamPractice({
       </section>
 
       <div className="container mx-auto max-w-5xl px-6 py-8 sm:py-10">
-        <section
-          aria-label="Practice filters"
-          className="rounded-2xl border border-slate-700 bg-slate-900/60 p-5"
-        >
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-violet-300">
-            Choose a focus
-          </p>
-          <div className="mt-3 flex flex-wrap gap-2">
-            {DOMAIN_FILTERS.map((filter) => {
-              const active = filter.id === initialFilter
-              const href =
-                filter.id === "all"
-                  ? "/cloud/aws/certifications/ai-practitioner/practice"
-                  : `/cloud/aws/certifications/ai-practitioner/practice?filter=${encodeURIComponent(filter.id)}`
-              return (
-                <Link
-                  key={filter.id}
-                  href={href}
-                  onClick={resetAnswers}
-                  className={`rounded-lg border px-3 py-2 text-sm transition-colors ${
-                    active
-                      ? "border-violet-300 bg-violet-400/15 text-white"
-                      : "border-slate-700 text-slate-300 hover:border-slate-500"
-                  }`}
-                >
-                  {filter.label}
-                </Link>
-              )
-            })}
-          </div>
-          <p className="mt-3 text-sm leading-6 text-slate-400">
-            Timed full mocks and weak-area tracking come in later tickets. This view grades a short
-            practice set with instant feedback.
-          </p>
-        </section>
+        <AifStudyControls mode="questions" initialFilter={initialFilter} onNavigate={resetAnswers} />
 
         {questions.length === 0 ? (
           <p className="mt-8 rounded-xl border border-amber-400/30 bg-amber-400/10 p-4 text-sm text-amber-100">

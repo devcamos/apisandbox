@@ -6,6 +6,7 @@ import {
   AIF_C01_MIN_QUESTION_COUNT,
   AIF_C01_QUESTION_BANK,
   AIF_C01_QUESTION_BANK_VERSION,
+  createAifFlashcards,
   getAifExamQuestionById,
   gradeAifExamPracticeSession,
   gradeAifExamQuestion,
@@ -116,5 +117,18 @@ describe("AIF-C01 question bank", () => {
     expect(result.correctCount).toBe(3)
     expect(result.scorePercent).toBe(100)
     expect(getAifExamQuestionById(set[0].id)?.id).toBe(set[0].id)
+  })
+
+  it("creates answer-backed flashcards from the same question selection", () => {
+    const cards = createAifFlashcards(AIF_C01_QUESTION_BANK, { seed: 21, limit: 4 })
+
+    expect(cards).toHaveLength(4)
+    expect(cards.every((card) => card.front.length > 0)).toBe(true)
+    expect(cards.every((card) => card.answers.length > 0)).toBe(true)
+    expect(cards.map((card) => card.id)).toEqual(
+      selectAifExamQuestions(AIF_C01_QUESTION_BANK, { seed: 21, limit: 4 }).map(
+        (question) => question.id,
+      ),
+    )
   })
 })

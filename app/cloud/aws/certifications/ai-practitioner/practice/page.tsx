@@ -1,13 +1,16 @@
 import type { Metadata } from "next"
 import { SubscriptionGate } from "@/components/SubscriptionGate"
 import { AifExamPractice } from "@/components/learning/AifExamPractice"
+import { AifFlashcards } from "@/components/learning/AifFlashcards"
 import {
   AIF_C01_QUESTION_BANK,
+  createAifFlashcards,
   sanitizeAifExamQuestions,
   selectAifExamQuestions,
   summarizeAifQuestionBank,
 } from "@/lib/learning/aif-c01-question-bank"
 import type { AifC01DomainId } from "@/lib/learning/aws-ai-practitioner-mastery"
+import type { AifStudyMode } from "@/components/learning/AifStudyControls"
 
 export const metadata: Metadata = {
   title: "AIF-C01 exam practice | API Sandbox",
@@ -50,13 +53,18 @@ function seedFromSetParam(filter: PracticeFilter, setParam: string | undefined):
   return practiceSeed(filter)
 }
 
+function parseMode(raw: string | undefined): AifStudyMode {
+  return raw === "flashcards" ? "flashcards" : "questions"
+}
+
 export default async function AifExamPracticePage({
   searchParams,
 }: Readonly<{
-  searchParams: Promise<{ filter?: string; limit?: string; set?: string }>
+  searchParams: Promise<{ filter?: string; limit?: string; mode?: string; set?: string }>
 }>) {
   const params = await searchParams
   const filter = parseFilter(params.filter)
+  const mode = parseMode(params.mode)
   const parsedLimit = Number.parseInt(params.limit ?? "8", 10)
   const limit = Number.isFinite(parsedLimit) ? Math.min(Math.max(parsedLimit, 1), 20) : 8
 
@@ -68,14 +76,19 @@ export default async function AifExamPracticePage({
   })
 
   const summary = summarizeAifQuestionBank(AIF_C01_QUESTION_BANK)
+  const flashcards = mode === "flashcards" ? createAifFlashcards(selected) : []
 
   return (
     <SubscriptionGate phaseNumber="cloud" lockedContentName="AIF-C01 exam practice">
-      <AifExamPractice
-        questions={sanitizeAifExamQuestions(selected)}
-        summary={summary}
-        initialFilter={filter}
-      />
+      {mode === "flashcards" ? (
+        <AifFlashcards cards={flashcards} summary={summary} initialFilter={filter} />
+      ) : (
+        <AifExamPractice
+          questions={sanitizeAifExamQuestions(selected)}
+          summary={summary}
+          initialFilter={filter}
+        />
+      )}
     </SubscriptionGate>
   )
 }

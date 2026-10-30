@@ -10,6 +10,7 @@ export { AIF_C01_QUESTION_BANK_VERSION } from "@/lib/learning/aif-c01-question-b
 export * from "@/lib/learning/aif-c01-question-bank/types"
 export * from "@/lib/learning/aif-c01-question-bank/catalog"
 export {
+  createAifFlashcards,
   gradeAifExamPracticeSession,
   gradeAifExamQuestion,
   isMetricsTopic,

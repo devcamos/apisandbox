@@ -9,6 +9,7 @@ import {
 } from "@/lib/learning/aif-c01-question-bank/catalog"
 import {
   AIF_C01_QUESTION_BANK_VERSION,
+  type AifFlashcard,
   type AifExamPracticeSessionGrade,
   type AifExamQuestion,
   type AifExamQuestionGrade,
@@ -54,6 +55,27 @@ export function sanitizeAifExamQuestion(question: AifExamQuestion): SanitizedAif
 
 export function sanitizeAifExamQuestions(questions: AifExamQuestion[]): SanitizedAifExamQuestion[] {
   return questions.map(sanitizeAifExamQuestion)
+}
+
+export function createAifFlashcards(
+  bank: readonly AifExamQuestion[],
+  options: SelectAifQuestionsOptions = {},
+): AifFlashcard[] {
+  return selectAifExamQuestions(bank, options).map((question) => ({
+    id: question.id,
+    domainId: question.domainId,
+    taskStatement: question.taskStatement,
+    topic: question.topic,
+    difficulty: question.difficulty,
+    front: question.stem,
+    answers: question.options
+      .filter((option) => question.correctOptionIds.includes(option.id))
+      .map((option) => ({
+        optionId: option.id,
+        text: option.text,
+        explanation: option.explanation,
+      })),
+  }))
 }
 
 export function gradeAifExamQuestion(
