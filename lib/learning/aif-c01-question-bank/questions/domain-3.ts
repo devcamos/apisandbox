@@ -1730,4 +1730,435 @@ export const domain3Questions: AifExamQuestion[] = [
     ],
     correctOptionIds: ["a"],
   }),
+
+  defineAifQuestion({
+    id: "aif-d3-046",
+    format: "single-choice",
+    domainId: "foundation-models",
+    taskStatement: "3.1",
+    topic: "rag",
+    difficulty: "easy",
+    stem: "A legal assistant must answer questions using the latest approved internal policies without retraining its foundation model after every policy update. Which architecture is most suitable?",
+    options: [
+      {
+        id: "A",
+        text: "Retrieval-augmented generation that retrieves current policy passages before generation",
+        explanation:
+          "Correct. RAG can supply current authorized content at request time without retraining the foundation model for each update.",
+      },
+      {
+        id: "B",
+        text: "A larger model with no connection to the policy repository",
+        explanation:
+          "Model size does not guarantee access to current private policies and can increase cost without solving freshness.",
+      },
+      {
+        id: "C",
+        text: "Hard-code every policy sentence into the user interface",
+        explanation:
+          "Hard-coding is difficult to maintain and does not provide a scalable retrieval architecture.",
+      },
+      {
+        id: "D",
+        text: "Disable source retrieval so the model relies only on training memory",
+        explanation:
+          "Removing retrieval makes current policy access less reliable and increases the risk of unsupported answers.",
+      },
+    ],
+    correctOptionIds: ["A"],
+  }),
+
+  defineAifQuestion({
+    id: "aif-d3-047",
+    format: "multi-response",
+    domainId: "foundation-models",
+    taskStatement: "3.1",
+    topic: "vector-databases",
+    difficulty: "medium",
+    stem: "Which two capabilities are useful in a vector database that supports a RAG application? (Select TWO.)",
+    options: [
+      {
+        id: "A",
+        text: "Find stored vectors that are nearest to a query embedding",
+        explanation:
+          "Correct. Nearest-neighbor search identifies stored content that is semantically similar to the query.",
+      },
+      {
+        id: "B",
+        text: "Filter candidate results using metadata such as tenant or document status",
+        explanation:
+          "Correct. Metadata filters can restrict retrieval to authorized and relevant records.",
+      },
+      {
+        id: "C",
+        text: "Guarantee that retrieved passages are factually correct without validation",
+        explanation:
+          "Similarity search does not verify facts; source quality and application validation remain necessary.",
+      },
+      {
+        id: "D",
+        text: "Replace IAM authorization for the documents it returns",
+        explanation:
+          "A vector database does not remove the need for identity, authorization, and tenant-isolation controls.",
+      },
+      {
+        id: "E",
+        text: "Automatically fine-tune the foundation model after every search",
+        explanation:
+          "Retrieval and fine-tuning are different operations; a search does not automatically retrain the model.",
+      },
+    ],
+    correctOptionIds: ["A", "B"],
+  }),
+
+  defineAifQuestion({
+    id: "aif-d3-048",
+    format: "single-choice",
+    domainId: "foundation-models",
+    taskStatement: "3.1",
+    topic: "bedrock-knowledge-bases",
+    difficulty: "medium",
+    stem: "What is a key purpose of the ingestion process for an Amazon Bedrock Knowledge Base?",
+    options: [
+      {
+        id: "A",
+        text: "Prepare source documents, create embeddings, and store representations for retrieval",
+        explanation:
+          "Correct. Ingestion transforms source data into searchable representations that the knowledge base can retrieve.",
+      },
+      {
+        id: "B",
+        text: "Replace all source documents with model-generated summaries and discard the originals",
+        explanation:
+          "Ingestion does not require discarding source documents, and preserving authoritative sources supports traceability.",
+      },
+      {
+        id: "C",
+        text: "Grant every application user administrator access to the source bucket",
+        explanation:
+          "Ingestion is a data preparation process and should not broaden user permissions.",
+      },
+      {
+        id: "D",
+        text: "Train a new foundation model from scratch on every document",
+        explanation:
+          "Knowledge-base ingestion supports retrieval and does not mean training a new foundation model from scratch.",
+      },
+    ],
+    correctOptionIds: ["A"],
+  }),
+
+  defineAifQuestion({
+    id: "aif-d3-049",
+    format: "single-choice",
+    domainId: "foundation-models",
+    taskStatement: "3.2",
+    topic: "zero-shot-prompting",
+    difficulty: "easy",
+    stem: "A prompt asks a foundation model to classify a support message as billing, technical, or account-related and provides no examples. Which prompting approach is this?",
+    options: [
+      {
+        id: "A",
+        text: "Zero-shot prompting",
+        explanation:
+          "Correct. Zero-shot prompting specifies the task without including labeled examples in the prompt.",
+      },
+      {
+        id: "B",
+        text: "Few-shot prompting",
+        explanation:
+          "Few-shot prompting includes examples that demonstrate the task before the new input.",
+      },
+      {
+        id: "C",
+        text: "Model distillation",
+        explanation:
+          "Distillation trains a smaller model from a larger model’s behavior; it is not a prompt format.",
+      },
+      {
+        id: "D",
+        text: "Vector indexing",
+        explanation:
+          "Vector indexing prepares embeddings for retrieval and is not the prompting approach described.",
+      },
+    ],
+    correctOptionIds: ["A"],
+  }),
+
+  defineAifQuestion({
+    id: "aif-d3-050",
+    format: "multi-response",
+    domainId: "foundation-models",
+    taskStatement: "3.2",
+    topic: "prompt-engineering",
+    difficulty: "medium",
+    stem: "Which three prompt-design practices can make a model’s output easier to use reliably? (Select THREE.)",
+    options: [
+      {
+        id: "A",
+        text: "State the task, audience, and constraints explicitly",
+        explanation:
+          "Correct. Clear objectives and constraints give the model useful guidance for the requested output.",
+      },
+      {
+        id: "B",
+        text: "Specify a structured output format such as a JSON shape when the application needs structured data",
+        explanation:
+          "Correct. Output requirements help downstream systems and users receive a consistent response shape.",
+      },
+      {
+        id: "C",
+        text: "Delimit untrusted retrieved text and tell the model how to treat it as reference material",
+        explanation:
+          "Correct. Clear boundaries reduce confusion between instructions and untrusted content in the context.",
+      },
+      {
+        id: "D",
+        text: "Put credentials directly into the prompt so the model can authenticate to services",
+        explanation:
+          "Secrets should never be placed in prompts. Use authorized application tools and secure credential handling instead.",
+      },
+      {
+        id: "E",
+        text: "Remove all context and instructions to ensure the model remains unbiased",
+        explanation:
+          "Removing useful context does not guarantee unbiased output and generally makes task performance less reliable.",
+      },
+    ],
+    correctOptionIds: ["A", "B", "C"],
+  }),
+
+  defineAifQuestion({
+    id: "aif-d3-051",
+    format: "single-choice",
+    domainId: "foundation-models",
+    taskStatement: "3.2",
+    topic: "temperature",
+    difficulty: "easy",
+    stem: "A team wants a classification assistant to produce more consistent results for the same input. Which inference setting should it generally evaluate lowering?",
+    options: [
+      {
+        id: "A",
+        text: "Temperature",
+        explanation:
+          "Correct. Lower temperature usually reduces sampling randomness, which can improve consistency for suitable tasks.",
+      },
+      {
+        id: "B",
+        text: "Encryption key length",
+        explanation:
+          "Key length affects encryption security and does not control generation variability.",
+      },
+      {
+        id: "C",
+        text: "IAM policy version",
+        explanation:
+          "IAM policy versions govern permissions and do not control model sampling behavior.",
+      },
+      {
+        id: "D",
+        text: "S3 storage class",
+        explanation:
+          "Storage class affects object storage characteristics, not how a model samples output tokens.",
+      },
+    ],
+    correctOptionIds: ["A"],
+  }),
+
+  defineAifQuestion({
+    id: "aif-d3-052",
+    format: "single-choice",
+    domainId: "foundation-models",
+    taskStatement: "3.3",
+    topic: "fine-tuning",
+    difficulty: "medium",
+    stem: "A company needs a foundation model to follow a specialized support style and recognize domain terminology that prompting alone does not reliably teach. Which approach should the team evaluate?",
+    options: [
+      {
+        id: "A",
+        text: "Fine-tuning with a carefully prepared, representative dataset",
+        explanation:
+          "Correct. Fine-tuning can adapt model behavior to a domain or style when the data is suitable and the use case justifies it.",
+      },
+      {
+        id: "B",
+        text: "Changing the DNS record for the model endpoint",
+        explanation:
+          "DNS routing does not teach a model domain terminology or response style.",
+      },
+      {
+        id: "C",
+        text: "Increasing the S3 bucket size without changing training data",
+        explanation:
+          "Storage capacity alone does not change model behavior or provide training examples.",
+      },
+      {
+        id: "D",
+        text: "Disabling evaluation so the new behavior is accepted automatically",
+        explanation:
+          "Evaluation is required to determine whether adaptation improved the intended behavior and introduced unwanted effects.",
+      },
+    ],
+    correctOptionIds: ["A"],
+  }),
+
+  defineAifQuestion({
+    id: "aif-d3-053",
+    format: "multi-response",
+    domainId: "foundation-models",
+    taskStatement: "3.3",
+    topic: "fine-tuning",
+    difficulty: "medium",
+    stem: "Which two practices support a reliable fine-tuning workflow? (Select TWO.)",
+    options: [
+      {
+        id: "A",
+        text: "Use representative, high-quality examples that match the intended task and style",
+        explanation:
+          "Correct. Fine-tuning data should reflect the behavior the model is expected to learn.",
+      },
+      {
+        id: "B",
+        text: "Keep a separate validation set to measure behavior on examples not used for training",
+        explanation:
+          "Correct. A held-out validation set helps identify whether the adapted model generalizes beyond its training examples.",
+      },
+      {
+        id: "C",
+        text: "Mix confidential secrets into examples because the model will automatically delete them",
+        explanation:
+          "Secrets and unnecessary sensitive data should not be included in training examples; models do not guarantee automatic deletion.",
+      },
+      {
+        id: "D",
+        text: "Use duplicated examples only so the model cannot learn any variation",
+        explanation:
+          "Duplicates can distort training and do not provide representative coverage of the target behavior.",
+      },
+      {
+        id: "E",
+        text: "Skip versioning the dataset because the latest file is always reproducible",
+        explanation:
+          "Dataset versioning supports reproducibility, auditing, and comparison across training runs.",
+      },
+    ],
+    correctOptionIds: ["A", "B"],
+  }),
+
+  defineAifQuestion({
+    id: "aif-d3-054",
+    format: "single-choice",
+    domainId: "foundation-models",
+    taskStatement: "3.3",
+    topic: "distillation",
+    difficulty: "medium",
+    stem: "What is the primary goal of knowledge distillation in a foundation-model application?",
+    options: [
+      {
+        id: "A",
+        text: "Transfer useful behavior from a larger teacher model to a smaller student model",
+        explanation:
+          "Correct. Distillation aims to create a smaller or faster model that approximates selected teacher behavior.",
+      },
+      {
+        id: "B",
+        text: "Encrypt the teacher model’s weights with an S3 bucket policy",
+        explanation:
+          "Encryption and access policies protect artifacts but are not the purpose of knowledge distillation.",
+      },
+      {
+        id: "C",
+        text: "Retrieve the nearest document vector at inference time",
+        explanation:
+          "Nearest-vector retrieval is a RAG operation, not distillation.",
+      },
+      {
+        id: "D",
+        text: "Guarantee the student model has more parameters than the teacher",
+        explanation:
+          "The student is typically smaller or more efficient; distillation does not require more parameters.",
+      },
+    ],
+    correctOptionIds: ["A"],
+  }),
+
+  defineAifQuestion({
+    id: "aif-d3-055",
+    format: "single-choice",
+    domainId: "foundation-models",
+    taskStatement: "3.4",
+    topic: "model-evaluation",
+    difficulty: "medium",
+    stem: "A team is evaluating a summarization model for a customer-support workflow. Which approach gives the strongest evidence that the summaries are useful for the actual task?",
+    options: [
+      {
+        id: "A",
+        text: "Evaluate representative support cases with task-specific quality criteria and review a sample with qualified people",
+        explanation:
+          "Correct. Evaluation should reflect the real workload and combine appropriate metrics with human judgment where meaning and usefulness matter.",
+      },
+      {
+        id: "B",
+        text: "Measure only the number of tokens generated",
+        explanation:
+          "Length does not show whether a summary is accurate, complete, relevant, or useful.",
+      },
+      {
+        id: "C",
+        text: "Test one easy example and assume the result applies to every support case",
+        explanation:
+          "A single easy example is not representative and cannot establish general performance.",
+      },
+      {
+        id: "D",
+        text: "Choose the model with the most parameters without evaluating outputs",
+        explanation:
+          "Parameter count is not a substitute for workload-specific quality and safety evaluation.",
+      },
+    ],
+    correctOptionIds: ["A"],
+  }),
+
+  defineAifQuestion({
+    id: "aif-d3-056",
+    format: "multi-response",
+    domainId: "foundation-models",
+    taskStatement: "3.4",
+    topic: "model-evaluation",
+    difficulty: "medium",
+    stem: "Which three practices help evaluate a generative AI application before production? (Select THREE.)",
+    options: [
+      {
+        id: "A",
+        text: "Use a held-out set of representative scenarios that were not used to tune prompts",
+        explanation:
+          "Correct. Held-out scenarios help reveal whether the application generalizes beyond examples used during development.",
+      },
+      {
+        id: "B",
+        text: "Compare outputs with reference answers or rubrics where the task permits objective assessment",
+        explanation:
+          "Correct. References and rubrics provide a basis for assessing correctness and task quality.",
+      },
+      {
+        id: "C",
+        text: "Include adversarial and safety scenarios relevant to the application’s risks",
+        explanation:
+          "Correct. Safety testing should cover misuse and failure modes that matter for the deployment context.",
+      },
+      {
+        id: "D",
+        text: "Evaluate only the prettiest output produced during development",
+        explanation:
+          "A cherry-picked output does not measure typical behavior or failure modes.",
+      },
+      {
+        id: "E",
+        text: "Treat a successful API response code as proof that the generated content is correct",
+        explanation:
+          "Transport success does not establish content quality, factuality, or safety.",
+      },
+    ],
+    correctOptionIds: ["A", "B", "C"],
+  }),
 ]

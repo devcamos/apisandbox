@@ -893,4 +893,201 @@ export const domain5Questions: AifExamQuestion[] = [
     ],
     correctOptionIds: ["A"],
   }),
+
+  defineAifQuestion({
+    id: "aif-d5-024",
+    format: "single-choice",
+    domainId: "ai-security",
+    taskStatement: "5.1",
+    topic: "iam",
+    difficulty: "easy",
+    stem: "An application running on Amazon EC2 needs to call an AI service. Which approach avoids storing long-lived access keys in the application code?",
+    options: [
+      {
+        id: "A",
+        text: "Attach an IAM role to the EC2 instance and use temporary credentials",
+        explanation:
+          "Correct. An instance role supplies temporary credentials through the AWS credential provider chain without embedding long-lived keys.",
+      },
+      {
+        id: "B",
+        text: "Create a root access key and place it in the application repository",
+        explanation:
+          "Root credentials should not be used by applications, and storing keys in source control creates severe exposure risk.",
+      },
+      {
+        id: "C",
+        text: "Put an access key in the model prompt so the model can renew it",
+        explanation:
+          "Prompts are not secret stores, and model output cannot safely manage AWS credentials.",
+      },
+      {
+        id: "D",
+        text: "Disable authentication for the AI service endpoint",
+        explanation:
+          "Disabling authentication would expose the service and is not a secure credential-management approach.",
+      },
+    ],
+    correctOptionIds: ["A"],
+  }),
+
+  defineAifQuestion({
+    id: "aif-d5-025",
+    format: "single-choice",
+    domainId: "ai-security",
+    taskStatement: "5.1",
+    topic: "tls",
+    difficulty: "easy",
+    stem: "A team wants to protect AI prompts and responses while they travel between an application and an AWS service. Which control addresses this requirement?",
+    options: [
+      {
+        id: "A",
+        text: "Use TLS-protected HTTPS connections and validate certificates",
+        explanation:
+          "Correct. TLS helps protect data in transit from interception or tampering between the client and service.",
+      },
+      {
+        id: "B",
+        text: "Compress the prompt before sending it over an unencrypted connection",
+        explanation:
+          "Compression does not provide confidentiality or integrity for data in transit.",
+      },
+      {
+        id: "C",
+        text: "Hash the response after it has already crossed the network in plaintext",
+        explanation:
+          "Hashing after transmission does not protect the original prompt or response while it is in transit.",
+      },
+      {
+        id: "D",
+        text: "Use a larger language model for every request",
+        explanation:
+          "Model size has no role in protecting network traffic.",
+      },
+    ],
+    correctOptionIds: ["A"],
+  }),
+
+  defineAifQuestion({
+    id: "aif-d5-026",
+    format: "multi-response",
+    domainId: "ai-security",
+    taskStatement: "5.1",
+    topic: "prompt-injection",
+    difficulty: "hard",
+    stem: "Which three controls can reduce the impact of prompt injection in an AI application that can call tools? (Select THREE.)",
+    options: [
+      {
+        id: "A",
+        text: "Give the application’s tools only the permissions required for the approved task",
+        explanation:
+          "Correct. Least privilege limits the damage if untrusted content influences the model or tool-selection process.",
+      },
+      {
+        id: "B",
+        text: "Treat retrieved documents and user text as untrusted data rather than higher-priority instructions",
+        explanation:
+          "Correct. Separating untrusted content from application instructions helps prevent injected text from changing control flow.",
+      },
+      {
+        id: "C",
+        text: "Require validation or human approval before high-impact tool actions",
+        explanation:
+          "Correct. Approval and validation provide a control point before an unsafe or irreversible action occurs.",
+      },
+      {
+        id: "D",
+        text: "Expose all administrative tools because a model can always distinguish malicious text",
+        explanation:
+          "Models are not guaranteed to detect every injection; broad tool access increases the blast radius.",
+      },
+      {
+        id: "E",
+        text: "Place database passwords in the system prompt so the model can use them when needed",
+        explanation:
+          "Secrets should not be exposed in prompts. Secure tool integrations should handle credentials outside model context.",
+      },
+    ],
+    correctOptionIds: ["A", "B", "C"],
+  }),
+
+  defineAifQuestion({
+    id: "aif-d5-027",
+    format: "single-choice",
+    domainId: "ai-security",
+    taskStatement: "5.2",
+    topic: "data-residency",
+    difficulty: "medium",
+    stem: "A regulated organization requires customer data to remain in an approved geographic location when an AI application processes it. Which design step is most important?",
+    options: [
+      {
+        id: "A",
+        text: "Choose supported AWS Regions and services that meet the requirement, then verify their data-handling behavior",
+        explanation:
+          "Correct. Data residency depends on the selected Regions, service behavior, architecture, and applicable contractual or regulatory requirements.",
+      },
+      {
+        id: "B",
+        text: "Assume all AWS services process and retain data only in the Region of the application",
+        explanation:
+          "Data handling varies by service and feature, so residency must be verified rather than assumed.",
+      },
+      {
+        id: "C",
+        text: "Move the application to a larger instance without checking the service terms",
+        explanation:
+          "Compute size does not establish where a managed AI service processes or stores data.",
+      },
+      {
+        id: "D",
+        text: "Rely on a prompt instruction asking the model not to leave the Region",
+        explanation:
+          "A prompt is not a data-residency control. Architecture and service configuration must enforce the requirement.",
+      },
+    ],
+    correctOptionIds: ["A"],
+  }),
+
+  defineAifQuestion({
+    id: "aif-d5-028",
+    format: "multi-response",
+    domainId: "ai-security",
+    taskStatement: "5.2",
+    topic: "ai-governance",
+    difficulty: "medium",
+    stem: "Which three practices support governance of an AI system over its lifecycle? (Select THREE.)",
+    options: [
+      {
+        id: "A",
+        text: "Version datasets, prompts, model configurations, and evaluation results used for releases",
+        explanation:
+          "Correct. Versioning supports reproducibility, accountability, and investigation of changes in behavior.",
+      },
+      {
+        id: "B",
+        text: "Maintain audit records for relevant access, deployments, and material decisions",
+        explanation:
+          "Correct. Audit evidence supports oversight, incident response, and compliance obligations.",
+      },
+      {
+        id: "C",
+        text: "Define ownership, approval criteria, and a process for responding to incidents or harmful outputs",
+        explanation:
+          "Correct. Clear accountability and response processes are core parts of operational AI governance.",
+      },
+      {
+        id: "D",
+        text: "Allow unreviewed production changes so teams can move faster",
+        explanation:
+          "Unreviewed changes weaken control and make it harder to understand or manage production behavior.",
+      },
+      {
+        id: "E",
+        text: "Delete evaluation evidence after deployment to reduce storage cost",
+        explanation:
+          "Deleting evidence undermines traceability and can prevent effective audits or incident analysis.",
+      },
+    ],
+    correctOptionIds: ["A", "B", "C"],
+  }),
 ]

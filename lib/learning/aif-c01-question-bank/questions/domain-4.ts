@@ -856,4 +856,238 @@ export const domain4Questions: AifExamQuestion[] = [
     ],
     correctOptionIds: ["B"],
   }),
+
+  defineAifQuestion({
+    id: "aif-d4-023",
+    format: "single-choice",
+    domainId: "responsible-ai",
+    taskStatement: "4.1",
+    topic: "bias",
+    difficulty: "easy",
+    stem: "A hiring model performs well on historical data but performs poorly for applicants from a group that was underrepresented in the training set. What is a likely contributing issue?",
+    options: [
+      {
+        id: "A",
+        text: "The training data may not represent the populations and conditions where the model will be used",
+        explanation:
+          "Correct. Underrepresentation can lead to unequal performance and is a data-related source of bias.",
+      },
+      {
+        id: "B",
+        text: "The model is fair because its overall accuracy is high",
+        explanation:
+          "Overall accuracy can hide performance differences between groups and does not establish fairness.",
+      },
+      {
+        id: "C",
+        text: "The model cannot be biased if it uses numerical features",
+        explanation:
+          "Numerical features can still encode historical or proxy bias and produce unequal outcomes.",
+      },
+      {
+        id: "D",
+        text: "Adding more model parameters automatically removes representation gaps",
+        explanation:
+          "A larger model does not correct missing or unrepresentative training data by itself.",
+      },
+    ],
+    correctOptionIds: ["A"],
+  }),
+
+  defineAifQuestion({
+    id: "aif-d4-024",
+    format: "single-choice",
+    domainId: "responsible-ai",
+    taskStatement: "4.1",
+    topic: "guardrails",
+    difficulty: "medium",
+    stem: "A customer-facing assistant must block requests for self-harm instructions and avoid returning confidential account data. Which control is most directly relevant?",
+    options: [
+      {
+        id: "A",
+        text: "Configure safety and privacy guardrails that filter harmful requests and sensitive responses",
+        explanation:
+          "Correct. Guardrails can apply defined policies to model inputs and outputs, alongside authorization and human escalation controls.",
+      },
+      {
+        id: "B",
+        text: "Increase the maximum output length for every request",
+        explanation:
+          "Output length does not enforce safety or privacy policy and can increase the amount of harmful content returned.",
+      },
+      {
+        id: "C",
+        text: "Disable monitoring so users cannot see blocked requests",
+        explanation:
+          "Disabling monitoring removes useful oversight and does not prevent harmful or sensitive content.",
+      },
+      {
+        id: "D",
+        text: "Use a higher temperature to make the assistant more empathetic",
+        explanation:
+          "Temperature changes sampling behavior and does not enforce content safety or data access controls.",
+      },
+    ],
+    correctOptionIds: ["A"],
+  }),
+
+  defineAifQuestion({
+    id: "aif-d4-025",
+    format: "multi-response",
+    domainId: "responsible-ai",
+    taskStatement: "4.1",
+    topic: "responsible-ai-controls",
+    difficulty: "medium",
+    stem: "Which three practices support responsible development of an AI system? (Select THREE.)",
+    options: [
+      {
+        id: "A",
+        text: "Test performance across relevant user groups and operating conditions",
+        explanation:
+          "Correct. Disaggregated and representative testing can reveal unequal performance and unexpected failure modes.",
+      },
+      {
+        id: "B",
+        text: "Provide a human review or escalation path for high-impact decisions",
+        explanation:
+          "Correct. Human oversight helps manage uncertainty and consequences when automated outputs affect people materially.",
+      },
+      {
+        id: "C",
+        text: "Monitor deployed behavior and investigate material changes or incidents",
+        explanation:
+          "Correct. Responsible operation continues after launch through monitoring, incident handling, and improvement.",
+      },
+      {
+        id: "D",
+        text: "Hide known limitations from users so they will trust the system more",
+        explanation:
+          "Hiding limitations undermines transparency and can lead users to rely on the system in unsafe ways.",
+      },
+      {
+        id: "E",
+        text: "Use sensitive personal data by default because more data always makes decisions fairer",
+        explanation:
+          "Sensitive data requires a justified, governed use; more data does not automatically improve fairness and can increase privacy risk.",
+      },
+    ],
+    correctOptionIds: ["A", "B", "C"],
+  }),
+
+  defineAifQuestion({
+    id: "aif-d4-026",
+    format: "single-choice",
+    domainId: "responsible-ai",
+    taskStatement: "4.2",
+    topic: "explainability",
+    difficulty: "medium",
+    stem: "A reviewer asks why a particular loan application received a high-risk score. Which type of information would best support a local explanation?",
+    options: [
+      {
+        id: "A",
+        text: "The important input features or factors that influenced this individual prediction",
+        explanation:
+          "Correct. A local explanation focuses on factors contributing to a specific prediction rather than only describing the model globally.",
+      },
+      {
+        id: "B",
+        text: "Only the model’s total number of parameters",
+        explanation:
+          "Parameter count does not explain why this particular application received its score.",
+      },
+      {
+        id: "C",
+        text: "The average response latency of the API",
+        explanation:
+          "Latency describes performance, not the factors that influenced an individual risk prediction.",
+      },
+      {
+        id: "D",
+        text: "The name of the availability zone hosting the endpoint",
+        explanation:
+          "Deployment location does not explain the model’s decision for a particular application.",
+      },
+    ],
+    correctOptionIds: ["A"],
+  }),
+
+  defineAifQuestion({
+    id: "aif-d4-027",
+    format: "single-choice",
+    domainId: "responsible-ai",
+    taskStatement: "4.2",
+    topic: "model-cards",
+    difficulty: "easy",
+    stem: "Which artifact is most useful for communicating a model’s intended use, evaluation results, limitations, and risk considerations to stakeholders?",
+    options: [
+      {
+        id: "A",
+        text: "A model card",
+        explanation:
+          "Correct. Model cards document intended uses, performance, limitations, and other information that supports transparency.",
+      },
+      {
+        id: "B",
+        text: "A DNS zone file",
+        explanation:
+          "A DNS zone file maps names to network records and does not document model behavior or risks.",
+      },
+      {
+        id: "C",
+        text: "A CPU utilization alarm only",
+        explanation:
+          "A resource alarm supports operations but does not communicate intended use or model limitations.",
+      },
+      {
+        id: "D",
+        text: "A compressed model checkpoint with no metadata",
+        explanation:
+          "A checkpoint contains model data but, without documentation, does not communicate intended use or risks to stakeholders.",
+      },
+    ],
+    correctOptionIds: ["A"],
+  }),
+
+  defineAifQuestion({
+    id: "aif-d4-028",
+    format: "multi-response",
+    domainId: "responsible-ai",
+    taskStatement: "4.2",
+    topic: "transparency",
+    difficulty: "medium",
+    stem: "Which three practices improve transparency for users of an AI-assisted workflow? (Select THREE.)",
+    options: [
+      {
+        id: "A",
+        text: "Tell users when an AI system contributes to the result",
+        explanation:
+          "Correct. Users can make better-informed decisions when the role of AI in a workflow is disclosed.",
+      },
+      {
+        id: "B",
+        text: "Communicate important limitations, uncertainty, or conditions under which outputs may be unreliable",
+        explanation:
+          "Correct. Explaining limitations helps users calibrate trust and avoid inappropriate reliance.",
+      },
+      {
+        id: "C",
+        text: "Provide a channel for users to question or correct an AI-assisted result",
+        explanation:
+          "Correct. Feedback and review paths improve accountability and let users surface errors.",
+      },
+      {
+        id: "D",
+        text: "Describe the model as always correct to maximize adoption",
+        explanation:
+          "Overstating accuracy is misleading and prevents users from understanding when review is needed.",
+      },
+      {
+        id: "E",
+        text: "Remove all audit records so the system appears simpler",
+        explanation:
+          "Removing records reduces accountability and does not improve meaningful transparency.",
+      },
+    ],
+    correctOptionIds: ["A", "B", "C"],
+  }),
 ]

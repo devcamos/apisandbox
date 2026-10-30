@@ -1467,7 +1467,7 @@ const cloudPractitionerCourse: LearningCourse = {
 const aiPractitionerCourse: LearningCourse = {
   id: AWS_AI_PRACTITIONER_COURSE_ID,
   title: "AWS Certified AI Practitioner",
-  description: "Learn provider-independent AI capabilities through prediction, Java builds, failure drills, and explanation before mapping each capability to AWS and AIF-C01.",
+  description: "Learn the core AI ideas in plain language, practise them with Java, test what can go wrong, and then map each idea to AWS and AIF-C01.",
   audience: "Beginners through senior engineers who want transferable AI foundations, Java practice, and evidence-backed AIF-C01 preparation.",
   masteryThreshold: AWS_CERTIFICATION_MASTERY_THRESHOLD,
   units: aiPractitionerUnits,
@@ -1523,7 +1523,7 @@ export const awsCertificationTracks: AwsCertificationTrack[] = [
     level: "Foundational",
     examCode: "AIF-C01",
     shortTitle: "AI Practitioner",
-    description: "Master invariant AI capabilities first, prove them with Java, then map the decisions to AWS and AIF-C01.",
+    description: "Learn the core AI ideas, practise them with Java, and connect each decision to AWS and AIF-C01.",
     audience: aiPractitionerCourse.audience,
     examFormat: "65 questions · 90 minutes",
     experienceGuidance: "No prior AI or ML experience is required; basic AWS and software-development familiarity makes the examples easier to apply.",

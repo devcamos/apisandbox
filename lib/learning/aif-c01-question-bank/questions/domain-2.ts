@@ -1467,4 +1467,392 @@ export const domain2Questions: AifExamQuestion[] = [
     ],
     correctOptionIds: ["A", "B"],
   }),
+
+  defineAifQuestion({
+    id: "aif-d2-039",
+    format: "single-choice",
+    domainId: "genai-fundamentals",
+    taskStatement: "2.1",
+    topic: "tokens",
+    difficulty: "easy",
+    stem: "Why can a long input cause a generative AI request to fail even when the input contains fewer words than expected?",
+    options: [
+      {
+        id: "A",
+        text: "Models process text as tokens, and the request can exceed the model’s combined input and output context limit",
+        explanation:
+          "Correct. Token counts are not identical to word counts, and the model must fit input plus generated output within its context limit.",
+      },
+      {
+        id: "B",
+        text: "Every model accepts exactly one token for each word",
+        explanation:
+          "Tokenization varies by text and language; one word can map to multiple tokens or combine with neighboring text.",
+      },
+      {
+        id: "C",
+        text: "The model automatically converts all input into images before processing it",
+        explanation:
+          "Text models do not generally convert every request into images, and this does not explain context-limit failures.",
+      },
+      {
+        id: "D",
+        text: "A longer prompt always improves model quality and therefore cannot be rejected",
+        explanation:
+          "Long prompts can exceed limits and add irrelevant context; quality does not guarantee acceptance of an oversized request.",
+      },
+    ],
+    correctOptionIds: ["A"],
+  }),
+
+  defineAifQuestion({
+    id: "aif-d2-040",
+    format: "single-choice",
+    domainId: "genai-fundamentals",
+    taskStatement: "2.1",
+    topic: "embeddings",
+    difficulty: "medium",
+    stem: "What is the primary purpose of an embedding model in a semantic search application?",
+    options: [
+      {
+        id: "A",
+        text: "Convert text into numerical vectors whose relationships can represent semantic similarity",
+        explanation:
+          "Correct. Embeddings represent content in a vector space so semantically related items can be compared.",
+      },
+      {
+        id: "B",
+        text: "Encrypt every document with a customer-managed KMS key",
+        explanation:
+          "Encryption is a security control, not the purpose of an embedding model.",
+      },
+      {
+        id: "C",
+        text: "Generate a final answer without using a language model or retrieved context",
+        explanation:
+          "Embeddings support retrieval and comparison; they do not by themselves generate a natural-language answer.",
+      },
+      {
+        id: "D",
+        text: "Guarantee that two documents with similar vectors contain identical facts",
+        explanation:
+          "Vector similarity indicates related meaning, not factual identity or a guarantee that documents are interchangeable.",
+      },
+    ],
+    correctOptionIds: ["A"],
+  }),
+
+  defineAifQuestion({
+    id: "aif-d2-041",
+    format: "multi-response",
+    domainId: "genai-fundamentals",
+    taskStatement: "2.1",
+    topic: "transformers",
+    difficulty: "medium",
+    stem: "Which two characteristics are associated with transformer architectures? (Select TWO.)",
+    options: [
+      {
+        id: "A",
+        text: "Self-attention can relate a token to other tokens in the sequence",
+        explanation:
+          "Correct. Self-attention helps a transformer model relationships among tokens when processing a sequence.",
+      },
+      {
+        id: "B",
+        text: "Training can process many sequence positions in parallel more readily than strictly sequential recurrent processing",
+        explanation:
+          "Correct. Transformer operations support substantial parallelism during training compared with recurrent architectures.",
+      },
+      {
+        id: "C",
+        text: "Transformers can only process fixed rules and cannot learn from data",
+        explanation:
+          "Transformers are learned neural-network architectures and are not limited to hand-authored rules.",
+      },
+      {
+        id: "D",
+        text: "Attention removes the need for tokenization or numerical representations",
+        explanation:
+          "Transformers still require inputs to be represented as tokens and numerical embeddings.",
+      },
+      {
+        id: "E",
+        text: "A transformer always produces correct and current information without external data",
+        explanation:
+          "Architecture does not guarantee factual accuracy or current knowledge; models can be wrong or outdated.",
+      },
+    ],
+    correctOptionIds: ["A", "B"],
+  }),
+
+  defineAifQuestion({
+    id: "aif-d2-042",
+    format: "single-choice",
+    domainId: "genai-fundamentals",
+    taskStatement: "2.2",
+    topic: "hallucinations",
+    difficulty: "medium",
+    stem: "A chatbot gives a confident answer about a policy that is absent from the organization’s approved documents. Which limitation does this demonstrate?",
+    options: [
+      {
+        id: "A",
+        text: "Hallucination or unsupported content generation",
+        explanation:
+          "Correct. A generative model can produce plausible-sounding content that is not grounded in an authoritative source.",
+      },
+      {
+        id: "B",
+        text: "Guaranteed retrieval accuracy",
+        explanation:
+          "The answer is unsupported, so it does not demonstrate guaranteed retrieval accuracy.",
+      },
+      {
+        id: "C",
+        text: "Network packet fragmentation",
+        explanation:
+          "Packet fragmentation is a networking behavior and does not explain an invented policy answer.",
+      },
+      {
+        id: "D",
+        text: "Database normalization",
+        explanation:
+          "Database normalization structures relational data and is unrelated to generated unsupported text.",
+      },
+    ],
+    correctOptionIds: ["A"],
+  }),
+
+  defineAifQuestion({
+    id: "aif-d2-043",
+    format: "single-choice",
+    domainId: "genai-fundamentals",
+    taskStatement: "2.2",
+    topic: "model-selection",
+    difficulty: "medium",
+    stem: "A support application needs short answers with low latency and moderate reasoning. The team wants to reduce inference cost while maintaining acceptable quality. Which approach is most appropriate to evaluate first?",
+    options: [
+      {
+        id: "A",
+        text: "Compare a smaller suitable foundation model against the current model using representative quality and latency tests",
+        explanation:
+          "Correct. Model selection should balance capability, latency, and cost using workload-specific evaluation rather than assumptions.",
+      },
+      {
+        id: "B",
+        text: "Select the largest available model without measuring quality or cost",
+        explanation:
+          "The largest model can increase cost and latency and may not be necessary for the task.",
+      },
+      {
+        id: "C",
+        text: "Reduce the model’s permissions instead of measuring its inference behavior",
+        explanation:
+          "Permissions improve security but do not determine model quality, latency, or inference cost.",
+      },
+      {
+        id: "D",
+        text: "Use a random model for production because all foundation models have identical capabilities",
+        explanation:
+          "Foundation models differ in capabilities, pricing, latency, and behavior, so production choice requires evaluation.",
+      },
+    ],
+    correctOptionIds: ["A"],
+  }),
+
+  defineAifQuestion({
+    id: "aif-d2-044",
+    format: "multi-response",
+    domainId: "genai-fundamentals",
+    taskStatement: "2.2",
+    topic: "genai-limitations",
+    difficulty: "medium",
+    stem: "Which three are common limitations of generative AI systems? (Select THREE.)",
+    options: [
+      {
+        id: "A",
+        text: "They can produce fluent but factually incorrect responses",
+        explanation:
+          "Correct. Fluency does not guarantee factual correctness, and hallucinations are a known limitation.",
+      },
+      {
+        id: "B",
+        text: "Their responses can be sensitive to wording and context provided in the prompt",
+        explanation:
+          "Correct. Small changes in instructions or context can affect generated output.",
+      },
+      {
+        id: "C",
+        text: "Their outputs can reflect unwanted bias present in training data or system design",
+        explanation:
+          "Correct. Bias can be learned or amplified, so responsible use requires evaluation and mitigation.",
+      },
+      {
+        id: "D",
+        text: "They cannot produce more than one possible response to the same prompt",
+        explanation:
+          "Generative systems can produce varied responses, especially when sampling settings allow randomness.",
+      },
+      {
+        id: "E",
+        text: "They automatically know private company documents even when those documents were never provided",
+        explanation:
+          "A model does not automatically have access to private documents; relevant data must be supplied through an authorized design.",
+      },
+    ],
+    correctOptionIds: ["A", "B", "C"],
+  }),
+
+  defineAifQuestion({
+    id: "aif-d2-045",
+    format: "single-choice",
+    domainId: "genai-fundamentals",
+    taskStatement: "2.2",
+    topic: "context-engineering",
+    difficulty: "medium",
+    stem: "A team includes a large amount of irrelevant text in every prompt and sees higher cost and less focused answers. Which change is most likely to help?",
+    options: [
+      {
+        id: "A",
+        text: "Retrieve and include only relevant, authorized context and summarize it when appropriate",
+        explanation:
+          "Correct. Focused context can reduce token use and help the model attend to information relevant to the task.",
+      },
+      {
+        id: "B",
+        text: "Append the entire company data lake to every request",
+        explanation:
+          "Adding more irrelevant content increases cost and can exceed context limits or distract the model.",
+      },
+      {
+        id: "C",
+        text: "Remove the user’s task instructions so only source documents remain",
+        explanation:
+          "The model needs clear task instructions as well as relevant context.",
+      },
+      {
+        id: "D",
+        text: "Increase randomness until the model uses every supplied passage",
+        explanation:
+          "Randomness does not make irrelevant context relevant and can make answers less consistent.",
+      },
+    ],
+    correctOptionIds: ["A"],
+  }),
+
+  defineAifQuestion({
+    id: "aif-d2-046",
+    format: "single-choice",
+    domainId: "genai-fundamentals",
+    taskStatement: "2.3",
+    topic: "amazon-bedrock",
+    difficulty: "easy",
+    stem: "A developer wants to call supported foundation models through a managed AWS API without building and operating the model training infrastructure. Which service is the best fit?",
+    options: [
+      {
+        id: "A",
+        text: "Amazon Bedrock",
+        explanation:
+          "Correct. Amazon Bedrock provides managed access to foundation models through APIs and related application capabilities.",
+      },
+      {
+        id: "B",
+        text: "Amazon Route 53",
+        explanation:
+          "Route 53 provides DNS and related networking services, not foundation-model inference APIs.",
+      },
+      {
+        id: "C",
+        text: "Amazon EBS",
+        explanation:
+          "EBS provides block storage for compute resources and does not provide managed model access.",
+      },
+      {
+        id: "D",
+        text: "AWS Artifact",
+        explanation:
+          "Artifact provides compliance reports and agreements; it is not an inference service.",
+      },
+    ],
+    correctOptionIds: ["A"],
+  }),
+
+  defineAifQuestion({
+    id: "aif-d2-047",
+    format: "multi-response",
+    domainId: "genai-fundamentals",
+    taskStatement: "2.3",
+    topic: "sagemaker-jumpstart",
+    difficulty: "medium",
+    stem: "Which two capabilities are associated with Amazon SageMaker JumpStart? (Select TWO.)",
+    options: [
+      {
+        id: "A",
+        text: "Explore selected pretrained models and solution templates",
+        explanation:
+          "Correct. JumpStart helps teams discover pretrained models and solution templates for common ML tasks.",
+      },
+      {
+        id: "B",
+        text: "Deploy selected models to SageMaker endpoints for inference",
+        explanation:
+          "Correct. JumpStart can help deploy compatible models to SageMaker for inference.",
+      },
+      {
+        id: "C",
+        text: "Issue public TLS certificates for every endpoint automatically",
+        explanation:
+          "Certificate issuance is not the purpose of JumpStart and is not automatically provided for every endpoint.",
+      },
+      {
+        id: "D",
+        text: "Replace IAM policies with model-generated access decisions",
+        explanation:
+          "JumpStart does not replace AWS identity and access management controls.",
+      },
+      {
+        id: "E",
+        text: "Guarantee that every pretrained model is appropriate for every business workload",
+        explanation:
+          "Teams must evaluate model quality, licensing, safety, and fit for their own workload.",
+      },
+    ],
+    correctOptionIds: ["A", "B"],
+  }),
+
+  defineAifQuestion({
+    id: "aif-d2-048",
+    format: "single-choice",
+    domainId: "genai-fundamentals",
+    taskStatement: "2.3",
+    topic: "amazon-q",
+    difficulty: "easy",
+    stem: "An organization wants an AI assistant that can answer employees’ questions using information from authorized company systems and applications. Which AWS service is designed for this type of experience?",
+    options: [
+      {
+        id: "A",
+        text: "Amazon Q",
+        explanation:
+          "Correct. Amazon Q provides generative AI assistant experiences tailored to business or developer use cases and connected data.",
+      },
+      {
+        id: "B",
+        text: "Amazon VPC",
+        explanation:
+          "VPC provides network isolation and connectivity, not an employee knowledge assistant.",
+      },
+      {
+        id: "C",
+        text: "Amazon CloudFront",
+        explanation:
+          "CloudFront is a content delivery network and is not an enterprise generative AI assistant.",
+      },
+      {
+        id: "D",
+        text: "AWS CloudFormation",
+        explanation:
+          "CloudFormation provisions infrastructure from templates; it does not provide an employee question-answering assistant.",
+      },
+    ],
+    correctOptionIds: ["A"],
+  }),
 ]

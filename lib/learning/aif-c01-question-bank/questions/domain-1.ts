@@ -1232,4 +1232,312 @@ export const domain1Questions: AifExamQuestion[] = [
     ],
     correctOptionIds: ["A", "B", "C"],
   }),
+
+  defineAifQuestion({
+    id: "aif-d1-033",
+    format: "single-choice",
+    domainId: "ai-ml-fundamentals",
+    taskStatement: "1.1",
+    topic: "unsupervised-learning",
+    difficulty: "easy",
+    stem: "A retailer has customer purchase records but no predefined customer segments. Which machine learning approach can group customers by similarity without labeled segment names?",
+    options: [
+      {
+        id: "A",
+        text: "Unsupervised learning",
+        explanation:
+          "Correct. Unsupervised learning discovers patterns or groups in data without requiring labeled outcomes.",
+      },
+      {
+        id: "B",
+        text: "Supervised classification",
+        explanation:
+          "Classification learns from labeled categories, which the retailer does not already have in this scenario.",
+      },
+      {
+        id: "C",
+        text: "Reinforcement learning",
+        explanation:
+          "Reinforcement learning learns from actions and rewards, not simply from grouping unlabeled records.",
+      },
+      {
+        id: "D",
+        text: "Rule-based inference only",
+        explanation:
+          "Fixed rules can segment records, but they do not discover similarity-based groups through machine learning.",
+      },
+    ],
+    correctOptionIds: ["A"],
+  }),
+
+  defineAifQuestion({
+    id: "aif-d1-034",
+    format: "single-choice",
+    domainId: "ai-ml-fundamentals",
+    taskStatement: "1.1",
+    topic: "regression",
+    difficulty: "easy",
+    stem: "A property company wants to estimate the sale price of a home from its features. Which type of machine learning problem is this?",
+    options: [
+      {
+        id: "A",
+        text: "Regression",
+        explanation:
+          "Correct. Regression predicts a continuous numerical value such as a sale price.",
+      },
+      {
+        id: "B",
+        text: "Binary classification",
+        explanation:
+          "Binary classification predicts one of two categories, not an arbitrary continuous price.",
+      },
+      {
+        id: "C",
+        text: "Clustering",
+        explanation:
+          "Clustering groups similar records and does not directly predict a labeled numerical target.",
+      },
+      {
+        id: "D",
+        text: "Association rule mining",
+        explanation:
+          "Association rules find item relationships, such as products purchased together, rather than a home price.",
+      },
+    ],
+    correctOptionIds: ["A"],
+  }),
+
+  defineAifQuestion({
+    id: "aif-d1-035",
+    format: "multi-response",
+    domainId: "ai-ml-fundamentals",
+    taskStatement: "1.1",
+    topic: "supervised-learning",
+    difficulty: "medium",
+    stem: "Which two examples use supervised learning? (Select TWO.)",
+    options: [
+      {
+        id: "A",
+        text: "Predict whether a transaction is fraudulent from historical transactions labeled fraudulent or legitimate",
+        explanation:
+          "Correct. The model learns from examples with known target labels.",
+      },
+      {
+        id: "B",
+        text: "Predict next month’s demand from historical observations paired with their actual demand values",
+        explanation:
+          "Correct. Historical inputs paired with known numerical outcomes provide supervised training data.",
+      },
+      {
+        id: "C",
+        text: "Group unlabeled support tickets by their vocabulary",
+        explanation:
+          "This is an unsupervised clustering task because no target labels are provided.",
+      },
+      {
+        id: "D",
+        text: "Learn a robot’s actions solely from rewards received during exploration",
+        explanation:
+          "This describes reinforcement learning, where rewards guide actions instead of fixed labels.",
+      },
+      {
+        id: "E",
+        text: "Compress records into a lower-dimensional representation without a target value",
+        explanation:
+          "This is an unsupervised representation-learning task, not supervised prediction.",
+      },
+    ],
+    correctOptionIds: ["A", "B"],
+  }),
+
+  defineAifQuestion({
+    id: "aif-d1-036",
+    format: "single-choice",
+    domainId: "ai-ml-fundamentals",
+    taskStatement: "1.2",
+    topic: "aws-ml-services",
+    difficulty: "easy",
+    stem: "A business needs to extract printed text, forms, and tables from scanned invoices stored in Amazon S3. Which AWS service is the best fit?",
+    options: [
+      {
+        id: "A",
+        text: "Amazon Textract",
+        explanation:
+          "Correct. Textract extracts text and structured information such as forms and tables from documents.",
+      },
+      {
+        id: "B",
+        text: "Amazon Transcribe",
+        explanation:
+          "Transcribe converts speech to text. It is not the service for extracting fields from scanned invoices.",
+      },
+      {
+        id: "C",
+        text: "Amazon Polly",
+        explanation:
+          "Polly converts text to speech and does not analyze scanned documents.",
+      },
+      {
+        id: "D",
+        text: "Amazon Personalize",
+        explanation:
+          "Personalize builds recommendation experiences; it does not perform document text extraction.",
+      },
+    ],
+    correctOptionIds: ["A"],
+  }),
+
+  defineAifQuestion({
+    id: "aif-d1-037",
+    format: "single-choice",
+    domainId: "ai-ml-fundamentals",
+    taskStatement: "1.2",
+    topic: "aws-ml-services",
+    difficulty: "easy",
+    stem: "A retailer wants a managed service to forecast product demand from historical time-series data. Which AWS service is designed for this use case?",
+    options: [
+      {
+        id: "A",
+        text: "Amazon Forecast",
+        explanation:
+          "Correct. Amazon Forecast is designed to generate time-series forecasts from historical data and related information.",
+      },
+      {
+        id: "B",
+        text: "Amazon Rekognition",
+        explanation:
+          "Rekognition analyzes images and video, not product-demand time series.",
+      },
+      {
+        id: "C",
+        text: "Amazon Lex",
+        explanation:
+          "Lex builds conversational interfaces and is not a time-series forecasting service.",
+      },
+      {
+        id: "D",
+        text: "Amazon Comprehend",
+        explanation:
+          "Comprehend provides natural-language analysis such as sentiment and entity detection.",
+      },
+    ],
+    correctOptionIds: ["A"],
+  }),
+
+  defineAifQuestion({
+    id: "aif-d1-038",
+    format: "multi-response",
+    domainId: "ai-ml-fundamentals",
+    taskStatement: "1.2",
+    topic: "ai-use-cases",
+    difficulty: "medium",
+    stem: "Which three are common practical uses of AI? (Select THREE.)",
+    options: [
+      {
+        id: "A",
+        text: "Detect unusual payment behavior for possible fraud investigation",
+        explanation:
+          "Correct. Anomaly detection can help identify transactions that differ from expected behavior.",
+      },
+      {
+        id: "B",
+        text: "Recommend products based on a customer’s interests and past activity",
+        explanation:
+          "Correct. Recommendation systems use behavioral and item data to personalize suggestions.",
+      },
+      {
+        id: "C",
+        text: "Transcribe customer support calls into searchable text",
+        explanation:
+          "Correct. Speech recognition is a common AI use case for creating text from recorded audio.",
+      },
+      {
+        id: "D",
+        text: "Guarantee that a manually entered spreadsheet contains no arithmetic mistakes without checking it",
+        explanation:
+          "AI can assist with data quality, but it cannot guarantee an unchecked spreadsheet is error-free.",
+      },
+      {
+        id: "E",
+        text: "Replace every business rule with an opaque model regardless of risk or explainability needs",
+        explanation:
+          "AI should be selected for an appropriate problem and governed for its risks; replacing every rule is not a sound use case.",
+      },
+    ],
+    correctOptionIds: ["A", "B", "C"],
+  }),
+
+  defineAifQuestion({
+    id: "aif-d1-039",
+    format: "single-choice",
+    domainId: "ai-ml-fundamentals",
+    taskStatement: "1.3",
+    topic: "ml-lifecycle",
+    difficulty: "medium",
+    stem: "During which machine learning lifecycle stage does a team use held-out data to estimate how well a trained model generalizes to unseen examples?",
+    options: [
+      {
+        id: "A",
+        text: "Model evaluation",
+        explanation:
+          "Correct. Evaluation uses validation or test data to measure performance beyond the training examples.",
+      },
+      {
+        id: "B",
+        text: "Data ingestion only",
+        explanation:
+          "Ingestion brings data into the workflow but does not by itself measure generalization.",
+      },
+      {
+        id: "C",
+        text: "Feature storage",
+        explanation:
+          "Feature storage manages reusable inputs; it is not the stage that evaluates predictions.",
+      },
+      {
+        id: "D",
+        text: "Endpoint deletion",
+        explanation:
+          "Deleting an endpoint is an operational action after deployment, not model evaluation.",
+      },
+    ],
+    correctOptionIds: ["A"],
+  }),
+
+  defineAifQuestion({
+    id: "aif-d1-040",
+    format: "single-choice",
+    domainId: "ai-ml-fundamentals",
+    taskStatement: "1.3",
+    topic: "data-drift",
+    difficulty: "medium",
+    stem: "A deployed loan-risk model receives applicant data whose income and employment distributions have shifted substantially from the training data. What is this change commonly called?",
+    options: [
+      {
+        id: "A",
+        text: "Data drift",
+        explanation:
+          "Correct. Data drift is a change in the distribution of input data over time compared with the data used to train the model.",
+      },
+      {
+        id: "B",
+        text: "Data encryption",
+        explanation:
+          "Encryption protects data confidentiality and does not describe a change in its statistical distribution.",
+      },
+      {
+        id: "C",
+        text: "Model distillation",
+        explanation:
+          "Distillation transfers behavior from a larger model to a smaller one; it is not an input-distribution change.",
+      },
+      {
+        id: "D",
+        text: "Tokenization",
+        explanation:
+          "Tokenization splits text into units and is unrelated to a distribution shift in applicant features.",
+      },
+    ],
+    correctOptionIds: ["A"],
+  }),
 ]
