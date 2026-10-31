@@ -30,6 +30,18 @@ describe("token-service", () => {
     })
   })
 
+  it("round-trips a per-device session id", () => {
+    process.env.AUTH_JWT_SECRET = "session-bound-secret"
+
+    const issued = issueJwtToken({
+      sub: "user_session",
+      email: "session@example.com",
+      sid: "session_1",
+    })
+
+    expect(verifyJwtToken(issued.token).sid).toBe("session_1")
+  })
+
   it("falls back to NEXTAUTH_SECRET when AUTH_JWT_SECRET and AUTH_SECRET are unset", () => {
     delete process.env.AUTH_JWT_SECRET
     delete process.env.AUTH_SECRET
@@ -44,10 +56,10 @@ describe("token-service", () => {
     })
   })
 
-  it("defaults browser sessions to a 30 minute inactivity window", () => {
+  it("defaults browser sessions to a 30 day inactivity window", () => {
     delete process.env.AUTH_IDLE_EXPIRES_IN_SECONDS
 
-    expect(getJwtIdleExpirySeconds()).toBe(60 * 30)
+    expect(getJwtIdleExpirySeconds()).toBe(60 * 60 * 24 * 30)
   })
 
   it("rejects tokens after the inactivity window", () => {

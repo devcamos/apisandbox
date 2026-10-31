@@ -82,6 +82,7 @@ model User {
 
   accounts            Account[]
   sessions            Session[]
+  userSessions        UserSession[]
   verificationToken   VerificationToken[]
   profile             UserProfile?
   phaseProgress       UserPhaseProgress[]
@@ -91,6 +92,25 @@ model User {
   learningEnrollments LearningEnrollment[]
   learningCheckpointProgress LearningCheckpointProgress[]
   learningUnitAssessmentProgress LearningUnitAssessmentProgress[]
+}
+
+/// Revocable browser/app login sessions. One row represents one device login.
+model UserSession {
+  id         String    @id @default(cuid())
+  userId     String
+  deviceName String?
+  userAgent  String?
+  ipAddress  String?
+  lastUsedAt DateTime  @default(now())
+  expiresAt  DateTime
+  revokedAt  DateTime?
+  createdAt  DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([userId, revokedAt])
+  @@index([expiresAt])
 }
 
 model StripeWebhookEvent {

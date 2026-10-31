@@ -23,5 +23,6 @@ export const GET = withRouteErrorHandling(async (request: NextRequest) => {
       expiresIn,
     },
     200,
+    request,
   )
 })

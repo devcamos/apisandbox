@@ -24,5 +24,5 @@ export const POST = withRouteErrorHandling(async (request: NextRequest) => {
     plan: parsed.data.plan,
   })
 
-  return authSessionResponse(result)
+  return authSessionResponse(result, 200, request)
 })

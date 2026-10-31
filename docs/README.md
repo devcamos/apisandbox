@@ -12,6 +12,7 @@ Essential docs for onboarding and shipping changes. Product learning content liv
 | [DEPLOYMENT.md](./DEPLOYMENT.md) | Vercel env, Prisma on deploy, Google OAuth origins, public-schema RLS |
 | [KNOWN_ERRORS.md](./KNOWN_ERRORS.md) | Repeatable deployment failures and recovery runbooks |
 | [SAAS.md](./SAAS.md) | Production SaaS flags, Stripe, rate limits, health probe |
+| [USER_SESSION_ARCHITECTURE.md](./USER_SESSION_ARCHITECTURE.md) | Reusable per-device user-session contract, security, operations, and rollout |
 | [STRIPE_LOCAL.md](./STRIPE_LOCAL.md) | Real Stripe Checkout in Test mode + webhook forwarding |
 | [EDUCATION_SYSTEM.md](./EDUCATION_SYSTEM.md) | Learning progress domain, premium model boundary, dependency integration map |
 | [EP226_API_CONCEPTS.md](./EP226_API_CONCEPTS.md) | ByteByteGo EP226 concept list mapped to in-app lessons |

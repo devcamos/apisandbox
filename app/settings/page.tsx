@@ -5,6 +5,7 @@ import Link from "next/link"
 import { Copy, KeyRound, Loader2, Plus, ShieldCheck, Trash2 } from "lucide-react"
 import { authApiJsonInit, authApiRequestInit } from "@/lib/auth/client-fetch"
 import { useSession } from "@/components/providers/SessionProvider"
+import { UserSessionsPanel } from "@/components/settings/UserSessionsPanel"
 import { API_TOKEN_SCOPES, type ApiTokenScope, type PublicApiToken } from "@/lib/api-tokens/token-types"
 
 type ApiEnvelope<T> = {
@@ -238,6 +239,8 @@ export default function SettingsPage() {
             </code>
           </section>
         )}
+
+        <UserSessionsPanel />
 
         <div className="grid gap-6 lg:grid-cols-[22rem_1fr]">
           <form onSubmit={createToken} className="rounded-lg border border-slate-800 bg-slate-900 p-5">

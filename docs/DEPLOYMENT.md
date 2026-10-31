@@ -28,6 +28,11 @@ Preview hosts change per PR (`https://apisandbox-<hash>-….vercel.app`). Each h
 | `GOOGLE_CLIENT_ID` | Google OAuth Web client ID |
 | `NEXT_PUBLIC_APP_URL` | canonical site URL |
 
+Session defaults are 30 days for both the signed browser token and its revocable
+database session. If an application needs a shorter inactivity window, set
+`AUTH_IDLE_EXPIRES_IN_SECONDS`; see
+[USER_SESSION_ARCHITECTURE.md](./USER_SESSION_ARCHITECTURE.md).
+
 **Preview pitfall:** If `AUTH_JWT_SECRET` is scoped to a single Git branch (e.g. `fix/foo` only), other PR previews will show *Sign-in is not configured*. Prefer **Preview → all branches**, or add the secret per branch. After changing env vars, **redeploy** the preview (Vercel → Deployments → Redeploy).
 
 ```bash

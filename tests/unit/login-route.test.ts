@@ -1,13 +1,30 @@
 import { beforeEach, describe, expect, it, vi } from "vitest"
-import { NextRequest } from "next/server"
+import { NextRequest, NextResponse } from "next/server"
 
 const loginWithPassword = vi.hoisted(() => vi.fn())
 const createEphemeralDemoSession = vi.hoisted(() => vi.fn())
 const checkRateLimit = vi.hoisted(() => vi.fn())
 const demoEnabled = vi.hoisted(() => ({ value: true }))
+const createUserSession = vi.hoisted(() => vi.fn())
+const findActiveUserSession = vi.hoisted(() => vi.fn())
+const authSessionResponse = vi.hoisted(() => vi.fn())
 
 vi.mock("@/lib/services/auth/auth-service", () => ({ loginWithPassword }))
 vi.mock("@/lib/services/auth/demo-auth-service", () => ({ createEphemeralDemoSession }))
+vi.mock("@/lib/services/auth/user-session-service", () => ({
+  createUserSession,
+  findActiveUserSession,
+  getUserSessionContext: () => ({ userAgent: null, ipAddress: null }),
+}))
+vi.mock("@/lib/http/auth-route-helpers", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@/lib/http/auth-route-helpers")>()
+  authSessionResponse.mockImplementation((payload: { token: string; expiresIn: number }, status = 200) => {
+    const response = NextResponse.json({ success: true, data: payload }, { status })
+    response.cookies.set("auth_token", payload.token, { httpOnly: true, path: "/", maxAge: payload.expiresIn })
+    return response
+  })
+  return { ...actual, authSessionResponse }
+})
 vi.mock("@/lib/rate-limit", async (orig) => {
   const actual = await orig<typeof import("@/lib/rate-limit")>()
   return {
@@ -43,6 +60,8 @@ describe("POST /api/auth/login", () => {
   beforeEach(() => {
     vi.clearAllMocks()
     demoEnabled.value = true
+    createUserSession.mockResolvedValue({ id: "session-1", expiresIn: 2592000 })
+    findActiveUserSession.mockResolvedValue(null)
     checkRateLimit.mockResolvedValue({ allowed: true, remaining: 10, resetAt: 0 })
   })
 

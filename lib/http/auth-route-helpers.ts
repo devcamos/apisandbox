@@ -1,6 +1,14 @@
 import type { NextRequest, NextResponse } from "next/server"
 import type { z } from "zod"
 import { errorResponse, handleRouteError, okResponse } from "@/lib/http/responses"
+import type { AuthUser } from "@/lib/auth/types"
+import { verifyJwtToken } from "@/lib/services/auth/token-service"
+import { issueAuthTokenForUser } from "@/lib/services/auth/auth-response-mapper"
+import {
+  createUserSession,
+  findActiveUserSession,
+  getUserSessionContext,
+} from "@/lib/services/auth/user-session-service"
 
 /**
  * Bearer token for API routes, with `auth_token` cookie fallback.
@@ -81,15 +89,46 @@ export async function parseJsonBody<T>(
 interface AuthSessionResponse {
   token: string
   expiresIn: number
+  user: AuthUser
 }
 
 /**
  * Build the standard 200 (or other) JSON success response and attach the
  * auth_token cookie sourced from the response payload.
  */
-export function authSessionResponse<T extends AuthSessionResponse>(payload: T, status = 200) {
-  const res = okResponse(payload, status)
-  return setAuthCookie(res, { token: payload.token, maxAge: payload.expiresIn })
+async function getOrCreateSessionId(userId: string, request: NextRequest) {
+  const currentToken = readAuthToken(request)
+  if (currentToken) {
+    try {
+      const currentPayload = verifyJwtToken(currentToken)
+      if (currentPayload.sub === userId && currentPayload.sid) {
+        const activeSession = await findActiveUserSession(userId, currentPayload.sid)
+        if (activeSession) return activeSession.id
+      }
+    } catch {
+      // A login response may not have an existing token. A new session is created below.
+    }
+  }
+
+  const session = await createUserSession(userId, getUserSessionContext(request))
+  return session.id
+}
+
+export async function authSessionResponse<T extends AuthSessionResponse>(
+  payload: T,
+  status = 200,
+  request?: NextRequest,
+) {
+  const sessionId = request ? await getOrCreateSessionId(payload.user.id, request) : undefined
+  const responsePayload = sessionId
+    ? { ...payload, ...issueAuthTokenForUser(payload.user, sessionId) }
+    : payload
+
+  const res = okResponse(responsePayload, status)
+  return setAuthCookie(res, {
+    token: responsePayload.token,
+    maxAge: responsePayload.expiresIn,
+  })
 }
 
 type RouteHandler = (request: NextRequest) => Promise<NextResponse>

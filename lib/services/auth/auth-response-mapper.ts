@@ -33,10 +33,11 @@ export function mapUserToAuthUser(user: UserWithProfile): AuthUser {
   }
 }
 
-export function issueAuthTokenForUser(authUser: AuthUser) {
+export function issueAuthTokenForUser(authUser: AuthUser, sessionId?: string) {
   const { token, expiresIn } = issueJwtToken({
     sub: authUser.id,
     email: authUser.email,
+    sid: sessionId,
   })
 
   return {

@@ -30,7 +30,7 @@ export const POST = withRouteErrorHandling(async (request: NextRequest) => {
   }
 
   const response = await createEphemeralDemoSession()
-  const res = authSessionResponse(response)
+  const res = await authSessionResponse(response, 200, request)
   const headers = new Headers(res.headers)
   for (const [k, v] of Object.entries(rateLimitHeaders(limit))) {
     headers.set(k, String(v))
