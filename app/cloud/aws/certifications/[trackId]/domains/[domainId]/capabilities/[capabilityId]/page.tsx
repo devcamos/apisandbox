@@ -1,6 +1,6 @@
 import type { Metadata } from "next"
 import { notFound } from "next/navigation"
-import { SubscriptionGate } from "@/components/SubscriptionGate"
+import { PremiumPageGate } from "@/components/premium/PremiumPageGate"
 import { AwsCertificationCourse } from "@/components/learning/AwsCertificationCourse"
 import { getSanitizedLearningCourse } from "@/lib/learning/api-foundations-course"
 import { awsCertificationTracks, getAwsCertificationTrack } from "@/lib/learning/aws-certification-course"
@@ -58,8 +58,8 @@ export default async function AwsCertificationCapabilityPage({
   if (!course) notFound()
 
   return (
-    <SubscriptionGate phaseNumber="cloud" lockedContentName={track.examCode + " certification mastery"}>
+    <PremiumPageGate phaseNumber="cloud" lockedContentName={track.examCode + " certification mastery"}>
       <AwsCertificationCourse track={track} course={course} unitId={capabilityId} />
-    </SubscriptionGate>
+    </PremiumPageGate>
   )
 }

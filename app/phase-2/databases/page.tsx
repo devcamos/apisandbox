@@ -1,3 +1,4 @@
+import { PremiumPageGate } from "@/components/premium/PremiumPageGate"
 import { Metadata } from 'next'
 import Link from 'next/link'
 import { Database, Zap, Server, Code } from 'lucide-react'
@@ -46,7 +47,7 @@ const databases = [
   }
 ]
 
-export default function DatabasesPage() {
+function DatabasesPageContent() {
   return (
     <div className="min-h-screen bg-gray-50 py-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -152,5 +153,14 @@ export default function DatabasesPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+/** Server-gated premium page. */
+export default function DatabasesPage() {
+  return (
+    <PremiumPageGate phaseNumber={2} lockedContentName="Phase 2: Databases">
+      <DatabasesPageContent />
+    </PremiumPageGate>
   )
 }

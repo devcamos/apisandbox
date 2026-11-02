@@ -315,5 +315,27 @@ describe("saas config", () => {
         warnings: 1,
       })
     })
+
+    it("warns that the paywall is enforced anyway when the flag is off on Vercel Production", async () => {
+      vi.stubEnv("VERCEL_ENV", "production")
+      vi.stubEnv("NEXT_PUBLIC_FF_PREMIUM_PAYWALL", "")
+      const { evaluateSaasReadiness } = await import("@/lib/saas/config")
+      const check = checkById(evaluateSaasReadiness(), "paywall")
+      expect(check.status).toBe("warn")
+      expect(check.detail).toContain("enforced anyway")
+    })
+
+    it("reports paywall ok when the flag is on", async () => {
+      vi.stubEnv("NEXT_PUBLIC_FF_PREMIUM_PAYWALL", "true")
+      const { evaluateSaasReadiness } = await import("@/lib/saas/config")
+      expect(checkById(evaluateSaasReadiness(), "paywall").status).toBe("ok")
+    })
+
+    it("blocks instant upgrade on any Vercel deployment", async () => {
+      vi.stubEnv("NODE_ENV", "development")
+      vi.stubEnv("VERCEL_ENV", "preview")
+      const { isInstantPremiumUpgradeAllowed } = await import("@/lib/saas/config")
+      expect(isInstantPremiumUpgradeAllowed()).toBe(false)
+    })
   })
 })

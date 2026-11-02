@@ -1,3 +1,4 @@
+import { PremiumPageGate } from "@/components/premium/PremiumPageGate"
 import { Metadata } from 'next'
 import { Database, Shield, Zap, Users } from 'lucide-react'
 
@@ -7,7 +8,7 @@ export const metadata: Metadata = {
   description: 'Learn PostgreSQL with Prisma ORM for type-safe database operations',
 }
 
-export default function PostgreSQLPage() {
+function PostgreSQLPageContent() {
   return (
     <div className="min-h-screen bg-gray-50 py-12">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -238,5 +239,14 @@ $$ LANGUAGE plpgsql;`} />
         </div>
       </div>
     </div>
+  )
+}
+
+/** Server-gated premium page. */
+export default function PostgreSQLPage() {
+  return (
+    <PremiumPageGate phaseNumber={2} lockedContentName="Phase 2: PostgreSQL">
+      <PostgreSQLPageContent />
+    </PremiumPageGate>
   )
 }
