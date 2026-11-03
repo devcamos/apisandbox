@@ -1,11 +1,13 @@
-import { NextResponse } from "next/server";
+import { NextResponse, type NextRequest } from "next/server";
+import { withPremiumApiAccess } from "@/lib/http/premium-api-guard";
+import { awsToolsLimiter } from "@/lib/rate-limit";
 
 function invalidBodyResponse(error: unknown) {
   const detail = error instanceof Error ? error.message : "Invalid request body";
   return NextResponse.json({ error: detail }, { status: 400 });
 }
 
-export async function POST(request: Request) {
+async function handlePOST(request: Request) {
   try {
     const body = await request.json();
     const { appType, complexity } = body;
@@ -50,4 +52,10 @@ export async function POST(request: Request) {
   } catch (error) {
     return invalidBodyResponse(error);
   }
+}
+
+const guard = { phase: "cloud" as const, limiter: awsToolsLimiter, bucket: "aws-tools" }
+
+export async function POST(request: NextRequest) {
+  return withPremiumApiAccess(request, guard, () => handlePOST(request))
 }

@@ -123,6 +123,9 @@ export async function handleCheckoutSessionCompleted(event: Stripe.Event): Promi
   await applyPremiumSubscription(userId, {
     stripeSubscriptionId: subscriptionId ?? null,
     stripeSubscriptionStatus: "active",
+    // Clear any stale expiry from a previous lapsed subscription so a returning
+    // subscriber is not treated as expired until the next subscription event.
+    subscriptionExpiresAt: null,
   })
   await sendConfirmationBestEffort(userId)
 

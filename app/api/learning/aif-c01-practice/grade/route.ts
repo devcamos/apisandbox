@@ -1,4 +1,6 @@
-import { NextResponse } from "next/server"
+import { NextResponse, type NextRequest } from "next/server"
+import { withPremiumApiAccess } from "@/lib/http/premium-api-guard"
+import { practiceGradeLimiter } from "@/lib/rate-limit"
 import {
   getAifExamQuestionsByIds,
   gradeAifExamPracticeSession,
@@ -20,7 +22,7 @@ function isAnswersMap(value: unknown): value is Record<string, string[]> {
   return Object.values(value).every((entry) => isStringArray(entry))
 }
 
-export async function POST(request: Request) {
+async function gradePractice(request: Request): Promise<Response> {
   let body: GradeRequestBody
   try {
     body = (await request.json()) as GradeRequestBody
@@ -59,4 +61,11 @@ export async function POST(request: Request) {
 
   const result = gradeAifExamPracticeSession(questions, body.answers)
   return NextResponse.json({ data: result })
+}
+
+const guard = { phase: "cloud" as const, limiter: practiceGradeLimiter, bucket: "aif-practice" }
+
+/** Premium Cloud content: requires a signed-in user with Cloud access, rate-limited per user. */
+export async function POST(request: NextRequest) {
+  return withPremiumApiAccess(request, guard, () => gradePractice(request))
 }

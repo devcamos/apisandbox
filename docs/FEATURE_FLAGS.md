@@ -18,6 +18,13 @@ Boolean toggles control SaaS billing, auth, rate limits, and analytics without c
 
 Only the literal string `"true"` enables a flag (`"yes"`, `"1"`, etc. are treated as off).
 
+**Paywall is always enforced on Vercel Production.** If `NEXT_PUBLIC_FF_PREMIUM_PAYWALL` is
+missing or not `true` while `VERCEL_ENV` / `NEXT_PUBLIC_VERCEL_ENV` is `production`, the
+paywall is enforced anyway and `/api/health/saas` reports `paywall: warn` until you set it.
+Premium pages (Phases 2–9, Cloud, AI) are gated on the server by `PremiumPageGate`; locked
+viewers receive only the `PhasePreview` card. The instant upgrade API is local-dev only.
+See [STRIPE-GO-LIVE.md](./STRIPE-GO-LIVE.md).
+
 Templates: [`config/environments/local.env.example`](../config/environments/local.env.example), [`config/environments/prod.env.example`](../config/environments/prod.env.example).
 
 ## Usage in code
@@ -88,7 +95,7 @@ See [STRIPE_LOCAL.md](./STRIPE_LOCAL.md) for local test mode.
 
 | Flag | Primary touchpoints |
 |------|---------------------|
-| `PREMIUM_PAYWALL` | `middleware.ts`, `SubscriptionGate`, dashboard |
+| `PREMIUM_PAYWALL` | `middleware.ts`, `PremiumPageGate` (server), `assertPhaseAccessForUser`, dashboard |
 | `STRIPE_CHECKOUT` | `/api/checkout`, webhooks, instant-upgrade guard |
 | `BILLING_PORTAL` | `/api/billing/portal`, `ManageSubscriptionButton` in nav |
 | `RATE_LIMITING` | `lib/rate-limit.ts`, auth + assistant routes |

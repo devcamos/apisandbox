@@ -1,6 +1,8 @@
-import { NextResponse } from "next/server";
+import { NextResponse, type NextRequest } from "next/server";
+import { withPremiumApiAccess } from "@/lib/http/premium-api-guard";
+import { awsToolsLimiter } from "@/lib/rate-limit";
 
-export async function GET() {
+async function handleGET(_request: Request) {
   const services = [
     {
       id: "ec2",
@@ -55,3 +57,9 @@ export async function GET() {
   return NextResponse.json(services);
 }
 
+
+const guard = { phase: "cloud" as const, limiter: awsToolsLimiter, bucket: "aws-tools" }
+
+export async function GET(request: NextRequest) {
+  return withPremiumApiAccess(request, guard, () => handleGET(request))
+}

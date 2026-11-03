@@ -21,8 +21,14 @@
 
 import { prisma } from "@/lib/prisma"
 import { applyPremiumSubscription } from "@/lib/subscription-provision"
+import {
+  effectiveTier as resolveEffectiveTier,
+  isFreePhase,
+  isPremiumPhase,
+  type SubscriptionTier,
+} from "@/lib/subscription-access"
 
-export type SubscriptionTier = "FREE" | "PREMIUM"
+export type { SubscriptionTier } from "@/lib/subscription-access"
 
 export interface AccessCheck {
   hasAccess: boolean
@@ -64,27 +70,14 @@ export async function checkPhaseAccess(
     }
   }
 
-  const tier = user.subscriptionTier as SubscriptionTier
-  const isExpired = user.subscriptionExpiresAt
-    ? user.subscriptionExpiresAt < new Date()
-    : false
+  const { tier: effectiveTier, isExpired } = resolveEffectiveTier(user)
 
-  // MENTOR NOTE: Effective tier (expired premium = free)
-  const effectiveTier: SubscriptionTier = isExpired ? "FREE" : tier
-
-  // Access rules
   let hasAccess = false
   let upgradeRequired = false
 
-  if (phaseNumber === 0 || phaseNumber === 1) {
+  if (isFreePhase(phaseNumber)) {
     hasAccess = true
-  } else if (
-    phaseNumber === "cloud" ||
-    phaseNumber === "ai" ||
-    (typeof phaseNumber === "number" &&
-      phaseNumber >= 2 &&
-      phaseNumber <= 9)
-  ) {
+  } else if (isPremiumPhase(phaseNumber)) {
     hasAccess = effectiveTier === "PREMIUM"
     upgradeRequired = !hasAccess
   }

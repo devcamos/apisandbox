@@ -44,10 +44,13 @@ function publicAppUrlIsValid(): boolean {
   }
 }
 
-/** Instant POST /api/subscription/upgrade — dev/demo only, never when Stripe checkout is live. */
+/** Instant POST /api/subscription/upgrade — local development only, never when Stripe checkout is on. */
 export function isInstantPremiumUpgradeAllowed(): boolean {
+  // Local `next dev` only. Vercel Preview, CI `next start` and Production all run
+  // with NODE_ENV=production (or test), so the shortcut is unavailable there.
+  if (process.env.NODE_ENV !== "development") return false
+  if (process.env.VERCEL_ENV?.trim()) return false
   if (isFeatureEnabled("STRIPE_CHECKOUT")) return false
-  if (isProductionDeploy()) return false
   return true
 }
 
@@ -178,7 +181,17 @@ function stripeCheck(): SaasReadinessCheck {
 }
 
 function paywallCheck(): SaasReadinessCheck {
+  const flagSet = process.env.NEXT_PUBLIC_FF_PREMIUM_PAYWALL === "true"
   const enabled = isFeatureEnabled("PREMIUM_PAYWALL")
+  if (enabled && !flagSet) {
+    return {
+      id: "paywall",
+      label: "Premium paywall",
+      status: "warn",
+      detail:
+        "NEXT_PUBLIC_FF_PREMIUM_PAYWALL is not true, but the paywall is enforced anyway on Vercel Production. Set it to true to make this explicit.",
+    }
+  }
   return {
     id: "paywall",
     label: "Premium paywall",

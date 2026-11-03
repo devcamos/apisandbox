@@ -1,5 +1,5 @@
 import type { Metadata } from "next"
-import { SubscriptionGate } from "@/components/SubscriptionGate"
+import { PremiumPageGate } from "@/components/premium/PremiumPageGate"
 import { AifExamPractice } from "@/components/learning/AifExamPractice"
 import {
   AIF_C01_QUESTION_BANK,
@@ -70,12 +70,12 @@ export default async function AifExamPracticePage({
   const summary = summarizeAifQuestionBank(AIF_C01_QUESTION_BANK)
 
   return (
-    <SubscriptionGate phaseNumber="cloud" lockedContentName="AIF-C01 exam practice">
+    <PremiumPageGate phaseNumber="cloud" lockedContentName="AIF-C01 exam practice">
       <AifExamPractice
         questions={sanitizeAifExamQuestions(selected)}
         summary={summary}
         initialFilter={filter}
       />
-    </SubscriptionGate>
+    </PremiumPageGate>
   )
 }
