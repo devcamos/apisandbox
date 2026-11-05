@@ -23,6 +23,32 @@ describe("Feature Flags", () => {
     expect(isFeatureEnabled("PREMIUM_PAYWALL")).toBe(false)
   })
 
+  it("enforces the paywall on Vercel Production even when the flag is off", async () => {
+    vi.stubEnv("NEXT_PUBLIC_FF_PREMIUM_PAYWALL", "")
+    vi.stubEnv("VERCEL_ENV", "production")
+    const { isFeatureEnabled } = await import("@/config/featureFlags")
+    expect(isFeatureEnabled("PREMIUM_PAYWALL")).toBe(true)
+    vi.unstubAllEnvs()
+  })
+
+  it("enforces the paywall in the browser bundle on Vercel Production", async () => {
+    vi.stubEnv("NEXT_PUBLIC_FF_PREMIUM_PAYWALL", "false")
+    vi.stubEnv("NEXT_PUBLIC_VERCEL_ENV", "production")
+    const { isFeatureEnabled, isVercelProductionTarget } = await import("@/config/featureFlags")
+    expect(isVercelProductionTarget()).toBe(true)
+    expect(isFeatureEnabled("PREMIUM_PAYWALL")).toBe(true)
+    vi.unstubAllEnvs()
+  })
+
+  it("does not force the paywall on Vercel Preview", async () => {
+    vi.stubEnv("NEXT_PUBLIC_FF_PREMIUM_PAYWALL", "")
+    vi.stubEnv("VERCEL_ENV", "preview")
+    vi.stubEnv("NEXT_PUBLIC_VERCEL_ENV", "preview")
+    const { isFeatureEnabled } = await import("@/config/featureFlags")
+    expect(isFeatureEnabled("PREMIUM_PAYWALL")).toBe(false)
+    vi.unstubAllEnvs()
+  })
+
   it("signupRequiredForPremium maps to PREMIUM_PAYWALL flag", async () => {
     vi.stubEnv("NEXT_PUBLIC_FF_PREMIUM_PAYWALL", "true")
     const { signupRequiredForPremium } = await import("@/config/featureFlags")

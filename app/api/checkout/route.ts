@@ -7,6 +7,7 @@ import { prisma } from "@/lib/prisma"
 import { isFeatureEnabled } from "@/config/featureFlags"
 import { logger } from "@/lib/logger"
 import { blocksNewStripeSubscription } from "@/lib/stripe-subscriptions"
+import { hasActivePremium } from "@/lib/subscription-access"
 import { checkoutIdempotencyKey, resolveBillingOrigin } from "@/lib/billing/checkout-origin"
 
 export async function POST(request: NextRequest) {
@@ -53,6 +54,7 @@ export async function POST(request: NextRequest) {
         stripeCustomerId: true,
         stripeSubscriptionId: true,
         subscriptionTier: true,
+        subscriptionExpiresAt: true,
       },
     })
 
@@ -60,7 +62,9 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "User not found" }, { status: 404 })
     }
 
-    if (dbUser.subscriptionTier === "PREMIUM" || dbUser.stripeSubscriptionId) {
+    // Lapsed premium (expiry in the past) may re-subscribe; Stripe's own subscription list
+    // below still blocks duplicates.
+    if (hasActivePremium(dbUser) || dbUser.stripeSubscriptionId) {
       return NextResponse.json(
         { error: "An active subscription already exists. Use Manage subscription instead." },
         { status: 409 },

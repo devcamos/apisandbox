@@ -4,6 +4,7 @@ import { verifyJwtToken } from "@/lib/services/auth/token-service"
 import { findActiveUserSession } from "@/lib/services/auth/user-session-service"
 import { AppError } from "@/lib/http/errors"
 import { readAuthToken } from "@/lib/http/auth-route-helpers"
+import { hasActivePremium } from "@/lib/subscription-access"
 
 export async function requireAuthenticatedSession(request: NextRequest) {
   const token = readAuthToken(request)
@@ -40,10 +41,11 @@ export async function requirePremiumUser(request: NextRequest) {
   const user = await requireAuthenticatedUser(request)
   const record = await prisma.user.findUnique({
     where: { id: user.id },
-    select: { subscriptionTier: true },
+    select: { subscriptionTier: true, subscriptionExpiresAt: true },
   })
 
-  if (record?.subscriptionTier !== "PREMIUM") {
+  // Same effective-tier rule as checkPhaseAccess: lapsed premium counts as FREE.
+  if (!hasActivePremium(record)) {
     throw new AppError(
       "Learning Assistant is available for Premium subscribers only",
       403,

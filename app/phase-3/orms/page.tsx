@@ -1,3 +1,4 @@
+import { PremiumPageGate } from "@/components/premium/PremiumPageGate"
 import { Metadata } from 'next'
 import Link from 'next/link'
 import { Database, Shield, Code, Layers } from 'lucide-react'
@@ -54,7 +55,7 @@ const orms = [
   }
 ]
 
-export default function ORMsPage() {
+function ORMsPageContent() {
   return (
     <div className="min-h-screen bg-gray-50 py-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -260,5 +261,14 @@ export default function ORMsPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+/** Server-gated premium page. */
+export default function ORMsPage() {
+  return (
+    <PremiumPageGate phaseNumber={3} lockedContentName="Phase 3: ORMs">
+      <ORMsPageContent />
+    </PremiumPageGate>
   )
 }

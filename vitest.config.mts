@@ -61,6 +61,11 @@ export default defineConfig({
         "lib/validation/email.ts",
         "lib/validation/learner-profile.ts",
         "config/featureFlags.ts",
+        "lib/subscription-access.ts",
+        "lib/access/page-access.ts",
+        "lib/access/phase-preview-content.ts",
+        "lib/http/premium-api-guard.ts",
+        "lib/access/server-viewer.ts",
       ],
       // subscription.test.ts imports DB-backed helpers; keep them out of LCOV so SonarCloud
       // does not treat Prisma paths as uncovered new code.

@@ -27,11 +27,30 @@ function envFlagEnabled(envKey: string): boolean {
   return process.env[envKey] === "true"
 }
 
+/**
+ * True on the Vercel Production target. `NEXT_PUBLIC_VERCEL_ENV` is exposed to the
+ * browser bundle by Vercel; `VERCEL_ENV` covers server-only code paths.
+ */
+export function isVercelProductionTarget(): boolean {
+  return (
+    process.env.VERCEL_ENV === "production" ||
+    process.env.NEXT_PUBLIC_VERCEL_ENV === "production"
+  )
+}
+
+/**
+ * The premium paywall is always enforced on Vercel Production, even if
+ * `NEXT_PUBLIC_FF_PREMIUM_PAYWALL` is missing or false (see docs/FEATURE_FLAGS.md).
+ */
+function premiumPaywallEnabled(): boolean {
+  return envFlagEnabled(FEATURE_FLAG_ENV_KEYS.PREMIUM_PAYWALL) || isVercelProductionTarget()
+}
+
 const flags: Record<FeatureFlag, FlagConfig> = {
   PREMIUM_PAYWALL: {
-    enabled: envFlagEnabled(FEATURE_FLAG_ENV_KEYS.PREMIUM_PAYWALL),
+    enabled: premiumPaywallEnabled(),
     description:
-      "Require sign-in and active subscription for premium phases (2–6). When off, all content is accessible without auth.",
+      "Require sign-in and active subscription for premium phases (2–9, Cloud, AI). Always on in Vercel Production; when off elsewhere, all content is accessible without auth.",
   },
   STRIPE_CHECKOUT: {
     enabled: envFlagEnabled(FEATURE_FLAG_ENV_KEYS.STRIPE_CHECKOUT),

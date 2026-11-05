@@ -1,6 +1,6 @@
 import Link from "next/link"
 import { Compass, ArrowLeft, BookOpen, CheckCircle2 } from "lucide-react"
-import { SubscriptionGate } from "@/components/SubscriptionGate"
+import { PremiumPageGate } from "@/components/premium/PremiumPageGate"
 import PhaseLayout from "@/components/PhaseLayout"
 import Phase5NotFound from "@/components/phase-5/Phase5NotFound"
 import BulletListCard from "@/components/phase-5/BulletListCard"
@@ -26,7 +26,7 @@ export default async function PatternFundamentalsPage({
   const dsa = dsaFoundationsByPattern[pattern.id] || "Core data structures"
 
   return (
-    <SubscriptionGate phaseNumber={5} lockedContentName={`Phase 5: ${pattern.label} Fundamentals`}>
+    <PremiumPageGate phaseNumber={5} lockedContentName={`Phase 5: ${pattern.label} Fundamentals`}>
       <PhaseLayout
         phaseNumber={5}
         title={`${pattern.label} Fundamentals`}
@@ -115,6 +115,6 @@ export default async function PatternFundamentalsPage({
           dotClass="mt-2 h-2 w-2 rounded-full bg-emerald-300"
         />
       </PhaseLayout>
-    </SubscriptionGate>
+    </PremiumPageGate>
   )
 }

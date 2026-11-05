@@ -41,6 +41,10 @@ export const webhookLimiter = createLimiter(50, "1 m", "webhook")
 export const demoLoginLimiter = createLimiter(20, "1 h", "demo-login")
 /** Per-user cap on AI assistant calls (cost control). */
 export const assistantLimiter = createLimiter(30, "1 h", "assistant")
+/** Per-user cap on AIF-C01 practice grading. */
+export const practiceGradeLimiter = createLimiter(60, "15 m", "aif-practice")
+/** Per-user cap on the Cloud section AWS tool endpoints. */
+export const awsToolsLimiter = createLimiter(60, "15 m", "aws-tools")
 
 export interface RateLimitResult {
   allowed: boolean
