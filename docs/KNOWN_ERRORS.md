@@ -11,7 +11,40 @@ Use `gh pr checks` to identify the failing job before applying a recovery. The s
 | `SonarQube Cloud` | new-code coverage, duplication, reliability, or security gate | [Inspect the quality gate](#sonarqube-cloud-quality-gate-fails) |
 | Vercel | Neon preview-branch capacity is exhausted | [Check provisioning](#vercel-preview-fails-before-build-neon-branch-limit) |
 | Vercel Preview build | `prisma migrate deploy` / unreachable Preview DB | [Preview build vs migrate](#vercel-preview-build-fails-on-prisma-migrate-deploy) |
+| Vercel - API Sandbox E2E (preview) | Preview schema behind (e.g. missing `UserSession`) → register 503 | [Preview E2E register 503](#preview-e2e-register-returns-503-configuration_error) |
 | Architecture review | Gemini configuration, quota, or PR comment permission | [Inspect review generation](#pr-architecture-intelligence-fails) |
+
+## Preview E2E register returns 503 configuration_error
+
+### Symptoms
+
+- GitHub CI and the Vercel Preview deploy are green.
+- Hosted check **Vercel - API Sandbox E2E (preview)** fails on `POST /api/auth/register`.
+- `/api/health/db` and `/api/health/auth` succeed (`SELECT 1` / JWT configured).
+- Register body: `configuration_error` / `Authentication service is temporarily unavailable`
+  (maps Prisma `P2021`/`P2022` schema drift — often a missing table such as `UserSession`).
+
+### Cause
+
+Vercel Preview builds **skip** `prisma migrate deploy` by design. The isolated Preview
+database (Supabase `apisandbox-preview-db`) can lag migrations that exist only on a PR
+branch until an explicit Preview-only migrate runs.
+
+### Recovery (Preview DB only — never Production)
+
+```bash
+git fetch origin <migration-ref> && git checkout <migration-ref>
+export DATABASE_URL='<preview-supabase-url>'
+export DIRECT_URL='<preview-supabase-direct-url>'
+CONFIRM_PREVIEW_MIGRATE=YES npm run db:migrate:preview -- --status-only
+CONFIRM_PREVIEW_MIGRATE=YES npm run db:migrate:preview
+```
+
+Or Actions → **Preview DB migrate** with `confirm=YES` and `ref=<migration-ref>` after
+GitHub Environment `preview-db` secrets are configured (see [DEPLOYMENT.md](./DEPLOYMENT.md)).
+
+Then re-run the Preview E2E check or redeploy Preview. Do not point credentials at
+Production Neon. Do not lower the E2E gate.
 
 ## Vercel Preview build fails on `prisma migrate deploy`
 
@@ -31,10 +64,11 @@ If an older deployment still runs migrate on every environment, redeploy from a
 commit that includes `scripts/migrate-on-production.mjs` and the updated
 `vercel.json` `buildCommand`.
 
-When the Preview database is reachable and needs a schema update:
+When the Preview database is reachable and needs a schema update, use the
+Preview-only helper (refuses Neon/Production hosts by default):
 
 ```bash
-DATABASE_URL='<preview-database-url>' npx prisma migrate deploy
+CONFIRM_PREVIEW_MIGRATE=YES DATABASE_URL='<preview-database-url>' npm run db:migrate:preview
 ```
 
 Do not use Production credentials. Runtime Preview features that query Postgres
