@@ -91,12 +91,20 @@ Incident response:
 
 ## Compatibility and rollout
 
-1. Apply the UserSession migration before enabling session-bound validation.
+1. Apply the UserSession creation and successor RLS-hardening migrations before enabling session-bound validation. Preview builds skip migrations; a Ready build alone does not establish schema readiness. Obtain approval for the exact database and migration action before applying either migration. Never use the Production database for Preview.
 2. Deploy code that accepts legacy JWTs and upgrades them through /api/auth/me.
 3. Confirm new logins create rows and revocation works in preview/staging.
 4. Remove legacy-token acceptance only after the maximum old JWT lifetime has elapsed and all consumers have upgraded.
 
 Rollback is code-reversible while retaining the table. Do not drop UserSession until all deployments and tokens using sid have expired.
+
+### Preview schema readiness
+
+When registration returns HTTP 503 with `Authentication service is temporarily unavailable`, inspect the exact deployed response and Prisma error evidence. This response maps missing-table/column errors (`P2021`/`P2022`); it does not identify the missing object. Check migration history and the expected `UserSession` columns on the confirmed isolated Preview database before applying a fix. A health check using `SELECT 1` is insufficient.
+
+After explicit approval, apply pending migrations through `npm run db:migrate:deploy` with the verified Preview connection selected securely. Retain migration history; do not rewrite previously applied migrations, use `db push` as a fallback, or move Preview migrations into the Vercel build. Inspect `UserSession` RLS, restrictive API-role policies and effective grants before running any remediation helper: `npm run db:check-rls:database` changes the database and can hide a migration-order defect.
+
+Verify registration, login, `/api/auth/me`, two independent sessions and revocation on the exact Preview revision, then rerun the deployed E2E check. If the migration is blocked, retain the failing check and pause rollout; do not silently fall back to unrevocable sessions. Code rollback keeps the new table and its protection in place.
 
 ## Quality gates
 

@@ -1,4 +1,4 @@
-import type { NextRequest, NextResponse } from "next/server"
+import { NextResponse, type NextRequest } from "next/server"
 import type { z } from "zod"
 import { errorResponse, handleRouteError, okResponse } from "@/lib/http/responses"
 import type { AuthUser } from "@/lib/auth/types"
@@ -118,13 +118,17 @@ export async function authSessionResponse<T extends AuthSessionResponse>(
   payload: T,
   status = 200,
   request?: NextRequest,
+  // The legacy signup endpoint exposes fields at the top level.
+  responseFormat: "envelope" | "plain" = "envelope",
 ) {
   const sessionId = request ? await getOrCreateSessionId(payload.user.id, request) : undefined
   const responsePayload = sessionId
     ? { ...payload, ...issueAuthTokenForUser(payload.user, sessionId) }
     : payload
 
-  const res = okResponse(responsePayload, status)
+  const res = responseFormat === "plain"
+    ? NextResponse.json(responsePayload, { status })
+    : okResponse(responsePayload, status)
   return setAuthCookie(res, {
     token: responsePayload.token,
     maxAge: responsePayload.expiresIn,

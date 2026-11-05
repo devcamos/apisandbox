@@ -47,6 +47,7 @@ export async function POST(request: NextRequest) {
       },
       201,
       request,
+      "plain",
     )
     return attachRateLimitHeaders(
       response,

@@ -37,6 +37,7 @@ export default defineConfig({
         "lib/saas/config.ts",
         "lib/auth/jwt-secret.ts",
         "lib/google-client-id.ts",
+        "lib/http/auth-route-helpers.ts",
         // Omit lib/learning/** and lib/lessons/** — Sonar excludes them from sources,
         // so LCOV entries for those paths produce "Could not resolve" warnings.
         "lib/login-error-parser.ts",
