@@ -296,6 +296,7 @@ jobs:
       - name: Run E2E smoke (Chromium)
         env:
           CI_E2E_USE_PROD_SERVER: "1"
+          NEXT_PUBLIC_FF_PREMIUM_PAYWALL: "true"
           ALLOW_DEMO_LOGIN_IN_PRODUCTION: "true"
           PLAYWRIGHT_WORKERS: "3"
           VERCEL_ENV: preview

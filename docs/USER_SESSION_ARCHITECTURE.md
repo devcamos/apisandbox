@@ -30,6 +30,10 @@ Every independent browser profile or device login creates a separate row.
 - Reject the request when the session is missing, expired, or revoked.
 - Touch lastUsedAt at most once every five minutes.
 
+Server-rendered premium gates also validate the persisted session before returning
+protected HTML/RSC content. A refresh with an existing sid must reuse an active
+session or fail; it must never replace a revoked session with a new active row.
+
 Tokens without sid remain temporarily accepted for backwards compatibility. A successful /api/auth/me response upgrades the browser to a session-bound token.
 
 ### Session management

@@ -1,5 +1,6 @@
 import { randomUUID } from "node:crypto";
 import { test, expect } from "@playwright/test";
+import { E2E_STRIPE_WEBHOOK_SECRET, postCheckoutCompletedWebhook } from "./helpers/premium-helpers";
 import {
   expectAuthHealthReady,
   expectDbHealthReady,
@@ -19,6 +20,15 @@ test("device sessions preserve signup compatibility and revoke retained tokens",
   expect(signupBody.user.email).toBe(email);
   expect(typeof signupBody.token).toBe("string");
   const firstHeaders = { Authorization: `Bearer ${signupBody.token}` };
+  const { response: provision } = await postCheckoutCompletedWebhook(request, {
+    userId: signupBody.user.id,
+    secret: E2E_STRIPE_WEBHOOK_SECRET,
+  });
+  expect(provision.status()).toBe(200);
+  const premiumPage = await request.get("/phase-2", {
+    headers: { Cookie: `auth_token=${signupBody.token}` },
+  });
+  expect((await premiumPage.text()).includes("Auth Essentials")).toBe(true);
 
   const otherDevice = await playwright.request.newContext({ baseURL });
   try {
@@ -36,11 +46,21 @@ test("device sessions preserve signup compatibility and revoke retained tokens",
     expect(revoke.status()).toBe(200);
     expect((await revoke.json()).data.revoked).toBe(true);
     expect((await otherDevice.get("/api/auth/me", { headers: otherHeaders })).status()).toBe(401);
+    const revokedPage = await otherDevice.get("/phase-2", {
+      headers: { Cookie: `auth_token=${loginBody.data.token}` },
+    });
+    const revokedHtml = await revokedPage.text();
+    expect(revokedHtml.includes('data-testid="phase-preview"')).toBe(true);
+    expect(revokedHtml.includes("Auth Essentials")).toBe(false);
     expect((await request.get("/api/auth/me", { headers: firstHeaders })).status()).toBe(200);
 
     const logout = await request.post("/api/auth/logout", { headers: firstHeaders });
     expect(logout.status()).toBe(200);
     expect((await request.get("/api/auth/me", { headers: firstHeaders })).status()).toBe(401);
+    const loggedOutPage = await request.get("/phase-2", {
+      headers: { Cookie: `auth_token=${signupBody.token}` },
+    });
+    expect((await loggedOutPage.text()).includes("Auth Essentials")).toBe(false);
   } finally {
     await otherDevice.dispose();
   }

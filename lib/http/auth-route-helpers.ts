@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server"
 import type { z } from "zod"
 import { errorResponse, handleRouteError, okResponse } from "@/lib/http/responses"
+import { AppError } from "@/lib/http/errors"
 import type { AuthUser } from "@/lib/auth/types"
 import { verifyJwtToken } from "@/lib/services/auth/token-service"
 import { issueAuthTokenForUser } from "@/lib/services/auth/auth-response-mapper"
@@ -92,13 +93,25 @@ interface AuthSessionResponse {
   user: AuthUser
 }
 
-/**
- * Build the standard 200 (or other) JSON success response and attach the
- * auth_token cookie sourced from the response payload.
- */
-async function getOrCreateSessionId(userId: string, request: NextRequest) {
+async function getRefreshSessionId(userId: string, currentToken: string | null) {
+  // Never resurrect a session revoked after the initial authentication check.
+  if (!currentToken) throw new AppError("Unauthorized", 401, "auth_failure")
+  const payload = verifyJwtToken(currentToken)
+  if (payload.sub !== userId) throw new AppError("Unauthorized", 401, "auth_failure")
+  // Valid legacy tokens may be upgraded to a persisted session.
+  if (!payload.sid) return undefined
+  const session = await findActiveUserSession(userId, payload.sid)
+  if (!session) throw new AppError("Session has been revoked or expired", 401, "auth_failure")
+  return session.id
+}
+
+async function getOrCreateSessionId(userId: string, request: NextRequest, issuance: "authenticate" | "refresh") {
   const currentToken = readAuthToken(request)
-  if (currentToken) {
+  if (issuance === "refresh") {
+    const sessionId = await getRefreshSessionId(userId, currentToken)
+    if (sessionId) return sessionId
+  }
+  if (issuance === "authenticate" && currentToken) {
     try {
       const currentPayload = verifyJwtToken(currentToken)
       if (currentPayload.sub === userId && currentPayload.sid) {
@@ -114,14 +127,16 @@ async function getOrCreateSessionId(userId: string, request: NextRequest) {
   return session.id
 }
 
+/** Build a JSON success response and attach the session's auth_token cookie. */
 export async function authSessionResponse<T extends AuthSessionResponse>(
   payload: T,
   status = 200,
   request?: NextRequest,
   // The legacy signup endpoint exposes fields at the top level.
   responseFormat: "envelope" | "plain" = "envelope",
+  issuance: "authenticate" | "refresh" = "authenticate",
 ) {
-  const sessionId = request ? await getOrCreateSessionId(payload.user.id, request) : undefined
+  const sessionId = request ? await getOrCreateSessionId(payload.user.id, request, issuance) : undefined
   const responsePayload = sessionId
     ? { ...payload, ...issueAuthTokenForUser(payload.user, sessionId) }
     : payload

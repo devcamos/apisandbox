@@ -24,5 +24,7 @@ export const GET = withRouteErrorHandling(async (request: NextRequest) => {
     },
     200,
     request,
+    "envelope",
+    "refresh",
   )
 })
