@@ -10,6 +10,42 @@ import {
   dismissCookieBanner,
 } from "./helpers/smoke-helpers";
 
+test("device sessions preserve signup compatibility and revoke retained tokens", async ({ request, playwright, baseURL }) => {
+  const email = `sessions-${randomUUID()}@example.com`;
+  const password = "Test1234!@#$";
+  const signup = await request.post("/api/auth/signup", { data: { email, password } });
+  expect(signup.status()).toBe(201);
+  const signupBody = await signup.json();
+  expect(signupBody.user.email).toBe(email);
+  expect(typeof signupBody.token).toBe("string");
+  const firstHeaders = { Authorization: `Bearer ${signupBody.token}` };
+
+  const otherDevice = await playwright.request.newContext({ baseURL });
+  try {
+    const login = await otherDevice.post("/api/auth/login", { data: { email, password } });
+    expect(login.status()).toBe(200);
+    const loginBody = await login.json();
+    const otherHeaders = { Authorization: `Bearer ${loginBody.data.token}` };
+    const list = await request.get("/api/auth/sessions", { headers: firstHeaders });
+    expect(list.status()).toBe(200);
+    const sessions = (await list.json()).data.sessions as { id: string; current: boolean }[];
+    expect(sessions).toHaveLength(2);
+    expect(sessions.filter((session) => session.current)).toHaveLength(1);
+    const otherSession = sessions.find((session) => !session.current)!;
+    const revoke = await request.delete(`/api/auth/sessions/${otherSession.id}`, { headers: firstHeaders });
+    expect(revoke.status()).toBe(200);
+    expect((await revoke.json()).data.revoked).toBe(true);
+    expect((await otherDevice.get("/api/auth/me", { headers: otherHeaders })).status()).toBe(401);
+    expect((await request.get("/api/auth/me", { headers: firstHeaders })).status()).toBe(200);
+
+    const logout = await request.post("/api/auth/logout", { headers: firstHeaders });
+    expect(logout.status()).toBe(200);
+    expect((await request.get("/api/auth/me", { headers: firstHeaders })).status()).toBe(401);
+  } finally {
+    await otherDevice.dispose();
+  }
+});
+
 /**
  * Minimal checks for GitHub Actions (fast, stable gate).
  * Run the full suite locally: npm run test:ci or npm run test

@@ -1,5 +1,6 @@
 import { test, expect } from "@playwright/test"
 import { randomUUID } from "node:crypto"
+import { E2E_STRIPE_WEBHOOK_SECRET, postCheckoutCompletedWebhook } from "./helpers/premium-helpers"
 
 function randomEmail(prefix: string) {
   return `${prefix}-${Date.now()}-${randomUUID()}@example.com`
@@ -87,11 +88,13 @@ test.describe("Unified Auth", () => {
       },
     })
     const registerBody = await registerRes.json()
-    const token = registerBody.data.token
-
-    await request.post("/api/subscription/upgrade", {
-      headers: { Authorization: `Bearer ${token}` },
+    // Provision the synthetic account through the existing signed test webhook.
+    // Instant upgrade is intentionally unavailable in CI and Preview.
+    const { response: provision } = await postCheckoutCompletedWebhook(request, {
+      userId: registerBody.data.user.id,
+      secret: E2E_STRIPE_WEBHOOK_SECRET,
     })
+    expect(provision.status()).toBe(200)
 
     const response = await request.post("/api/auth/google", {
       data: {
