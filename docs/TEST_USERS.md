@@ -45,8 +45,9 @@ Each PR preview shares the Preview-scoped database configured in Vercel (a separ
 Postgres project from Production Neon). Preview builds do not run migrations or seed
 users. The local test-user command is not automatically run during deployment, so
 `test@example.com` and `qa@example.com` commonly do not exist in Preview. When the
-Preview schema needs updating, run `npx prisma migrate deploy` against the Preview
-`DATABASE_URL` manually (see `config/environments/preview.env.example`).
+Preview schema needs updating, run `CONFIRM_PREVIEW_MIGRATE=YES npm run db:migrate:preview`
+against the Preview `DATABASE_URL` only (see `config/environments/preview.env.example`
+and `docs/DEPLOYMENT.md`). Never use Production credentials.
 
 For routine preview testing:
 

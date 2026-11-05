@@ -1,0 +1,99 @@
+# Explicit operator step: apply pending Prisma migrations to the isolated Preview DB only.
+# Never targets Production. Vercel Preview builds continue to skip migrate (see
+# scripts/migrate-on-production.mjs); this workflow is the durable Preview path.
+#
+# Prerequisites (GitHub → Settings → Environments → preview-db):
+# - Create environment `preview-db` (optional required reviewers)
+# - Environment secrets: PREVIEW_DATABASE_URL, PREVIEW_DIRECT_URL (direct/session :5432 preferred)
+# - Values must be the Supabase Preview project (apisandbox-preview-db), never Neon Production
+#
+# Usage: Actions → "Preview DB migrate" → Run workflow
+# - confirm: YES
+# - ref: git ref that contains the migrations to apply (e.g. codex/user-session-architecture)
+
+name: Preview DB migrate
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: Type YES to migrate the isolated Preview database only (never Production)
+        required: true
+        type: string
+      ref:
+        description: Git ref containing prisma/migrations to apply
+        required: true
+        type: string
+        default: main
+      status_only:
+        description: If true, run prisma migrate status only (no schema changes)
+        required: false
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: preview-db-migrate
+  cancel-in-progress: false
+
+jobs:
+  migrate-preview:
+    name: Migrate Preview database only
+    runs-on: ubuntu-latest
+    environment: preview-db
+    if: github.event.inputs.confirm == 'YES'
+    steps:
+      - name: Check out migration ref
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.inputs.ref }}
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: "22"
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Ensure Preview migrate helper (from main when ref lacks it)
+        run: |
+          if [ ! -f scripts/migrate-on-preview.mjs ]; then
+            echo "scripts/migrate-on-preview.mjs missing on ref; loading helper from origin/main"
+            git fetch origin main --depth=1
+            git checkout origin/main -- scripts/migrate-on-preview.mjs
+          fi
+          test -f scripts/migrate-on-preview.mjs
+          test -f scripts/migrate-on-production.mjs
+
+      - name: Refuse missing Preview secrets
+        env:
+          PREVIEW_DATABASE_URL: ${{ secrets.PREVIEW_DATABASE_URL }}
+        run: |
+          if [ -z "${PREVIEW_DATABASE_URL}" ]; then
+            echo "::error::PREVIEW_DATABASE_URL is not set on the preview-db environment. Add the isolated Supabase Preview URL only — never Production Neon."
+            exit 1
+          fi
+
+      - name: Preview migrate status
+        if: ${{ github.event.inputs.status_only == true || github.event.inputs.status_only == 'true' }}
+        env:
+          CONFIRM_PREVIEW_MIGRATE: "YES"
+          DATABASE_URL: ${{ secrets.PREVIEW_DATABASE_URL }}
+          DIRECT_URL: ${{ secrets.PREVIEW_DIRECT_URL }}
+          VERCEL_ENV: preview
+          ENVIRONMENT: preview
+        run: node scripts/migrate-on-preview.mjs --status-only
+
+      - name: Apply pending Preview migrations
+        if: ${{ github.event.inputs.status_only != true && github.event.inputs.status_only != 'true' }}
+        env:
+          CONFIRM_PREVIEW_MIGRATE: "YES"
+          DATABASE_URL: ${{ secrets.PREVIEW_DATABASE_URL }}
+          DIRECT_URL: ${{ secrets.PREVIEW_DIRECT_URL }}
+          VERCEL_ENV: preview
+          ENVIRONMENT: preview
+        run: node scripts/migrate-on-preview.mjs
