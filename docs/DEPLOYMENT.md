@@ -88,20 +88,64 @@ the Prisma schema `directUrl` requirement without requiring a new Vercel secret.
 | Vercel environment | `VERCEL_ENV` | Migrations at build |
 |--------------------|--------------|---------------------|
 | Production | `production` | Yes — `prisma migrate deploy` |
-| Preview | `preview` | No — migrate the Preview DB manually when needed |
+| Preview | `preview` | No — use the Preview-only migrate path below |
 | Development | `development` | No |
 | On Vercel, env unset/unknown | (empty / other) | Yes — fail-safe (prefer migrate over shipping unmigrated) |
 
 **Production** uses Neon (via Vercel Postgres / `DATABASE_URL`). **Preview** uses a
-separate Preview-scoped Postgres (currently a Supabase project). Never point Preview
-at Production.
+separate Preview-scoped Postgres (currently Supabase project `apisandbox-preview-db`).
+Never point Preview at Production.
 
-When the Preview schema needs updating and the Preview DB is reachable:
+### Preview-only migrate (durable path)
+
+Preview builds intentionally skip migrate so an unreachable DB cannot fail `next build`.
+Schema changes for the shared Preview database are applied through an **explicit
+Preview-only** path that refuses Production hosts:
+
+| Path | When to use |
+|------|-------------|
+| `npm run db:migrate:preview` | Local/operator with Preview `DATABASE_URL` + `CONFIRM_PREVIEW_MIGRATE=YES` |
+| GitHub Action **Preview DB migrate** | Operator `workflow_dispatch` against environment `preview-db` |
+| Vercel Deployment E2E (preview) | Auto-applies pending migrations when `PREVIEW_DATABASE_URL` is set |
+
+Default host policy: allow `supabase.co` / `supabase.com`, deny `neon.tech`. Override with
+`PREVIEW_DB_HOST_ALLOWLIST` / `PREVIEW_DB_HOST_DENYLIST` only when the Preview topology
+changes. The helper never prints connection strings.
+
+#### One-time GitHub setup (owner)
+
+1. Create GitHub Environment **`preview-db`** (recommended: required reviewers).
+2. Add environment secrets (Preview Supabase only — never Neon Production values):
+   - `PREVIEW_DATABASE_URL` — Preview pooler or direct URL
+   - `PREVIEW_DIRECT_URL` — direct/session URL (`:5432`) preferred for migrate
+3. Optionally add the same two names as repository secrets so **Vercel - API Sandbox E2E
+   (preview)** can migrate before registration smoke.
+
+#### Operator commands (Preview DB only)
 
 ```bash
-# With Preview DATABASE_URL (and optional DIRECT_URL) in the environment:
-npm run db:migrate:deploy
+# 1) Check out the git ref that contains the pending prisma/migrations
+git fetch origin <migration-ref>
+git checkout <migration-ref>
+
+# 2) Load Preview credentials only (Vercel Preview env / secret manager).
+#    Never export Production Neon DATABASE_URL here.
+export DATABASE_URL='<preview-supabase-database-url>'
+export DIRECT_URL='<preview-supabase-direct-url>'   # :5432 session/direct
+
+# 3) Confirm host is Supabase Preview, then migrate
+CONFIRM_PREVIEW_MIGRATE=YES npm run db:migrate:preview -- --status-only
+CONFIRM_PREVIEW_MIGRATE=YES npm run db:migrate:preview
 ```
+
+GitHub UI alternative (after this workflow is on `main`):
+
+1. Actions → **Preview DB migrate** → Run workflow
+2. `confirm`: `YES`
+3. `ref`: branch/SHA that contains the migrations (example for UserSession: `codex/user-session-architecture`)
+4. Optional: `status_only: true` first
+
+After migrate, re-run Preview E2E or redeploy the Preview deployment. Production is untouched.
 
 `next build` does not query the database: Prisma is used from API routes / auth at
 runtime. Creating `PrismaClient` at module load does not open a connection until the
@@ -128,8 +172,8 @@ Migration `prisma/migrations/20261008120000_enable_public_rls` therefore:
 
 CI runs `npm run db:check-rls` (static migration guard) and, after e2e `db push`,
 `npm run db:check-rls:database` (applies the SQL and fails if any `public` table
-lacks RLS). Preview DBs still need a manual `npm run db:migrate:deploy` when the
-Preview database is reachable — Vercel Preview builds skip migrate by design.
+lacks RLS). Preview schema updates use `npm run db:migrate:preview` / the
+**Preview DB migrate** workflow — Vercel Preview builds skip migrate by design.
 
 Do **not** set `FORCE ROW LEVEL SECURITY`: that would apply RLS to the Prisma
 connection and break the app (no policies are defined; deny-by-default is only
@@ -188,7 +232,8 @@ The repository policy retains no more than five total Neon branches.
 
 Preview application data is configured via Preview-scoped `DATABASE_URL` (separate
 from Production Neon). Preview builds skip `migrate deploy`; apply schema changes
-manually against that Preview database when it is reachable.
+with the Preview-only migrate path (`db:migrate:preview` / **Preview DB migrate**
+workflow / optional E2E auto-migrate when `PREVIEW_DATABASE_URL` is configured).
 
 ---
 
@@ -196,6 +241,7 @@ manually against that Preview database when it is reachable.
 
 | Date | Change |
 |------|--------|
+| 2026-11-05 | Durable Preview-only migrate path: `db:migrate:preview`, workflow `Preview DB migrate`, optional E2E auto-migrate via `PREVIEW_DATABASE_URL` (Production untouched; Preview builds still skip migrate) |
 | 2026-10-21 | Shared Preview Stripe TEST baseline and deployed premium-upgrade E2E; trusted branch return URLs and cross-branch idempotency. See PREVIEW_BILLING.md. |
 | 2026-08-10 | Added deployed-URL E2E for Vercel repository-dispatch events, including Preview database/auth checks and Playwright registration/login coverage |
 | 2026-09-27 | Vercel build runs `prisma migrate deploy` only for Production (`db:migrate:deploy:vercel`); Preview skips migrate so unreachable Preview DB cannot fail the build |
