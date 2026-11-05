@@ -222,7 +222,9 @@ jobs:
 
   e2e-smoke:
     needs: [lint-and-build]
-    runs-on: ubuntu-latest
+    # WebKit's native libraries must match the browser's supported distro.
+    # ubuntu-latest moved to 26.04; a cached 24.04 browser cannot launch there.
+    runs-on: ubuntu-24.04
     services:
       postgres:
         image: postgres:16-alpine
@@ -278,7 +280,7 @@ jobs:
         id: playwright-cache
         with:
           path: ~/.cache/ms-playwright
-          key: ${{ runner.os }}-playwright-${{ hashFiles('package-lock.json') }}
+          key: ${{ runner.os }}-${{ runner.arch }}-ubuntu-24.04-playwright-${{ hashFiles('package-lock.json') }}
 
       - name: Install Playwright Chromium + WebKit (with system deps)
         if: steps.playwright-cache.outputs.cache-hit != 'true'
