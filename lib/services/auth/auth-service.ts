@@ -7,6 +7,7 @@ import { validatePasswordLogin } from "@/lib/services/auth/password-auth-service
 import { verifyGoogleIdentity } from "@/lib/services/auth/google-identity-service"
 import { linkGoogleIdentityToExistingEmailAccount } from "@/lib/services/auth/account-linking-service"
 import { verifyJwtToken } from "@/lib/services/auth/token-service"
+import { findActiveUserSession } from "@/lib/services/auth/user-session-service"
 
 interface RegisterInput {
   email: string
@@ -102,6 +103,12 @@ export async function loginWithGoogle(input: GoogleLoginInput) {
 
 export async function getAuthenticatedUserFromToken(token: string) {
   const payload = verifyJwtToken(token)
+  if (payload.sid) {
+    const session = await findActiveUserSession(payload.sub, payload.sid)
+    if (!session) {
+      throw new AppError("Session has been revoked or expired", 401, "auth_failure")
+    }
+  }
   const user = await prisma.user.findUnique({
     where: { id: payload.sub },
     select: {

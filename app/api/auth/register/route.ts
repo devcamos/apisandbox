@@ -36,5 +36,5 @@ export const POST = withRouteErrorHandling(async (request: NextRequest) => {
       process.env.NODE_ENV !== "production" && parsed.data.__testForceBootstrapFail === true,
   })
 
-  return attachRateLimitHeaders(authSessionResponse(response, 201), rate.result)
+  return attachRateLimitHeaders(await authSessionResponse(response, 201, request), rate.result)
 })

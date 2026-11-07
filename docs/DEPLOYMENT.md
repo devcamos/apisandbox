@@ -28,6 +28,11 @@ Preview hosts change per PR (`https://apisandbox-<hash>-….vercel.app`). Each h
 | `GOOGLE_CLIENT_ID` | Google OAuth Web client ID |
 | `NEXT_PUBLIC_APP_URL` | canonical site URL |
 
+Session defaults are 30 days for both the signed browser token and its revocable
+database session. If an application needs a shorter inactivity window, set
+`AUTH_IDLE_EXPIRES_IN_SECONDS`; see
+[USER_SESSION_ARCHITECTURE.md](./USER_SESSION_ARCHITECTURE.md).
+
 **Preview pitfall:** If `AUTH_JWT_SECRET` is scoped to a single Git branch (e.g. `fix/foo` only), other PR previews will show *Sign-in is not configured*. Prefer **Preview → all branches**, or add the secret per branch. After changing env vars, **redeploy** the preview (Vercel → Deployments → Redeploy).
 
 ```bash
@@ -93,15 +98,30 @@ the Prisma schema `directUrl` requirement without requiring a new Vercel secret.
 | On Vercel, env unset/unknown | (empty / other) | Yes — fail-safe (prefer migrate over shipping unmigrated) |
 
 **Production** uses Neon (via Vercel Postgres / `DATABASE_URL`). **Preview** uses a
-separate Preview-scoped Postgres (currently a Supabase project). Never point Preview
-at Production.
+separate Neon project, `apisandbox-preview` (`super-butterfly-26338757`), branch
+`preview`, database `apisandbox_preview`. It was initialized empty on 2026-11-07;
+only synthetic test identities belong here. Never point Preview at Production.
 
-When the Preview schema needs updating and the Preview DB is reachable:
+Preview runtime uses pooled `DATABASE_URL`; `DIRECT_URL` is the unpooled Neon
+connection for approved schema operations. The Preview `POSTGRES_PRISMA_URL`,
+`POSTGRES_URL`, and `POSTGRES_URL_NON_POOLING` aliases point at the same project.
+Signing secrets and application auth remain unchanged. Legacy Supabase integration
+variables are retained but are not used by the Prisma database resolver.
 
-```bash
-# With Preview DATABASE_URL (and optional DIRECT_URL) in the environment:
-npm run db:migrate:deploy
-```
+The fresh Preview schema was generated from the PR71 Prisma schema with
+`prisma migrate diff --from-empty --to-schema-datamodel prisma/schema.prisma --script`,
+then applied atomically with the public-schema and UserSession RLS hardening SQL.
+All 14 application tables have RLS enabled. The historical migration directory
+contains SQLite-era DDL and is **not** a replayable fresh-Postgres baseline. Do not
+run the entire historical `migrate deploy` chain against this Preview. Future
+Preview schema changes require reviewed incremental PostgreSQL SQL and explicit
+migration authorization; reconcile migration history before adopting automatic
+`migrate deploy`. Preview builds continue to skip migrations.
+
+Environment changes apply to new deployments. Trigger a Git Preview deployment
+and verify database/auth health plus registration/login before accepting a switch.
+Older immutable deployments retain their previous database configuration. The old
+Supabase database is retained; no source data was copied or deleted.
 
 `next build` does not query the database: Prisma is used from API routes / auth at
 runtime. Creating `PrismaClient` at module load does not open a connection until the
@@ -128,8 +148,9 @@ Migration `prisma/migrations/20261008120000_enable_public_rls` therefore:
 
 CI runs `npm run db:check-rls` (static migration guard) and, after e2e `db push`,
 `npm run db:check-rls:database` (applies the SQL and fails if any `public` table
-lacks RLS). Preview DBs still need a manual `npm run db:migrate:deploy` when the
-Preview database is reachable — Vercel Preview builds skip migrate by design.
+lacks RLS). Existing databases with compatible migration history can use approved
+`npm run db:migrate:deploy`. The fresh Neon Preview requires the incremental SQL
+procedure above; Vercel Preview builds skip migrate by design.
 
 Do **not** set `FORCE ROW LEVEL SECURITY`: that would apply RLS to the Prisma
 connection and break the app (no policies are defined; deny-by-default is only
@@ -196,6 +217,7 @@ manually against that Preview database when it is reachable.
 
 | Date | Change |
 |------|--------|
+| 2026-11-07 | Migrated Preview configuration to an isolated, empty Neon project; pooled runtime/direct schema URLs, native PostgreSQL schema baseline and RLS. Production and auth signing secrets unchanged. |
 | 2026-10-21 | Shared Preview Stripe TEST baseline and deployed premium-upgrade E2E; trusted branch return URLs and cross-branch idempotency. See PREVIEW_BILLING.md. |
 | 2026-08-10 | Added deployed-URL E2E for Vercel repository-dispatch events, including Preview database/auth checks and Playwright registration/login coverage |
 | 2026-09-27 | Vercel build runs `prisma migrate deploy` only for Production (`db:migrate:deploy:vercel`); Preview skips migrate so unreachable Preview DB cannot fail the build |

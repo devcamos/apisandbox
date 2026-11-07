@@ -85,6 +85,7 @@ npm run db:check-rls:database
 npx playwright install chromium --with-deps >/dev/null 2>&1 || npx playwright install chromium
 
 export CI_E2E_USE_PROD_SERVER=1
+export NEXT_PUBLIC_FF_PREMIUM_PAYWALL=true
 export PLAYWRIGHT_WORKERS=3
 export VERCEL_ENV="${VERCEL_ENV:-preview}"
 export NEXT_PUBLIC_FF_STRIPE_CHECKOUT="${NEXT_PUBLIC_FF_STRIPE_CHECKOUT:-true}"

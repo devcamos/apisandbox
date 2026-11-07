@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { z } from "zod"
 import { registerWithPassword } from "@/lib/services/auth/auth-service"
 import { AppError } from "@/lib/http/errors"
-import { setAuthCookie } from "@/lib/http/auth-route-helpers"
+import { authSessionResponse } from "@/lib/http/auth-route-helpers"
 import { splitFullName } from "@/lib/user-name"
 import { applyRateLimit, attachRateLimitHeaders } from "@/lib/http/apply-rate-limit"
 import { signupLimiter } from "@/lib/rate-limit"
@@ -38,20 +38,19 @@ export async function POST(request: NextRequest) {
         process.env.NODE_ENV !== "production" && parsed.data.__testForceBootstrapFail === true,
     })
 
-    const response = NextResponse.json(
+    const response = await authSessionResponse(
       {
         user: authResponse.user,
         token: authResponse.token,
         expiresIn: authResponse.expiresIn,
         message: "Account created successfully",
       },
-      { status: 201 }
+      201,
+      request,
+      "plain",
     )
     return attachRateLimitHeaders(
-      setAuthCookie(response, {
-        token: authResponse.token,
-        maxAge: authResponse.expiresIn,
-      }),
+      response,
       rate.result,
     )
   } catch (error) {

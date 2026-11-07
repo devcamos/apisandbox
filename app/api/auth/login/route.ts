@@ -34,7 +34,7 @@ export const POST = withRouteErrorHandling(async (request: NextRequest) => {
       const rate = await applyRateLimit(request, demoLoginLimiter)
       if (rate.blocked) return rate.blocked
       const demo = await createEphemeralDemoSession()
-      return attachRateLimitHeaders(authSessionResponse(demo), rate.result)
+      return attachRateLimitHeaders(await authSessionResponse(demo, 200, request), rate.result)
     }
   }
 
@@ -46,5 +46,5 @@ export const POST = withRouteErrorHandling(async (request: NextRequest) => {
   if (rate.blocked) return rate.blocked
 
   const response = await loginWithPassword({ email, password: parsed.data.password })
-  return attachRateLimitHeaders(authSessionResponse(response), rate.result)
+  return attachRateLimitHeaders(await authSessionResponse(response, 200, request), rate.result)
 })

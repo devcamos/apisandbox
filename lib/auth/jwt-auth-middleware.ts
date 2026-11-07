@@ -1,11 +1,12 @@
 import { NextRequest } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { verifyJwtToken } from "@/lib/services/auth/token-service"
+import { findActiveUserSession } from "@/lib/services/auth/user-session-service"
 import { AppError } from "@/lib/http/errors"
 import { readAuthToken } from "@/lib/http/auth-route-helpers"
 import { hasActivePremium } from "@/lib/subscription-access"
 
-export async function requireAuthenticatedUser(request: NextRequest) {
+export async function requireAuthenticatedSession(request: NextRequest) {
   const token = readAuthToken(request)
   if (!token) {
     throw new AppError("Missing auth token", 401, "auth_failure")
@@ -21,6 +22,18 @@ export async function requireAuthenticatedUser(request: NextRequest) {
     throw new AppError("User is not active", 401, "auth_failure")
   }
 
+  if (payload.sid) {
+    const session = await findActiveUserSession(user.id, payload.sid)
+    if (!session) {
+      throw new AppError("Session has been revoked or expired", 401, "auth_failure")
+    }
+  }
+
+  return { user, sessionId: payload.sid ?? null }
+}
+
+export async function requireAuthenticatedUser(request: NextRequest) {
+  const { user } = await requireAuthenticatedSession(request)
   return user
 }
 
