@@ -10,8 +10,8 @@ datasource db {
   // MENTOR NOTE: Mono-Environment Framework
   // PostgreSQL for all environments (local, dev, staging, prod)
   // Works with: Local PostgreSQL, Docker, Vercel Postgres, AWS RDS, etc.
-  // DATABASE_URL: pooled runtime URL (Supabase transaction pooler :6543 + pgbouncer).
-  // DIRECT_URL: direct/session URL for migrations and introspect (Supabase :5432).
+  // DATABASE_URL: pooled runtime URL (Neon pooler with pgbouncer compatibility).
+  // DIRECT_URL: unpooled URL for approved schema operations and introspection.
   provider  = "postgresql"
   url       = env("DATABASE_URL")
   directUrl = env("DIRECT_URL")
