@@ -80,7 +80,7 @@ No shared password seed is required.
 
 The UI calls `POST /api/auth/demo` (rate-limited). The response is a normal auth session for the new demo user.
 
-**Migration note:** This flow does **not** add a Prisma migration. Preview (Supabase) and production (Neon) only need the existing schema. PR #43 (skip migrate on Preview) does not affect this feature.
+**Migration note:** This flow does **not** add a Prisma migration. Preview and Production (separate Neon databases) only need the existing schema. PR #43 (skip migrate on Preview) does not affect this feature.
 
 ## Invalid login credentials
 

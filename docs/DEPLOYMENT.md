@@ -122,6 +122,8 @@ Environment changes apply to new deployments. Trigger a Git Preview deployment
 and verify database/auth health plus registration/login before accepting a switch.
 Older immutable deployments retain their previous database configuration. The old
 Supabase database is retained; no source data was copied or deleted.
+Follow [Neon Preview cleanup](NEON_PREVIEW_CLEANUP.md) to review and retire unused
+Preview settings separately from the completed migration.
 
 `next build` does not query the database: Prisma is used from API routes / auth at
 runtime. Creating `PrismaClient` at module load does not open a connection until the
