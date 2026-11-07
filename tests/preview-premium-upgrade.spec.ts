@@ -1,6 +1,10 @@
 import { randomUUID } from "node:crypto"
 import { expect, request as playwrightRequest, test, type Locator, type Page } from "@playwright/test"
 import { injectAuthToken } from "./helpers/premium-helpers"
+import {
+  previewWebhookDeploymentMismatch,
+  type SaasDeploymentIdentity,
+} from "./helpers/preview-webhook-deployment"
 
 // Real hosted Stripe TEST-mode payment, including Stripe's own webhook delivery.
 // Never runs against a live Checkout session. No Stripe API/signing secrets are
@@ -8,15 +12,34 @@ import { injectAuthToken } from "./helpers/premium-helpers"
 test.use({ trace: "off", screenshot: "off", video: "off" })
 test.describe.configure({ retries: 0 })
 
+function isDetachedFrameError(error: unknown): boolean {
+  const message = error instanceof Error ? error.message : String(error)
+  return /frame was detached|Target closed|Execution context was destroyed/i.test(message)
+}
+
 async function visibleCheckoutField(page: Page, selector: string): Promise<Locator | null> {
   for (const frame of page.frames()) {
-    const candidates = frame.locator(selector)
-    for (let index = 0; index < await candidates.count(); index++) {
-      const candidate = candidates.nth(index)
-      if (await candidate.isVisible()) return candidate
+    try {
+      const candidates = frame.locator(selector)
+      for (let index = 0; index < await candidates.count(); index++) {
+        const candidate = candidates.nth(index)
+        if (await candidate.isVisible()) return candidate
+      }
+    } catch (error) {
+      // Stripe Checkout can replace iframes while address fields appear.
+      if (isDetachedFrameError(error)) continue
+      throw error
     }
   }
   return null
+}
+
+function deploymentFromSaasBody(body: unknown): SaasDeploymentIdentity {
+  const deployment = (body as { data?: { deployment?: SaasDeploymentIdentity } } | null)?.data?.deployment
+  return {
+    deploymentId: deployment?.deploymentId ?? null,
+    gitSha: deployment?.gitSha ?? null,
+  }
 }
 
 async function requiredCheckoutField(page: Page, selector: string, description: string) {
@@ -53,7 +76,9 @@ test("FREE Preview user completes hosted TEST payment and receives PREMIUM from 
   }
   const health = await request.get("/api/health/saas")
   expect(health.status(), "Preview readiness must pass before test writes").toBe(200)
-  expect((await health.json())?.data?.environment).toBe("preview")
+  const healthBody = await health.json()
+  expect(healthBody?.data?.environment).toBe("preview")
+  const branchDeployment = deploymentFromSaasBody(healthBody)
 
   // Stripe cannot send Vercel automation headers. Check the shared ingress
   // without bypass credentials before creating a learner or TEST payment.
@@ -69,6 +94,16 @@ test("FREE Preview user completes hosted TEST payment and receives PREMIUM from 
   try {
     const webhookProbe = await publicRequest.get(ingress.toString(), { maxRedirects: 0 })
     expect(webhookProbe.status(), "Stripe TEST webhook ingress must be reachable without Vercel sign-in").toBe(405)
+    // Catch stale alias routing before a TEST payment: checkout writes the learner
+    // on this Preview DB, but Stripe delivers to the shared ingress deployment.
+    const ingressHealth = await publicRequest.get(new URL("/api/health/saas", ingress.origin).toString(), {
+      maxRedirects: 0,
+    })
+    expect(ingressHealth.status(), "Shared webhook ingress SaaS readiness must be public").toBe(200)
+    const ingressBody = await ingressHealth.json()
+    expect(ingressBody?.data?.environment).toBe("preview")
+    const mismatch = previewWebhookDeploymentMismatch(branchDeployment, deploymentFromSaasBody(ingressBody))
+    expect(mismatch, mismatch ?? "webhook ingress deployment must match this Preview").toBeNull()
   } finally {
     await publicRequest.dispose()
   }
@@ -152,5 +187,12 @@ test("FREE Preview user completes hosted TEST payment and receives PREMIUM from 
   await expect.poll(async () => {
     const me = await request.get("/api/auth/me", { headers: { Authorization: `Bearer ${token}` } })
     return me.ok() ? (await me.json())?.data?.user?.subscriptionTier : "unavailable"
-  }, { timeout: 60_000, message: "Stripe TEST webhook must upgrade this learner to PREMIUM" }).toBe("PREMIUM")
+  }, {
+    timeout: 60_000,
+    message:
+      "Stripe TEST webhook must upgrade this learner to PREMIUM. " +
+      "If checkout returned to /upgrade/success but tier stays FREE, verify " +
+      "apisandbox-billing-preview.vercel.app is assigned to this Preview deployment " +
+      "(same database) and that Stripe TEST delivery to /api/webhooks/stripe succeeds.",
+  }).toBe("PREMIUM")
 })
