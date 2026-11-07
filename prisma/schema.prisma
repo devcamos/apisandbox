@@ -10,8 +10,8 @@ datasource db {
   // MENTOR NOTE: Mono-Environment Framework
   // PostgreSQL for all environments (local, dev, staging, prod)
   // Works with: Local PostgreSQL, Docker, Vercel Postgres, AWS RDS, etc.
-  // DATABASE_URL: pooled runtime URL (Supabase transaction pooler :6543 + pgbouncer).
-  // DIRECT_URL: direct/session URL for migrations and introspect (Supabase :5432).
+  // DATABASE_URL: pooled runtime URL (Neon pooler with pgbouncer compatibility).
+  // DIRECT_URL: unpooled URL for approved schema operations and introspection.
   provider  = "postgresql"
   url       = env("DATABASE_URL")
   directUrl = env("DIRECT_URL")
@@ -82,6 +82,7 @@ model User {
 
   accounts            Account[]
   sessions            Session[]
+  userSessions        UserSession[]
   verificationToken   VerificationToken[]
   profile             UserProfile?
   phaseProgress       UserPhaseProgress[]
@@ -91,6 +92,25 @@ model User {
   learningEnrollments LearningEnrollment[]
   learningCheckpointProgress LearningCheckpointProgress[]
   learningUnitAssessmentProgress LearningUnitAssessmentProgress[]
+}
+
+/// Revocable browser/app login sessions. One row represents one device login.
+model UserSession {
+  id         String    @id @default(cuid())
+  userId     String
+  deviceName String?
+  userAgent  String?
+  ipAddress  String?
+  lastUsedAt DateTime  @default(now())
+  expiresAt  DateTime
+  revokedAt  DateTime?
+  createdAt  DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([userId, revokedAt])
+  @@index([expiresAt])
 }
 
 model StripeWebhookEvent {

@@ -16,6 +16,7 @@ export interface AuthUser {
 export interface AuthPayload {
   sub: string
   email: string
+  sid?: string
   iat?: number
   exp?: number
   idleExp?: number

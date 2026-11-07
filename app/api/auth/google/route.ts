@@ -16,5 +16,5 @@ export const POST = withRouteErrorHandling(async (request: NextRequest) => {
   if (!parsed.ok) return parsed.response
 
   const response = await loginWithGoogle(parsed.data)
-  return authSessionResponse(response)
+  return authSessionResponse(response, 200, request)
 })

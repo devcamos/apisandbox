@@ -4,8 +4,8 @@ import { AppError } from "@/lib/http/errors"
 import type { AuthPayload } from "@/lib/auth/types"
 
 const JWT_ALG = "HS256"
-const DEFAULT_EXPIRY_SECONDS = 60 * 60 * 24 * 7 // 7 days
-const DEFAULT_IDLE_EXPIRY_SECONDS = 60 * 30 // 30 minutes
+const DEFAULT_EXPIRY_SECONDS = 60 * 60 * 24 * 30 // 30 days
+const DEFAULT_IDLE_EXPIRY_SECONDS = 60 * 60 * 24 * 30 // 30 days; configure shorter if required
 
 function base64UrlEncode(value: string | Buffer) {
   return Buffer.from(value)
@@ -124,8 +124,10 @@ export function verifyJwtToken(token: string): AuthPayload {
     throw new AppError("Session has expired due to inactivity", 401, "auth_failure")
   }
 
-  return {
+  const verified: AuthPayload = {
     sub: payload.sub,
     email: payload.email,
   }
+  if (payload.sid) verified.sid = payload.sid
+  return verified
 }
