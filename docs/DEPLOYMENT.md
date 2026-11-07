@@ -217,7 +217,7 @@ manually against that Preview database when it is reachable.
 
 | Date | Change |
 |------|--------|
-| 2026-11-07 | Migrated Preview configuration to an isolated, empty Neon project; pooled runtime/direct schema URLs, native PostgreSQL schema baseline and RLS. Production and auth signing secrets unchanged. |
+| 2026-11-07 | Migrated Preview configuration to an isolated, empty Neon project; pooled runtime/direct schema URLs, native PostgreSQL schema baseline and RLS. Production and auth signing secrets unchanged. After any Preview DB cutover, reassign `apisandbox-billing-preview.vercel.app` to a deployment that uses the new Preview database (see PREVIEW_BILLING.md). |
 | 2026-10-21 | Shared Preview Stripe TEST baseline and deployed premium-upgrade E2E; trusted branch return URLs and cross-branch idempotency. See PREVIEW_BILLING.md. |
 | 2026-08-10 | Added deployed-URL E2E for Vercel repository-dispatch events, including Preview database/auth checks and Playwright registration/login coverage |
 | 2026-09-27 | Vercel build runs `prisma migrate deploy` only for Production (`db:migrate:deploy:vercel`); Preview skips migrate so unreachable Preview DB cannot fail the build |
