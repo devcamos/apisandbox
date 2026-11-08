@@ -39,7 +39,7 @@ npm run dev                # http://localhost:4000
 ### Local gotchas
 
 - **Prisma:** If `migrate deploy` fails (lock provider mismatch), use `npx prisma db push` for dev only.
-- **RLS:** Hosted Supabase exposes `public` via PostgREST; this app uses Prisma only (no anon client). See [DEPLOYMENT.md](./DEPLOYMENT.md#public-schema-rls-supabase-data-api).
+- **Database:** Preview and Production use separate Neon databases; this app uses Prisma and existing app auth. Retain RLS hardening for server-only tables and legacy Data API roles. See [DEPLOYMENT.md](./DEPLOYMENT.md#public-schema-rls-supabase-data-api) and the [Preview cleanup runbook](./NEON_PREVIEW_CLEANUP.md).
 - **Env:** Source `.env.local` before CLI: `set -a && source .env.local && set +a`
 - **Port:** App uses **4000**; stop other dev servers before `npm run verify:ci`
 - **Feature flags:** Stripe, Redis, email, analytics off by default in `.env.local` — app runs without them
