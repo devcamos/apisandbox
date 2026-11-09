@@ -13,8 +13,9 @@
  * DIRECT_URL falls back to DATABASE_URL when unset (Prisma schema requires it).
  *
  * Usage: npm run db:migrate:deploy:vercel
- * Manual Preview migrate (when the Preview DB is reachable):
- *   DATABASE_URL=... npm run db:migrate:deploy
+ * Preview migrate (isolated Preview DB only — never from this Vercel build helper):
+ *   CONFIRM_PREVIEW_MIGRATE=YES DATABASE_URL=... npm run db:migrate:preview
+ *   See scripts/migrate-on-preview.mjs and docs/DEPLOYMENT.md.
  */
 
 import { spawnSync } from "node:child_process"
