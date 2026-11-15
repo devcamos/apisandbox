@@ -59,6 +59,31 @@ This shared ingress assumes a shared Preview database and compatible schema.
 Database-per-branch experiments require their own event routing; do not apply the
 shared setup to isolated databases without adapting it.
 
+### Preview database cutovers (Neon / shared DB)
+
+Checkout and learner registration run on the branch Preview URL. Stripe delivers
+events to the shared alias (`apisandbox-billing-preview.vercel.app`). Those two
+hosts must resolve to a deployment that uses the **same** Preview database.
+
+After changing Preview `DATABASE_URL` / `DIRECT_URL` (for example the 2026-11-07
+cutover to isolated Neon project `apisandbox-preview`):
+
+1. Redeploy a reviewed Preview Git revision that already has the new Preview env.
+2. Assign `apisandbox-billing-preview.vercel.app` to **that** deployment (Vercel →
+   Deployments → … → Assign Domain / alias). Keep the existing Stripe TEST
+   endpoint URL and signing secret unless you intentionally rotate them.
+3. Confirm unauthenticated `GET /api/webhooks/stripe` → `405` and unsigned
+   `POST` → `400` on the alias.
+4. Confirm `GET /api/health/saas` on both the branch Preview and the alias report
+   the same non-secret `data.deployment.deploymentId` (and matching `gitSha`).
+5. Re-run hosted Preview billing E2E. Do not treat database/auth health alone as
+   proof that entitlements work.
+
+If hosted Checkout returns to `/upgrade/success` with a `cs_test_` session but
+`/api/auth/me` stays `FREE`, the usual cause is a stale alias still writing an
+older Preview database — not a need to disable Deployment Protection or weaken
+the E2E.
+
 ## Automated E2E
 
 The deployed-URL workflow checks out the exact deployment SHA and runs
@@ -69,12 +94,15 @@ The Preview billing suite checks deployed readiness and environment, then probes
 the shared webhook ingress without any Vercel bypass credentials before creating
 users or test payments. Its default ingress is
 `https://apisandbox-billing-preview.vercel.app/api/webhooks/stripe`; override with
-`PREVIEW_STRIPE_WEBHOOK_URL` for a deliberately different setup. It then registers a
-disposable FREE learner, opens a real `cs_test_` hosted Checkout session, submits
-Stripe's `4242` test card, verifies the return to the same branch, and polls for
-PREMIUM after Stripe's real webhook. No app checkout stub or synthesized webhook
-is used by this acceptance test. Traces, screenshots and videos are disabled, and
-Vercel bypass headers are stripped before external requests.
+`PREVIEW_STRIPE_WEBHOOK_URL` for a deliberately different setup. Before registration
+it also compares non-secret `data.deployment` from `/api/health/saas` on the branch
+Preview and on the shared ingress origin, failing fast when the alias still points
+at another deployment. It then registers a disposable FREE learner, opens a real
+`cs_test_` hosted Checkout session, submits Stripe's `4242` test card, verifies the
+return to the same branch, and polls for PREMIUM after Stripe's real webhook. No app
+checkout stub or synthesized webhook is used by this acceptance test. Traces,
+screenshots and videos are disabled, and Vercel bypass headers are stripped before
+external requests.
 
 Run against each of two branch origins:
 

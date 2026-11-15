@@ -11,7 +11,49 @@ Use `gh pr checks` to identify the failing job before applying a recovery. The s
 | `SonarQube Cloud` | new-code coverage, duplication, reliability, or security gate | [Inspect the quality gate](#sonarqube-cloud-quality-gate-fails) |
 | Vercel | Neon preview-branch capacity is exhausted | [Check provisioning](#vercel-preview-fails-before-build-neon-branch-limit) |
 | Vercel Preview build | `prisma migrate deploy` / unreachable Preview DB | [Preview build vs migrate](#vercel-preview-build-fails-on-prisma-migrate-deploy) |
+| Hosted Preview billing E2E | Checkout succeeds; learner stays `FREE` | [Stale billing webhook alias](#hosted-preview-billing-stays-free-after-stripe-test-checkout) |
 | Architecture review | Gemini configuration, quota, or PR comment permission | [Inspect review generation](#pr-architecture-intelligence-fails) |
+
+## Hosted Preview billing stays FREE after Stripe TEST checkout
+
+### Symptoms
+
+- `tests/prod-deployment-auth.spec.ts` passes (register/login/dashboard).
+- `tests/preview-premium-upgrade.spec.ts` reaches `/upgrade/success` with a
+  `cs_test_` `session_id`, then times out while `/api/auth/me` remains `FREE`.
+- Or the suite fails earlier saying the shared webhook ingress serves a different
+  Vercel deployment / Git SHA than the branch Preview.
+
+### Cause
+
+Checkout and registration use the branch Preview URL. Stripe delivers TEST events
+to the shared ingress `https://apisandbox-billing-preview.vercel.app/api/webhooks/stripe`.
+If that alias still points at an older Preview deployment (especially after a
+Preview database cutover), the webhook upgrades a different database than the
+learner the E2E is polling.
+
+Unauthenticated `GET` → `405` / unsigned `POST` → `400` only proves the ingress
+is reachable and signature verification is wired. It does **not** prove the alias
+and branch share a database. Webhook signing-secret mismatch remains possible but
+must be confirmed from Stripe delivery / app logs; do not assume it from the FREE
+tier symptom alone.
+
+### Owner recovery (Preview only; no Production changes)
+
+1. Open the reviewed Preview deployment that has the current Preview database env.
+2. Assign domain/alias `apisandbox-billing-preview.vercel.app` to that deployment.
+3. Keep the existing Stripe TEST webhook URL and signing secret unless rotating
+   deliberately; do not disable Deployment Protection project-wide.
+4. Verify:
+   ```bash
+   curl -sS -o /dev/null -w "%{http_code}\n" https://apisandbox-billing-preview.vercel.app/api/webhooks/stripe
+   # expect 405
+   curl -sS https://apisandbox-billing-preview.vercel.app/api/health/saas | jq '.data.deployment'
+   # must match the branch Preview /api/health/saas data.deployment
+   ```
+5. Re-run **Vercel - API Sandbox E2E (preview)** for that deployment SHA.
+
+See [PREVIEW_BILLING.md](./PREVIEW_BILLING.md).
 
 ## Vercel Preview build fails on `prisma migrate deploy`
 

@@ -338,4 +338,64 @@ describe("saas config", () => {
       expect(isInstantPremiumUpgradeAllowed()).toBe(false)
     })
   })
+
+  describe("saasDeploymentIdentity / previewWebhookDeploymentMismatch", () => {
+    it("reads non-secret Vercel deploy identity from the environment", async () => {
+      vi.stubEnv("VERCEL_DEPLOYMENT_ID", "dpl_preview_example")
+      vi.stubEnv("VERCEL_GIT_COMMIT_SHA", "abc123def456")
+      const { saasDeploymentIdentity } = await import("@/lib/saas/config")
+      expect(saasDeploymentIdentity()).toEqual({
+        deploymentId: "dpl_preview_example",
+        gitSha: "abc123def456",
+      })
+    })
+
+    it("returns null fields when Vercel identity is absent", async () => {
+      vi.stubEnv("VERCEL_DEPLOYMENT_ID", "")
+      vi.stubEnv("VERCEL_GIT_COMMIT_SHA", "   ")
+      const { saasDeploymentIdentity } = await import("@/lib/saas/config")
+      expect(saasDeploymentIdentity()).toEqual({
+        deploymentId: null,
+        gitSha: null,
+      })
+    })
+
+    it("prefers deployment id when comparing webhook ingress alignment", async () => {
+      const { previewWebhookDeploymentMismatch } = await import("@/lib/saas/config")
+      expect(
+        previewWebhookDeploymentMismatch(
+          { deploymentId: "dpl_a", gitSha: "sha_a" },
+          { deploymentId: "dpl_a", gitSha: "sha_b" },
+        ),
+      ).toBeNull()
+      expect(
+        previewWebhookDeploymentMismatch(
+          { deploymentId: "dpl_a", gitSha: "sha_a" },
+          { deploymentId: "dpl_b", gitSha: "sha_a" },
+        ),
+      ).toMatch(/different Vercel deployment/)
+    })
+
+    it("falls back to git SHA and skips comparison without enough public identity", async () => {
+      const { previewWebhookDeploymentMismatch } = await import("@/lib/saas/config")
+      expect(
+        previewWebhookDeploymentMismatch(
+          { deploymentId: null, gitSha: "sha_a" },
+          { deploymentId: null, gitSha: "sha_a" },
+        ),
+      ).toBeNull()
+      expect(
+        previewWebhookDeploymentMismatch(
+          { deploymentId: null, gitSha: "sha_a" },
+          { deploymentId: null, gitSha: "sha_b" },
+        ),
+      ).toMatch(/different Git SHA/)
+      expect(
+        previewWebhookDeploymentMismatch(
+          { deploymentId: null, gitSha: null },
+          { deploymentId: null, gitSha: "sha_b" },
+        ),
+      ).toBeNull()
+    })
+  })
 })

@@ -332,3 +332,57 @@ export function saasReadinessSummary(checks: SaasReadinessCheck[]): {
   const warnings = checks.filter((c) => c.status === "warn").length
   return { ready: failures === 0, failures, warnings }
 }
+
+export type SaasDeploymentIdentity = {
+  /** Vercel deployment id (`dpl_…`) when running on Vercel; otherwise null. */
+  deploymentId: string | null
+  /** Full Git commit SHA from Vercel, when present. */
+  gitSha: string | null
+}
+
+function nonEmptyEnv(key: string): string | null {
+  const value = process.env[key]?.trim()
+  return value ? value : null
+}
+
+/**
+ * Non-secret deploy identity for Preview webhook alias alignment checks.
+ * Never includes connection strings, signing secrets, or Stripe keys.
+ */
+export function saasDeploymentIdentity(): SaasDeploymentIdentity {
+  return {
+    deploymentId: nonEmptyEnv("VERCEL_DEPLOYMENT_ID"),
+    gitSha: nonEmptyEnv("VERCEL_GIT_COMMIT_SHA"),
+  }
+}
+
+/**
+ * Returns a human-readable mismatch when the shared Stripe webhook ingress
+ * serves a different Preview deployment than the branch under test.
+ * Prefers exact deployment id; falls back to git SHA when ids are unavailable.
+ * Returns null when there is not enough public identity to compare.
+ */
+export function previewWebhookDeploymentMismatch(
+  branch: SaasDeploymentIdentity,
+  ingress: SaasDeploymentIdentity,
+): string | null {
+  if (branch.deploymentId && ingress.deploymentId) {
+    if (branch.deploymentId === ingress.deploymentId) return null
+    return (
+      "Shared Stripe webhook ingress serves a different Vercel deployment than this Preview. " +
+      "Repoint apisandbox-billing-preview.vercel.app to this Git deployment so TEST webhooks " +
+      "write the same Preview database as learner registration."
+    )
+  }
+
+  if (branch.gitSha && ingress.gitSha) {
+    if (branch.gitSha === ingress.gitSha) return null
+    return (
+      "Shared Stripe webhook ingress serves a different Git SHA than this Preview. " +
+      "Repoint apisandbox-billing-preview.vercel.app to this Git deployment before running " +
+      "hosted TEST payments."
+    )
+  }
+
+  return null
+}
