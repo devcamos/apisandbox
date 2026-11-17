@@ -81,7 +81,7 @@
     "isomorphic-dompurify": "^3.19.0",
     "lucide-react": "^0.562.0",
     "mermaid": "^10.9.8",
-    "next": "^16.4.2",
+    "next": "^16.4.6",
     "next-auth": "^5.0.0-beta.32",
     "openai": "^6.37.0",
     "pg": "^8.21.0",
