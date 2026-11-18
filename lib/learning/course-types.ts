@@ -102,6 +102,7 @@ export interface CapabilityMasteryJourney {
   decision: CapabilityDecisionGuide
   tradeOffs: string[]
   recallPrompts: string[]
+  recallAnswers: [string, string]
   reasoning: CapabilityReasoningExercise
   implementation: CapabilityOpenSourceImplementation
   breakExercise: CapabilityBreakExercise

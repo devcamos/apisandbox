@@ -13,7 +13,9 @@ import {
   Target,
   Wrench,
 } from "lucide-react"
-import { CapabilityExplanationDraft, CapabilityPrediction } from "@/components/learning/CapabilityPractice"
+import { CapabilityPrediction } from "@/components/learning/CapabilityPractice"
+import { CapabilityExplanation } from "@/components/learning/CapabilityExplanation"
+import { CapabilityLab } from "@/components/learning/CapabilityLab"
 import { CourseAssessment } from "@/components/learning/CourseAssessment"
 import { CAPABILITY_MASTERY_STAGES, type SanitizedLearningUnit } from "@/lib/learning/api-foundations-course"
 
@@ -97,7 +99,7 @@ export function AwsCapabilityMasteryJourney({
           <div>
             <h2 className="text-xl font-bold text-white">Mastery requires transfer evidence</h2>
             <p className="mt-2 text-sm leading-6 text-slate-300">
-              Opening this capability—or watching related content—earns nothing. Predict first, build it in Java, break it, explain it, map the invariant to AWS, then pass the scored checkpoint.
+              Opening this capability or watching related content earns nothing. Predict first, run the lab, inject a fault, explain your decision, map the invariant to AWS, then pass the scored checkpoint.
             </p>
           </div>
         </div>
@@ -125,26 +127,26 @@ export function AwsCapabilityMasteryJourney({
         </Stage>
 
         <Stage id="predict" title="Predict" subtitle="Commit to a decision before seeing the mechanism.">
-          <CapabilityPrediction scenario={unit.scenario} />
+          <CapabilityPrediction scenario={unit.scenario} courseId={courseId} unitId={unit.id} />
         </Stage>
 
         <Stage id="learn" title="Learn" subtitle="Build the provider-independent causal model.">
           <div className="grid gap-4 lg:grid-cols-2">
-            <div className="rounded-xl border border-violet-400/25 bg-violet-400/5 p-5">
+            <div id="stage-learn-principle" className="scroll-mt-24 rounded-xl border border-violet-400/25 bg-violet-400/5 p-5">
               <p className="text-xs font-semibold uppercase tracking-wide text-violet-300">Principle</p>
               <p className="mt-2 text-sm leading-6 text-slate-200">{unit.principle}</p>
             </div>
-            <div className="rounded-xl border border-slate-700 bg-slate-950/35 p-5">
+            <div id="stage-learn-mechanism" className="scroll-mt-24 rounded-xl border border-slate-700 bg-slate-950/35 p-5">
               <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">Mechanism</p>
               <p className="mt-2 text-sm leading-6 text-slate-300">{content.mechanism}</p>
             </div>
           </div>
-          <div className="mt-5 grid gap-4 lg:grid-cols-3">
+          <div id="stage-learn-decision" className="mt-5 grid scroll-mt-24 gap-4 lg:grid-cols-3">
             <div><h4 className="mb-2 font-semibold text-white">Use when</h4><BulletList items={content.decision.useWhen} tone="success" /></div>
             <div><h4 className="mb-2 font-semibold text-white">Avoid when</h4><BulletList items={content.decision.avoidWhen} tone="warning" /></div>
             <div><h4 className="mb-2 font-semibold text-white">Alternatives</h4><BulletList items={content.decision.alternatives} /></div>
           </div>
-          <div className="mt-5 rounded-xl border border-amber-400/20 bg-amber-400/5 p-4">
+          <div id="stage-learn-trade-offs" className="mt-5 scroll-mt-24 rounded-xl border border-amber-400/20 bg-amber-400/5 p-4">
             <h4 className="flex items-center gap-2 font-semibold text-white"><AlertTriangle className="h-4 w-4 text-amber-300" /> Trade-offs</h4>
             <div className="mt-3"><BulletList items={content.tradeOffs} tone="warning" /></div>
           </div>
@@ -155,6 +157,14 @@ export function AwsCapabilityMasteryJourney({
             {content.recallPrompts.map((prompt, index) => (
               <li key={prompt} className="rounded-xl border border-slate-700 bg-slate-950/35 p-4 text-sm leading-6 text-slate-200">
                 <span className="mr-2 font-bold text-violet-300">{index + 1}.</span>{prompt}
+                <details className="mt-2 text-sm">
+                  <summary className="cursor-pointer text-violet-200">Show hint</summary>
+                  <a href={index === 0 ? "#stage-learn-mechanism" : "#stage-learn-decision"} className="underline">Review {index === 0 ? "the mechanism" : "the decision boundary"}</a>
+                  <details className="mt-2">
+                    <summary className="cursor-pointer text-violet-200">Reveal canonical answer</summary>
+                    <p className="mt-1 text-slate-300">{content.recallAnswers[index]}</p>
+                  </details>
+                </details>
               </li>
             ))}
           </ol>
@@ -176,7 +186,11 @@ export function AwsCapabilityMasteryJourney({
           <ol className="mt-5 grid gap-3 sm:grid-cols-3">
             {content.implementation.steps.map((step, index) => <li key={step} className="rounded-xl border border-slate-700 bg-slate-950/35 p-4 text-sm leading-6 text-slate-300"><span className="font-bold text-emerald-300">{index + 1}.</span> {step}</li>)}
           </ol>
-          <pre className="mt-5 overflow-x-auto rounded-xl border border-slate-700 bg-slate-950 p-4 text-xs leading-6 text-emerald-100"><code>{content.implementation.code}</code></pre>
+          <CapabilityLab courseId={courseId} unitId={unit.id} stage="build" />
+          <details className="mt-4 text-sm text-slate-300">
+            <summary className="cursor-pointer">View Java 21 reference</summary>
+            <pre className="mt-2 overflow-x-auto rounded-xl border border-slate-700 bg-slate-950 p-4 text-xs leading-6 text-emerald-100"><code>{content.implementation.code}</code></pre>
+          </details>
           <div className="mt-5"><h4 className="mb-2 font-semibold text-white">Success criteria</h4><BulletList items={content.implementation.successCriteria} tone="success" /></div>
         </Stage>
 
@@ -186,10 +200,11 @@ export function AwsCapabilityMasteryJourney({
             <div><h4 className="mb-2 font-semibold text-white">Observe</h4><BulletList items={content.breakExercise.observe} /></div>
           </div>
           <div className="mt-5 rounded-xl border border-emerald-400/20 bg-emerald-400/5 p-4"><p className="text-xs font-semibold uppercase tracking-wide text-emerald-300">Recovery design</p><p className="mt-2 text-sm leading-6 text-slate-200">{content.breakExercise.recovery}</p></div>
+          <CapabilityLab courseId={courseId} unitId={unit.id} stage="break" />
         </Stage>
 
         <Stage id="explain" title="Explain" subtitle="Teach the decision back and expose gaps.">
-          <CapabilityExplanationDraft courseId={courseId} capabilityId={unit.id} prompt={content.explanation.prompt} evidenceCriteria={content.explanation.evidenceCriteria} />
+          <CapabilityExplanation courseId={courseId} unitId={unit.id} prompt={content.explanation.prompt} criteria={content.explanation.evidenceCriteria} />
         </Stage>
 
         <Stage id="aws-map" title="AWS Map" subtitle="Map the invariant to AWS only after understanding it.">
@@ -197,8 +212,8 @@ export function AwsCapabilityMasteryJourney({
             <table className="min-w-full divide-y divide-slate-700 text-left text-sm">
               <thead className="bg-slate-950/50 text-xs uppercase tracking-wide text-slate-400"><tr><th className="px-4 py-3">Invariant capability</th><th className="px-4 py-3">AWS implementation</th><th className="px-4 py-3">Why it maps</th></tr></thead>
               <tbody className="divide-y divide-slate-800">
-                {content.platformMap.items.map((item) => (
-                  <tr key={item.invariant + "-" + item.implementation}>
+                {content.platformMap.items.map((item, index) => (
+                  <tr id={`stage-aws-map-row-${index + 1}`} className="scroll-mt-24" key={item.invariant + "-" + item.implementation}>
                     <td className="px-4 py-4 font-semibold text-white">{item.invariant}</td>
                     <td className="px-4 py-4 text-violet-200">{item.implementation}</td>
                     <td className="px-4 py-4 leading-6 text-slate-300">{item.why}</td>
@@ -210,9 +225,9 @@ export function AwsCapabilityMasteryJourney({
           <div className="mt-4 rounded-xl border border-violet-400/20 bg-violet-400/5 p-4"><p className="text-xs font-semibold uppercase tracking-wide text-violet-300">AIF-C01 exam lens</p><p className="mt-2 text-sm leading-6 text-slate-200">{content.platformMap.examLens}</p></div>
         </Stage>
 
-        <Stage id="exam" title="Exam" subtitle="Record scored recall and decision evidence; practical artifacts remain separate.">
-          <CourseAssessment courseId={courseId} unitId={unit.id} assessment={unit.assessment} loginCallbackUrl={loginCallbackUrl} showReflection={false} />
-          <p className="mt-4 text-xs leading-5 text-slate-500">Passing records exam evidence for {trackSlug}. It does not certify that the Java build, failure drill, or explanation was independently reviewed.</p>
+        <Stage id="exam" title="Exam" subtitle="Check recall and export the evidence from your practice.">
+          <CourseAssessment courseId={courseId} unitId={unit.id} assessment={unit.assessment} loginCallbackUrl={loginCallbackUrl} showReflection={false} certificationKind="capability" evidenceTitle={unit.title} />
+          <p className="mt-4 text-xs leading-5 text-slate-500">Passing records the scored checkpoint for {trackSlug}. Your export also includes the practical evidence you collected.</p>
         </Stage>
       </div>
     </div>

@@ -35,6 +35,7 @@ interface CapabilityInput {
     alternative: [string, string]
   }
   recallPrompts: string[]
+  recallAnswers: [string, string]
   reasoning: CapabilityMasteryJourney["reasoning"]
   build: Omit<CapabilityMasteryJourney["implementation"], "language" | "steps">
   breakExercise: CapabilityMasteryJourney["breakExercise"]
@@ -71,6 +72,7 @@ function capabilityUnit(input: CapabilityInput): LearningUnit {
     decision: input.decision,
     tradeOffs: input.tradeOffs,
     recallPrompts: input.recallPrompts,
+    recallAnswers: input.recallAnswers,
     reasoning: input.reasoning,
     implementation: {
       ...input.build,
@@ -145,17 +147,18 @@ export const aifC01CapabilityUnits: LearningUnit[] = [
     problem: "A support router needs exact reasons for governed decisions but also sees wording that fixed rules miss.",
     mechanism: "Rules encode decisions directly. ML estimates a mapping from examples. Deep networks learn multiple representation layers and usually require more data, compute, and controls.",
     decision: {
-      useWhen: ["Use rules for explicit stable policy; use ML for repeatable patterns that rules cannot express economically."],
+      useWhen: ["Use rules for explicit stable policy; use ML for repeatable patterns that rules cannot express economically. Within ML, classification predicts a category, regression predicts a number, and clustering discovers groups without predefined labels."],
       avoidWhen: ["Do not choose deep learning when deterministic code completely expresses the requirement."],
       alternatives: ["Rules engine", "Search", "Human review", "Conventional statistical model"],
     },
-    tradeOffs: ["Learned systems generalise but are probabilistic.", "Expressive models cost more to train, evaluate, explain, and operate."],
+    tradeOffs: ["Learned systems generalise but are probabilistic.", "For rare urgent tickets, recall measures how many urgent cases were found. Precision measures how many escalations were genuinely urgent. Accuracy alone can hide missed urgent requests.", "Expressive models cost more to train, evaluate, explain, and operate."],
     prediction: {
       prompt: "Regulators require an exact reason for every denied request. What should the first implementation be?",
       preferred: ["Explicit rules plus an escalation path", "The behaviour is deterministic; unresolved cases create evidence for a later ML decision."],
       alternative: ["The largest neural model available", "Complexity and probabilistic behaviour arrive before the need is proven."],
     },
     recallPrompts: ["Define AI, ML, and deep learning without naming a vendor.", "Give one task where a rule is stronger than ML."],
+    recallAnswers: ["AI is the broad pursuit of intelligent behavior. ML is an approach to AI that learns from examples. Deep learning is ML that uses multilayer neural networks.", "A fixed eligibility rule works well when policy is explicit and each decision must be explained exactly."],
     reasoning: {
       prompt: "Defend a rules, ML, or hybrid support router given 300 labelled tickets and asymmetric error costs.",
       strongAnswerIncludes: ["Data and label quality", "Error cost and escalation", "Explainability and change cost"],
@@ -170,7 +173,7 @@ export const aifC01CapabilityUnits: LearningUnit[] = [
     breakExercise: {
       faults: ["Swap the learned weights.", "Feed an example outside training coverage."],
       observe: ["Deterministic versus data-dependent failure", "Where abstention should begin"],
-      recovery: "Add an uncertainty threshold and route ambiguous cases to a human.",
+      recovery: "Route scores with an absolute margin below 0.1 to human review by returning ABSTAIN.",
     },
     explanation: {
       prompt: "Explain the hierarchy and justify the smallest suitable approach to a product owner.",
@@ -211,7 +214,7 @@ export const aifC01CapabilityUnits: LearningUnit[] = [
     goal: "Trace data, parameters, versions, evaluation, deployment, and production predictions.",
     concepts: ["training", "inference", "validation", "model version", "drift"],
     problem: "A classifier succeeds in a notebook but fails after release because test data, training, and live behaviour were mixed.",
-    mechanism: "Training updates parameters to reduce an objective. Validation estimates generalisation. Inference loads a fixed approved version and produces outputs without relearning from each request.",
+    mechanism: "Training updates parameters to reduce an objective. Validation estimates generalisation. Strong training performance paired with weak validation performance signals overfitting. Inference loads a fixed approved version and produces outputs without relearning from each request.",
     decision: {
       useWhen: ["Train only when an existing model cannot satisfy the measured task; serve immutable approved versions."],
       avoidWhen: ["Do not train on test cases or silently update parameters inside production requests."],
@@ -224,6 +227,7 @@ export const aifC01CapabilityUnits: LearningUnit[] = [
       alternative: ["Retrain inside every request", "Outputs become unreviewed and non-reproducible."],
     },
     recallPrompts: ["What changes during training?", "What stays stable during one governed inference request?"],
+    recallAnswers: ["Training adjusts model parameters to reduce an objective on examples.", "Inference uses the same approved artifact and parameters throughout the request."],
     reasoning: {
       prompt: "Choose batch or real-time inference for nightly learner recommendations.",
       strongAnswerIncludes: ["Freshness requirement", "Latency and cost", "Versioned rollback"],
@@ -292,6 +296,7 @@ export const aifC01CapabilityUnits: LearningUnit[] = [
       alternative: ["Use the largest model by default", "Model size substitutes for workload evidence."],
     },
     recallPrompts: ["What makes a model foundational?", "Why is it not a complete application?"],
+    recallAnswers: ["A foundation model is broadly pretrained and can be adapted to many downstream tasks.", "The application still needs context, tools, validation, permissions, and evaluation for its own use case."],
     reasoning: {
       prompt: "Compare managed and self-hosted models for private learner data.",
       strongAnswerIncludes: ["Quality and latency", "Data boundary", "Hosting skill and total cost"],
@@ -360,6 +365,7 @@ export const aifC01CapabilityUnits: LearningUnit[] = [
       alternative: ["DNS resolution", "DNS maps network names, not language relationships."],
     },
     recallPrompts: ["What do query, key, and value do?", "Why is positional information needed?"],
+    recallAnswers: ["A query represents what a position is looking for. Keys determine relevance to it. The weighted values provide the information the position receives.", "Attention compares token representations. Positional information lets the model distinguish sequences with the same tokens in different orders."],
     reasoning: {
       prompt: "Evaluate doubling context length for every request.",
       strongAnswerIncludes: ["Need for distant context", "Compute and latency", "Retrieval alternative"],
@@ -428,6 +434,7 @@ export const aifC01CapabilityUnits: LearningUnit[] = [
       alternative: ["Append every document", "The request may fail or truncate the wrong material."],
     },
     recallPrompts: ["Why is a token not always a word?", "What shares a context window?"],
+    recallAnswers: ["Tokenizers may split a word into pieces, combine short words with surrounding spaces, or split punctuation and code separately.", "Instructions, user input, conversation history, retrieved context, and room for the generated output share the available context budget."],
     reasoning: {
       prompt: "Allocate a context budget across instructions, history, evidence, and answer.",
       strongAnswerIncludes: ["Explicit allocation", "Overflow policy", "Quality test after trimming"],
@@ -496,6 +503,7 @@ export const aifC01CapabilityUnits: LearningUnit[] = [
       alternative: ["Require exact equality", "The relevant note is missed."],
     },
     recallPrompts: ["What is an embedding?", "Why must vector spaces be compatible?"],
+    recallAnswers: ["An embedding is a numeric vector that represents features of content so related items can be compared.", "Similarity has meaning within a compatible representation space. A different model or preprocessing version can change the geometry and require reindexing."],
     reasoning: {
       prompt: "Choose semantic, keyword, or hybrid search for docs with exact control IDs.",
       strongAnswerIncludes: ["Semantic recall", "Exact precision", "Filters and hybrid ranking"],
@@ -564,6 +572,7 @@ export const aifC01CapabilityUnits: LearningUnit[] = [
       alternative: ["Treat similarity as authorization", "Semantic closeness leaks data."],
     },
     recallPrompts: ["What does cosine compare?", "How do top-k and thresholds differ?"],
+    recallAnswers: ["Cosine similarity compares the angle between two vectors and is invariant to positive changes in their magnitudes.", "Top-k limits how many candidates are returned. A threshold rejects weak matches, so the result set can contain fewer than k items."],
     reasoning: {
       prompt: "Repair high-recall but low-precision retrieval.",
       strongAnswerIncludes: ["Measured precision/recall", "Filters", "Top-k or reranking trade-off"],
@@ -632,6 +641,7 @@ export const aifC01CapabilityUnits: LearningUnit[] = [
       alternative: ["Generate the likely policy", "Fluency masks an unsupported claim."],
     },
     recallPrompts: ["Define hallucination.", "Name three impact controls."],
+    recallAnswers: ["A hallucination is generated content that sounds plausible but is unsupported or incorrect.", "Retrieve approved evidence, check each claim against its sources, and abstain or escalate uncertain high-impact answers."],
     reasoning: {
       prompt: "Contrast controls for creative brainstorming and a regulated policy assistant.",
       strongAnswerIncludes: ["Different error costs", "Grounding", "Abstention and human review"],
@@ -692,6 +702,7 @@ export const aifC01CapabilityUnits: LearningUnit[] = [
     tradeOffs: ["Long prompts raise clarity and token cost.", "Examples can anchor and bias behaviour."],
     prediction: { prompt: "The API requires stable JSON. Which design is strongest?", preferred: ["Specify a schema, validate, and handle failure", "The model gets a contract and code protects the boundary."], alternative: ["Ask for good JSON and trust it", "Malformed output reaches downstream code."] },
     recallPrompts: ["Name trusted and untrusted prompt regions.", "Why does an example not guarantee compliance?"],
+    recallAnswers: ["System and application policy are trusted. User text and retrieved documents are untrusted data, even when they contain instruction-like language.", "Examples guide a probabilistic model. A schema validator and permission checks enforce the actual boundary."],
     reasoning: { prompt: "A retrieved document says to ignore system policy. Design the control layers.", strongAnswerIncludes: ["Treat context as data", "Least-privilege tools", "Validation and adversarial tests"] },
     build: { title: "Create a versioned Java prompt", stack: ["Plain Java", "JSON schema validator optional"], objective: "Keep instructions, untrusted context, and output visibly separate.", code: "record PromptInput(String question, String context) {}\nstatic String build(PromptInput i) {\n  return \"SYSTEM: Answer only from CONTEXT. Return {answer,citations}.\\n\"\n      + \"CONTEXT_START\\n\" + i.context() + \"\\nCONTEXT_END\\n\"\n      + \"USER: \" + i.question();\n}", successCriteria: ["Prompt version is recorded.", "Malformed output is rejected."] },
     breakExercise: { faults: ["Insert an instruction into context.", "Remove the schema."], observe: ["Injection susceptibility", "Format failure"], recovery: "Keep policy outside untrusted data, validate output, restrict tools, and add adversarial tests." },
@@ -719,6 +730,7 @@ export const aifC01CapabilityUnits: LearningUnit[] = [
     tradeOffs: ["Small chunks improve precision and can lose context.", "Large top-k improves recall and adds noise, latency, and tokens."],
     prediction: { prompt: "The source changes daily. Fine-tune after every edit?", preferred: ["Update the retrieval index", "Current evidence enters without daily parameter changes."], alternative: ["Retrain after every edit", "Parameters become stale content storage."] },
     recallPrompts: ["List the RAG pipeline.", "Where can it fail before generation?"],
+    recallAnswers: ["Ingest and chunk approved sources, embed and index them, retrieve authorized relevant chunks, supply them as context, and validate generated claims.", "Chunking can remove needed context, retrieval can miss matches, the index can go stale, or filtering can select ineligible documents."],
     reasoning: { prompt: "A fluent answer cites another tenant's document. Find controls.", strongAnswerIncludes: ["Tenant filtering", "Retrieval quality", "Claim-to-source validation"] },
     build: { title: "Build in-memory Java retrieval", stack: ["Plain Java", "Local embedding adapter"], objective: "Filter, rank, and cite before adding a managed store.", code: "record Chunk(String id, String tenant, String text, double[] vector) {}\nstatic List<Chunk> retrieve(List<Chunk> chunks, String tenant, double[] q, int k) {\n  return chunks.stream().filter(c -> c.tenant().equals(tenant))\n      .sorted(Comparator.comparingDouble((Chunk c) -> cosine(q, c.vector())).reversed())\n      .limit(k).toList();\n}", successCriteria: ["Only authorised chunks return.", "Every answer carries source IDs."] },
     breakExercise: { faults: ["Split a critical sentence.", "Remove tenant filter.", "Index stale versions."], observe: ["Lost context", "Data leakage", "Outdated answers"], recovery: "Version sources, test chunking, authorize before retrieval, and support abstention." },
@@ -746,6 +758,7 @@ export const aifC01CapabilityUnits: LearningUnit[] = [
     tradeOffs: ["Adaptation can improve consistency and reduce generality.", "Training adds governance and compute cost."],
     prediction: { prompt: "A policy changes weekly. Fine-tune first?", preferred: ["No—retrieve the current policy", "Knowledge stays linked to its source."], alternative: ["Retrain every edit", "Parameters become stale content storage."] },
     recallPrompts: ["What changes in fine-tuning?", "Why compare base and adapted models?"],
+    recallAnswers: ["Fine-tuning updates some model parameters using curated training examples.", "Comparing both versions on the same untouched evaluation cases shows genuine gains and exposes regressions in safety or existing capabilities."],
     reasoning: { prompt: "Fine-tuning improves JSON but worsens safety. Decide whether to ship.", strongAnswerIncludes: ["Independent gates", "Rollback", "Validation alternative"] },
     build: { title: "Validate a Java adaptation dataset", stack: ["Plain Java", "Open-source local trainer"], objective: "Make data quality and train/evaluation separation explicit.", code: "record Example(String id, String input, String expected) {}\nstatic void validate(List<Example> train, Set<String> evalIds) {\n  var ids = new HashSet<String>();\n  for (var e : train) if (!ids.add(e.id()) || evalIds.contains(e.id()))\n    throw new IllegalArgumentException(\"duplicate or leakage\");\n}", successCriteria: ["No train/evaluation overlap.", "Base and adapted models run the same tests."] },
     breakExercise: { faults: ["Copy evaluation cases into training.", "Remove safety examples."], observe: ["Inflated score", "Safety regression"], recovery: "Repair and version data, then promote only when all gates pass." },
@@ -773,6 +786,7 @@ export const aifC01CapabilityUnits: LearningUnit[] = [
     tradeOffs: ["Automated metrics scale and miss nuance.", "Human review adds nuance, cost, and variability."],
     prediction: { prompt: "Candidate is cheaper but fails citation accuracy. Promote it?", preferred: ["No—keep the release gate", "Cost does not override trust criteria."], alternative: ["Yes—cost is everything", "Unsupported answers become an unapproved trade-off."] },
     recallPrompts: ["Why keep untouched evaluation cases?", "Name four dimensions beyond accuracy."],
+    recallAnswers: ["Untouched cases measure generalization and help detect training leakage and overfitting.", "For example, measure factuality, safety, latency, and cost independently."],
     reasoning: { prompt: "Design release gates for rare but severe safety failures.", strongAnswerIncludes: ["Adversarial cases", "Independent metric floors", "Rollback"] },
     build: { title: "Compare candidate and baseline in Java", stack: ["Plain Java", "JUnit optional"], objective: "Fail promotion on explicit criteria.", code: "record Score(double quality, long latencyMs, double cost) {}\nstatic boolean passes(Score c, Score b) {\n  return c.quality() >= 0.90 && c.quality() >= b.quality() - 0.01\n      && c.latencyMs() <= 1500;\n}", successCriteria: ["Both versions use identical cases.", "Any required failure blocks promotion."] },
     breakExercise: { faults: ["Test easy cases only.", "Average away one severe failure."], observe: ["Selection bias", "Hidden tail risk"], recovery: "Version data and rubrics, report dimensions separately, and inspect severe failures." },
@@ -800,6 +814,7 @@ export const aifC01CapabilityUnits: LearningUnit[] = [
     tradeOffs: ["Fairness definitions can conflict.", "Human review adds accountability and possible human bias."],
     prediction: { prompt: "Subgroup error differs materially. What next?", preferred: ["Pause automation and investigate", "Review preserves remedy while the system is repaired."], alternative: ["Ship on aggregate accuracy", "Concentrated harm stays hidden."] },
     recallPrompts: ["Where can bias enter?", "Why can fairness definitions conflict?"],
+    recallAnswers: ["Bias can enter during sampling, labeling, feature or objective design, deployment, and downstream use.", "Metrics such as equal selection and equal error rates can call for different thresholds when groups have different base rates."],
     reasoning: { prompt: "Set release conditions for an advisory access recommendation.", strongAnswerIncludes: ["Intended use", "Subgroup thresholds", "Appeal and monitoring"] },
     build: { title: "Measure subgroup false positives", stack: ["Plain Java"], objective: "Expose unequal error hidden by an aggregate.", code: "record Outcome(String group, boolean actual, boolean predicted) {}\nstatic double fpr(List<Outcome> rows, String group) {\n  var n = rows.stream().filter(r -> r.group().equals(group) && !r.actual()).toList();\n  long fp = n.stream().filter(Outcome::predicted).count();\n  return n.isEmpty() ? 0 : (double) fp / n.size();\n}", successCriteria: ["Aggregate and subgroup results are shown.", "Small samples are flagged."] },
     breakExercise: { faults: ["Remove a group from tests.", "Automate without appeal."], observe: ["Coverage blind spot", "Missing accountability"], recovery: "Repair representation, reassess thresholds, document limits, and preserve appeal." },
@@ -827,6 +842,7 @@ export const aifC01CapabilityUnits: LearningUnit[] = [
     tradeOffs: ["Strict filters block harm and valid requests.", "Classifiers add nuance and latency."],
     prediction: { prompt: "A model proposes a refund. What moves money?", preferred: ["Deterministic policy and authorization", "Trusted code enforces identity, amount, and rules."], alternative: ["A careful prompt", "Probabilistic text becomes a financial control."] },
     recallPrompts: ["Name four guardrail layers.", "Define false positive and false negative."],
+    recallAnswers: ["Filter inputs, scope retrieved data, authorize tools, and validate output. Monitoring and escalation handle failures.", "A false positive blocks permitted behavior. A false negative allows prohibited behavior through."],
     reasoning: { prompt: "Design controls for search-only notes with no account changes.", strongAnswerIncludes: ["Read-only tool", "Input/output policy", "Logging and escalation"] },
     build: { title: "Compose Java policy checks", stack: ["Plain Java"], objective: "Keep tool permission explicit.", code: "static final Set<String> ALLOWED = Set.of(\"searchCourseNotes\");\nstatic void authorise(String tool) {\n  if (!ALLOWED.contains(tool)) throw new SecurityException(\"not allowed\");\n}\nstatic String guard(String out) {\n  return out.matches(\".*\\\\b\\\\d{3}-\\\\d{2}-\\\\d{4}\\\\b.*\") ? \"withheld\" : out;\n}", successCriteria: ["Disallowed tools fail closed.", "Tests cover bypass and overblocking."] },
     breakExercise: { faults: ["Obfuscate sensitive text.", "Request a tool indirectly."], observe: ["Pattern bypass", "Intent versus string gap"], recovery: "Layer permissions, classifiers, schema checks, adversarial tests, and escalation." },
@@ -854,6 +870,7 @@ export const aifC01CapabilityUnits: LearningUnit[] = [
     tradeOffs: ["mTLS adds rotation and revocation.", "Private networks do not encrypt or authorize alone.", "Logs can capture sensitive data."],
     prediction: { prompt: "Two services need encrypted transport and mutual workload identity. What fits?", preferred: ["mTLS plus authorization", "Both peers authenticate during TLS while policy controls actions."], alternative: ["Caller name in prompt", "Text is mistaken for cryptographic identity."] },
     recallPrompts: ["What does TLS provide?", "What does mTLS add and not add?"],
+    recallAnswers: ["TLS encrypts and protects data in transit and typically authenticates the server.", "mTLS also authenticates the client certificate. Application authorization still decides what the authenticated workload may do."],
     reasoning: { prompt: "Place controls across browser, API, model, learner data, tools, and logs.", strongAnswerIncludes: ["Transport versus application", "Least privilege", "Secret-safe logs"] },
     build: { title: "Create a Java mTLS client", stack: ["Java HttpClient", "PKCS#12", "Trust store"], objective: "Demonstrate mutual authentication at transport.", code: "char[] password = System.getenv(\"MTLS_STORE_PASSWORD\").toCharArray();\nvar keys = KeyStore.getInstance(\"PKCS12\");\ntry (var in = Files.newInputStream(Path.of(System.getenv(\"MTLS_KEYSTORE\")))) { keys.load(in, password); }\nvar kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());\nkmf.init(keys, password);\nvar ssl = SSLContext.getInstance(\"TLS\");\nssl.init(kmf.getKeyManagers(), null, new SecureRandom());\nvar client = HttpClient.newBuilder().sslContext(ssl).build();", successCriteria: ["Server is validated.", "Unapproved clients fail.", "Authorization still checks actions."] },
     breakExercise: { faults: ["Expire client certificate.", "Use untrusted CA.", "Log store password."], observe: ["Handshake failure", "Trust failure", "Secret exposure"], recovery: "Automate rotation and revocation, fail closed, redact, and retain authorization." },
@@ -881,6 +898,7 @@ export const aifC01CapabilityUnits: LearningUnit[] = [
     tradeOffs: ["Controls can slow low-risk experiments without tiers.", "Audit data aids response and adds privacy duties."],
     prediction: { prompt: "A developer changes the production model ID. What is required?", preferred: ["Version, evaluation, approval, rollback", "The release is attributable and reversible."], alternative: ["Trust memory", "No evidence connects change to outcome."] },
     recallPrompts: ["What makes output reproducible?", "Preventive versus detective control?"],
+    recallAnswers: ["Record the model, prompt, sources, configuration, and evaluation versions for the request.", "A preventive control blocks an unapproved action. A detective control records or alerts on it so it can be investigated."],
     reasoning: { prompt: "Contrast governance for a summariser and a high-impact recommendation.", strongAnswerIncludes: ["Risk and owner", "Proportional approval", "Monitoring and retirement"] },
     build: { title: "Emit a Java AI decision record", stack: ["Plain Java", "Append-only audit sink"], objective: "Capture reproducibility without unnecessary sensitive content.", code: "record AiDecisionRecord(UUID requestId, String useCaseId,\n    String modelVersion, String promptVersion, List<String> sourceIds,\n    String evaluationRelease, Instant occurredAt) {}\nvar record = new AiDecisionRecord(UUID.randomUUID(), \"course-assistant\",\n    \"model-7\", \"prompt-12\", List.of(\"policy-2026-08\"), \"eval-44\", Instant.now());", successCriteria: ["Output links to model, prompt, sources, and evaluation.", "No secret or unnecessary learner data is stored."] },
     breakExercise: { faults: ["Remove prompt version.", "Allow unapproved model.", "Store every raw prompt forever."], observe: ["Lost reproducibility", "Policy bypass", "Privacy risk"], recovery: "Validate evidence, enforce approved versions, and minimise audit data." },

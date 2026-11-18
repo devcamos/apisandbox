@@ -2,32 +2,35 @@
 
 import { useEffect, useState, type FormEvent } from "react"
 import { CheckCircle2, RotateCcw } from "lucide-react"
+import { evidenceKey, readEvidence, readLocal, writeLocal } from "@/lib/learning/capability-evidence"
 import type { InteractiveScenario } from "@/lib/learning/api-foundations-course"
 
-function readExplanationDraft(storageKey: string) {
-  try {
-    return globalThis.localStorage?.getItem(storageKey) ?? ""
-  } catch {
-    return ""
-  }
-}
-
-function writeExplanationDraft(storageKey: string, value: string) {
-  try {
-    globalThis.localStorage?.setItem(storageKey, value)
-  } catch {
-    return
-  }
-}
-
-export function CapabilityPrediction({ scenario }: Readonly<{ scenario: InteractiveScenario }>) {
+export function CapabilityPrediction({ scenario, courseId, unitId }: Readonly<{
+  scenario: InteractiveScenario
+  courseId: string
+  unitId: string
+}>) {
+  const predictionKey = evidenceKey(courseId, unitId, "prediction")
+  const takeawayKey = evidenceKey(courseId, unitId, "takeaway")
   const [selectedId, setSelectedId] = useState("")
   const [committedId, setCommittedId] = useState("")
+  const [takeaway, setTakeaway] = useState("")
+
+  useEffect(() => {
+    const saved = readEvidence<{ id: string }>(predictionKey)
+    setSelectedId(saved?.id ?? "")
+    setCommittedId(saved?.id ?? "")
+    setTakeaway(readLocal(takeawayKey))
+  }, [predictionKey, takeawayKey])
+
   const selected = scenario.options.find((option) => option.id === committedId)
 
   function commit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
-    if (selectedId) setCommittedId(selectedId)
+    const option = scenario.options.find(({ id }) => id === selectedId)
+    if (!option) return
+    setCommittedId(option.id)
+    if (!readLocal(predictionKey)) writeLocal(predictionKey, JSON.stringify({ id: option.id, label: option.label, prompt: scenario.prompt }))
   }
 
   function reset() {
@@ -95,69 +98,15 @@ export function CapabilityPrediction({ scenario }: Readonly<{ scenario: Interact
           </ol>
           <button type="button" onClick={reset} className="mt-4 inline-flex items-center gap-2 text-xs font-semibold text-slate-300 hover:text-white">
             <RotateCcw className="h-3.5 w-3.5" />
-            Reset prediction
+            Try another prediction
           </button>
         </div>
       ) : null}
-    </div>
-  )
-}
-
-export function CapabilityExplanationDraft({
-  courseId,
-  capabilityId,
-  prompt,
-  evidenceCriteria,
-}: Readonly<{
-  courseId: string
-  capabilityId: string
-  prompt: string
-  evidenceCriteria: string[]
-}>) {
-  const storageKey = "aws-capability-explanation:v1:" + courseId + ":" + capabilityId
-  const [draft, setDraft] = useState("")
-
-  useEffect(() => {
-    setDraft(readExplanationDraft(storageKey))
-  }, [storageKey])
-
-  function updateDraft(value: string) {
-    setDraft(value)
-    writeExplanationDraft(storageKey, value)
-  }
-
-  const readyForReview = draft.trim().length >= 120
-
-  return (
-    <div>
-      <label htmlFor={capabilityId + "-explanation"} className="text-base font-semibold leading-7 text-white">
-        {prompt}
-      </label>
-      <textarea
-        id={capabilityId + "-explanation"}
-        value={draft}
-        onChange={(event) => updateDraft(event.target.value)}
-        rows={6}
-        placeholder="Teach the mechanism, decision boundary, and failure mode back in your own words…"
-        className="mt-4 w-full rounded-xl border border-slate-700 bg-slate-950/40 p-4 text-sm leading-6 text-white placeholder:text-slate-600 focus:border-violet-300 focus:outline-hidden"
-      />
-      <div className="mt-3 flex flex-wrap items-center justify-between gap-3 text-xs">
-        <span className={readyForReview ? "text-emerald-300" : "text-slate-400"}>
-          {draft.trim().length} characters · {readyForReview ? "ready for peer review" : "aim for at least 120"}
-        </span>
-        <span className="text-slate-500">Browser draft only · never include secrets or learner data</span>
-      </div>
-      <ul className="mt-4 grid gap-2 sm:grid-cols-3">
-        {evidenceCriteria.map((criterion) => (
-          <li key={criterion} className="flex items-start gap-2 rounded-lg border border-slate-700 bg-slate-950/30 p-3 text-xs text-slate-300">
-            <CheckCircle2 className="mt-0.5 h-3.5 w-3.5 shrink-0 text-emerald-300" />
-            {criterion}
-          </li>
-        ))}
-      </ul>
-      <p className="mt-4 text-xs leading-5 text-slate-500">
-        This draft is practice evidence, not automatic mastery. Keep the Java output, failure observation, peer explanation, and scored exam result together.
-      </p>
+      <label htmlFor={`${unitId}-takeaway`} className="mt-5 block text-sm font-semibold text-white">Final takeaway</label>
+      <textarea id={`${unitId}-takeaway`} value={takeaway} maxLength={4000} rows={3} onChange={(event) => {
+        setTakeaway(event.target.value)
+        writeLocal(takeawayKey, event.target.value)
+      }} className="mt-2 w-full rounded-lg border border-slate-700 bg-slate-950/40 p-3 text-sm text-slate-200" placeholder="After the lab, explain what changed in your thinking." />
     </div>
   )
 }
