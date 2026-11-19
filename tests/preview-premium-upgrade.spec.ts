@@ -29,6 +29,31 @@ async function requiredCheckoutField(page: Page, selector: string, description: 
   return field!
 }
 
+const paymentSubmitSelector = [
+  'button[data-testid="hosted-payment-submit-button"]:visible',
+  'button.SubmitButton:visible',
+  'form button[type="submit"]:visible',
+  'form input[type="submit"]:visible',
+].join(", ")
+
+function stripeCheckoutFrames(page: Page) {
+  const stripeOrigins = new Set(["https://checkout.stripe.com", "https://js.stripe.com"])
+  return page.frames().filter((frame) => URL.canParse(frame.url()) && stripeOrigins.has(new URL(frame.url()).origin))
+}
+
+async function findPaymentSubmit(page: Page) {
+  const frames = stripeCheckoutFrames(page)
+  const controls = (await Promise.all(frames.map(async (frame) => {
+    const byStructure = frame.locator(paymentSubmitSelector)
+    if (await byStructure.count() > 0) return byStructure.all()
+
+    return frame.getByRole("button", {
+      name: /\b(pay|subscribe|subscription|start(?: your)?(?: free)? trial)\b/i,
+    }).filter({ visible: true }).all()
+  }))).flat()
+  return { controls, stripeFrames: frames.length }
+}
+
 test("FREE Preview user completes hosted TEST payment and receives PREMIUM from Stripe webhook", async ({
   page,
   request,
@@ -163,10 +188,13 @@ test("FREE Preview user completes hosted TEST payment and receives PREMIUM from 
 
   // Read/verify current URL before submitting. The well-known 4242 card is only
   // ever submitted to a cs_test_ hosted session; no real charge is made.
-  const stripeSubmit = page.locator('button[data-testid="hosted-payment-submit-button"]:visible, button.SubmitButton:visible')
-  const formSubmit = page.locator('form button[type="submit"]:visible, form input[type="submit"]:visible')
-  const submit = stripeSubmit.or(formSubmit).filter({ visible: true })
-  await expect(submit, "Hosted TEST checkout must expose one payment submit control").toHaveCount(1)
+  let submit: Locator | undefined
+  await expect.poll(async () => {
+    const { controls, stripeFrames } = await findPaymentSubmit(page)
+    submit = controls.length === 1 ? controls[0] : undefined
+    return submit ? "ready" : `${controls.length} possible submit controls in ${stripeFrames} Stripe frames`
+  }, { timeout: 20_000, message: "Hosted TEST checkout must expose one payment submit control" }).toBe("ready")
+  if (!submit) throw new Error("Stripe TEST payment submit control was not found")
   await expect(submit).toBeEnabled({ timeout: 15_000 })
   assertCurrentTestCheckout()
   await submit.click()
