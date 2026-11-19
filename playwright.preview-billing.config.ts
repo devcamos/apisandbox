@@ -5,15 +5,19 @@ if (!baseURL || process.env.DEPLOYMENT_ENVIRONMENT !== "preview") {
   throw new Error("Set a deployed Preview URL and DEPLOYMENT_ENVIRONMENT=preview")
 }
 const origin = new URL(baseURL)
-if (origin.protocol !== "https:" || !origin.hostname.endsWith(".vercel.app") || origin.username || origin.password || origin.pathname !== "/" || origin.search || origin.hash) {
+if (origin.protocol !== "https:" || !origin.hostname.endsWith(".vercel.app") || origin.hostname === "apisandbox-coral.vercel.app" || origin.username || origin.password || origin.pathname !== "/" || origin.search || origin.hash) {
   throw new Error("Billing E2E requires a bare HTTPS Vercel Preview origin")
 }
 
+const previewBillingSpec = process.env.PREVIEW_BILLING_SIGNED_DIAGNOSTIC === "1"
+  ? "**/preview-billing.spec.ts"
+  : "**/preview-checkout-handoff.spec.ts"
+
 export default defineConfig({
   testDir: "./tests",
-  testMatch: process.env.PREVIEW_BILLING_SIGNED_DIAGNOSTIC === "1"
-    ? "**/preview-billing.spec.ts"
-    : "**/preview-premium-upgrade.spec.ts",
+  testMatch: process.env.PREVIEW_BILLING_LIVE_CHECKOUT === "1"
+    ? "**/preview-premium-upgrade.spec.ts"
+    : previewBillingSpec,
   workers: 1,
   retries: 0,
   forbidOnly: !!process.env.CI,

@@ -65,7 +65,15 @@ The deployed-URL workflow checks out the exact deployment SHA and runs
 `npm run test:prod`. The runner includes `test:preview:billing` only when
 `DEPLOYMENT_ENVIRONMENT=preview`; Production remains outside payment tests.
 
-The Preview billing suite checks deployed readiness and environment, then probes
+The default hosted check registers a Preview learner, exercises the checkout handoff
+with a browser fixture, and verifies both return paths. It checks that returning
+alone does not grant Premium and that the success page responds to a simulated
+subscription update. CI separately exercises the signed webhook and database
+upgrade. The hosted gate makes no payment and does not depend on Stripe's page.
+
+For an optional provider diagnostic, set `PREVIEW_BILLING_LIVE_CHECKOUT=1` with
+`npm run test:preview:billing`. The diagnostic checks deployed readiness and
+environment, then probes
 the shared webhook ingress without any Vercel bypass credentials before creating
 users or test payments. Its default ingress is
 `https://apisandbox-billing-preview.vercel.app/api/webhooks/stripe`; override with
@@ -79,6 +87,7 @@ Vercel bypass headers are stripped before external requests.
 Run against each of two branch origins:
 
 ```bash
+PREVIEW_BILLING_LIVE_CHECKOUT=1 \
 DEPLOYMENT_ENVIRONMENT=preview \
 PLAYWRIGHT_PROD_URL=https://your-preview.vercel.app \
 npm run test:preview:billing

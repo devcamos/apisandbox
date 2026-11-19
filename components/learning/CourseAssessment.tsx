@@ -3,6 +3,11 @@
 import Link from "next/link"
 import { useEffect, useMemo, useState, type FormEvent } from "react"
 import { CheckCircle2, CircleAlert, ClipboardCheck, LoaderCircle } from "lucide-react"
+import { CapabilityEvidenceExport } from "@/components/learning/CapabilityEvidenceExport"
+import { CapabilityExplanation } from "@/components/learning/CapabilityExplanation"
+import { domainRubrics, questionReviewLink } from "@/lib/learning/capability-review"
+import { evidenceKey, readEvidence, writeLocal } from "@/lib/learning/capability-evidence"
+import { updateReviewSchedule, type CheckpointKind, type ReviewSchedule } from "@/lib/learning/checkpoint-review"
 import { useSession } from "@/components/providers/SessionProvider"
 import { authApiJsonInit, authApiRequestInit, type AuthApiEnvelope } from "@/lib/auth/client-fetch"
 import type { AssessmentGrade, SanitizedAssessmentDefinition } from "@/lib/learning/api-foundations-course"
@@ -31,20 +36,45 @@ export function CourseAssessment({
   assessment,
   loginCallbackUrl = `/learn/api-foundations/${unitId}`,
   showReflection = true,
+  certificationKind,
+  evidenceTitle,
 }: Readonly<{
   courseId: string
   unitId: string
   assessment: SanitizedAssessmentDefinition
   loginCallbackUrl?: string
   showReflection?: boolean
+  certificationKind?: CheckpointKind
+  evidenceTitle?: string
 }>) {
   const { status } = useSession()
   const [answers, setAnswers] = useState<Record<string, string>>({})
   const [reflection, setReflection] = useState("")
   const [progress, setProgress] = useState<AssessmentProgress | null>(null)
+  const [resultAnswers, setResultAnswers] = useState<Record<string, string>>({})
   const [result, setResult] = useState<AssessmentResult | null>(null)
   const [loading, setLoading] = useState(false)
   const [loadError, setLoadError] = useState("")
+  const [reviewSchedule, setReviewSchedule] = useState<ReviewSchedule>({})
+  const [reviewNow, setReviewNow] = useState(0)
+  const reviewKey = evidenceKey(courseId, unitId, "recall-schedule")
+  const domainRubric = showReflection && certificationKind === "domain-exam" ? domainRubrics[unitId] : undefined
+  const dueItems = Object.entries(reviewSchedule).filter(([, item]) => item.dueAt <= reviewNow)
+  const exportButton = evidenceTitle ? (
+    <CapabilityEvidenceExport courseId={courseId} unitId={unitId} title={evidenceTitle} checkpoint={result?.result ?? (progress ? {
+      correctAnswers: progress.bestCorrectAnswers,
+      totalQuestions: progress.totalQuestions,
+      mastered: Boolean(progress.completedAt),
+    } : undefined)} />
+  ) : null
+
+  useEffect(() => {
+    if (!certificationKind) return
+    setReviewSchedule(readEvidence<ReviewSchedule>(reviewKey) ?? {})
+    setReviewNow(Date.now())
+    const timer = window.setInterval(() => setReviewNow(Date.now()), 60_000)
+    return () => window.clearInterval(timer)
+  }, [certificationKind, reviewKey])
 
   const endpoint = `/api/learning/assessments/${encodeURIComponent(courseId)}/${encodeURIComponent(unitId)}`
   const completed = useMemo(
@@ -87,7 +117,15 @@ export function CourseAssessment({
     }
 
     setResult(payload.data)
+    setResultAnswers(answers)
     setProgress(payload.data.progress)
+    if (certificationKind) {
+      const now = Date.now()
+      const next = updateReviewSchedule(readEvidence<ReviewSchedule>(reviewKey) ?? {}, certificationKind, payload.data.result.details, answers, now)
+      writeLocal(reviewKey, JSON.stringify(next))
+      setReviewSchedule(next)
+      setReviewNow(now)
+    }
   }
 
   if (status === "unauthenticated") {
@@ -99,6 +137,7 @@ export function CourseAssessment({
         <Link href={`/login?callbackUrl=${encodeURIComponent(loginCallbackUrl)}`} className="mt-4 inline-flex rounded-lg bg-violet-500 px-4 py-2 text-sm font-semibold text-white hover:bg-violet-400">
           Sign in to assess understanding
         </Link>
+        {exportButton ? <div>{exportButton}</div> : null}
       </section>
     )
   }
@@ -116,7 +155,7 @@ export function CourseAssessment({
         </div>
         {progress ? (
           <div className="rounded-lg border border-slate-700 bg-slate-950/40 px-3 py-2 text-sm text-slate-300">
-            Best: <span className="font-semibold text-white">{progress.bestCorrectAnswers}/{progress.totalQuestions}</span> · {progress.attempts} attempt{progress.attempts === 1 ? "" : "s"}
+            {progress.totalQuestions === assessment.questions.length ? "Best" : "Best on previous format"}: <span className="font-semibold text-white">{progress.bestCorrectAnswers}/{progress.totalQuestions}</span> · {progress.attempts} attempt{progress.attempts === 1 ? "" : "s"}
           </div>
         ) : null}
       </div>
@@ -131,9 +170,20 @@ export function CourseAssessment({
         </div>
       </div>
 
+      {Object.keys(reviewSchedule).length > 0 ? (
+        <div className="mt-5 rounded-lg border border-violet-400/25 bg-slate-950/40 p-3 text-sm text-slate-200">
+          <p className="font-semibold">{dueItems.length ? "Recall practice due" : "Recall practice scheduled"}</p>
+          <ul className="mt-1 space-y-1">
+            {(dueItems.length ? dueItems : Object.entries(reviewSchedule)).map(([id, item]) => (
+              <li key={id}><a href={item.href} className="text-violet-200 underline">{item.label}</a> · {item.dueAt <= reviewNow ? "due now" : `review on ${new Date(item.dueAt).toLocaleDateString()}`}</li>
+            ))}
+          </ul>
+        </div>
+      ) : null}
+
       <form onSubmit={submit} className="mt-6 space-y-6">
         {assessment.questions.map((question, questionIndex) => (
-          <fieldset key={question.id} className="rounded-xl border border-slate-700 bg-slate-950/30 p-4">
+          <fieldset key={question.id} disabled={loading} className="rounded-xl border border-slate-700 bg-slate-950/30 p-4">
             <legend className="px-1 text-sm font-semibold leading-6 text-white">{questionIndex + 1}. {question.prompt}</legend>
             <div className="mt-3 grid gap-2">
               {question.options.map((option, optionIndex) => {
@@ -149,7 +199,7 @@ export function CourseAssessment({
           </fieldset>
         ))}
 
-        {showReflection ? (
+        {showReflection && !domainRubric ? (
           <div>
             <label htmlFor={`${unitId}-reflection`} className="text-sm font-semibold text-white">Explain it back <span className="font-normal text-slate-400">(not graded or saved)</span></label>
             <p className="mt-1 text-sm text-slate-400">{assessment.reflectionPrompt}</p>
@@ -165,6 +215,13 @@ export function CourseAssessment({
         </button>
       </form>
 
+      {domainRubric ? (
+        <section className="mt-6" aria-label="Explain it back">
+          <h3 className="mb-2 text-lg font-semibold text-white">Explain it back</h3>
+          <CapabilityExplanation courseId={courseId} unitId={unitId} prompt={assessment.reflectionPrompt} criteria={domainRubric.criteria} />
+        </section>
+      ) : null}
+
       {result ? (
         <div className={`mt-6 rounded-xl border p-4 ${result.result.mastered ? "border-emerald-400/30 bg-emerald-400/10" : "border-amber-400/30 bg-amber-400/10"}`}>
           <div className="flex gap-3">
@@ -175,15 +232,22 @@ export function CourseAssessment({
             </div>
           </div>
           <ul className="mt-4 space-y-3">
-            {result.result.details.map((detail) => (
-              <li key={detail.questionId} className="rounded-lg bg-slate-950/35 p-3 text-sm text-slate-200">
-                <span className={detail.correct ? "font-semibold text-emerald-300" : "font-semibold text-amber-300"}>{detail.correct ? "Understood" : `Review: ${detail.reviewLabel}`}</span>
-                <p className="mt-1 leading-5 text-slate-300">{detail.explanation}</p>
-              </li>
-            ))}
+            {result.result.details.map((detail) => {
+              const href = certificationKind && !detail.correct
+                ? questionReviewLink(certificationKind, detail.questionId, resultAnswers[detail.questionId])
+                : undefined
+              return (
+                <li key={detail.questionId} className="rounded-lg bg-slate-950/35 p-3 text-sm text-slate-200">
+                  <span className={detail.correct ? "font-semibold text-emerald-300" : "font-semibold text-amber-300"}>{detail.correct ? "Understood" : `Review: ${detail.reviewLabel}`}</span>
+                  <p className="mt-1 leading-5 text-slate-300">{detail.explanation}</p>
+                  {href ? <a href={href} className="mt-2 inline-block text-violet-200 underline">Review this concept</a> : null}
+                </li>
+              )
+            })}
           </ul>
         </div>
       ) : null}
+      {exportButton}
     </section>
   )
 }

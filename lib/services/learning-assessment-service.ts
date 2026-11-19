@@ -143,7 +143,7 @@ export async function submitLearningUnitAssessment({
   const { progress, improved } = await prisma.$transaction(async (tx) => {
     const locked = await lockAssessmentProgress(tx, userId, courseId, unitId)
     const existing = locked[0] ?? null
-    const previousBest = existing?.bestCorrectAnswers ?? 0
+    const previousBest = existing?.totalQuestions === grading.totalQuestions ? existing.bestCorrectAnswers : 0
 
     const applyUpdate = async (current: AssessmentProgressSnapshot | null) => {
       const merged = mergeAssessmentProgress(current, {
@@ -194,7 +194,7 @@ export async function submitLearningUnitAssessment({
           })
           return {
             progress: toProgressRecord(unitId, updated),
-            improved: grading.correctAnswers > winner.bestCorrectAnswers,
+            improved: grading.correctAnswers > (winner.totalQuestions === grading.totalQuestions ? winner.bestCorrectAnswers : 0),
           }
         }
       }

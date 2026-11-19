@@ -255,11 +255,13 @@ export function AwsCertificationCourse({
             {activeUnit.certification?.kind === "domain-exam" ? (
               <div className="mt-6">
                 <CourseAssessment
+                  key={activeUnit.id}
                   courseId={course.id}
                   unitId={activeUnit.id}
                   assessment={activeUnit.assessment}
                   loginCallbackUrl={loginCallbackUrl}
                   showReflection
+                  certificationKind="domain-exam"
                 />
               </div>
             ) : null}

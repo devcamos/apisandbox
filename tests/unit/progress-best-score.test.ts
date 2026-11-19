@@ -67,6 +67,14 @@ describe("mergeAssessmentProgress", () => {
     expect(second.attempts).toBe(2)
     expect(second.completedAt).toEqual(first.completedAt)
   })
+  it("starts a new best score for an expanded exam and keeps the attempt count", () => {
+    const updated = mergeAssessmentProgress(
+      { bestCorrectAnswers: 3, totalQuestions: 3, attempts: 2, completedAt: new Date("2026-01-01") },
+      { correctAnswers: 1, totalQuestions: 10, masteryThreshold: 0.8 },
+    )
+    expect(updated).toEqual({ bestCorrectAnswers: 1, totalQuestions: 10, attempts: 3, completedAt: null })
+  })
+
 })
 
 describe("simulateConcurrentScoreWrites", () => {

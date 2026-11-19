@@ -1,3 +1,4 @@
+import { additionalAifDomainQuestions, aifDomainCheckpointQuestions } from "@/lib/learning/aif-domain-checkpoints"
 import {
   AWS_CERTIFICATION_MASTERY_THRESHOLD,
   AWS_AI_PRACTITIONER_COURSE_ID,
@@ -1115,7 +1116,16 @@ const aiPractitionerDomainExamUnits: LearningUnit[] = [
       },
     ],
   }),
-]
+].map((unit) => ({
+  ...unit,
+  assessment: {
+    ...unit.assessment,
+    questions: [
+      ...unit.assessment.questions,
+      ...additionalAifDomainQuestions(unit.id as keyof typeof aifDomainCheckpointQuestions),
+    ],
+  },
+}))
 
 const aiPractitionerUnits = AIF_C01_DOMAIN_ORDER.flatMap((domainId) => [
   ...aifC01CapabilityUnits.filter((unit) => unit.certification?.domainId === domainId),
