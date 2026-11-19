@@ -1,6 +1,7 @@
 import { randomUUID } from "node:crypto"
 import { expect, request as playwrightRequest, test, type Locator, type Page } from "@playwright/test"
 import { injectAuthToken } from "./helpers/premium-helpers"
+import { isSameStripeTestCheckout, readStripeTestCheckout, type StripeTestCheckout } from "./helpers/stripe-test-checkout"
 
 // Real hosted Stripe TEST-mode payment, including Stripe's own webhook delivery.
 // Never runs against a live Checkout session. No Stripe API/signing secrets are
@@ -26,15 +27,6 @@ async function requiredCheckoutField(page: Page, selector: string, description: 
     return field !== null
   }, { timeout: 30_000, message: `Hosted TEST checkout must expose ${description}` }).toBe(true)
   return field!
-}
-
-function assertTestCheckoutUrl(url: URL) {
-  if (
-    url.origin !== "https://checkout.stripe.com" ||
-    !/^\/c\/pay\/cs_test_[A-Za-z0-9_]+/.test(url.pathname)
-  ) {
-    throw new Error("Refusing card entry: hosted Checkout must use a cs_test_ session")
-  }
 }
 
 test("FREE Preview user completes hosted TEST payment and receives PREMIUM from Stripe webhook", async ({
@@ -102,27 +94,58 @@ test("FREE Preview user completes hosted TEST payment and receives PREMIUM from 
     await route.continue({ headers })
   })
 
-  // Upgrade redirects with window.location as soon as /api/checkout resolves, so the
-  // response body can vanish before response.json(). Status is still available; the
-  // TEST-mode session URL is asserted from the Stripe page (and again before card entry).
+  // Read the real server response before the upgrade page can navigate away.
+  const checkoutEndpoint = `${origin}/api/checkout`
+  const captured: { checkout?: StripeTestCheckout; verificationFailed?: boolean } = {}
+  await page.route(checkoutEndpoint, async (route) => {
+    if (route.request().method() !== "POST") {
+      await route.fallback()
+      return
+    }
+    const response = await route.fetch({ maxRedirects: 0 })
+    if (response.ok()) {
+      try {
+        captured.checkout = readStripeTestCheckout(await response.json())
+      } catch {
+        captured.verificationFailed = true
+        await route.fulfill({ status: 502, json: { error: "Stripe TEST session could not be verified" } })
+        return
+      }
+    }
+    await route.fulfill({ response })
+  })
+
   const checkoutResponsePromise = page.waitForResponse((response) =>
-    response.url() === `${origin}/api/checkout` && response.request().method() === "POST",
+    response.url() === checkoutEndpoint && response.request().method() === "POST",
   )
   await page.goto("/upgrade?checkout=1", { waitUntil: "domcontentloaded" })
   const checkoutResponse = await checkoutResponsePromise
+  if (captured.verificationFailed) throw new Error("Refusing card entry: the checkout response did not identify a Stripe TEST session")
   expect(checkoutResponse.status(), "Real Preview checkout must be enabled").toBe(200)
-  await page.waitForURL((url) => url.origin === "https://checkout.stripe.com", { timeout: 30_000 })
-  assertTestCheckoutUrl(new URL(page.url()))
+  const checkout = captured.checkout
+  if (!checkout) throw new Error("Refusing card entry: no Stripe TEST session was captured")
 
-  const cardNumber = await requiredCheckoutField(page,
-    'input[name="cardNumber"], input[autocomplete="cc-number"], input[placeholder="1234 1234 1234 1234"]', "card number")
-  // The guard is repeated immediately before entering test card details.
-  assertTestCheckoutUrl(new URL(page.url()))
-  await cardNumber.fill("4242424242424242")
-  await (await requiredCheckoutField(page,
-    'input[name="cardExpiry"], input[autocomplete="cc-exp"], input[placeholder="MM / YY"]', "expiry")).fill("12/35")
-  await (await requiredCheckoutField(page,
-    'input[name="cardCvc"], input[autocomplete="cc-csc"], input[placeholder="CVC"]', "security code")).fill("123")
+  const assertCurrentTestCheckout = () => {
+    if (!isSameStripeTestCheckout(new URL(page.url()), checkout)) {
+      throw new Error("Refusing card entry: the browser is not on the verified Stripe TEST session")
+    }
+  }
+
+  await expect.poll(() => isSameStripeTestCheckout(new URL(page.url()), checkout), {
+    timeout: 30_000,
+    message: "Browser must reach the verified Stripe TEST session",
+  }).toBe(true)
+
+  const cardFields = [
+    ['input[name="cardNumber"], input[autocomplete="cc-number"], input[placeholder="1234 1234 1234 1234"]', "card number", "4242424242424242"],
+    ['input[name="cardExpiry"], input[autocomplete="cc-exp"], input[placeholder="MM / YY"]', "expiry", "12/35"],
+    ['input[name="cardCvc"], input[autocomplete="cc-csc"], input[placeholder="CVC"]', "security code", "123"],
+  ] as const
+  for (const [selector, description, value] of cardFields) {
+    const field = await requiredCheckoutField(page, selector, description)
+    assertCurrentTestCheckout()
+    await field.fill(value)
+  }
 
   const name = await visibleCheckoutField(page, 'input[name="billingName"], input[autocomplete="cc-name"]')
   if (name) await name.fill("Preview Stripe Test")
@@ -140,12 +163,12 @@ test("FREE Preview user completes hosted TEST payment and receives PREMIUM from 
 
   // Read/verify current URL before submitting. The well-known 4242 card is only
   // ever submitted to a cs_test_ hosted session; no real charge is made.
-  assertTestCheckoutUrl(new URL(page.url()))
   const submit = page.getByRole("button", { name: /^(subscribe|pay|start subscription|start trial)(\b|$)/i })
   await expect(submit).toBeEnabled()
+  assertCurrentTestCheckout()
   await submit.click()
   await page.waitForURL((url) => url.origin === origin && url.pathname === "/upgrade/success", { timeout: 90_000 })
-  expect(new URL(page.url()).searchParams.get("session_id")).toMatch(/^cs_test_/)
+  expect(new URL(page.url()).searchParams.get("session_id")).toBe(checkout.sessionId)
 
   // Nothing signs or synthesizes a webhook here: Stripe must deliver the real
   // test payment event to the app's configured Preview webhook ingress.

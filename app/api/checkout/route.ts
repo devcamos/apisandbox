@@ -131,7 +131,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Checkout is unavailable" }, { status: 502 })
     }
 
-    return NextResponse.json({ url: session.url })
+    return NextResponse.json({ url: session.url, sessionId: session.id, livemode: session.livemode })
   } catch (error) {
     return handleRouteError(error)
   }
