@@ -58,7 +58,7 @@ describe("AWS certification curriculum", () => {
     expect(awsCertificationTracks.flatMap((track) => track.course.units)).toHaveLength(36)
     expect(
       awsCertificationTracks.flatMap((track) => track.course.units).flatMap((unit) => unit.assessment.questions),
-    ).toHaveLength(127)
+    ).toHaveLength(255)
     expect(getAwsCertificationTrack("associate")?.examCode).toBe("SAA-C03")
     expect(getAwsCertificationTrack("unknown")).toBeNull()
   })
@@ -136,7 +136,8 @@ describe("AWS certification curriculum", () => {
       expect(journey.explanation.evidenceCriteria.length).toBeGreaterThanOrEqual(3)
       expect(journey.platformMap.label).toBe("AWS Map")
       expect(journey.platformMap.items.length).toBeGreaterThan(0)
-      expect(unit.assessment.questions).toHaveLength(2)
+      expect(unit.assessment.questions).toHaveLength(10)
+      expect(new Set(unit.assessment.questions.map(({ prompt }) => prompt)).size).toBe(10)
     }
   })
 

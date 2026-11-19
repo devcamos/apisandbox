@@ -1,3 +1,4 @@
+import { additionalAifCapabilityQuestions } from "@/lib/learning/aif-capability-checkpoints"
 import type {
   AssessmentQuestion,
   CapabilityMasteryJourney,
@@ -122,7 +123,7 @@ function capabilityUnit(input: CapabilityInput): LearningUnit {
       title: input.title + " exam checkpoint",
       description: "Test recall and decision transfer. Opening content or finishing a video never counts as mastery.",
       reflectionPrompt: input.explanation.prompt,
-      questions: input.questions,
+      questions: [...input.questions, ...additionalAifCapabilityQuestions(input.id)],
     },
     certification: {
       kind: "capability",

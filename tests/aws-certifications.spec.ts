@@ -109,8 +109,14 @@ test.describe("AWS certification journey", () => {
     const checkpoint = page.locator("#stage-exam")
     await checkpoint.getByRole("radio", { name: "Deep learning is ML, and ML is one approach to AI" }).check()
     await checkpoint.getByRole("radio", { name: "Semantic generation is required" }).check()
+    await expect(checkpoint.locator("fieldset")).toHaveCount(10)
+    for (const question of await checkpoint.locator("fieldset").all()) {
+      if (await question.locator("input:checked").count() === 0) {
+        await question.getByRole("radio").first().check()
+      }
+    }
     await checkpoint.getByRole("button", { name: "Submit checkpoint" }).click()
-    await expect(checkpoint.getByRole("link", { name: "Review this concept" })).toHaveAttribute("href", "#stage-aws-map-row-1")
+    await expect(checkpoint.getByRole("link", { name: "Review this concept" }).and(checkpoint.locator('a[href="#stage-aws-map-row-1"]'))).toBeVisible()
     await expect(checkpoint.getByText("Recall practice scheduled")).toBeVisible()
     const download = page.waitForEvent("download")
     await checkpoint.getByRole("button", { name: "Export Capability Evidence" }).click()
@@ -125,7 +131,7 @@ test.describe("AWS certification journey", () => {
     expect(markdown).toContain("ABSTAIN")
     expect(markdown).toContain(draft)
     expect(markdown).toContain("Which approach would you reject?")
-    expect(markdown).toContain("1/2 correct (50%)")
+    expect(markdown).toContain("3/10 correct (30%)")
   })
 
   test("persists AI domain explanations and rubric feedback", async ({ page }) => {
