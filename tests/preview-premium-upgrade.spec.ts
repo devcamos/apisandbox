@@ -163,8 +163,11 @@ test("FREE Preview user completes hosted TEST payment and receives PREMIUM from 
 
   // Read/verify current URL before submitting. The well-known 4242 card is only
   // ever submitted to a cs_test_ hosted session; no real charge is made.
-  const submit = page.getByRole("button", { name: /^(subscribe|pay|start subscription|start trial)(\b|$)/i })
-  await expect(submit).toBeEnabled()
+  const stripeSubmit = page.locator('button[data-testid="hosted-payment-submit-button"]:visible, button.SubmitButton:visible')
+  const formSubmit = page.locator('form button[type="submit"]:visible, form input[type="submit"]:visible')
+  const submit = stripeSubmit.or(formSubmit).filter({ visible: true })
+  await expect(submit, "Hosted TEST checkout must expose one payment submit control").toHaveCount(1)
+  await expect(submit).toBeEnabled({ timeout: 15_000 })
   assertCurrentTestCheckout()
   await submit.click()
   await page.waitForURL((url) => url.origin === origin && url.pathname === "/upgrade/success", { timeout: 90_000 })
