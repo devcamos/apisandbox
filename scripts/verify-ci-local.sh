@@ -95,7 +95,7 @@ export STRIPE_PRICE_ID="${STRIPE_PRICE_ID:-price_e2e_premium_signup}"
 bash scripts/prepare-smoke-standalone.sh
 PLAYWRIGHT_JSON_OUTPUT_NAME=reports/playwright-smoke.json \
 PLAYWRIGHT_JUNIT_OUTPUT_NAME=reports/playwright-smoke-junit.xml \
-  npx playwright test tests/ci-smoke.spec.ts tests/premium-signup.spec.ts --project=chromium --reporter=line
+  npx playwright test tests/ci-smoke.spec.ts tests/premium-signup.spec.ts tests/preview-checkout-handoff.spec.ts --project=chromium --reporter=line
 
 ok "e2e smoke"
 

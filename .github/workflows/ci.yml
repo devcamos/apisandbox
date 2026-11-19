@@ -307,7 +307,7 @@ jobs:
           NEXT_PUBLIC_APP_URL: http://127.0.0.1:4000
         run: |
           mkdir -p reports
-          PLAYWRIGHT_JSON_OUTPUT_NAME=reports/playwright-smoke.json PLAYWRIGHT_JUNIT_OUTPUT_NAME=reports/playwright-smoke-junit.xml npx playwright test tests/ci-smoke.spec.ts tests/premium-signup.spec.ts tests/mobile-drawer-scroll.spec.ts --project=chromium --reporter=json,junit
+          PLAYWRIGHT_JSON_OUTPUT_NAME=reports/playwright-smoke.json PLAYWRIGHT_JUNIT_OUTPUT_NAME=reports/playwright-smoke-junit.xml npx playwright test tests/ci-smoke.spec.ts tests/premium-signup.spec.ts tests/preview-checkout-handoff.spec.ts tests/mobile-drawer-scroll.spec.ts --project=chromium --reporter=json,junit
 
       # iPhone Safari regression: mobile nav drawer must scroll (WebKit, iPhone 12 profile).
       - name: Run mobile drawer E2E (Mobile Safari / WebKit)
