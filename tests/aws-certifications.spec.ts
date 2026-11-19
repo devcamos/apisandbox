@@ -97,12 +97,24 @@ test.describe("AWS certification journey", () => {
     await page.getByRole("button", { name: "Check recovery" }).click()
     await expect(page.getByText("Recovery passed", { exact: true })).toBeVisible()
 
-    const explanation = page.locator("#stage-explain").getByRole("textbox")
+    const explainStage = page.locator("#stage-explain")
+    await expect(explainStage.getByText("Card 1 of 4")).toBeVisible()
+    const flashcardAnswer = explainStage.getByText("Rules encode decisions directly.", { exact: false })
+    await expect(flashcardAnswer).toBeHidden()
+    await explainStage.getByRole("button", { name: "Show answer" }).click()
+    await expect(flashcardAnswer).toBeVisible()
+    await explainStage.getByRole("button", { name: "Next card" }).click()
+    await expect(explainStage.getByText("Card 2 of 4")).toBeVisible()
+    await expect(explainStage.getByRole("button", { name: "Show answer" })).toBeVisible()
+    await explainStage.getByText("Write a graded explanation", { exact: true }).click()
+
+    const explanation = explainStage.getByRole("textbox")
     const draft = "AI includes ML and layered neural networks. Stable audit policy is best encoded in rules."
     await explanation.fill(draft)
     await page.getByRole("button", { name: "Check explanation" }).click()
     await expect(page.getByText("Which approach would you reject?")).toBeVisible()
     await page.reload()
+    await explainStage.getByText("Write a graded explanation", { exact: true }).click()
     await expect(explanation).toHaveValue(draft)
     await expect(page.getByText("Which approach would you reject?")).toBeVisible()
 

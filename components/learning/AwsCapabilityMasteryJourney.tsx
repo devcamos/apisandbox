@@ -14,6 +14,7 @@ import {
   Wrench,
 } from "lucide-react"
 import { CapabilityPrediction } from "@/components/learning/CapabilityPractice"
+import { CapabilityFlashcards } from "@/components/learning/CapabilityFlashcards"
 import { CapabilityExplanation } from "@/components/learning/CapabilityExplanation"
 import { CapabilityModuleProgress, CapabilityStageCheckbox } from "@/components/learning/CapabilityModuleProgress"
 import { CapabilityLab } from "@/components/learning/CapabilityLab"
@@ -193,8 +194,19 @@ export function AwsCapabilityMasteryJourney({
           <CapabilityLab courseId={courseId} unitId={unit.id} stage="break" />
         </Stage>
 
-        <Stage id="explain" title="Explain" subtitle="Teach the decision back and expose gaps.">
-          <CapabilityExplanation courseId={courseId} unitId={unit.id} prompt={content.explanation.prompt} criteria={content.explanation.evidenceCriteria} />
+        <Stage id="explain" title="Explain" subtitle="Answer each flashcard aloud before revealing it.">
+          <CapabilityFlashcards key={unit.id} cards={[
+            { prompt: "How does this capability work?", answer: [content.mechanism] },
+            { prompt: "When would you choose this approach?", answer: content.decision.useWhen },
+            { prompt: "When would you avoid it, and what could you use instead?", answer: [...content.decision.avoidWhen, content.decision.alternatives.join(" · ")] },
+            { prompt: "Which trade-offs would you explain to a teammate?", answer: content.tradeOffs },
+          ]} />
+          <details className="mt-5 rounded-xl border border-slate-700 p-4">
+            <summary className="cursor-pointer text-sm font-semibold text-violet-200">Write a graded explanation</summary>
+            <div className="mt-4">
+              <CapabilityExplanation courseId={courseId} unitId={unit.id} prompt={content.explanation.prompt} criteria={content.explanation.evidenceCriteria} />
+            </div>
+          </details>
         </Stage>
 
         <Stage id="aws-map" title="AWS Map" subtitle="Map the invariant to AWS only after understanding it.">
