@@ -15,6 +15,7 @@ import {
 } from "lucide-react"
 import { CapabilityPrediction } from "@/components/learning/CapabilityPractice"
 import { CapabilityExplanation } from "@/components/learning/CapabilityExplanation"
+import { CapabilityModuleProgress, CapabilityStageCheckbox } from "@/components/learning/CapabilityModuleProgress"
 import { CapabilityLab } from "@/components/learning/CapabilityLab"
 import { CourseAssessment } from "@/components/learning/CourseAssessment"
 import { CAPABILITY_MASTERY_STAGES, type SanitizedLearningUnit } from "@/lib/learning/api-foundations-course"
@@ -59,6 +60,7 @@ function Stage({
         </div>
       </div>
       <div className="mt-6">{children}</div>
+      <CapabilityStageCheckbox id={id} title={title} />
     </section>
   )
 }
@@ -105,19 +107,7 @@ export function AwsCapabilityMasteryJourney({
         </div>
       </div>
 
-      <nav aria-label="Capability mastery stages" className="mt-6 overflow-x-auto pb-2">
-        <ol className="flex min-w-max gap-2">
-          {CAPABILITY_MASTERY_STAGES.map((stage, index) => (
-            <li key={stage.id}>
-              <a href={"#stage-" + stage.id} className="inline-flex items-center gap-2 rounded-full border border-slate-700 bg-slate-900/70 px-3 py-2 text-xs font-semibold text-slate-300 hover:border-violet-400/50 hover:text-white">
-                <span className="text-violet-300">{index + 1}</span>{stage.label}
-              </a>
-            </li>
-          ))}
-        </ol>
-      </nav>
-
-      <div className="mt-4 space-y-5">
+      <CapabilityModuleProgress courseId={courseId} unitId={unit.id}>
         <Stage id="problem" title="Problem" subtitle="Start with the consequence before vocabulary or services.">
           <p className="text-base leading-7 text-slate-200">{content.problem}</p>
           <div className="mt-4 rounded-xl border border-slate-700 bg-slate-950/35 p-4">
@@ -229,7 +219,7 @@ export function AwsCapabilityMasteryJourney({
           <CourseAssessment courseId={courseId} unitId={unit.id} assessment={unit.assessment} loginCallbackUrl={loginCallbackUrl} showReflection={false} certificationKind="capability" evidenceTitle={unit.title} />
           <p className="mt-4 text-xs leading-5 text-slate-500">Passing records the scored checkpoint for {trackSlug}. Your export also includes the practical evidence you collected.</p>
         </Stage>
-      </div>
+      </CapabilityModuleProgress>
     </div>
   )
 }

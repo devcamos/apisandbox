@@ -78,8 +78,9 @@ export function mergeAssessmentProgress(
   attempt: AssessmentAttemptScore,
 ): AssessmentProgressSnapshot {
   const now = attempt.attemptedAt ?? new Date()
+  const comparable = existing?.totalQuestions === attempt.totalQuestions ? existing : null
   const bestCorrectAnswers = Math.max(
-    existing?.bestCorrectAnswers ?? 0,
+    comparable?.bestCorrectAnswers ?? 0,
     attempt.correctAnswers,
   )
   const mastered = isAssessmentMastered(
@@ -92,7 +93,7 @@ export function mergeAssessmentProgress(
     bestCorrectAnswers,
     totalQuestions: attempt.totalQuestions,
     attempts: (existing?.attempts ?? 0) + 1,
-    completedAt: mastered ? existing?.completedAt ?? now : null,
+    completedAt: mastered ? comparable?.completedAt ?? now : null,
   }
 }
 

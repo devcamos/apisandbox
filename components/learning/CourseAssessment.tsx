@@ -155,7 +155,7 @@ export function CourseAssessment({
         </div>
         {progress ? (
           <div className="rounded-lg border border-slate-700 bg-slate-950/40 px-3 py-2 text-sm text-slate-300">
-            Best: <span className="font-semibold text-white">{progress.bestCorrectAnswers}/{progress.totalQuestions}</span> · {progress.attempts} attempt{progress.attempts === 1 ? "" : "s"}
+            {progress.totalQuestions === assessment.questions.length ? "Best" : "Best on previous format"}: <span className="font-semibold text-white">{progress.bestCorrectAnswers}/{progress.totalQuestions}</span> · {progress.attempts} attempt{progress.attempts === 1 ? "" : "s"}
           </div>
         ) : null}
       </div>
