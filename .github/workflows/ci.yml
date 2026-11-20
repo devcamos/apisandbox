@@ -315,40 +315,15 @@ jobs:
           CI_E2E_USE_PROD_SERVER: "1"
           VERCEL_ENV: preview
           NEXT_PUBLIC_APP_URL: http://127.0.0.1:4000
-        run: npx playwright test tests/mobile-drawer-scroll.spec.ts --project="Mobile Safari" --reporter=list
+        run: PLAYWRIGHT_JSON_OUTPUT_FILE=reports/playwright-smoke-webkit.json npx playwright test tests/mobile-drawer-scroll.spec.ts --project="Mobile Safari" --reporter=list,json
 
       - name: Publish smoke test summary
         if: always()
         run: |
-          node <<'EOF'
-          const fs = require("fs")
-          const path = "reports/playwright-smoke.json"
-          const summaryFile = process.env.GITHUB_STEP_SUMMARY
-
-          if (!fs.existsSync(path)) {
-            fs.appendFileSync(summaryFile, "## E2E smoke tests\n\nNo Playwright smoke report was generated.\n")
-            process.exit(0)
-          }
-
-          const report = JSON.parse(fs.readFileSync(path, "utf8"))
-          const stats = report.stats || {}
-          const passed = stats.expected ?? 0
-          const failed = stats.unexpected ?? 0
-          const flaky = stats.flaky ?? 0
-          const skipped = stats.skipped ?? 0
-          const total = passed + failed + flaky + skipped
-
-          const lines = [
-            "## E2E smoke tests",
-            "",
-            `- Passed: ${passed}`,
-            `- Failed: ${failed}`,
-            `- Flaky: ${flaky}`,
-            `- Skipped: ${skipped}`,
-            `- Total: ${total}`,
-            `- Duration: ${Math.round((stats.duration ?? 0) / 1000)}s`,
-          ]
-          fs.appendFileSync(summaryFile, `${lines.join("\n")}\n`)
+          node --input-type=module <<'EOF'
+          import { publishPlaywrightRunSummary } from "./scripts/playwright-run-summary.mjs"
+          publishPlaywrightRunSummary("E2E smoke tests (Chromium)", "reports/playwright-smoke.json")
+          publishPlaywrightRunSummary("E2E smoke tests (Mobile Safari)", "reports/playwright-smoke-webkit.json")
           EOF
 
       - name: Publish smoke test check
