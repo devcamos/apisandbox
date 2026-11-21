@@ -57,6 +57,32 @@ jobs:
       - name: Verify deployed database and authentication
         run: node scripts/vercel-deployment-e2e.mjs
 
+      # Durable Preview schema path: when PREVIEW_DATABASE_URL is configured, apply
+      # pending migrations to the isolated Preview DB before registration E2E.
+      # Production deployments never enter this step. Secrets must be the Supabase
+      # Preview project only — never Neon Production. See docs/DEPLOYMENT.md.
+      # repository_dispatch loads this workflow from main; the checkout is the
+      # deployment SHA (may predate migrate-on-preview.mjs), so fall back to main's helper.
+      - name: Apply pending Preview migrations (isolated Preview DB only)
+        if: env.DEPLOYMENT_ENVIRONMENT == 'preview'
+        env:
+          CONFIRM_PREVIEW_MIGRATE: "YES"
+          DATABASE_URL: ${{ secrets.PREVIEW_DATABASE_URL }}
+          DIRECT_URL: ${{ secrets.PREVIEW_DIRECT_URL }}
+          VERCEL_ENV: preview
+          ENVIRONMENT: preview
+        run: |
+          if [ -z "${DATABASE_URL}" ]; then
+            echo "::warning::PREVIEW_DATABASE_URL is unset — skipping Preview migrate. If register returns 503 configuration_error, run workflow Preview DB migrate (or npm run db:migrate:preview) against the isolated Preview DB only."
+            exit 0
+          fi
+          if [ ! -f scripts/migrate-on-preview.mjs ]; then
+            echo "Loading scripts/migrate-on-preview.mjs from origin/main for this deployment SHA"
+            git fetch origin main --depth=1
+            git checkout origin/main -- scripts/migrate-on-preview.mjs
+          fi
+          node scripts/migrate-on-preview.mjs
+
       - name: Install Playwright Chromium
         if: env.DEPLOYMENT_ENVIRONMENT != 'production'
         run: npx playwright install chromium --with-deps

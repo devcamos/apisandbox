@@ -14,7 +14,16 @@ test.describe("Production deployment auth", () => {
     const register = await request.post("/api/auth/register", {
       data: { email, password, firstName: "Prod", lastName: "E2E" },
     })
-    expect(register.ok()).toBeTruthy()
+    if (!register.ok()) {
+      const body = await register.text()
+      const schemaDriftHint =
+        register.status() === 503 && /configuration_error|temporarily unavailable/i.test(body)
+          ? " Preview schema may be behind (e.g. missing UserSession). Apply pending migrations to the isolated Preview DB only: CONFIRM_PREVIEW_MIGRATE=YES npm run db:migrate:preview (never Production)."
+          : ""
+      throw new Error(
+        `POST /api/auth/register failed: HTTP ${register.status()} ${body.slice(0, 500)}.${schemaDriftHint}`,
+      )
+    }
 
     await page.goto("/login", { waitUntil: "domcontentloaded" })
     await dismissCookieBanner(page)
